@@ -1,0 +1,4 @@
+---
+- name: reload ferm
+#  service: name=ferm state=reloaded
+  shell: service ferm force-reload

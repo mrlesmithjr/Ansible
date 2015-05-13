@@ -1,0 +1,36 @@
+---
+
+# Ensure ferm is installed (Debian)
+- name: ensuring ferm is installed
+  apt: name=ferm state=present
+  when: ansible_os_family == "Debian"
+
+- name: ensuring ferm is installed (RedHat)
+  yum: name=ferm state=present
+  when: ansible_os_family == "RedHat"
+
+# Ensure ferm is started and enabled
+- name: ensuring ferm is started and enabled
+  service: name=ferm state=started enabled=yes
+
+- name: removing ferm directory
+  file: path=/etc/ferm state=absent
+
+- name: creating ferm directory
+  file: path=/etc/ferm state=directory owner=root group=root mode=0700
+
+- name: creating ferm configuration directory
+  file: path=/etc/ferm/ferm.d state=directory owner=root group=root mode=0700
+
+- name: uploading ferm configuration
+  copy: dest=/etc/ferm/ferm.conf src=ferm.conf owner=root group=root mode=0700
+  notify: run ferm
+
+- name: creating symlink for RedHat based installs
+  file: src=/etc/ferm/ferm.conf dest=/etc/ferm.conf owner=root group=root mode=0700 state=link
+  notify: run ferm
+  when: ansible_os_family == "RedHat"
+
+# Ensure ferm is started and enabled
+- name: ensuring ferm is started and enabled
+  service: name=ferm state=started enabled=yes

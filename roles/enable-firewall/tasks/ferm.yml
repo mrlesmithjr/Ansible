@@ -1,0 +1,38 @@
+---
+
+# Ensure ferm is installed (Debian)
+- name: ensuring ferm is installed
+  apt: name=ferm state=present
+  when: ansible_os_family == "Debian"
+
+- name: ensuring ferm is installed (RedHat)
+  yum: name=ferm state=present
+  when: ansible_os_family == "RedHat"
+
+- name: creating ferm directory
+  file: path=/etc/ferm state=directory owner=root group=root mode=0700
+
+- name: creating ferm configuration directory
+  file: path=/etc/ferm/ferm.d state=directory owner=root group=root mode=0700
+
+- name: uploading ferm configuration
+  copy: dest=/etc/ferm/ferm.conf src=ferm.conf owner=root group=root mode=0700
+  notify: reload ferm
+
+- name: creating symlink for RedHat based installs
+  file: src=/etc/ferm/ferm.conf dest=/etc/ferm.conf owner=root group=root mode=0700 state=link
+  notify: reload ferm
+  when: ansible_os_family == "RedHat"
+
+- name: uploading nat_masquerade rule
+  template: src=ferm.d/10-masquerade_nat.conf.j2 dest=/etc/ferm/ferm.d/10-masquerade_nat.conf owner=root group=root mode=0700
+  notify: reload ferm
+  when: nat_masquerade
+
+- name: uploading ferm block configuration
+  template: src=ferm.d/999-final_block_rules.conf.j2 dest=/etc/ferm/ferm.d/999-final_block_rules.conf owner=root group=root mode=0700
+  notify: reload ferm
+
+# Ensure ferm is started and enabled
+- name: ensuring ferm is started and enabled
+  service: name=ferm state=started enabled=yes

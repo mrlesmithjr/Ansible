@@ -1,0 +1,4 @@
+---
+# Install default apache2
+- name: debian | installing apache2 package
+  apt: name=apache2 state=present

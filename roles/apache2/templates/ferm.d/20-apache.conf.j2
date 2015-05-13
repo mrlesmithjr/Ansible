@@ -1,0 +1,10 @@
+# Allow apache ports
+table filter{
+    chain APACHE-Allowed;
+    chain INPUT {
+        proto tcp dport (80 443) jump APACHE-Allowed;
+    }
+    chain APACHE-Allowed {
+        proto tcp dport (80 443) mod state state NEW jump LOGGING-Allowed;
+    }
+}

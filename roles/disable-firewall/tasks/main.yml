@@ -1,0 +1,4 @@
+# Open firewall ports
+- include: ferm.yml
+  tags: [ferm]
+  when: enable_firewall != true

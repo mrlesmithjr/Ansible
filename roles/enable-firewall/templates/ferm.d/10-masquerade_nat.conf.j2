@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# Allow NAT Masquerading
+table nat{
+    chain POSTROUTING {
+         outerface {{ pri_bind_interface }} SNAT to {{ keepalived_vip }};
+    }
+}

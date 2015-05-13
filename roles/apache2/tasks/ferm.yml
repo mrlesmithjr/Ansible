@@ -1,0 +1,19 @@
+---
+
+# Ensure ferm is installed (Debian)
+- name: ferm | ensuring ferm is installed
+  apt: name=ferm state=present
+  when: ansible_os_family == "Debian"
+
+- name: ferm | ensuring ferm is installed (RedHat)
+  yum: name=ferm state=present
+  when: ansible_os_family == "RedHat"
+
+# Ensure ferm is started and enabled
+- name: ferm | ensuring ferm is started and enabled
+  service: name=ferm state=started enabled=yes
+
+# Open firewall ports
+- name: ferm | opening apache firewall ports
+  template: src=ferm.d/20-apache.conf.j2 dest=/etc/ferm/ferm.d/20-apache.conf owner=root group=root mode=0700
+  notify: run ferm

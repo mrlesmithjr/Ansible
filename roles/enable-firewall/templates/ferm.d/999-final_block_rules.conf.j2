@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+# ferm base configuration drop-rules
+domain ip {
+    table filter {
+        chain INPUT {
+            policy DROP;
+            mod state state INVALID jump LOGGING-Dropped;
+            jump LOGGING-Dropped;
+        }
+        chain FORWARD {
+            policy DROP;
+            jump LOGGING-Dropped;
+        }
+        chain LOGGING-Dropped {
+            mod limit limit 2/min LOG log-prefix 'IPTables-Dropped: ';
+#            REJECT reject-with icmp-proto-unreachable;
+            DROP;
+        }
+    }
+}
