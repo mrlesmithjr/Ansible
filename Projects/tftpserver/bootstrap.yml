@@ -1,0 +1,7 @@
+---
+- include: ../../playbooks/bootstrap.yml
+  vars:
+    create_cust_account: false
+    cust_account: 'replace_user'
+    cust_password: 'replace_password'
+    cust_ssh_key_file: 'replace_key_file'

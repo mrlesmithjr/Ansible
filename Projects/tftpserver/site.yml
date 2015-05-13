@@ -1,0 +1,8 @@
+---
+- hosts: all
+  sudo: yes
+  roles:
+    - { role: disable-firewall, when: enable_firewall == 'false' }
+    - { role: enable-firewall, when: enable_firewall == 'true' }
+#    - base
+    - { role: tftp-server, when: enable_tftp }

@@ -1,0 +1,58 @@
+---
+enable_firewall: false
+
+update_dhcpclient_conf: true
+config_eth1: false      # set to false to not configure eth1
+config_dnsmasq: true   # set to false to not configure dnsmasq
+enable_tftp: true
+config_tftp: true
+sync_tftp: false
+setup_tftp_images: true
+
+# sets up networking
+pri_bind_interface: 'eth0' # should be set to your primary interface --- assumes using DHCP
+pri_interface_method: 'dhcp'
+pri_bind_address: '{{ ansible_eth0.ipv4.address }}'
+pri_netmask: ''
+pri_netmask_cidr: ''
+pri_network: ''
+pri_gateway: ''
+pri_dns: '10.0.101.111'
+sec_bind_interface: '' # should be set to your secondary interface - which is providing DHCP and TFTP services
+sec_bind_address: ''
+sec_netmask: ''
+sec_network: ''
+sec_gateway: ''
+sec_dns: '10.0.101.112'
+dns_nameservers: '{{ pri_dns }} {{ sec_dns }}'
+dns_search: '{{ pri_domain_name}} {{ dnsmasq_domain }}'
+
+# DNSMasq configurations
+no_dhcp_bind_int: '{{ pri_bind_interface }}' # change to interface that you do not want DHCP listening on - useful in cases where DHCP services are provided elsewhere
+time_server: '10.10.10.1'
+pri_domain_name: 'everythingshouldbevirtual.local' # set to your primary domain name
+dnsmasq_domain: 'cloud.everythingshouldbevirtual.local' # use for provisioning of secondary domain for your cloud
+domain_suffix_search: '{{ pri_domain_name }},{{ dnsmasq_domain }}'
+#dhcp_range: '10.0.110.128,10.0.110.224,{{ pri_netmask }}'
+dhcp_boot: 'pxelinux.0,{{ inventory_hostname }},{{ pri_bind_address }}'
+netboot_url: 'http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot/'
+netboot_file: 'netboot.tar.gz'
+tftpboot_dir: '/var/lib/tftpboot'
+dnsmasq_nameservers:
+  - '{{ pri_dns }}'
+  - '{{ sec_dns }}'
+
+# preseed.cfg defaults
+domain_name: '{{ pri_domain_name }}'              # your primary domain name or secondary domain name - whichever suits your requirements
+root_pw: '$1$L1LMelLz$d38b34LHC62rcAlVbDJtj1'     # use echo "password" | mkpasswd -s -5
+bind_address: '{{ pri_bind_address }}'            # sets to your sec_bind_address - change to pri_bind_address if you are setting TFTP on your primary interface
+
+tftp_images_folders:
+  - { folder: 'ESXi/5.1' }
+  - { folder: 'ESXi/5.1U1' }
+  - { folder: 'ESXi/5.1U2' }
+  - { folder: 'ESXi/5.5' }
+  - { folder: 'ESXi/5.5U1' }
+  - { folder: 'ESXi/5.5U2' }
+  - { folder: 'ESXi/5.5U3' }
+  - { folder: 'ESXi/6.0' }

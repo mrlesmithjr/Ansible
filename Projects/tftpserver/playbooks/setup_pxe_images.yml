@@ -1,0 +1,18 @@
+---
+- hosts: all
+  vars:
+    - templates_path: '../templates{{ tftpboot_dir }}/pxelinux.cfg'
+    - pxe_items:
+        - { src: '{{ templates_path }}/default.j2', dest: '{{ tftpboot_dir }}/pxelinux.cfg/default' }
+        - { src: '{{ templates_path }}/pxe.conf.j2', dest: '{{ tftpboot_dir }}/pxelinux.cfg/pxe.conf' }
+        - { src: '{{ templates_path }}/conf/ESXi_Interactive.menu.j2', dest: '{{ tftpboot_dir }}/pxelinux.cfg/conf/ESXi_Interactive.menu' }
+  tasks:
+    - name: setup_pxe_images | config | sync images folders
+      synchronize: src=../images dest={{ tftpboot_dir }} recursive=yes
+    - name: setup_pxe_images | config | creating conf folder
+      file: path={{ tftpboot_dir }}/pxelinux.cfg/conf state=directory
+    - name: setup_pxe_images | config | copying new pxe boot menus
+      template: src={{ item.src }} dest={{ item.dest }} mode=0644
+      with_items: pxe_items
+    - name: setup_pxe_images | config | resetting permissions
+      file: path={{ tftpboot_dir }} state=directory recurse=yes owner=nobody group=nogroup

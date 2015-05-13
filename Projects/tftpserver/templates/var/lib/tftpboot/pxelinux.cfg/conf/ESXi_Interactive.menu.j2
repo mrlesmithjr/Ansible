@@ -1,0 +1,26 @@
+# {{ ansible_managed }}
+
+DEFAULT vesamenu.c32
+TIMEOUT 600
+ONTIMEOUT BootLocal
+PROMPT 0
+MENU INCLUDE pxelinux.cfg/pxe.conf
+NOESCAPE 1
+LABEL MainMenu
+        MENU LABEL ^Return to Main Menu
+        KERNEL ubuntu-installer/amd64/boot-screens/vesamenu.c32
+        APPEND pxelinux.cfg/default
+LABEL ESXi 5.5U2 Installer
+        KERNEL /images/ESXi/5.5U2/mboot.c32
+        APPEND -c /images/ESXi/5.5U2/boot.cfg
+        MENU LABEL ESXi-5.5U2 Installer
+        TEXT HELP
+        Install ESXi5.5U2
+        ENDTEXT
+LABEL ESXi 6.0 Installer
+        KERNEL /images/ESXi/6.0/mboot.c32
+        APPEND -c /images/ESXi/6.0/boot.cfg
+        MENU LABEL ESXi-6.0 Installer
+        TEXT HELP
+        Install ESXi6.0
+        ENDTEXT

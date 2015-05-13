@@ -1,0 +1,39 @@
+- hosts: all
+  gather_facts: false
+  connection: local
+  vars:
+    vcenter_hostname: 'vcsa.everythingshouldbevirtual.local'
+    vcenter_user: 'root'
+    datacenter: 'everythingshouldbevirtual'
+    esxi_host: 'esxi01.everythingshouldbevirtual.local'
+    notes: 'Created by Ansible'
+    vm_state: 'present'
+    vm_task_action: 'none' # none|create|create_from_template|reconfigure
+    cluster: 'HA-DRS-CLUSTER'
+    resource_pool: '/Resources'
+  vars_prompt:
+    - name: 'vcenter_pass'
+      prompt: 'Enter vcenter password to build VMs'
+      private: yes
+  tasks:
+    - name: reconfiguring vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        force: yes
+        state: reconfigured
+        vm_extra_config:
+          notes: "{{ notes }}"
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          scsi: paravirtual
+        vm_disk:
+          disk1:
+            size_gb: "{{ disk1 }}"
+            datastore: "{{ datastore }}"
+          disk2:
+            size_gb: "{{ disk2 }}"
+            datastore: "{{ datastore }}"

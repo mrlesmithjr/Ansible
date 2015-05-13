@@ -1,0 +1,1 @@
+tftpbuild-serv  ansible_ssh_host=10.0.101.172

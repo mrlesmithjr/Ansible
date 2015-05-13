@@ -1,0 +1,20 @@
+---
+# provision environment
+
+- include: "../../playbooks/provision_vms.yml"
+  vars:
+    vcenter_hostname: 'vcsa.everythingshouldbevirtual.local'
+    vcenter_user: 'root'
+    datacenter: 'everythingshouldbevirtual'
+    esxi_host: 'esxi01.everythingshouldbevirtual.local'
+    notes: 'Created by Ansible'
+    vm_state: 'present'
+    vm_task_action: 'none' # none|create|create_from_template|reconfigure
+    cluster: 'HA-DRS-CLUSTER'
+    resource_pool: '/Resources'
+    
+- include: "../../playbooks/gather_vm_details.yml"
+  vars:
+    vcenter_hostname: 'vcsa.everythingshouldbevirtual.local'
+    vcenter_user: 'root'
+
