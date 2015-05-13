@@ -1,0 +1,11 @@
+---
+# Open firewall ports
+- include: ferm.yml
+  tags: [ferm]
+  when: enable_firewall
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_tftp.yml
+  when: config_tftp

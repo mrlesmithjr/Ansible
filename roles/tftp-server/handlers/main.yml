@@ -1,0 +1,15 @@
+---
+- name: reload ferm
+  service: name=ferm state=reloaded
+
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted
+
+- name: restart tftpd-hpa
+  service: name=tftpd-hpa state=restarted
+
+- name: enable network
+  command: bash -c "ifdown {{ pri_bind_interface }} && ifup {{ pri_bind_interface }} && ifdown {{ sec_bind_interface }} && ifup {{ sec_bind_interface }}"

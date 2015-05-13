@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+menuentry "Install Ubuntu" {
+set gfxpayload=keep
+linux /ubuntu-installer/amd64/linux gfxpayload=800x600x16,800x600 -- quiet
+initrd /ubuntu-installer/amd64/initrd.gz
+}

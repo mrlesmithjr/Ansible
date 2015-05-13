@@ -1,0 +1,135 @@
+---
+- name: debian | config | configuring network interfaces
+  template: src=etc/network/interfaces.j2 dest=/etc/network/interfaces owner=root group=root mode=0644
+  when: pri_interface_method == "static" and sec_bind_interface is defined
+
+- name: config_tftp | checking to see if tftpboot_dir exists
+  stat: path={{ tftpboot_dir }}
+  register: tftpboot_dir_stat
+
+- name: config_tftp | creating tftpboot_dir
+  file: path={{ tftpboot_dir }} state=directory
+  when: tftpboot_dir_stat.stat.exists != true
+
+- name: checking to see if tftpboot has already been moved
+  stat: path={{ tftpboot_backup_dir }}
+  register: tftpboot_backup_moved
+  when: tftpboot_backup_dir is defined
+
+- name: moving existing tftpboot
+  command: mv {{ tftpboot_home }} {{ tftpboot_backup_dir }}
+  when: tftpboot_backup_dir is defined and (tftpboot_backup_moved.stat.exists != true) and config_tftp and sync_tftp
+
+- name: checking again if tftpboot has already been moved
+  stat: path={{ tftpboot_backup_dir }}
+  register: tftpboot_backup_stat
+  when: tftpboot_backup_dir is defined
+
+- name: touching file in tftpboot_backup_dir
+  file: path={{ tftpboot_backup_dir }}/already_moved state=touch
+  when: tftpboot_backup_dir is defined and (tftpboot_backup_stat.stat.exists == true) and config_tftp and sync_tftp
+
+- name: mounting gluster volumes - tftpboot
+  mount: name={{ item.mountpoint }} src={{ item.src }} fstype={{ item.fstype }} opts={{ item.options }} state=mounted
+  with_items:
+    - { mountpoint: '{{ tftpboot_home }}', src: '{{ primary_gfs_server }}:/{{ tftpboot_mnt }}', fstype: 'glusterfs', options: 'defaults,_netdev,backupvolfile-server={{ secondary_gfs_server }}' }
+  when: config_tftp and sync_tftp
+
+- name: debian | check if netboot has already been downloaded
+  stat: path={{ tftpboot_dir }}/netboot_present
+  register: netboot_present
+
+- name: debian | install | downloading netboot
+  get_url: url={{ netboot_url }}{{ netboot_file }} dest={{ tftpboot_dir }}/{{ netboot_file }}
+  when: (netboot_present.stat.exists != true) and sync_tftp != true
+
+- name: debian | install | downloading netboot
+  get_url: url={{ netboot_url }}{{ netboot_file }} dest={{ tftpboot_dir }}/{{ netboot_file }}
+  run_once: true
+  when: (netboot_present.stat.exists != true) and config_tftp and sync_tftp
+
+- name: debian | install | extracting netboot
+  shell: "tar zxvf {{ tftpboot_dir }}/{{ netboot_file }} -C {{ tftpboot_dir }}"
+  when: (netboot_present.stat.exists != true) and sync_tftp != true
+
+- name: debian | install | extracting netboot
+  shell: "tar zxvf {{ tftpboot_dir }}/{{ netboot_file }} -C {{ tftpboot_dir }}"
+  run_once: true
+  when: (netboot_present.stat.exists != true) and config_tftp and sync_tftp
+
+- name: debian | config | marking as netboot already downloaded
+  file: path={{ tftpboot_dir }}/netboot_present state=touch
+  when: config_tftp
+
+- name: debian | config | creating grub.cfg for installs
+  template: src=var/lib/tftpboot/grub.cfg.j2 dest={{ tftpboot_dir }}/grub.cfg owner=root group=root mode=0644
+  when: sync_tftp != true
+
+- name: debian | config | creating grub.cfg for installs
+  template: src=var/lib/tftpboot/grub.cfg.j2 dest={{ tftpboot_dir }}/grub.cfg owner=root group=root mode=0644
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | creating preseed.cfg for auto-installs
+  template: src=var/lib/tftpboot/preseed.cfg.j2 dest={{ tftpboot_dir }}/preseed.cfg owner=root group=root mode=0644
+  when: sync_tftp != true
+
+- name: debian | config | creating preseed.cfg for auto-installs
+  template: src=var/lib/tftpboot/preseed.cfg.j2 dest={{ tftpboot_dir }}/preseed.cfg owner=root group=root mode=0644
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | reconfiguring txt.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/txt.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/txt.cfg owner=root group=root mode=0664
+  when: sync_tftp != true
+
+- name: debian | config | reconfiguring txt.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/txt.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/txt.cfg owner=root group=root mode=0664
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | reconfigure menu.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/menu.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/menu.cfg owner=root group=root mode=0664
+  when: sync_tftp != true
+
+- name: debian | config | reconfigure menu.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/menu.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/menu.cfg owner=root group=root mode=0664
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | reconfigure prompt.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/prompt.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/prompt.cfg owner=root group=root mode=0664
+  when: sync_tftp != true
+
+- name: debian | config | reconfigure prompt.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/prompt.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/prompt.cfg owner=root group=root mode=0664
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | reconfigure syslinux.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/syslinux.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/syslinux.cfg owner=root group=root mode=0664
+  when: sync_tftp != true
+
+- name: debian | config | reconfigure syslinux.cfg
+  template: src=var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/syslinux.cfg.j2 dest={{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/syslinux.cfg owner=root group=root mode=0664
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | setting folder permissions on {{ tftp_root_dir }}
+  file: path={{ tftpboot_dir }} state=directory recurse=yes owner=nobody group=nogroup
+
+- name: debian | install | removing {{ netboot_file }}
+  file: path={{ tftpboot_dir }}/{{ netboot_file }} state=absent
+  when: sync_tftp != true
+
+- name: debian | install | removing {{ netboot_file }}
+  file: path={{ tftpboot_dir }}/{{ netboot_file }} state=absent
+  run_once: true
+  when: config_tftp and sync_tftp
+
+- name: debian | config | enable IP Forwarding
+  sysctl: name="net.ipv4.ip_forward" value=1 sysctl_set=yes state=present reload=yes
+
+#- name: debian | config | configuring tftpd-hpa
+#  template: src=etc/default/tftpd-hpa.j2 dest=/etc/default/tftpd-hpa owner=root group=root mode=0644
+#  notify: restart tftpd-hpa

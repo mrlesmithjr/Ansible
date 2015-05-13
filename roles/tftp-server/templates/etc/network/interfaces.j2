@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto {{ pri_bind_interface }}
+iface {{ pri_bind_interface }} inet {{ pri_interface_method }}
+address {{ pri_bind_address }}
+netmask {{ pri_netmask }}
+gateway {{ pri_gateway }}
+dns-nameservers {{ dns_nameservers }}
+dns-search {{ dns_search }}
+
+#auto {{ sec_bind_interface }}
+#iface {{ sec_bind_interface }} inet {{ sec_interface_method }}
+#address {{ sec_bind_address }}
+#netmask {{ sec_netmask }}
+
+source /etc/network/interfaces.d/*

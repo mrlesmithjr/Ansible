@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+# /etc/default/tftpd-hpa
+
+TFTP_USERNAME="tftp"
+TFTP_DIRECTORY="/var/lib/tftpboot"
+TFTP_ADDRESS="{{ tftp_bind_address }}:69"
+TFTP_OPTIONS="--secure --create"

@@ -1,0 +1,8 @@
+---
+- name: debian | install | installing pre-reqs
+  apt: name={{ item }} state=absent
+  with_items:
+    - nfs-kernel-server
+#    - tftpd-hpa
+#    - tftp-hpa
+#    - xinetd

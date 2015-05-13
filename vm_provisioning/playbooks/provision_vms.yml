@@ -1,0 +1,194 @@
+---
+- hosts: all
+  gather_facts: false
+  connection: local
+  vars_prompt:
+    - name: 'vm_task_action'
+      prompt: 'Enter vm action to execute (none, create, create_from_template, delete, reboot, reconfigure, reconfigure_template)'
+      default: 'none'
+      private: no
+
+    - name: 'vcenter_pass'
+      prompt: "Enter password for username defined to connect to vCenter"
+      private: yes
+      register: vcenter_pass
+
+    - name: 'confirm_delete'
+      prompt: "To confirm deleting VMs enter DELETE otherwise enter none"
+      default: 'none'
+      private: no
+      when: vm_task_action == "delete"
+  tasks:
+
+########################### creating VMs #################################
+
+    - name: creating new vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: "{{ vm_state }}"
+        vm_extra_config:
+          notes: "{{ notes }}"
+        vm_disk:
+          disk1:
+            size_gb: "{{ disk1 }}"
+            type: thin
+            datastore: "{{ datastore }}"
+        vm_nic:
+          nic1:
+            type: vmxnet3
+            network: "{{ network }}"
+            network_type: standard
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          osid: "{{ osid }}"
+          scsi: paravirtual
+        esxi:
+          datacenter: "{{ datacenter }}"
+          hostname: "{{ esxi_host }}"
+      when: vm_task_action == 'create' and multi == "false"
+
+    - name: creating new vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: "{{ vm_state }}"
+        vm_extra_config:
+          notes: "{{ notes }}"
+        vm_disk:
+          disk1:
+            size_gb: "{{ disk1 }}"
+            type: thin
+            datastore: "{{ datastore }}"
+          disk2:
+            size_gb: "{{ disk2 }}"
+            type: thin
+            datastore: "{{ datastore }}"
+        vm_nic:
+          nic1:
+            type: vmxnet3
+            network: "{{ network }}"
+            network_type: standard
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          osid: "{{ osid }}"
+          scsi: paravirtual
+        esxi:
+          datacenter: "{{ datacenter }}"
+          hostname: "{{ esxi_host }}"
+      when: vm_task_action == 'create' and multi == "true"
+
+    - name: creating vms from template
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        from_template: yes
+        template_src: "{{ vm_template }}"
+        cluster: "{{ cluster }}"
+        resource_pool: "{{ resource_pool }}"
+        vm_extra_config:
+          notes: "{{ notes }}"
+          tools.deployPkg.fileName: 'imcf-mgMNqN'
+          datacenter: "{{ datacenter }}"
+          hostname: "{{ esxi_host }}"
+      when: vm_task_action == 'create_from_template'
+
+########################### reconfiguring VMs #################################
+
+    - name: reconfiguring vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: reconfigured
+        force: yes
+        vm_extra_config:
+          notes: "{{ notes }}"
+        vm_nic:
+          nic1:
+            type: vmxnet3
+            network: "{{ network }}"
+            network_type: standard
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          osid: "{{ osid }}"
+      when: vm_task_action == 'reconfigure'
+
+    - name: reconfiguring vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: reconfigured
+        force: yes
+        vm_disk:
+          disk2:
+            size_gb: "{{ disk2 }}"
+            type: thin
+            datastore: "{{ datastore }}"           
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+      when: vm_task_action == 'reconfigure_disk'
+
+    - name: powering on vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: powered_on
+      when: vm_task_action == "create"
+
+#    - name: waiting for server to come back
+#      local_action: wait_for port=22 host="{{ ansible_ssh_host  | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+#      sudo: false
+#      when: vm_task_action == 'reconfigure_template_disk' or vm_task_action == 'reconfigure_template' or vm_task_action == 'reconfigure'
+
+########################### rebooting VMs #################################
+
+    - name: rebooting VMs
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: restarted
+      when: vm_task_action == "reboot"
+
+#    - name: waiting for server to come back
+#      local_action: wait_for port=22 host="{{ ansible_ssh_host  | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+#      sudo: false
+#      when: vm_task_action == 'reboot'
+
+########################### deleting VMs #################################
+
+    - name: deleting VMs
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: absent
+        force: yes
+      when: vm_task_action == 'delete' and confirm_delete == "DELETE"
+
+    - name: gathering facts about VMs
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        vmware_guest_facts: yes
+      when: vm_task_action != "delete"

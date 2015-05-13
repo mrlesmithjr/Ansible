@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+default install
+label install
+	menu label ^Install
+	kernel ubuntu-installer/amd64/linux
+	append vga=788 initrd=ubuntu-installer/amd64/initrd.gz -- quiet 
+label cli
+	menu label ^Command-line install
+	kernel ubuntu-installer/amd64/linux
+	append tasks=standard pkgsel/language-pack-patterns= pkgsel/install-language-support=false vga=788 initrd=ubuntu-installer/amd64/initrd.gz -- quiet 
+label auto-install
+	menu label ^Automated install
+	menu default
+	kernel ubuntu-installer/amd64/linux
+	append auto=true priority=critical vga=788 initrd=tftp://{{ bind_address }}/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto url=tftp://{{ bind_address }}/preseed.cfg
+
