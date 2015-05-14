@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+# Allow DNSMASQ ports
+table filter{
+    chain DNSMASQ-Allowed;
+    chain INPUT {
+        proto tcp dport (53 69) jump DNSMASQ-Allowed;
+        proto udp dport (53 67:69) jump DNSMASQ-Allowed;
+    }
+    chain DNSMASQ-Allowed {
+        proto tcp dport (53 69) mod state state NEW jump LOGGING-Allowed;
+        proto udp dport (53 67:69) mod state state NEW jump LOGGING-Allowed;
+    }
+}

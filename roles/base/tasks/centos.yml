@@ -1,0 +1,19 @@
+---
+# Run yum update
+- name: centos | running yum update
+  yum: update_cache=yes cache_valid_time=86400
+
+# Install base packages
+- name: centos | installing base packages
+  yum: name={{ item }} state=present
+  with_items:
+   - curl
+   - git
+   - nano
+   - net-tools
+   - ntp
+   - sg3_utils
+
+# Rescan for new disks added
+- name: centos | rescanning for new disks added
+  command: /usr/bin/rescan-scsi-bus.sh

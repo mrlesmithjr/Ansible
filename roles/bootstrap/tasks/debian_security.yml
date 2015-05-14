@@ -1,0 +1,16 @@
+---
+- name: debian_security | allowing SSH password authentication
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication yes" state=present
+  notify: restart ssh
+ 
+- name: debian_security | disabling SSH GSS API authentication
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^GSSAPIAuthentication" line="GSSAPIAuthentication no" state=present
+  notify: restart ssh
+
+# apt-get update
+- name: debian_security | running apt-get update
+  apt: update_cache=yes cache_valid_time=86400
+
+# install fail2ban Debian
+- name: debian_security | installing fail2ban
+  apt: name=fail2ban state=present

@@ -1,0 +1,35 @@
+---
+# Remove vmware tools package repo - errors out trying to update
+- name: debian | removing vmware tools package repo on {{ ansible_hostname }}
+  apt_repository: repo='deb http://packages.vmware.com/packages/ubuntu trusty main' state=absent
+
+# Run apt-get update
+- name: debian | running apt-get update
+  apt: update_cache=yes cache_valid_time=86400
+
+# Install base packages
+- name: debian | installing base packages
+  apt: pkg={{ item }} state=present
+  with_items:
+   - build-essential
+   - software-properties-common
+   - curl
+   - git
+   - git-core
+   - ntp
+   - scsitools
+
+# Rescan for new disks added
+- name: debian | rescanning for new disks added
+  command: /sbin/rescan-scsi-bus
+
+- name: setting dns search suffix
+  lineinfile: dest=/etc/network/interfaces regexp='^dns-search' line='dns-search {{ dns_search }}'
+  when: update_dns_search
+
+- name: resetting /etc/dhcp/dhclient.conf to default
+  template: src=dhclient.conf.j2 dest=/etc/dhcp/dhclient.conf owner=root group=root mode=0644 backup=yes
+  when: update_dhcpclient_conf
+
+- name: updating /etc/hosts in case of dns lookup issues
+  lineinfile: dest=/etc/hosts regexp='^127.0.1.1' line="127.0.1.1      {{ inventory_hostname }} {{ inventory_hostname }}.{{ pri_domain_name }}" state=present

@@ -1,0 +1,6 @@
+---
+# Reconfigure rsyslog
+- name: Push config
+  template: src=centos_rsyslog.conf.j2 dest=/etc/rsyslog.conf mode=0644 owner=root group=root backup=yes
+  notify: restart rsyslog
+

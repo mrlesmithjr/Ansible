@@ -1,0 +1,4 @@
+---
+# install dnsmasq
+- name: install dnsmasq
+  apt: name=dnsmasq state=present update_cache=yes cache_valid_time=86400

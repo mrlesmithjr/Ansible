@@ -1,0 +1,5 @@
+---
+# Rsyslog setup
+syslog_servers:
+  - { name: 'logstash.everythingshouldbevirtual.local', proto: 'tcp', port: '514' }
+  - { name: 'logstash-dev.everythingshouldbevirtual.local', proto: 'udp', port: '514'}

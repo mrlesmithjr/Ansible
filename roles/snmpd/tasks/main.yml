@@ -1,0 +1,24 @@
+---
+# Ensure SNMPD is installed
+- name: main | installing snmpd
+  apt: name=snmpd state=present
+  when: ansible_os_family == "Debian"
+
+- name: main | installing snmpd
+  yum: name=snmpd state=present
+  when: ansible_os_family == "RedHat"
+
+# Copy configuration
+- name: main | copying snmpd config
+  template: src=snmpd.conf.j2 dest=/etc/snmp/snmpd.conf owner=root group=root mode=0644
+  when: config_snmpd
+  notify: restart snmpd
+
+# Start and enable service
+- name: main | starting and enabling snmpd service
+  service: name=snmpd state=started enabled=yes
+
+# Open firewall ports
+- include: ferm.yml
+  tags: [ferm]
+  when: enable_firewall

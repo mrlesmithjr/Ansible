@@ -1,0 +1,25 @@
+---
+enable_firewall: false
+update_dns_search: false
+update_dhcpclient_conf: false
+
+config_lvm: false                                       # must be set to true in order to execute any tasks in play (failsafe option :)- )
+create: false                                           # set to true if creating a new logical volume (do not set extend or resize to true)
+resize: false                                           # set to true if resizing the logical volume (do not set create to true)
+extend: false                                           # set to true if extending the logical volume (do not set create to true)
+current_disk: '/dev/sda5'                               # set to your current disk device already setup in lvm
+new_disk: '/dev/sdb'                                    # set to new disk being added to volume group
+new_mntp: '/mnt/test'                                   # set to the desired mount point to be created and new logical volume to be mounted to
+create_vgname: 'test-vg'                                # set to volume group name to create
+resize_vgname: 'test-vg'                                # set to volume group name to resize
+extend_vgname: 'test-vg'                                # set to volume group name to extend
+create_lvname: 'test-lv'                                # set to logical volume name to create
+resize_lvname: 'test-lv'                                # set to logical volume name to resize
+extend_lvname: 'test-lv'                                # set to logical volume name to extend
+create_lvsize: '100%FREE'                               # set to logical volume size to create --- (10G) - would create new lvm with 10Gigabytes -- (512) - would create new lvm with 512m
+extend_disks: '{{ current_disk }},{{ new_disk }}'       # first disk is current volume group
+lvextend_options: '-L+10G'                              # setting the options to pass to lvextend --- ('-L+10G') - would increase by 10GB whereas ('-l +100%FREE') would increase to full capacity
+filesystem: 'ext4'                                      # set to filesystem type to format new logical volume with ( ext3, ext4, xfs, etc. )
+
+pri_domain_name: 'everythingshouldbevirtual.local'           # set to your primary domain name
+dns_search: ' everythingshouldbevirtual.local cloud.everythingshouldbevirtual.local'     # set to your domain name suffix search

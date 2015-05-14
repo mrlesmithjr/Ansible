@@ -1,0 +1,8 @@
+---
+enable_firewall: false
+
+# SNMPD configurations
+config_snmpd: true
+enable_snmpd: true
+snmpd_ro_community: 'everythingshouldbevirtual'
+snmpd_authorized_network: '10.0.101.0/24'

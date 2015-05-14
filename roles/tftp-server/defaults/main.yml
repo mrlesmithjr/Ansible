@@ -58,5 +58,6 @@ dnsmasq_nameservers:
 
 # preseed.cfg defaults
 domain_name: '{{ pri_domain_name }}'              # your primary domain name or secondary domain name - whichever suits your requirements
-root_pw: ''                                       # use echo "password" | mkpasswd -s -5
+# root_pw below is set to hash of 'P@55w0rd'
+root_pw: '$6$5RKojj9oec$cHgXvm4UWcy6kPW31abZGpX/5HyPjKb6KiGpONWQeBH10iLB8qRduTnGiEdd46CrUDDRrm2afHhqt3F8gLQr6.'   # run 'mkpasswd -m sha-512' to generate password
 bind_address: '{{ pri_bind_address }}'            # sets to your sec_bind_address - change to pri_bind_address if you are setting TFTP on your primary interface

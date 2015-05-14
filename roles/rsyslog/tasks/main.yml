@@ -1,0 +1,8 @@
+---
+# Debian
+- include: debian_rsyslog.yml
+  when: ansible_os_family == "Debian"
+
+# CentOS
+- include: centos_rsyslog.yml
+  when: ansible_os_family == "RedHat"

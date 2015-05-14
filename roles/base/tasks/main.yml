@@ -1,0 +1,9 @@
+---
+- include: config_lvm.yml
+  when: config_lvm
+- include: debian.yml
+  tags: [base]
+  when: ansible_os_family == "Debian"
+- include: centos.yml
+  tags: [base]
+  when: ansible_os_family == "RedHat"

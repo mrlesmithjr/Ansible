@@ -1,0 +1,7 @@
+---
+- name: centos_lockdown | disabling root SSH access
+  lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
+  notify: restart sshd
+
+-  name: centos_lockdown | changing root password
+   action: user name=root password={{ root_password }}

@@ -1,0 +1,51 @@
+---
+- name: config_lvm | install | installing packages
+  apt: name={{ item }} state=present
+  with_items:
+     - lvm2
+     - scsitools
+     - xfsprogs
+  when: config_lvm and ansible_os_family == "Debian"
+
+- name: installing lvm2
+  yum: name=system-storage-manager state=present
+  when: config_lvm and ansible_os_family == "RedHat"
+      
+- name: installing sg3_utils
+  yum: name=sg3_utils state=present
+  when: config_lvm and ansible_os_family == "RedHat"
+      
+- name: rescanning for new disks
+  command: /sbin/rescan-scsi-bus
+  when: config_lvm and ansible_os_family == "Debian"
+      
+- name: rescanning for new disks
+  command: /usr/bin/rescan-scsi-bus.sh
+  when: config_lvm and ansible_os_family == "RedHat"
+
+- name: creating new LVM volume group
+  lvg: vg={{ create_vgname }} pvs={{ new_disk }} state=present
+  when: create and config_lvm
+
+- name: creating new LVM logical volume
+  lvol: vg={{ create_vgname }} lv={{ create_lvname }} size={{ create_lvsize }}
+
+- name: creating new filesystem on new LVM logical volume
+  filesystem: fstype={{ filesystem }} dev=/dev/{{ create_vgname }}/{{ create_lvname }}
+  when: create and config_lvm
+
+- name: mounting new filesystem
+  mount: name={{ new_mntp }} src=/dev/{{ create_vgname }}/{{ create_lvname }} fstype={{ filesystem }} state=mounted
+  when: create and config_lvm
+
+- name: extending existing LVM volume group
+  lvg: vg={{ extend_vgname }} pvs={{ extend_disks }}
+  when: extend and config_lvm
+
+- name: extending existing filesystem
+  command: lvextend {{ lvextend_options }} /dev/{{ extend_vgname }}/{{ extend_lvname }}
+  when: extend and config_lvm
+
+- name: resizing filesystem
+  command: resize2fs /dev/{{ resize_vgname }}/{{ resize_lvname }}
+  when: resize and config_lvm

@@ -1,0 +1,12 @@
+---
+# Reconfigure rsyslog
+- name: Copy new rsyslog.conf
+  copy: src=rsyslog.conf dest=/etc/rsyslog.conf owner=root group=root mode=0644
+  notify: restart rsyslog
+  when: ansible_os_family == "Debian"
+
+- name: Push config
+  template: src=50-default.conf.j2 dest=/etc/rsyslog.d/50-default.conf owner=root group=root mode=0644
+  notify: restart rsyslog
+  when: ansible_os_family == "Debian"
+

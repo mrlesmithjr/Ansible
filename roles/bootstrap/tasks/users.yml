@@ -1,0 +1,34 @@
+---
+- name: users | adding user administrator
+  user: name=administrator password={{ administrator_password }}
+- name: users | changing administrator password 
+  user: name=administrator password={{ administrator_password }}
+- name: users | adding user remote
+  user: name=remote password={{ remote_password }} shell=/bin/bash comment="Ansible user"
+- name: users | adding user cacti
+  user: name={{ cacti_user }} password={{ cacti_password }} comment="Cacti user"
+  when: enable_cacti_monitoring
+- name: users | adding SSH public key to user remote for ansible host (user administrator)
+  authorized_key: user=remote key="{{ lookup('file', "../files/ansible.pub") }}"
+#- name: users | adding SSH public key to user remote for jenkins host (user jenkins)
+#  authorized_key: user=remote key="{{ lookup('file', "../files/jenkins.pub") }}"
+- name: users | adding SSH public key to user cacti for cacti host (user cacti)
+  authorized_key: user={{ cacti_user }} key="{{ lookup('file', "../files/cacti.pub") }}"
+  when: enable_cacti_monitoring
+- name: users | adding user remote to sudoers
+  lineinfile: dest=/etc/sudoers state=present regexp='^remote ALL' line='remote ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s'
+- name: users | adding user administrator to sudoers
+  lineinfile: dest=/etc/sudoers state=present regexp='^administrator ALL' line='administrator ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s'
+
+# Adding customer accounts
+- name: users | adding customer account
+  action: user name={{ cust_account }} password={{ cust_password }} shell=/bin/bash
+  when: create_cust_account
+- name: users | adding user to sudoers
+  lineinfile: dest=/etc/sudoers state=present regexp='^{{ cust_account }} ALL' line='{{ cust_account }} ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s'
+  when: create_cust_account
+#- name: users | adding SSH public key to user
+#  authorized_key: user={{ cust_account }} key="{{ item }}"
+#  with_file:
+#    - "{{ cust_ssh_key_file }}"
+#  when: create_cust_account

@@ -1,0 +1,17 @@
+---
+create_cust_account: false
+enable_cacti_monitoring: false
+#cust_ssh_key_file: /tmp/dummy
+
+# Bootstrap setup
+reboot: true                             # reboot after changing hostname to match inventory_hostname - set to false if you do not want to reboot
+
+# Passwords - The below password is hashed  - Generate new password like below
+# to generate password run 'mkpasswd -m sha-512' and enter your password and then copy the hashed password
+#
+# Below is the hashed password of 'P@55w0rd'
+administrator_password: '$6$5RKojj9oec$cHgXvm4UWcy6kPW31abZGpX/5HyPjKb6KiGpONWQeBH10iLB8qRduTnGiEdd46CrUDDRrm2afHhqt3F8gLQr6.'
+cacti_user: 'cacti'
+cacti_password: '$6$5RKojj9oec$cHgXvm4UWcy6kPW31abZGpX/5HyPjKb6KiGpONWQeBH10iLB8qRduTnGiEdd46CrUDDRrm2afHhqt3F8gLQr6.'
+remote_password: '$6$5RKojj9oec$cHgXvm4UWcy6kPW31abZGpX/5HyPjKb6KiGpONWQeBH10iLB8qRduTnGiEdd46CrUDDRrm2afHhqt3F8gLQr6.'
+root_password: '$6$5RKojj9oec$cHgXvm4UWcy6kPW31abZGpX/5HyPjKb6KiGpONWQeBH10iLB8qRduTnGiEdd46CrUDDRrm2afHhqt3F8gLQr6.'

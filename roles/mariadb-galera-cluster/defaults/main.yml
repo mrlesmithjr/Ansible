@@ -1,0 +1,8 @@
+---
+enable_firewall: false
+galera_cluster_name: 'test_cluster'
+mysql_root_password: 'mysql'
+deb_db_password: 'mysql'
+enable_cacti_monitoring: false
+cacti_user: 'cactiuser'
+cacti_pass: 'cactiuser'

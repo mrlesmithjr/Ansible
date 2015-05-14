@@ -49,12 +49,6 @@ filesystem: xfs
 # Reconfigure networking on ititial setup
 pre_bootstrap_change_ip: true            # changes ip of each node based on host_vars ip setting
 
-# Bootstrap setup
-reboot: true                             # reboot after changing hostname to match inventory_hostname - set to false if you do not want to reboot
-root_password: '$1$lDZD3dKn$ZRoapxlZOzivK/sQWqdFg/'             # MD5 hash of your root password
-administrator_password: '$1$WcS2byl4$hU0dn5RtQsCbRWiorXsTL.'    # MD5 hash of your administrator password - if used
-remote_password: '$1$D3pAE14D$HSv0wd9jK9P.bt/vMcOv6.'           # MD5 hash of your remote password - used for Ansible
-
 # Rsyslog setup
 syslog_server_1: 'logstash.everythingshouldbevirtual.local'
 syslog_server_port_1: '514'
@@ -151,7 +145,8 @@ dnsmasq_nameservers:
 # Define preseed.cfg defaults (TFTP)
 #domain_name: '{{ pri_domain_name }}'              # your primary domain name or secondary domain name - whichever suits your requirements
 domain_name: '{{ dnsmasq_domain }}'              # comment out above and uncomment this line if you want to use your cloud domain for provisioning vs. primary domain name
-root_pw: '$1$6Rpvg6ad$VUpMRxLIDXbNp3of9RjGE0'     # use echo "password" | mkpasswd -s -5
+# root_pw hashed to 'P@55w0rd'
+root_pw: '$6$5RKojj9oec$cHgXvm4UWcy6kPW31abZGpX/5HyPjKb6KiGpONWQeBH10iLB8qRduTnGiEdd46CrUDDRrm2afHhqt3F8gLQr6.'     # to generate password run 'mkpasswd -m sha-512' and enter your password and then copy the hashed password
 bind_address: '{{ tftp_bind_address }}'            # sets to your sec_bind_address - change to pri_bind_address if you are setting TFTP on your primary interface
 
 # Define DNSmasq DHCP ranges
