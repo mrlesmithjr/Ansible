@@ -1,8 +1,17 @@
 ---
 enable_firewall: false
-galera_cluster_name: 'test_cluster'
-mysql_root_password: 'mysql'
-deb_db_password: 'mysql'
+galera_cluster_name: 'test_cluster' # Define the name of the cluster
+galera_cluster_nodes: '' # Define the IP addresses of the nodes which will be part of the cluster
+mysql_root_password: 'mysql@dm!n'
+deb_db_password: 'mysql@dm!n'
 enable_cacti_monitoring: false
 cacti_user: 'cactiuser'
 cacti_pass: 'cactiuser'
+
+# galeranotify script
+enable_galera_monitoring_script: true
+galera_monitor_script_path: '/etc/mysql'
+galera_monitor_script_name: 'galeranotify.py'
+notify_smtp_server: 'smtp.example.org'
+notify_mail_from: 'galeranotify@example.org'
+notify_mail_to: 'alerts@example.org'

@@ -3,6 +3,8 @@
   when: ansible_os_family == "Debian"
 - include: centos.yml
   when: ansible_os_family == "RedHat"
+- include: galera_monitoring.yml
+  when: enable_galera_monitoring_script
 # Open firewall ports
 - include: ferm.yml
   tags: [ferm]

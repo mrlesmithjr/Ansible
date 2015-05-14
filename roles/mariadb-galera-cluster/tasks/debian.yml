@@ -6,6 +6,7 @@
     - software-properties-common
     - python-mysqldb
     - rsync
+    - mysqltuner
 - name: debian | importing repository key
   apt_key: keyserver=keyserver.ubuntu.com id=0xcbcb082a1bb943db
 - name: debian | adding apt repository
