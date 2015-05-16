@@ -1,0 +1,9 @@
+collectd_collectors:
+  - 'logstash-dev.everythingshouldbevirtual.local'
+  - 'logstash.everythingshouldbevirtual.local'
+
+enable_mysql_monitoring: false
+monitor_user: 'collectd'
+monitor_pass: 'collectd'
+monitor_db: 'mysql'
+mysql_clustered: false

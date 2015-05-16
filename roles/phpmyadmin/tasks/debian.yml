@@ -1,0 +1,29 @@
+---
+- name: debian | installing dbconfig-common
+  apt: name=dbconfig-common state=present install_recommends=no
+
+- name: debian | configuring phpmyadmin db
+  template: src=etc/dbconfig-common/phpmyadmin.conf.j2 dest=/etc/dbconfig-common/phpmyadmin.conf owner=root group=root mode=0600
+
+- name: debian | installing phpmyadmin
+  apt: name=phpmyadmin state=present install_recommends=no
+  notify: restart apache
+
+- name: debian | creating phpmyadmin database
+  mysql_db: name={{ phpmyadmin_control_database | default('phpmyadmin') }} state=present
+  when: mysql_master
+
+- name: debian | importing phpmyadmin schema
+  mysql_db: name={{ phpmyadmin_control_database | default('phpmyadmin') }} state=import target=/usr/share/doc/phpmyadmin/examples/create_tables.sql.gz
+  when: mysql_master
+
+- name: debian | creating phpmyadmin db user
+  mysql_user: name={{ phpmyadmin_control_user | default('phpmyadmin') }} password={{ phpmyadmin_control_password }} priv=*.*:ALL,GRANT state=present
+  when: mysql_master
+
+- name: debian | creating phpmyadmin apache configuration
+  file: src=/etc/phpmyadmin/apache.conf dest=/etc/apache2/conf-available/phpmyadmin.conf state=link
+
+- name: debian | enablig phpmyadmin apache configuration
+  command: a2enconf phpmyadmin.conf
+  notify: restart apache

@@ -1,0 +1,6 @@
+---
+graphite_node: 'grafana'
+graphite_host: 'grafana.everythingshouldbevirtual.local'
+graphite_port: '2003'
+graphite_protocol: 'tcp'
+graphite_prefix: 'collectd.'

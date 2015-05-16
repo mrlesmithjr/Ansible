@@ -1,0 +1,8 @@
+---
+# install collectd
+- name: install collectd
+  apt: name=collectd state=present
+
+- name: push collectd config
+  template: src=collectd.conf.j2 dest=/etc/collectd/collectd.conf mode=0644 owner=root group=root backup=no
+  notify: restart collectd

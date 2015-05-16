@@ -1,0 +1,12 @@
+---
+- include: debian.yml
+  tags: [collectd]
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  tags: [collectd]
+  when: ansible_os_family == "RedHat"
+
+- include: db_monitoring.yml
+  tags: [collectd]
+  when: enable_mysql_monitoring

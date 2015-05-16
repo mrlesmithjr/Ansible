@@ -1,0 +1,12 @@
+---
+# install collectd
+- name: Install collectd
+  yum: name=collectd state=present
+
+# enable on boot and start
+- name: enable and start collectd service
+  service: name=collectd state=started enabled=yes
+
+- name: push collectd config
+  template: src=collectd.conf.j2 dest=/etc/collectd.conf mode=0644 owner=root group=root backup=yes
+  notify: restart collectd
