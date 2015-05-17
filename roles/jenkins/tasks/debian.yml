@@ -1,0 +1,16 @@
+---
+# Install Jenkins
+# Add jenkins repo key
+- name: Add jenkins repo key
+  apt_key: url=http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key state=present
+
+# Add jenkins repo
+- name: Add jenkins repo
+  apt_repository: repo='deb http://pkg.jenkins-ci.org/debian binary/' state=present
+
+- name: install base packages
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+   - default-jdk
+   - default-jre-headless
+   - jenkins

@@ -1,0 +1,3 @@
+---
+- include: debian.yml
+  when: install_jenkins
