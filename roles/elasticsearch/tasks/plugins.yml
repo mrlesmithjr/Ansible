@@ -1,0 +1,24 @@
+---
+
+# head plugin
+- include: plugins/head.yml
+  when: install_head is defined and install_head
+
+# marvel plugin
+- include: plugins/marvel.yml
+  when: install_marvel is defined and install_marvel
+
+# elasticHQ plugin
+- include: plugins/elastichq.yml
+  when: install_eshq is defined and install_eshq
+
+# bigdesk plugin
+- include: plugins/bigdesk.yml
+  when: install_bigdesk is defined and install_bigdesk
+
+# curator tool
+- include: plugins/debian_curator.yml
+  when: install_curator is defined and install_curator and ansible_os_family == "Debian"
+
+- include: plugins/centos_curator.yml
+  when: install_curator is defined and install_curator and ansible_os_family == "RedHat"

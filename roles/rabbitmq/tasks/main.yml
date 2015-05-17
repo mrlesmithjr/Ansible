@@ -1,0 +1,28 @@
+---
+- name: Add the RabbitMQ public GPG key to the apt repo
+  apt_key: url=http://www.rabbitmq.com/rabbitmq-signing-key-public.asc state=present
+
+- name: Add RabbitMQ to the sources list
+  apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' update_cache=no state=present
+
+- name: Install RabbitMQ server
+  apt: name={{ item }} update_cache=no force=yes state=installed
+  with_items:
+    - rabbitmq-server
+
+- name: Enable the RabbitMQ Management Console
+  rabbitmq_plugin: names=rabbitmq_management state=enabled
+  notify: restart rabbitmq-server
+
+- name: Ensure that the RabbitMQ service is running
+  service: name=rabbitmq-server state=started enabled=yes
+
+- name: check | checking to see if already clustered
+  stat: path=/etc/rabbitmq/clustered
+  register: clustered
+
+- include: rabbitmq_clustering.yml
+  when: enable_rabbitmq_clustering and (clustered.stat.exists != True)
+
+- include: rabbitmq_ha_config.yml
+  when: config_rabbitmq_ha and enable_rabbitmq_clustering

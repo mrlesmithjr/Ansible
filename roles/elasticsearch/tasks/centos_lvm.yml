@@ -1,0 +1,16 @@
+---
+# setup LVM Volume Group for elasticsearch
+- name: install lvm2
+  yum: name=system-storage-manager state=present
+
+- name: create LVM volume group {{ vgname }}
+  lvg: vg={{ vgname }} pvs={{ disks }} state=present
+
+- name: create LVM logical volume {{ lvname }}
+  lvol: vg={{ vgname }} lv={{ lvname }} size=100%FREE state=present
+
+- name: create filesystem for {{ vgname }}/{{ lvname }}
+  filesystem: fstype=ext4 dev=/dev/{{ vgname }}/{{ lvname }}
+
+- name: mount filesystem {{ mntp }}/{{ vgname }}/{{ lvname }}
+  mount: name={{ mntp }} src=/dev/{{ vgname }}/{{ lvname }} fstype=ext4 state=mounted

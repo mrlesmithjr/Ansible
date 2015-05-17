@@ -1,0 +1,6 @@
+---
+- name: reload ferm
+  service: name=ferm state=reloaded
+
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf

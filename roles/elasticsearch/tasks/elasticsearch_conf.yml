@@ -1,0 +1,5 @@
+---
+# create elasticsearch.yml from template
+- name: push elasticsearch.yml config
+  template: src=elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml mode=0644 owner=root group=root
+  notify: restart elasticsearch

@@ -1,0 +1,40 @@
+---
+- name: rabbitmq_clustering | config | stopping rabbitmq app
+  command: rabbitmqctl stop_app
+
+- name: rabbitmq_clustering | config | resetting rabbitmq app
+  command: rabbitmqctl reset
+
+- name: rabbitmq_clustering | config | copy erlang cookie
+  template: src=erlang.cookie.j2 dest=/var/lib/rabbitmq/.erlang.cookie owner=rabbitmq group=rabbitmq mode=0400 backup=yes
+
+- name: rabbitmq_clustering | config | starting rabbitmq app
+  command: rabbitmqctl start_app
+  when: inventory_hostname  == "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | sending sigterm to any running rabbitmq processes
+  shell: pkill -u rabbitmq || true
+  when: inventory_hostname != "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | restarting rabbitmq-server
+  service: name=rabbitmq-server state=restarted
+  when: inventory_hostname != "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | stopping rabbitmq app
+  command: rabbitmqctl stop_app
+  when: inventory_hostname != "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | resetting rabbitmq app
+  command: rabbitmqctl reset
+  when: inventory_hostname != "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | joining rabbitmq cluster
+  command: rabbitmqctl join_cluster 'rabbit@{{ master_rabbit_node }}'
+  when: inventory_hostname != "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | starting rabbitmq app
+  command: rabbitmqctl start_app
+  when: inventory_hostname != "{{ master_rabbit_node }}"
+
+- name: rabbitmq_clustering | config | marking as clustered
+  file: path=/etc/rabbitmq/clustered state=touch

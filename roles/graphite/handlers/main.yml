@@ -1,0 +1,9 @@
+---
+- name: reload ferm
+  service: name=ferm state=reloaded
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf
+- name: restart apache2
+  service: name=apache2 state=restarted
+- name: restart carbon-cache
+  service: name=carbon-cache state=restarted

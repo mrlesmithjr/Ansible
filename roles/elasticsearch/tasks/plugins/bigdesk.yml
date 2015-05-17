@@ -1,0 +1,12 @@
+---
+
+- name: get installed ES plugins list
+  shell: /usr/share/elasticsearch/bin/plugin -l
+  tags: es_bigdesk
+  register: es_bigdesk
+  changed_when: false
+
+- name: install bigdesk plugin
+  shell: /usr/share/elasticsearch/bin/plugin -install lukas-vlcek/bigdesk
+  tags: es_bigdesk
+  when: '"- bigdesk" not in es_bigdesk.stdout'

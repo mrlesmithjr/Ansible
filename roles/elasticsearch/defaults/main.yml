@@ -1,0 +1,32 @@
+---
+enable_firewall: false
+config_lvm: false
+config_nfs: false
+
+# NFS mount info
+nfs_mount: '10.0.101.51:/volumes/HD-Pool/elasticsearch-snapshots'
+nfs_mountpoint: '/mnt/elasticsearch-snapshots'
+nfs_mount_opts: 'defaults'
+
+# Elasticsearch
+elasticsearch_version: 1.4
+es_version: 1.4
+es_fqdn: localhost
+es_port: 9200
+
+## Plugins
+# Curator tool
+install_curator: True
+curator_max_keep_days: 14
+curator_close_after_days: 7
+# Head plugin
+install_head: True
+# ElasticHQ plugin
+install_eshq: True
+# Marvel plugin
+install_marvel: True
+# Bigdesk plugin
+install_bigdesk: True
+
+# Cluster specific settings
+es_cluster_name: ansible-test

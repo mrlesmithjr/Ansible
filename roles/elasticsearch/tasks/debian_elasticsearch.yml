@@ -1,0 +1,20 @@
+---
+# install elasticsearch
+
+# add elasticsearch repo key
+- apt_key: url=https://packages.elasticsearch.org/GPG-KEY-elasticsearch state=present
+
+# add elasticsearch repository
+- apt_repository: repo='deb http://packages.elasticsearch.org/elasticsearch/{{ elasticsearch_version }}/debian stable main' state=present
+
+# install elasticsearch and java
+- name: install elasticsearch and java
+  apt: name={{ item }} state=latest force=yes
+  with_items:
+    - elasticsearch
+    - openjdk-7-jre-headless
+  notify: init elasticsearch
+
+# start service
+- name: start elasticsearch service
+  service: name=elasticsearch state=started

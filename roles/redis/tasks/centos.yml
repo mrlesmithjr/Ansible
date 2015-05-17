@@ -1,0 +1,7 @@
+---
+- name: install redis
+  yum: name=redis state=installed
+  notify: start redis
+
+- name: enable redis service on boot
+  service: name=redis enabled=yes

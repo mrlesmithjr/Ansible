@@ -1,0 +1,9 @@
+---
+# setup LVM
+- include: centos_lvm.yml
+  when: es_config_lvm and 'elk-d-es-nodes' in group_names
+- include: centos_lvm.yml
+  when: es_config_lvm and 'elk-p-es-nodes' in group_names
+
+# setup elasticsearch
+- include: centos_elasticsearch.yml

@@ -1,0 +1,69 @@
+---
+- name: debian | config | adding grafana apt key
+  apt_key: url=https://packagecloud.io/gpg.key state=present
+
+- name: debian | config | adding grafana apt repo
+  apt_repository: repo='deb https://packagecloud.io/grafana/stable/debian/ wheezy main' state=present
+
+- name: debian | install | installing packages
+  apt: name={{ item }} state=present
+  with_items:
+    - git
+    - grafana
+    - python-pip
+    - unzip
+    - openjdk-7-jdk
+    - maven    
+
+- name: debian | config | ensuring grafana started and enabled on boot
+  service: name=grafana-server enabled=yes
+
+- name: debian | install | installing python pip module pysphere
+  pip: name=pysphere state=present
+
+- name: debian | config | create /opt/statsfeeder if not present
+  file: path=/opt/statsfeeder state=directory
+
+- name: debian | download | downloading statsfeeder
+  get_url: url=http://download3.vmware.com/software/vmw-tools/statsfeeder/StatsFeeder-4.1.697.zip dest=/opt/statsfeeder/statsfeeder.zip mode=0644
+
+- name: debian | extract | extracting statsfeeder
+  command: unzip /opt/statsfeeder/statsfeeder.zip -d /opt/statsfeeder creates=/opt/statsfeeder/StatsFeeder.sh
+
+- name: debian | install | pulling graphitereceiver from github
+  sudo: no
+  git: repo=https://github.com/SYNAXON/GraphiteReceiver dest=~/GraphiteReceiver
+
+- name: debian | config | creating build folders
+  sudo: no
+  file: path={{ item }} state=directory
+  with_items:
+    - '~/.m2/repository/com/vmware/tools/statsfeeder-common/4.1'
+    - '~/.m2/repository/com/vmware/tools/statsfeeder-core/4.1'
+
+- name: debian | config | copying build files
+  sudo: no
+  shell: cp {{ item.src }} {{ item.dest }}
+  with_items:
+    - { src: '/opt/statsfeeder/lib/statsfeeder-common-4.1.jar' , dest: '~/.m2/repository/com/vmware/tools/statsfeeder-common/4.1' }
+    - { src: '/opt/statsfeeder/lib/statsfeeder-core-4.1.jar' , dest: '~/.m2/repository/com/vmware/tools/statsfeeder-core/4.1' }
+
+- name: debian | build | building GraphiteReceiver maven package
+  sudo: no
+  shell: mvn package chdir=~/GraphiteReceiver creates=~/GraphiteReceiver/target/GraphiteReceiver-1.0-SNAPSHOT.jar
+
+- name: debian | build | copying files to tmp
+  sudo: no
+  shell: cp {{ item }} /tmp
+  with_items:
+    - '~/GraphiteReceiver/target/GraphiteReceiver-1.0-SNAPSHOT.jar'
+#    - '~/GraphiteReceiver/sample/sampleConfig.xml' 
+
+- name: debian | build | moving files to statsfeeder
+  shell: mv {{ item.src }} {{ item.dest }}
+  with_items:
+    - { src: '/tmp/GraphiteReceiver-1.0-SNAPSHOT.jar' , dest: '/opt/statsfeeder/lib' }
+#    - { src: '/tmp/sampleConfig.xml' , dest: '/opt/statsfeeder' }
+
+- name: debian | config | creating sampleConfig.xml
+  template: src=opt/statsfeeder/sampleConfig.xml.j2 dest=/opt/statsfeeder/sampleConfig.xml

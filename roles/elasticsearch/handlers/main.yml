@@ -1,0 +1,13 @@
+---
+# handlers
+- name: init elasticsearch
+  command: update-rc.d elasticsearch defaults 95 10
+
+- name: restart elasticsearch
+  service: name=elasticsearch state=restarted
+
+- name: reload ferm
+  shell: service ferm force-reload
+
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf
