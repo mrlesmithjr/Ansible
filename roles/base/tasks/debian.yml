@@ -9,7 +9,7 @@
 
 # Install base packages
 - name: debian | installing base packages
-  apt: pkg={{ item }} state=present
+  apt: name={{ item }} state=present
   with_items:
    - build-essential
    - software-properties-common
