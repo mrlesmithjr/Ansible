@@ -1,0 +1,51 @@
+---
+- hosts: nameservers
+  vars:
+    pdns_api_key: 'changeme'
+    pdns_api_url: 'http://127.0.0.1:8081/servers/localhost/zones'
+    pdns_curl_header: "-H 'X-API-Key: {{pdns_api_key }}'"
+    pdns_domain: 'everythingshouldbevirtual.local'
+    pdns_nameservers: '"10.0.101.11", "10.0.101.12"'
+    pdns_zones:
+      - 'everythingshouldbevirtual.local'
+      - '_msdcs.everythingshouldbevirtual.local'
+      - '_sites.everythingshouldbevirtual.local'
+      - '_tcp.everythingshouldbevirtual.local'
+      - '_udp.everythingshouldbevirtual.local'
+      - '0.0.10.in-addr.arpa'
+      - '10.10.10.in-addr.arpa'
+      - '101.0.10.in-addr.arpa'
+      - '106.0.10.in-addr.arpa'
+      - '110.0.10.in-addr.arpa'
+      - '125.0.10.in-addr.arpa'
+      - '24.16.172.in-addr.arpa'
+      - '1.168.192.in-addr.arpa'
+      - '200.168.192.in-addr.arpa'
+    pdns_records:
+      - { name: 'ns1.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.11', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'ns2.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.12', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'ns-1-2-clust-mgmr.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.10', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'dc01.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.111', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'dc02.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.112', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'jumpbox.everythingshouldbevirtual.local', type: 'A', ip: '192.168.1.101', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'switch01.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.1', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'esxi01.everythingshouldbevirtual.local', type: 'A', ip: '10.0.106.53', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'esxi02.everythingshouldbevirtual.local', type: 'A', ip: '10.0.106.54', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'esxi03.everythingshouldbevirtual.local', type: 'A', ip: '10.0.106.52', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'vcsa.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.40', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'pfsense.everythingshouldbevirtual.local', type: 'A', ip: '10.10.10.1', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'nas01.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.50', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'nas02.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.51', zone: 'everythingshouldbevirtual.local' }
+      - { name: 'logstash.everythingshouldbevirtual.local', type: 'A', ip: '10.0.101.60', zone: 'everythingshouldbevirtual.local' }
+    pdns_ad_records:
+      - { name: '_ldap._tcp.dc._msdcs.everythingshouldbevirtual.local', type: 'SRV', ip: '0 100 88 DC01.everythingshouldbevirtual.local', zone: '_msdcs.everythingshouldbevirtual.local' }
+      - { name: '_ldap._tcp.dc._msdcs.everythingshouldbevirtual.local', type: 'SRV', ip: '0 100 88 DC02.everythingshouldbevirtual.local', zone: '_msdcs.everythingshouldbevirtual.local' }
+      - { name: '_ldap._tcp.dc._msdcs.everythingshouldbevirtual.local', type: 'SRV', ip: '0 100 389 DC01.everythingshouldbevirtual.local', zone: '_msdcs.everythingshouldbevirtual.local' }
+      - { name: '_ldap._tcp.dc._msdcs.everythingshouldbevirtual.local', type: 'SRV', ip: '0 100 389 DC02.everythingshouldbevirtual.local', zone: '_msdcs.everythingshouldbevirtual.local' }
+  tasks:
+    - name: debian | config | adding dns zones
+      template: src=../templates/pdns_zones.sh.j2 dest=/tmp/pdns_zones.sh mode=0774
+      run_once: true
+    - name: debian | config | configuring zones
+      command: /tmp/pdns_zones.sh
+      run_once: true

@@ -1,0 +1,14 @@
+- hosts: all
+  serial: 1
+  tasks:
+
+  - name: main | config | restart machine
+    command: shutdown -r now
+    async: 0
+    poll: 0
+    ignore_errors: true
+
+  - name: waiting for server to come back
+    local_action: wait_for port=22 host="{{ ansible_ssh_host  | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+    sudo: false
+

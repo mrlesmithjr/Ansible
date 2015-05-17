@@ -1,0 +1,10 @@
+---
+- hosts: all
+  tasks:
+    - name: change_ip | config | changing IP and updating /etc/interfaces
+      template: src=../templates/etc/interfaces_static.j2 dest=/etc/network/interfaces owner=root group=root mode=0644 backup=yes
+      when: pre_bootstrap_change_ip
+
+    - name: change_ip | reboot | restarting host
+      command: 'shutdown -r now'
+      when: pre_bootstrap_change_ip
