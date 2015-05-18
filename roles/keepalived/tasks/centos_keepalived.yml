@@ -1,0 +1,13 @@
+- name: install keepalived
+  yum: name=keepalived state=present
+
+- name: enable keepalived on boot and start
+  service: name=keepalived state=started enabled=yes
+
+- name: allow VIP to come up on both nodes
+  sysctl: name="net.ipv4.ip_nonlocal_bind" value=1 state=present reload=yes
+
+- name: configure keepalived
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf mode=0644 owner=root group=root backup=yes
+  notify:
+    - restart keepalived

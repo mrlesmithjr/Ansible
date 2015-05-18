@@ -1,0 +1,62 @@
+# {{ ansible_managed }}
+
+global
+#        log logstash    local0 #Change logstash to your naming
+        log /dev/log    local0
+        log /dev/log    local1 notice
+#	log-send-hostname
+	chroot /var/lib/haproxy
+	user haproxy
+	group haproxy
+	daemon
+	maxconn 40000
+	spread-checks 3
+
+defaults
+	log     global
+	mode    tcp
+	maxconn 40000
+	option  httplog
+	option  dontlognull
+	option redispatch
+	option tcp-smart-accept
+	option tcp-smart-connect
+	retries 3
+	timeout queue 5000
+	timeout connect 50000
+	timeout client 50000
+	timeout server 50000
+
+userlist STATSUSERS
+	group admin users admin
+	user admin insecure-password admin
+
+listen admin_page 0.0.0.0:9090
+        mode http
+        stats enable
+        stats refresh 60s
+        stats uri /
+        acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+        acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+        stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+
+frontend http
+        bind {{ keepalived_vip }}:80
+        default_backend http
+
+backend http
+        mode http
+        stats enable
+        stats auth admin:password # Change this to your own username and password!
+        #balance leastconn - The server with the lowest number of connections receives the connection
+        #balance roundrobin - Each server is used in turns, according to their weights.
+        #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+        balance roundrobin
+	default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+        option httpclose
+        option httplog
+	option forwardfor except {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
+        cookie JSESSIONID prefix indirect nocache
+{% for host in groups['web-vms'] %}
+        server {{ host }} {{ host }}:80 cookie check
+{% endfor %}

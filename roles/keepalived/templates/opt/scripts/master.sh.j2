@@ -1,0 +1,16 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+# Starts all services which should be running primary node
+#/etc/init.d/isc-dhcp-server start
+/etc/init.d/dnsmasq start
+#/etc/init.d/nginx start
+/etc/init.d/haproxy start
+
+# Setup Masquerade NAT rule
+iptables -t nat -D POSTROUTING -o {{ pri_bind_interface }} -j MASQUERADE
+iptables -t nat -A POSTROUTING -o {{ pri_bind_interface }} -j MASQUERADE
+
+touch /var/log/primary_node
+rm /var/log/standby_node
+rm /var/log/faulted_node

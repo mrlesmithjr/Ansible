@@ -1,0 +1,3 @@
+---
+config_haproxy: false
+sync_haproxy: false

@@ -1,0 +1,8 @@
+---
+enable_firewall: false
+config_keepalived: false
+enable_conntrackd: false
+config_conntrackd: false
+notify_master_script: 'master.sh'
+notify_backup_script: 'backup.sh'
+notify_fault_script: 'fault.sh'

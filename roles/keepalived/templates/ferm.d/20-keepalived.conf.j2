@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+# Allow KeepAliveD ports
+table filter{
+    chain KEEPALIVED-Allowed;
+    chain CONNTRACKD-Allowed;
+    chain INPUT {
+        daddr 224.0.0.0/8 jump KEEPALIVED-Allowed;
+        daddr 225.0.0.0/8 jump CONNTRACKD-Allowed;
+        proto vrrp jump KEEPALIVED-Allowed;
+        daddr {{ keepalived_vip }} proto tcp dport 9090 jump KEEPALIVED-Allowed;
+    }
+    chain KEEPALIVED-Allowed {
+        daddr 224.0.0.0/8 mod state state NEW jump LOGGING-Allowed;
+        proto vrrp mod state state NEW jump LOGGING-Allowed;
+        daddr {{ keepalived_vip }} proto tcp dport 9090 mod state state NEW jump LOGGING-Allowed;
+    }
+    chain CONNTRACKD-Allowed {
+        daddr 225.0.0.0/8 mod state state NEW jump LOGGING-Allowed;
+    }
+}

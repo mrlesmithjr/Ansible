@@ -1,0 +1,20 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+# Stops all services on standby node
+#/etc/init.d/isc-dhcp-server stop
+/etc/init.d/dnsmasq stop
+#/etc/init.d/nginx stop
+/etc/init.d/haproxy stop
+
+# shutting down interfaces on standby node
+{% for item in vlan_config %}
+/sbin/ifdown {{ item.vlan }}
+{% endfor %}
+
+# Remove Masquerade NAT rule
+iptables -t nat -D POSTROUTING -o {{ pri_bind_interface }} -j MASQUERADE
+
+touch /var/log/standby_node
+rm /var/log/primary_node
+rm /var/log/faulted_node

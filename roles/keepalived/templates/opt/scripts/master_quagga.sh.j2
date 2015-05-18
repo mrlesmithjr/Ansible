@@ -1,0 +1,31 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+# Brings interfaces back up on primary node
+{% for item in vlan_config %}
+ifup {{ item.vlan }}
+{% endfor %}
+
+# Starts all services which should be running primary node
+#/etc/init.d/quagga restart
+service quagga restart
+#/etc/init.d/isc-dhcp-server start
+#/etc/init.d/dnsmasq restart
+service dnsmasq restart
+#/etc/init.d/nginx start
+#/etc/init.d/haproxy restart
+service haproxy restart
+
+# Removes default route back on {{ quagga_mgmt_int }} when in standby mode
+#/sbin/route del default gw {{ quagga_mgmt_gateway }}
+
+iptables -t nat -F POSTROUTING
+{% for item in vlan_config %}
+iptables -t nat -A POSTROUTING -s {{ item.network }} -o {{ keepalived_vip_int }} -j SNAT --to {{ keepalived_vip }}
+{% endfor %}
+
+/opt/scripts/primary-backup.sh primary
+
+touch /var/log/primary_node
+rm /var/log/standby_node
+rm /var/log/faulted_node
