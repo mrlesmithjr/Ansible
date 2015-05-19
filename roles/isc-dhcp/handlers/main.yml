@@ -1,7 +1,10 @@
 ---
 - name: reload ferm
   service: name=ferm state=reloaded
+
 - name: run ferm
   shell: ferm /etc/ferm/ferm.conf
+
 - name: restart_isc_dhcp_server
-  service: name=isc-dhcp-server state=restarted
+#  service: name=isc-dhcp-server state=restarted
+  command: service isc-dhcp-server stop && pkill dhcpd && service isc-dhcp-server start

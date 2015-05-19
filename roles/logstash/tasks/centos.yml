@@ -1,0 +1,25 @@
+---
+# install rpm key
+- rpm_key: key="https://packages.elasticsearch.org/GPG-KEY-elasticsearch" state=present
+
+# logstash repository
+- name: enable logstash repository
+  template: src=logstash_repo.j2 dest=/etc/yum.repos.d/logstash.repo
+
+# install logstash
+- name: install logstash
+  yum: name={{ item }} state=latest
+  with_items:
+    - logstash
+    - logstash-contrib
+    - java-1.7.0-openjdk
+#  notify: init logstash
+
+# Disable logstash-web
+#- name: disable logstash-web
+#  replace: dest=/etc/init/logstash-web.conf regexp='^start on virtual-filesystems' replace='start on never' backup=yes
+#  notify: stop logstash-web
+
+# enable service on boot and start
+- name: enable logstash on boot and start
+  service: name=logstash state=started enabled=yes
