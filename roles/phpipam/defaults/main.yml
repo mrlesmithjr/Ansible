@@ -1,0 +1,16 @@
+---
+enable_firewall: false
+
+# Apache2
+web_root: '/var/www/html'
+
+# phpipam
+patch_discovery: true
+patch_email: true
+phpipam_download: 'http://sourceforge.net/projects/phpipam/files/latest/download'
+phpipam_db_host: 'localhost'
+phpipam_db_user: 'phpipam'
+phpipam_db_pass: 'phpipamadmin'
+phpipam_db_name: 'phpipam'
+phpipam_base: '/phpipam/'
+phpipam_root: '{{ web_root }}/phpipam'

@@ -1,0 +1,7 @@
+---
+- name: reload ferm
+  service: name=ferm state=reloaded
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf
+- name: restart_isc_dhcp_server
+  service: name=isc-dhcp-server state=restarted

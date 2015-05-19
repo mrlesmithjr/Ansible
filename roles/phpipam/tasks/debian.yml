@@ -1,0 +1,71 @@
+---
+- name: debian | installing pre-req packages
+  apt: name={{ item }} state=present
+  with_items:
+    - libapache2-mod-php5
+    - python-mysqldb
+    - php5
+    - php5-gmp
+    - php-pear
+    - php5-mysql
+    - php5-mysqlnd
+    - php5-ldap
+    - php5-mcrypt
+    - php5-curl
+    - php5-sqlite
+    - wget
+- name: debian | enabling php5-mcrypt
+  command: php5enmod mcrypt
+- name: debian | enabling apache mod_rewrite
+  apache2_module: name=rewrite state=present
+  notify: restart apache2
+- name: debian | downloading phpipam
+  get_url: url={{ phpipam_download }} dest=/tmp/phpipam.tar
+- name: debian | extracting phpipam package to web_root
+  unarchive: src=/tmp/phpipam.tar dest={{ web_root }} copy=no owner=www-data group=www-data creates={{ phpipam_root }}/config.php
+- name: debian | creating phpipam web config
+  template: src=config.php.j2 dest={{ phpipam_root }}/config.php owner=www-data group=www-data
+- name: debian | configuring .htacess
+  template: src=htaccess.j2 dest={{ phpipam_root }}/.htaccess owner=root group=root
+- name: debian | creating phpipam db
+  mysql_db: name={{ phpipam_db_name }} state=present
+  when: phpipam_primary
+- name: debian | creating phpipam user
+  mysql_user: name={{ phpipam_db_user }} password={{ phpipam_db_pass }} priv={{ phpipam_db_name }}.*:ALL state=present
+  when: phpipam_primary
+- name: debian | checking if phpipam db already imported
+  stat: path=/var/log/phpipam_db_imported
+  register: phpipam_db_imported
+  when: phpipam_primary
+- name: debian | copying db schema
+  template: src=phpipam_schema.sql.j2 dest=/tmp/phpipam_schema.sql
+  when: phpipam_primary
+- name: debian | importing phpipam database
+  mysql_db: name={{ phpipam_db_name }} state=import target=/tmp/phpipam_schema.sql
+#  mysql_db: name={{ phpipam_db_name }} state=import target={{ phpipam_root }}/db/SCHEMA.sql
+  when: phpipam_primary and phpipam_db_imported.stat.exists != True
+- name: debian | setting phpipam db imported
+  file: path=/var/log/phpipam_db_imported state=touch
+  when: phpipam_primary and phpipam_db_imported.stat.exists != True
+- name: debian | adding cron job for pingCheck
+  cron: name="phpipam pingCheck"
+        job="/usr/bin/php {{ phpipam_root }}/functions/scripts/pingCheck.php"
+        minute="*/15" hour="*" day="*" month="*"
+        user="www-data"
+        cron_file=phpipam_pingCheck 
+- name: debian | adding cron job for discoveryCheck
+  cron: name="phpipam discoveryCheck"
+        job="/usr/bin/php {{ phpipam_root }}/functions/scripts/discoveryCheck.php"
+        minute="*/15" hour="*" day="*" month="*"
+        user="www-data"
+        cron_file=phpipam_discoveryCheck
+  when: phpipam_primary
+- name: debian | patching functions-network.php
+  template: src=functions-network.php.j2 dest={{ phpipam_root }}/functions/functions-network.php owner=www-data group=www-data
+  when: patch_discovery
+- name: debian | patching email
+  template: src=functions-mail.php.j2 dest={{ phpipam_root }}/functions/functions-mail.php owner=www-data group=www-data
+  when: patch_email
+- name: debian | patching email
+  template: src=mailSettingsTestMail.php.j2 dest={{ phpipam_root }}/site/admin/mailSettingsTestMail.php owner=www-data group=www-data
+  when: patch_email
