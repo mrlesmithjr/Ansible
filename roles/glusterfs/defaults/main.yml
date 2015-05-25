@@ -1,0 +1,6 @@
+---
+enable_firewall: false
+glusterfs_server: false
+glusterfs_client: false
+config_glusterfs: false
+server_group: ans-cloud-rt01

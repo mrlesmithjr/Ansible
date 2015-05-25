@@ -1,0 +1,46 @@
+---
+- name: config_glusterfs | config | restarting ferm if enabled
+  service: name=ferm state=restarted
+  when: enable_firewall == "true"
+
+- name: reconfiguring /etc/init/mounting-glusterfs.conf to start earlier on boot
+  template: src=mounting-glusterfs.conf.j2 dest=/etc/init/mounting-glusterfs.conf owner=root group=root mode=0644
+  when: config_glusterfs
+
+- name: updating /etc/hosts in case of dns lookup issues
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_eth0.ipv4.address }} {{item}}" state=present
+  with_items: groups['{{ server_group }}']
+  when: config_hosts and glusterfs_repl_int == "eth0"
+
+- name: updating /etc/hosts in case of dns lookup issues
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_eth1.ipv4.address }} {{item}}" state=present
+  with_items: groups['{{ server_group }}']
+  when: config_hosts and glusterfs_repl_int == "eth1"
+
+- name: updating /etc/hosts in case of dns lookup issues
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_eth2.ipv4.address }} {{item}}" state=present
+  with_items: groups['{{ server_group }}']
+  when: config_hosts and glusterfs_repl_int == "eth2"
+
+- name: Start GlusterFS
+  service: name=glusterfs-server state=started enabled=true
+  when: glusterfs_server
+
+- name: connect gluster peers
+  shell: gluster peer probe {{ item }}
+  register: gluster_peer_probe
+  changed_when: "'already in peer list' not in gluster_peer_probe.stdout"
+  with_items: groups['{{ server_group }}']
+  when: glusterfs_server and '{{ item }} != {{ inventory_hostname }}'
+
+- name: creating brick folders
+  file: path={{ gluster_brick_dir }}/{{ item.name }}/ owner={{ item.owner }} group={{ item.group }} state=directory
+  with_items: create_gluster_bricks
+  when: glusterfs_server
+
+- name: create gluster volume
+  gluster_volume: state=present name={{ item.name }} brick={{ item.brick }} replicas={{ item.replicas }} cluster={{ cluster_hosts }}
+  with_items: create_gluster_volumes
+#  ignore_errors: yes
+  run_once: true
+  when: glusterfs_server

@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+# Allow GlusterFS ports
+table filter{
+    chain GLUSTERFS-Allowed;
+    chain INPUT {
+        proto tcp dport (111 2049 24007 24008 38465:38467 49152:49252) jump GLUSTERFS-Allowed;
+        proto udp dport (111) jump GLUSTERFS-Allowed;
+    }
+    chain GLUSTERFS-Allowed {
+        proto tcp dport (111 2049 24007 24008 38465:38467 49152:49252) mod state state NEW jump LOGGING-Allowed;
+        proto udp dport (111) mod state state NEW jump LOGGING-Allowed;
+    }
+}

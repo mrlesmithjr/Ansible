@@ -1,0 +1,24 @@
+---
+- name: debian | install | installing pre-reqs
+  apt: name={{ item }} state=present
+  with_items:
+    - python-software-properties
+    - xfsprogs
+
+- name: debian | config | adding glusterfs apt repo key
+  apt_key: keyserver=keyserver.ubuntu.com id=F7C73FCC930AC9F83B387A5613E01B7B3FE869A9 state=present
+
+- name: debian | config | adding glusterfs apt repo
+  apt_repository: repo='deb http://ppa.launchpad.net/gluster/glusterfs-{{glusterfs_version}}/ubuntu trusty main' state=present update_cache=yes
+
+- name: debian | install | installing glusterfs server
+  apt: name=glusterfs-server state=latest
+  when: glusterfs_server
+
+- name: debian | install | installing glusterfs client
+  apt: name=glusterfs-client state=latest
+  when: glusterfs_client
+
+- name: debian | config | enabling glusterfs-server
+  service: name=glusterfs-server enabled=yes
+  when: glusterfs_server
