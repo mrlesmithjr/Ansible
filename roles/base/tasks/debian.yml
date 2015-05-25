@@ -1,13 +1,10 @@
 ---
-# Remove vmware tools package repo - errors out trying to update
 - name: debian | removing vmware tools package repo on {{ ansible_hostname }}
   apt_repository: repo='deb http://packages.vmware.com/packages/ubuntu trusty main' state=absent
 
-# Run apt-get update
 - name: debian | running apt-get update
   apt: update_cache=yes cache_valid_time=86400
 
-# Install base packages
 - name: debian | installing base packages
   apt: name={{ item }} state=present
   with_items:
@@ -19,7 +16,6 @@
    - ntp
    - scsitools
 
-# Rescan for new disks added
 - name: debian | rescanning for new disks added
   command: /sbin/rescan-scsi-bus
 
