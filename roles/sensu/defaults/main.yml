@@ -1,0 +1,3 @@
+---
+rabbitmq_sensu_user: sensu
+rabbitmq_sensu_pass: sensu
