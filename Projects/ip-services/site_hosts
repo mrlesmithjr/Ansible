@@ -1,0 +1,12 @@
+ns-1-2-clust-mgmr  ansible_ssh_host=10.0.101.10
+ns2  ansible_ssh_host=10.0.101.12
+ns1  ansible_ssh_host=10.0.101.11
+
+[ip-services]
+ns-1-2-clust-mgmr
+ns1
+ns2
+
+[nameservers]
+ns1
+ns2

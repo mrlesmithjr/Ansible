@@ -1,0 +1,11 @@
+---
+# provision environment
+- hosts: all
+  connection: local
+
+  tasks:
+- include: "gather_vm_details.yml"
+  vars:
+    vcenter_hostname: 'vcsa.everythingshouldbevirtual.local'
+    vcenter_user: 'ansible@everythingshouldbevirtual.local'
+    gather_dir: 'replace_gather_dir'

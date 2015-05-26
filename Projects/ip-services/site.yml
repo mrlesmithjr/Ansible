@@ -1,0 +1,21 @@
+---
+- hosts: ip-services
+  remote_user: remote
+  sudo: yes
+  roles:
+    - { role: disable-firewall, when: enable_firewall == 'false' }
+    - { role: enable-firewall, when: enable_firewall == 'true' }
+    - base
+    - { role: snmpd, when: enable_snmpd }
+    - { role: timezone, when: change_timezone }
+    - { role: zabbix-agent, when: enable_zabbix_monitoring }
+    - { role: collectd, when: enable_collectd_monitoring }
+    - mariadb-galera-cluster
+    - apache2
+- hosts: nameservers
+  remote_user: remote
+  sudo: yes
+  roles:
+    - { role: powerdns, when: install_dns }
+    - { role: isc-dhcp, when: install_dhcp }
+    - { role: phpipam, when: install_phpipam }

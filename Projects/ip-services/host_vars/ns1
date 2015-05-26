@@ -1,0 +1,40 @@
+---
+## Begin provisioning variables
+multi: 'true'
+disk1: '36'
+disk2: '50'
+datastore: 'Tier-3 (NAS01)'
+network: 'vSS-Green-Servers-VLAN101'
+memory: '512'
+cpucount: '1'
+osid: 'ubuntu64Guest'
+## End provisioning variables
+
+#### variables
+# datastore
+# network   -  vSS-OpenStack_Admin_PXE - used for initial provisioning   ---- vSS-Green-Servers-VLAN101 - for lan type services
+# memory    -  must be set to a min. of 512 for initial provisioning
+# cpucount
+# osid
+# vm_template :  template to use.... below are available templates
+# Centos 6 x64-Template
+# CentOS 7 x64-Template
+# Ubuntu 12.04 x64 Template
+# Ubuntu 14.04 64-bit Server Template ---- 1vCPU, 512MB memory, 36GB (disk1)
+# Server2012R2-STD
+
+# Define primary network settings (additional common settings are in group_vars/)
+pri_bind_address: '10.0.101.11'
+hostname: 'ns1.{{ pri_domain_name }}'
+
+# MySQL
+mysql_master: false
+mysql_slave: false
+
+# DHCP
+failover_role: 'primary'
+failover_address: '{{ pri_bind_address }}'
+failover_peer_address: '10.0.101.12'
+
+# PHPIPAM
+phpipam_primary: true

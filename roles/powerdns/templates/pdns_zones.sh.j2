@@ -1,0 +1,7 @@
+#!/bin/bash
+{% for item in pdns_zones %}
+curl -X POST -d '{"name": "{{ item.name }}", "kind": "{{ item.kind }}", "masters": "{{ item.masters }}", "nameservers": ["{{ item.nameservers }}"]}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{% endfor %}
+{% for item in pdns_records %}
+curl -X PATCH -d '{"rrsets": [ {"name": "{{ item.name }}", "type": "{{ item.type }}", "changetype": "REPLACE", "records": [ {"content": "{{ item.ip }}", "disabled": false, "set-ptr": true, "name": "{{ item.name }}", "ttl": 86400, "type": "{{ item.type}}" } ] } ] }' {{ pdns_curl_header }} {{ pdns_api_url }}/{{ item.zone }}
+{% endfor %}

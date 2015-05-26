@@ -1,0 +1,18 @@
+---
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "RedHat"
+
+# Open firewall ports
+- include: ferm.yml
+  tags: [ferm]
+  when: enable_firewall
+
+#- include: create_zones.yml
+#  when: pdns_create_zones
+
+- include: a-createnative.yml
+  tags: [pdns_create_zones]
+  when: "pdns_create_zones and zone_types == 'native' and 'nameservers' in group_names"

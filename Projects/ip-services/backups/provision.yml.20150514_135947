@@ -1,0 +1,21 @@
+---
+# provision environment
+- hosts: all
+  connection: local
+#  vars_prompt:
+#    - name: 'vm_task_action'
+#      prompt: 'Enter vm action to execute (none, create, create_from_template, delete, reconfigure, reconfigure_template)'
+#      private: no
+  tasks:
+
+- include: "provision_vms.yml"
+  vars:
+    vcenter_hostname: 'vcsa.everythingshouldbevirtual.local'
+    vcenter_user: 'ansible@everythingshouldbevirtual.local'
+    datacenter: 'everythingshouldbevirtual'
+    esxi_host: 'esxi01.everythingshouldbevirtual.local'
+    notes: 'Created by Ansible'
+    vm_state: 'present'
+    vm_task_action: 'none' # none|create|create_from_template|reconfigure
+    cluster: 'HA-DRS-CLUSTER'
+    resource_pool: '/Resources'

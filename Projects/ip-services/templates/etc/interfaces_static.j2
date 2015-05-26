@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+
+auto lo
+iface lo inet loopback
+
+auto {{ pri_bind_interface }}
+iface {{ pri_bind_interface }} inet static
+address {{ pri_bind_address }}
+netmask {{ pri_netmask }}
+up route add default gw {{ pri_gateway }}
+dns-nameservers {{ dns_nameservers }}
+dns-search {{ dns_search }}

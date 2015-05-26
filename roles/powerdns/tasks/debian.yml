@@ -1,0 +1,9 @@
+---
+- include: debian_pdns.yml
+  when: install_pdns_recursor
+
+- include: debian_pdns_recursor.yml
+  when: install_pdns_recursor
+
+- name: debian | ensuring pdns server is running
+  service: name=pdns state=started

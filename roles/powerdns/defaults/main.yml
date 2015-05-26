@@ -1,0 +1,61 @@
+---
+enable_firewall: false
+
+# PowerDNS
+pdns_server_version: 3.4.4-1
+pdns_recursor_version: 3.7.2-1
+pdns_api_key: changeme
+pdns_json_interface: yes
+pdns_webserver: yes
+pdns_webserver_address: 0.0.0.0
+pdns_webserver_allow: '0.0.0.0/0,::/0'
+pdns_webserver_port: 8081
+install_pdns_recursor: true   # install recursive caching server
+dns_forward_zones: 'everythingshouldbevirtual.local=127.0.0.1:54,cloud.everythingshouldbevirtual.local=127.0.0.1:54'
+allow_ddns_updates: true
+allow_ddns_updates_from: '0.0.0.0/0'
+pdns_api_url: 'http://127.0.0.1:8081/servers/localhost/zones'
+pdns_curl_header: "-H 'X-API-Key: {{pdns_api_key }}'"
+pdns_nameservers: '10.0.101.11,10.0.101.12'
+pdns_domain: everythingshouldbevirtual.local
+pdns_default_soa_mail: 'hostmaster.{{ pdns_domain }}' # hostmaster
+pdns_default_soa_name: '{{ ansible_hostname }}.{{ pdns_domain }}' # nameserver
+
+# DB
+db_host: localhost
+db_user: powerdns
+db_pass: powerdns
+db_name: powerdns
+
+# Poweradmin
+install_poweradmin: false
+poweradmin_ver: poweradmin-2.1.7
+poweradmin_user: admin
+poweradmin_pass: admin
+dns_hostmaster: hostmaster.everythingshouldbevirtual.local
+dns_ns1: ns1.everythingshouldbevirtual.local
+dns_ns2: ns2.everythingshouldbevirtual.local
+web_root: /var/www/html
+
+# Create dns zones
+pdns_create_zones: true    # set to false if you do not want to create zones
+zone_types: native
+create_fwd_zones:
+  - '{{ pdns_domain }}'
+  - 'test.{{ pdns_domain }}'
+  - 'wildwest.{{ pdns_domain }}'
+  - '_msdcs.{{ pdns_domain }}'
+  - '_sites.{{ pdns_domain }}'
+  - '_tcp.{{ pdns_domain }}'
+  - '_udp.{{ pdns_domain }}'
+create_rev_zones:
+  - '0.0.10'
+  - '101.0.10'
+  - '106.0.10'
+  - '107.0.10'
+  - '110.0.10'
+  - '125.0.10'
+  - '10.10.10'
+  - '24.16.172'
+  - '1.168.192'
+  - '200.168.192'

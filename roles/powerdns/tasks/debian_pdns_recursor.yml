@@ -1,0 +1,20 @@
+---
+- name: debian_pdns_recursor | creating pdns group
+  group: name=pdns state=present
+
+- name: debian_pdns_recursor | creating pdns user
+  user: name=pdns group=pdns system=yes home=/var/spool/powerdns shell=/bin/false state=present
+
+- name: debian_pdns_recursor | downloading powerdns recursor
+  get_url: url='https://downloads.powerdns.com/releases/deb/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb' dest='/tmp/pdns-recursor.deb'
+
+- name: debian_pdns_recursor | installing powerdns recursor
+  shell: dpkg -i /tmp/pdns-recursor.deb creates=/usr/sbin/pdns_recursor
+
+- name: debian_pdns_recursor | configuring powerdns recursor
+  template: src=recursor.conf.j2 dest=/etc/powerdns/recursor.conf owner=root group=root
+  notify: restart_pdns_recursor
+
+- name: debian_pdns_recursor | configuring pdns for recursor
+  replace: dest=/etc/powerdns/pdns.conf regexp='^recursor=no' replace='recursor=127.0.0.1:5300'
+  notify: restart_pdns

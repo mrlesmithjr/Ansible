@@ -1,0 +1,19 @@
+---
+- hosts: all
+  gather_facts: false
+  connection: local
+
+  vars:
+#    vcenter_hostname: 'vcsa.everythingshouldbevirtual.local'
+#    vcenter_user: 'root'
+    pysphere_script_home: '.'
+
+  vars_prompt:
+    - name: 'vcenter_pass'
+      prompt: 'Enter vcenter password to gather facts'
+      private: yes
+
+  tasks:
+    - name: capturing ip addresses
+      script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/vm_ip_info"
+      delegate_to: localhost

@@ -1,0 +1,56 @@
+---
+enable_firewall: false
+enable_cacti_monitoring: true
+enable_collectd_monitoring: true
+enable_snmpd: true
+enable_zabbix_monitoring: true
+change_timezone: true
+pri_domain_name: everythingshouldbevirtual.local
+
+# Define LVM configuration for additional disk added for GlusterFS
+config_lvm: true
+create: true
+create_vgname: 'mysql-vg'
+create_lvname: 'mysql-lv'
+create_lvsize: '100%FREE'
+new_mntp: '/var/lib/mysql'
+new_disk: '/dev/sdb'
+filesystem: ext4
+
+# Reconfigure networking on ititial setup
+pre_bootstrap_change_ip: true            # changes ip of each node based on host_vars ip setting
+
+# sets up networking - used througout various settings for additional services if they can be
+pri_bind_interface: 'eth0'          # should be set to your primary interface
+pri_interface_method: 'static'      # set to static or dhcp
+pri_netmask: '255.255.255.0'        # set to the netmask for your primary interface (eth0)
+pri_gateway: '10.0.101.1'           # set to the primary interface gateway...this will also setup the ospf default route
+pri_dns: '10.0.101.111'             # set to your primary dns server
+sec_dns: '10.0.101.112'             # set to your secondary dns server
+pri_domain_name: 'everythingshouldbevirtual.local'           # set to your primary domain name
+dns_nameservers: '{{ pri_dns }} {{ sec_dns }}'                 # add your dns servers for upstream resolution
+dns_search: '{{ pri_domain_name}}'      # sets your dns search suffix
+
+# PowerDNS
+install_dns: true
+
+# DHCP
+install_dhcp: true
+enable_failover: true
+authoritative: true
+
+# MySQL
+galera_cluster_nodes: '10.0.101.10,10.0.101.11,10.0.101.12'
+mysql_root_password: 'mysql@dm!n'
+deb_db_password: 'mysql@dm!n'
+phpmyadmin_mysql_password: '{{ mysql_root_password }}'
+
+# CollectD MySQL monitoring
+enable_mysql_monitoring: true
+monitor_db:
+  - 'phpipam'
+  - 'powerdns'
+mysql_clustered: true
+
+# PHPIPAM
+install_phpipam: true

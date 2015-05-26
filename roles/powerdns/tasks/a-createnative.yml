@@ -1,0 +1,12 @@
+---
+- pdns_zone: name="{{ item }}" action=native
+            soa="{{ ansible_hostname }} {{ pdns_default_soa_mail }} 1 1800 900 604800 3602"
+            nsset="{{ pdns_nameservers }}"
+  run_once: true
+  with_items: create_fwd_zones
+
+- pdns_zone: name="{{ item }}.in-addr.arpa" action=native
+            soa="{{ ansible_hostname }} {{ pdns_default_soa_mail }} 1 1800 900 604800 3602"
+            nsset="{{ pdns_nameservers }}"
+  run_once: true
+  with_items: create_rev_zones
