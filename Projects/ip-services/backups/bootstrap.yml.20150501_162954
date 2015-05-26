@@ -1,6 +1,0 @@
----
-- hosts: all
-  vars:
-    create_cust_account: false
-  roles:
-    - bootstrap

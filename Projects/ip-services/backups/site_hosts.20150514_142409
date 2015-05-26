@@ -1,6 +1,0 @@
-ns1  ansible_ssh_host=10.0.101.11
-ns2  ansible_ssh_host=10.0.101.12
-
-[nameservers]
-ns1
-ns2
