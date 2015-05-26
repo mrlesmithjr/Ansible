@@ -2,12 +2,15 @@
 - name: galera_monitoring | configuring monitor script for galera
   template: src=etc/mysql/{{ galera_monitor_script_name }}.j2 dest={{ galera_monitor_script_path }}/{{ galera_monitor_script_name }} owner=mysql group=mysql mode=0770
   register: galera_monitoring_updated
+
 - name: galera_monitoring | restarting mysql on master
   service: name=mysql state=restarted
   when: mysql_master and galera_monitoring_updated.changed
+
 - name: galera_monitoring | waiting for mysql to start on master
   wait_for: port=3306
   when: mysql_master
+
 - name: galera_monitoring | restarting mysql on additional servers
   service: name=mysql state=restarted
   when: not mysql_master and galera_monitoring_updated.changed

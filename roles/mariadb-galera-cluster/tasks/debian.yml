@@ -1,5 +1,6 @@
 ---
 - include: mysql_root_pw.yml
+
 - name: debian | installing pre-reqs
   apt: name={{ item }} state=present
   with_items:
@@ -7,47 +8,74 @@
     - python-mysqldb
     - rsync
     - mysqltuner
+
 - name: debian | importing repository key
   apt_key: keyserver=keyserver.ubuntu.com id=0xcbcb082a1bb943db
+
 - name: debian | adding apt repository
   apt_repository: repo="deb http://ftp.utexas.edu/mariadb/repo/10.0/{{ ansible_distribution|lower() }} {{ ansible_distribution_release }} main"
     state=present update_cache=yes
+
 - name: debian | installing mariadb-galera packages
   apt: name={{ item }} state=present
   with_items:
     - mariadb-galera-server
     - galera
+
 - name: debian | adding debian-sys-maintenance permissions to mysql
   mysql_user: name=debian-sys-maint password={{ deb_db_password }} priv=*.*:ALL,GRANT state=present
+
 - name: debian | deleting old my.cnf
   command: rm /etc/my.cfg removes=/etc/my.cfg
+
 - name: debian | configuring db server and galera
   template: src={{ item.src }} dest={{ item.dest }}
   with_items:
-    - { src: 'etc/mysql/my.cnf.j2', dest: '/etc/mysql/my.cnf' }
-    - { src: 'etc/mysql/debian.cnf.j2', dest: '/etc/mysql/debian.cnf' }
-    - { src: 'etc/mysql/conf.d/galera.cnf.j2', dest: '/etc/mysql/conf.d/galera.cnf' }
+    - { src: etc/mysql/my.cnf.j2, dest: /etc/mysql/my.cnf }
+    - { src: etc/mysql/debian.cnf.j2, dest: /etc/mysql/debian.cnf }
+    - { src: etc/mysql/conf.d/galera.cnf.j2, dest: /etc/mysql/conf.d/galera.cnf }
+
 - name: debian | checking if galera cluster setup
   stat: path=/etc/mysql/galera_cluster_configured
   register: galera_cluster_configured
+
 - name: debian | stopping mysql
   service: name=mysql state=stopped
   when: galera_cluster_configured.stat.exists == false
-- name: debian | bootstrapping galera cluster
-  shell: /etc/init.d/mysql start --wsrep-new-cluster
+
+- name: debian | killing lingering mysql processes
+  command: pkill mysqld
+  ignore_errors: true
+
+- name: debian | configuring temp galera config
+  template: src=etc/mysql/conf.d/temp.galera.cnf.j2 dest=/etc/mysql/conf.d/galera.cnf
   when: mysql_master and galera_cluster_configured.stat.exists == false
+
+- name: debian | bootstrapping galera cluster
+#  shell: /etc/init.d/mysql start --wsrep-new-cluster
+  service: name=mysql state=started
+  when: mysql_master and galera_cluster_configured.stat.exists == false
+
 - name: debian | joining galera cluster
   service: name=mysql state=started
   when: not mysql_master and galera_cluster_configured.stat.exists == false
+
+- name: debian | configuring galera config
+  template: src=etc/mysql/conf.d/galera.cnf.j2 dest=/etc/mysql/conf.d/galera.cnf
+  when: mysql_master and galera_cluster_configured.stat.exists == false
+
 - name: debian | stopping mysql services
   service: name=mysql state=stopped
   when: mysql_master and galera_cluster_configured.stat.exists == false
+
 - name: debian | restarting galera cluster
   service: name=mysql state=started
   when: mysql_master and galera_cluster_configured.stat.exists == false
+
 - name: debian | marking galera cluster as configured
   file: path=/etc/mysql/galera_cluster_configured state=touch
   when: galera_cluster_configured.stat.exists == false
+
 - name: debian | adding cacti db user for monitoring
   mysql_user: name={{ cacti_user }} password={{ cacti_pass }} priv=*.*:SUPER,PROCESS state=present
   when: enable_cacti_monitoring

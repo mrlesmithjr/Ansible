@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+[mysqld]
+#mysql settings
+binlog_format=ROW
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+query_cache_size=0
+query_cache_type=0
+bind-address=0.0.0.0
+#galera settings
+wsrep_node_name={{ ansible_hostname }}
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_cluster_name="{{ galera_cluster_name }}"
+#wsrep_cluster_address="gcomm://{{ galera_cluster_nodes }}"
+# To start failed cluster comment out above and uncomment below...Once cluster is started revert changes and restart mysql on main node where change was made
+wsrep_cluster_address="gcomm://"
+wsrep_sst_method=rsync
+{% if enable_galera_monitoring_script %}
+wsrep_notify_cmd='{{ galera_monitor_script_path }}/{{ galera_monitor_script_name }}'
+{% endif %}
