@@ -1,36 +1,6 @@
 ---
-- name: debian | adding sensu repo key
-  apt_key: url=http://repos.sensuapp.org/apt/pubkey.gpg state=present
+- include: debian_server.yml
+  when: sensu_server
 
-- name: debian | adding sensu repo
-  apt_repository: repo='deb http://repos.sensuapp.org/apt sensu main' state=present
-
-- name: debian | installing pre-reqs and sensu
-  apt: name={{ item }} state=present
-  with_items:
-    - erlang-nox
-    - make
-    - sensu
-    - uchiwa
-    - ruby
-    - ruby-dev
-
-- name: debian | creating sensu rabbitmq vhost
-  rabbitmq_vhost: name=/sensu state=present
-
-- name: debian | creating sensu rabbitmq user
-  rabbitmq_user: user={{ rabbitmq_sensu_user }}
-                 password={{ rabbitmq_sensu_pass }}
-                 vhost=/sensu
-                 configure_priv=.*
-                 read_priv=.*
-                 write_priv=.*
-                 state=present
-
-- name: debian | ensuring services are enabled and start on boot
-  service: name={{ item }} enabled=yes
-  with_items:
-    - sensu-server
-    - sensu-client
-    - sensu-api
-    - uchiwa
+- include: debian_client.yml
+  when: sensu_client

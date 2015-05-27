@@ -1,21 +1,22 @@
 ---
-enable_checks: true
-enable_local_monitoring: true
 enable_sensu_ssl: false
-install_plugins: true
 monitor_processes:
-  - cron
-  - apache
-  - redis
-  - rabbitmq
-  - sshd
-  - uchiwa
-
+  - { name: cron, sub: ALL }
+  - { name: apache, sub: webservers }
+  - { name: redis, sub: redis }
+  - { name: rabbitmq, sub: rabbit }
+  - { name: sensu-api, sub: sensu }
+  - { name: sensu-server, sub: sensu }
+  - { name: sshd, sub: ALL }
+  - { name: uchiwa, sub: sensu }
 rabbitmq_sensu_user: sensu
 rabbitmq_sensu_pass: sensu
 sensu_api_auth: false            #enable user/pass auth for api access...default is false...no user/pass required
 sensu_api_pass: sensu
 sensu_api_user: sensu
-sensu_root_dir: /etc/sensu
+sensu_client: false
 sensu_config_dir: '{{ sensu_root_dir }}/conf.d'
+sensu_host: sensu.everythingshouldbevirtual.local
 sensu_plugins_dir: '{{ sensu_root_dir }}/plugins'
+sensu_root_dir: /etc/sensu
+sensu_server: false

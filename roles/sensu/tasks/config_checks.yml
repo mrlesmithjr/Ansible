@@ -1,10 +1,10 @@
 ---
-- name: checks | configuring checks
-  template: src=etc/sensu/conf.d/checks.json.j2 dest={{ sensu_config_dir }}/check_{{ item }}.json owner=root group=root mode=0644
+- name: config_checks | configuring checks
+  template: src=etc/sensu/conf.d/checks.json.j2 dest={{ sensu_config_dir }}/check_{{ item.name }}.json owner=root group=root mode=0644
   notify: restart sensu services
   with_items: monitor_processes
 
-- name: checks | configuring plugins
+- name: config_checks | configuring plugins
   template: src=etc/sensu/plugins/{{ item }}.j2 dest={{ sensu_plugins_dir }}/{{ item }} owner=root group=root mode=0755
   notify: restart sensu services
   with_items:

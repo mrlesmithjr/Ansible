@@ -1,0 +1,7 @@
+---
+client_subs:
+  - rabbit
+  - redis
+  - sensu
+  - webservers
+sensu_server: true

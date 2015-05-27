@@ -1,9 +1,0 @@
----
-- name: plugins | installing sensu plugins
-  gem: name={{ item }} user_install=no state=latest
-  with_items:
-    - sensu-plugin
-    - sensu-plugins-disk-checks
-    - sensu-plugins-apache
-#    - sensu-plugin-redis
-#    - sensu-plugin-rabbitmq

@@ -1,7 +1,14 @@
 {
   "client":{
     "name": "{{ ansible_hostname }}",
-    "address": "{{ ansible_eth0.ipv4.address }}",
-    "subscriptions": ["ALL"]
+    "address": "{{ sensu_server }}",
+    "subscriptions": [
+{% if client_subs is defined %}
+{% for item in client_subs %}
+      "{{ item }}",
+{% endfor %}
+{% endif %}
+      "ALL"
+    ]
   }
 }

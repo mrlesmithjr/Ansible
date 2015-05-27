@@ -1,0 +1,6 @@
+---
+- name: config_client | configuring sensu
+  template: src=etc/sensu/conf.d/{{ item }}.j2 dest={{ sensu_config_dir }}/{{ item }} owner=root group=root mode=0644
+  notify: restart sensu-client
+  with_items:
+    - client.json

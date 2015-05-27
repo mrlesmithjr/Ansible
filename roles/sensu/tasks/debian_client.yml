@@ -1,0 +1,26 @@
+---
+- name: debian | adding sensu repo key
+  apt_key: url=http://repos.sensuapp.org/apt/pubkey.gpg state=present
+
+- name: debian | adding sensu repo
+  apt_repository: repo='deb http://repos.sensuapp.org/apt sensu main' state=present
+
+- name: debian | installing pre-reqs and sensu
+  apt: name={{ item }} state=present
+  with_items:
+    - erlang-nox
+    - make
+    - sensu
+    - ruby
+    - ruby-dev
+
+- name: debian | ensuring services are enabled and start on boot
+  service: name={{ item }} enabled=yes
+  with_items:
+    - sensu-client
+
+#- name: debian | disabling services not required for client only
+#  service: name={{ item }} enabled=no
+#  with_items:
+#    - sensu-server
+#    - sensu-api

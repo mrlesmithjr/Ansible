@@ -1,9 +1,9 @@
 {
   "checks": {
-    "{{ item }}": {
-      "command": "/etc/sensu/plugins/check-procs.rb -p {{ item }}",
+    "{{ item.name }}": {
+      "command": "/etc/sensu/plugins/check-procs.rb -p {{ item.name }}",
       "interval": 60,
-      "subscribers": [ "ALL" ]
+      "subscribers": [ "{{ item.sub }}" ]
     }
   }
 }

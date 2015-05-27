@@ -6,4 +6,7 @@
   shell: ferm /etc/ferm/ferm.conf
 
 - name: restart sensu services
-  shell: service sensu-server restart && service sensu-api restart && service sensu-client restart && service uchiwa restart
+  shell: service sensu-server restart && service sensu-api restart && service uchiwa restart
+
+- name: restart sensu-client
+  service: name=sensu-client state=restarted
