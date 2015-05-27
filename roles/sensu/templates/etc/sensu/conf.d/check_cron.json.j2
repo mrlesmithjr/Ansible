@@ -1,0 +1,10 @@
+{
+  "checks": {
+    "cron_check": {
+      "handler": "default",
+      "command": "/etc/sensu/plugins/check-procs.rb -p crond -C 1 ",
+      "interval": 60,
+      "subscribers": ["ALL"]
+    }
+  }
+}

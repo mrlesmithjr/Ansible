@@ -9,8 +9,11 @@
   apt: name={{ item }} state=present
   with_items:
     - erlang-nox
+    - make
     - sensu
     - uchiwa
+    - ruby
+    - ruby-dev
 
 - name: debian | creating sensu rabbitmq vhost
   rabbitmq_vhost: name=/sensu state=present

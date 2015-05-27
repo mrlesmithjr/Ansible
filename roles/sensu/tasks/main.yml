@@ -5,6 +5,15 @@
 - include: centos.yml
   when: ansible_os_family == "RedHat"
 
+- include: config_local_monitoring.yml
+  when: enable_local_monitoring
+
+- include: plugins.yml
+  when: install_plugins
+
+- include: checks.yml
+  when: enable_checks
+
 # Open firewall ports
 - include: ferm.yml
   tags: [ferm]
