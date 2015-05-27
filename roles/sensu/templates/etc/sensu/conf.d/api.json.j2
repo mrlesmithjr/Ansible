@@ -1,6 +1,6 @@
 {
   "api":{
-    "host": "localhost",
+    "host": "{{ sensu_host }}",
     "port": 4567
 {% if sensu_api_auth %}
     "user": "{{ sensu_api_user }}"

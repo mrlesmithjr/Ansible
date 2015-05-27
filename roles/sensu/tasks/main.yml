@@ -13,11 +13,9 @@
 
 - include: config_plugins.yml
   tags: [sensu]
-  when: sensu_server
 
 - include: config_checks.yml
   tags: [sensu]
-  when: sensu_server
 
 - include: config_client.yml
   tags: [sensu]
