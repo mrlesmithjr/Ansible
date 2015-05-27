@@ -1,0 +1,6 @@
+---
+- hosts: ansible-test
+  remote_user: remote
+  sudo: yes
+  roles:
+    - apache2

@@ -1,0 +1,8 @@
+---
+- hosts: ci-pipeline
+  remote_user: remote
+  sudo: yes
+  roles:
+    - { role: mysql, when: mysql_backend }
+    - { role: rundeck, when: enable_rundeck }
+    - { role: jenkins, when: enable_jenkins }

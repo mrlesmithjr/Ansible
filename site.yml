@@ -1,0 +1,27 @@
+---
+- hosts: all
+  sudo: yes
+  remote_user: remote
+  roles:
+    - { role: disable-firewall, when: enable_firewall == 'false' }
+    - { role: enable-firewall, when: enable_firewall == 'true' }
+    - base
+    - { role: change-hostname, when: update_hostname }
+    - rsyslog
+    - { role: snmpd, when: enable_snmpd }
+    - { role: timezone, when: change_timezone }
+    - { role: zabbix-agent, when: enable_zabbix_monitoring }
+    - { role: collectd, when: enable_collectd_monitoring }
+
+- hosts: smtp
+  sudo: yes
+  remote_user: remote
+  roles:
+    - { role: exim4, when: enable_exim4 }
+
+- hosts: cacti-servers
+  sudo: yes
+  remote_user: remote
+  roles:
+    - mariadb-mysql
+    - cacti

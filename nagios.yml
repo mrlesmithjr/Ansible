@@ -1,0 +1,6 @@
+---
+- hosts: nagios
+  remote_user: remote
+  sudo: yes
+  roles:
+    - nagios

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  sudo: yes
+  remote_user: remote
+  roles:
+    - { role: disable-firewall, when: enable_firewall == 'false' }
+    - { role: enable-firewall, when: enable_firewall == 'true' }
+    - { role: change-hostname, when: update_hostname }
+    - { role: snmpd, when: enable_snmpd }
+    - { role: timezone, when: change_timezone }
+    - { role: zabbix-agent, when: enable_zabbix_monitoring }
+    - { role: collectd, when: enable_collectd_monitoring }
