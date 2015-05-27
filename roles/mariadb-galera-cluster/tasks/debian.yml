@@ -22,6 +22,17 @@
     - mariadb-galera-server
     - galera
 
+- name: debian | unconfiguring galera cluster
+  file: path={{ item }} state=absent
+  with_items:
+    - /etc/mysql/conf.d/galera.cnf
+    - /etc/mysql/galera_cluster_configured
+  when: reconfigure_galera and reconfigure_galera is defined
+
+- name: debian | stopping mysql when reconfiguring galera cluster
+  service: name=mysql state=restarted
+  when: reconfigure_galera and reconfigure_galera is defined
+
 - name: debian | adding debian-sys-maintenance permissions to mysql
   mysql_user: name=debian-sys-maint password={{ deb_db_password }} priv=*.*:ALL,GRANT state=present
 
@@ -46,6 +57,7 @@
 - name: debian | killing lingering mysql processes
   command: pkill mysqld
   ignore_errors: true
+  when: galera_cluster_configured.stat.exists == false
 
 - name: debian | configuring temp galera config
   template: src=etc/mysql/conf.d/temp.galera.cnf.j2 dest=/etc/mysql/conf.d/galera.cnf
