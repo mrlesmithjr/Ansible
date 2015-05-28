@@ -21,6 +21,10 @@
   tags: [sensu]
   when: sensu_client
 
+- include: config_handlers.yml
+  tags: [sensu]
+  when: sensu_server and enable_handlers
+
 # Open firewall ports
 - include: ferm.yml
   tags: [ferm]

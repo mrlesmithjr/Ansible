@@ -10,6 +10,7 @@
   with_items:
     - erlang-nox
     - make
+    - mailutils
     - sensu
     - uchiwa
     - ruby

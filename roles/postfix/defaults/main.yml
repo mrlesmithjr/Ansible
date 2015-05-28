@@ -1,0 +1,15 @@
+---
+enable_postfix_domain_rewrite: true
+enable_postfix_relayhost: true
+postfix_conf_dir: /etc/postfix
+postfix_hostname: '{{ ansible_fqdn }}'
+postfix_masquerade_domains: ''
+postfix_mydestination: '{{ postfix_hostname }}, localhost'
+postfix_mynetworks: 127.0.0.0/8
+postfix_mydomain: everythingshouldbevirtual.com
+
+# Relay server info
+# make empty for direct internet delivery
+# postfix_relayhost: '[smtp.example.org]'
+postfix_relayhost: '[smtp.everythingshouldbevirtual.local]'
+postfix_rewrite_domain: everythingshouldbevirtual.com   #set to required rewrite for outgoing email

@@ -1,0 +1,14 @@
+{
+  "handlers": {
+    "logstash": {
+      "type": "pipe",
+      "command": "/etc/sensu/handlers/logstash.rb",
+      "severities": [
+        "ok",
+        "warning",
+        "critical",
+        "unknown"
+      ]
+    }
+  }
+}

@@ -2,6 +2,19 @@
   "checks": {
     "{{ item.name }}": {
       "command": "/etc/sensu/plugins/check-procs.rb -p {{ item.name }}",
+{% if enable_handlers %}
+{% if not multiple_handlers %}
+      "handler": "{{ default_handler }}",
+{% endif %}
+{% if multiple_handlers %}
+      "handlers": [
+{% for item in default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ default_handler }}"
+      ],
+{% endif %}
+{% endif %}
       "interval": 60,
       "subscribers": [ "{{ item.sub }}" ]
     }

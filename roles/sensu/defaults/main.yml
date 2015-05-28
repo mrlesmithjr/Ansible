@@ -1,5 +1,16 @@
 ---
+config_handlers_def:       #sensu definitions - added to /etc/sensu/conf.d
+  - handler_email
+  - handler_logstash 
+  - logstash
+config_handlers_mod:       #sensu ruby handlers - added to /etc/sensu/handlers
+  - logstash
+default_handler: email     #needs to be set to a handler not defined in default_handlers if using multiple handlers
+default_handlers:
+  - logstash
 enable_sensu_ssl: false
+enable_handlers: true      #to use handlers for events - configure config_handlers_def, config_handlers_mod, default_handler and default_handlers as appropriate
+logstash_server: logstash.everythingshouldbevirtual.local    #change to your logstash server
 monitor_processes:
   - { name: apache, sub: apache }
   - { name: cron, sub: ALL }
@@ -24,6 +35,8 @@ monitor_processes:
   - { name: sshd, sub: ALL }
   - { name: uchiwa, sub: sensu }
   - { name: zabbix_agentd, sub: ALL }
+multiple_handlers: true     #defines the use of using multiple handlers if enable_handlers is true and more than one default_handler is required
+notification_email: notifications@example.org      #set to email address to send alerts to
 rabbitmq_sensu_user: sensu
 rabbitmq_sensu_pass: sensu
 sensu_api_auth: false            #enable user/pass auth for api access...default is false...no user/pass required
@@ -31,7 +44,9 @@ sensu_api_pass: sensu
 sensu_api_user: sensu
 sensu_client: false
 sensu_config_dir: '{{ sensu_root_dir }}/conf.d'
+sensu_handlers_dir: '{{ sensu_root_dir }}/handlers'
 sensu_host: sensu.everythingshouldbevirtual.local
 sensu_plugins_dir: '{{ sensu_root_dir }}/plugins'
 sensu_root_dir: /etc/sensu
 sensu_server: false
+smtp_server: smtp.everythingshouldbevirtual.local
