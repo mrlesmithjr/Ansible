@@ -36,7 +36,7 @@ monitor_processes:
   - { name: uchiwa, sub: sensu }
   - { name: zabbix_agentd, sub: ALL }
 multiple_handlers: true     #defines the use of using multiple handlers if enable_handlers is true and more than one default_handler is required
-notification_email: notifications@example.org      #set to email address to send alerts to
+notification_email: larry.e.smith.jr@gmail.com      #set to email address to send alerts to
 rabbitmq_sensu_user: sensu
 rabbitmq_sensu_pass: sensu
 sensu_api_auth: false            #enable user/pass auth for api access...default is false...no user/pass required
