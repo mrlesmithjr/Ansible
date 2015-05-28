@@ -3,8 +3,8 @@
     "name": "{{ ansible_hostname }}",
     "address": "{{ sensu_host }}",
     "subscriptions": [
-{% if client_subs is defined %}
-{% for item in client_subs %}
+{% if sensu_client_subs is defined %}
+{% for item in sensu_client_subs %}
       "{{ item }}",
 {% endfor %}
 {% endif %}

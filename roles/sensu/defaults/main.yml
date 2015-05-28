@@ -1,14 +1,29 @@
 ---
 enable_sensu_ssl: false
 monitor_processes:
+  - { name: apache, sub: apache }
   - { name: cron, sub: ALL }
-  - { name: apache, sub: webservers }
+  - { name: dhcpd, sub: dhcpd }
+  - { name: dnsmasq, sub: dnsmasq }
+  - { name: elasticsearch, sub: elasticsearch }
+  - { name: exim4, sub: exim4 }
+  - { name: haproxy, sub: haproxy }
+  - { name: keepalived, sub: keepalived }
+  - { name: logstash, sub: logstash }
+  - { name: mysql, sub: mysql }
+  - { name: nginx, sub: nginx }
+  - { name: pdns_server, sub: powerdns }
+  - { name: pdns_recursor, sub: powerdns }
   - { name: redis, sub: redis }
   - { name: rabbitmq, sub: rabbit }
+  - { name: rsyslogd, sub: ALL }
   - { name: sensu-api, sub: sensu }
+  - { name: sensu-client, sub: ALL }
   - { name: sensu-server, sub: sensu }
+  - { name: snmpd, sub: ALL }
   - { name: sshd, sub: ALL }
   - { name: uchiwa, sub: sensu }
+  - { name: zabbix_agentd, sub: ALL }
 rabbitmq_sensu_user: sensu
 rabbitmq_sensu_pass: sensu
 sensu_api_auth: false            #enable user/pass auth for api access...default is false...no user/pass required
