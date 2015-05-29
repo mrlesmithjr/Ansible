@@ -2,10 +2,13 @@
 config_handlers_def:       #sensu definitions - added to /etc/sensu/conf.d
   - handler_email
   - handler_logstash 
+  - handler_mailer
   - logstash
+  - mailer
 config_handlers_mod:       #sensu ruby handlers - added to /etc/sensu/handlers
   - logstash
-default_handler: email     #needs to be set to a handler not defined in default_handlers if using multiple handlers
+  - mailer
+default_handler: mailer     #needs to be set to a handler not defined in default_handlers if using multiple handlers
 default_handlers:
   - logstash
 enable_sensu_ssl: false
@@ -51,7 +54,8 @@ monitor_processes:
 monitor_redis:
   - { name: ping, interval: 60, sub: redis }
 multiple_handlers: true     #defines the use of using multiple handlers if enable_handlers is true and more than one default_handler is required
-notification_email: larry.e.smith.jr@gmail.com      #set to email address to send alerts to
+notification_email_to: alerts@everythingshouldbevirtual.local      #set to email address to send alerts to
+notification_email_from: 'sensu@{{ smtp_domain_name }}'
 rabbitmq_sensu_user: sensu
 rabbitmq_sensu_pass: sensu
 sensu_api_auth: false            #enable user/pass auth for api access...default is false...no user/pass required
@@ -61,7 +65,10 @@ sensu_client: false
 sensu_config_dir: '{{ sensu_root_dir }}/conf.d'
 sensu_handlers_dir: '{{ sensu_root_dir }}/handlers'
 sensu_host: sensu.everythingshouldbevirtual.local
+sensu_host_port: 3000
 sensu_plugins_dir: '{{ sensu_root_dir }}/plugins'
 sensu_root_dir: /etc/sensu
 sensu_server: false
+smtp_domain_name: everythingshouldbevirtual.local
 smtp_server: smtp.everythingshouldbevirtual.local
+smtp_server_port: 25

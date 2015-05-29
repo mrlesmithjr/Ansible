@@ -3,6 +3,7 @@
   gem: name={{ item }} user_install=no state=latest
   with_items:
     - json
+    - mail
     - redis
     - rest-client
     - sensu-plugin
