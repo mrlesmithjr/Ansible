@@ -1,0 +1,75 @@
+{% if item.name == "cluster-status" %}
+{
+  "checks": {
+    "check_es_{{ item.name }}": {
+      "command": "{{ sensu_plugins_dir }}/check-es-cluster-status.rb",
+{% if enable_handlers %}
+{% if not multiple_handlers %}
+      "handler": "{{ default_handler }}",
+{% endif %}
+{% if multiple_handlers %}
+      "handlers": [
+{% for item in default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ default_handler }}"
+      ],
+{% endif %}
+{% endif %}
+      "occurences": 3,
+      "interval": {{ item.interval }},
+      "subscribers": [ "{{ item.sub }}" ]
+    }
+  }
+}
+{% endif %}
+{% if item.name == "file-descriptors" %}
+{
+  "checks": {
+    "check_es_{{ item.name }}": {
+      "command": "{{ sensu_plugins_dir }}/check-es-file-descriptors.rb",
+{% if enable_handlers %}
+{% if not multiple_handlers %}
+      "handler": "{{ default_handler }}",
+{% endif %}
+{% if multiple_handlers %}
+      "handlers": [
+{% for item in default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ default_handler }}"
+      ],
+{% endif %}
+{% endif %}
+      "occurences": 3,
+      "interval": {{ item.interval }},
+      "subscribers": [ "{{ item.sub }}" ]
+    }
+  }
+}
+{% endif %}
+{% if item.name == "heap" %}
+{
+  "checks": {
+    "check_es_{{ item.name }}": {
+      "command": "{{ sensu_plugins_dir }}/check-es-heap.rb",
+{% if enable_handlers %}
+{% if not multiple_handlers %}
+      "handler": "{{ default_handler }}",
+{% endif %}
+{% if multiple_handlers %}
+      "handlers": [
+{% for item in default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ default_handler }}"
+      ],
+{% endif %}
+{% endif %}
+      "occurences": 3,
+      "interval": {{ item.interval }},
+      "subscribers": [ "{{ item.sub }}" ]
+    }
+  }
+}
+{% endif %}

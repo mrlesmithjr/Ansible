@@ -1,11 +1,47 @@
 ---
-- name: config_checks | configuring checks
-  template: src=etc/sensu/conf.d/checks.json.j2 dest={{ sensu_config_dir }}/check_{{ item.name }}.json owner=root group=root mode=0644
+- name: config_checks | configuring cpu checks
+  template: src=etc/sensu/conf.d/check_cpu.json.j2 dest={{ sensu_config_dir }}/check_{{ item.name }}.json owner=root group=root mode=0644
+  notify: restart sensu services
+  with_items: monitor_cpu
+  when: sensu_server and enable_cpu_monitors
+
+- name: config_checks | configuring disk checks
+  template: src=etc/sensu/conf.d/check_disk.json.j2 dest={{ sensu_config_dir }}/check_disk.json owner=root group=root mode=0644
+  notify: restart sensu services
+  when: sensu_server and enable_disk_monitors
+
+- name: config_checks | configuring elasticsearch checks
+  template: src=etc/sensu/conf.d/check_es.json.j2 dest={{ sensu_config_dir }}/check_es_{{ item.name }}.json owner=root group=root mode=0644
+  notify: restart sensu services
+  with_items: monitor_es
+  when: sensu_server and enable_es_monitors
+
+- name: config_checks | configuring haproxy checks
+  template: src=etc/sensu/conf.d/check_haproxy.json.j2 dest={{ sensu_config_dir }}/check_haproxy.json owner=root group=root mode=0644
+  notify: restart sensu services
+  when: sensu_server and enable_haproxy_monitors
+
+- name: config_checks | configuring process checks
+  template: src=etc/sensu/conf.d/check_procs.json.j2 dest={{ sensu_config_dir }}/check_procs_{{ item.name }}.json owner=root group=root mode=0644
   notify: restart sensu services
   with_items: monitor_processes
-  when: sensu_server
+  when: sensu_server and enable_process_monitors
+
+- name: config_checks | configuring redis checks
+  template: src=etc/sensu/conf.d/check_redis.json.j2 dest={{ sensu_config_dir }}/check_redis_{{ item.name }}.json owner=root group=root mode=0644
+  notify: restart sensu services
+  with_items: monitor_redis
+  when: sensu_server and enable_redis_monitors
 
 - name: config_checks | configuring plugins
   template: src=etc/sensu/plugins/{{ item }}.j2 dest={{ sensu_plugins_dir }}/{{ item }} owner=root group=root mode=0755
   with_items:
+    - check-cpu.rb
+    - check-disk.rb
+    - check-es-cluster-status.rb
+    - check-es-file-descriptors.rb
+    - check-es-heap.rb
+    - check-haproxy.rb
     - check-procs.rb
+    - check-redis-ping.rb
+    - es-cluster-metrics.rb

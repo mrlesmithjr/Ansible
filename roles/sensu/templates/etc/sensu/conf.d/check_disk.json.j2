@@ -1,7 +1,7 @@
 {
   "checks": {
-    "{{ item.name }}": {
-      "command": "/etc/sensu/plugins/check-procs.rb -p {{ item.name }}",
+    "check_disk": {
+      "command": "{{ sensu_plugins_dir }}/check-disk.rb",
 {% if enable_handlers %}
 {% if not multiple_handlers %}
       "handler": "{{ default_handler }}",
@@ -15,8 +15,9 @@
       ],
 {% endif %}
 {% endif %}
+      "occurences": 3,
       "interval": 60,
-      "subscribers": [ "{{ item.sub }}" ]
+      "subscribers": [ "ALL" ]
     }
   }
 }

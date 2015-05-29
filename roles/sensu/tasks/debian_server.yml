@@ -8,13 +8,14 @@
 - name: debian_server | installing pre-reqs and sensu
   apt: name={{ item }} state=present
   with_items:
+    - build-essential
     - erlang-nox
-    - make
     - mailutils
-    - sensu
-    - uchiwa
+    - make
     - ruby
     - ruby-dev
+    - sensu
+    - uchiwa
 
 - name: debian_server | creating sensu rabbitmq vhost
   rabbitmq_vhost: name=/sensu state=present

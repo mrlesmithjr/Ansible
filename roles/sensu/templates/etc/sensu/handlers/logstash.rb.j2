@@ -1,27 +1,44 @@
-#!/usr/bin/env ruby
+#! /usr/bin/env ruby
 #
-# Sensu Logstash Handler
+#   handler-logstash
 #
-# Heavily inspried (er, copied from) the GELF Handler written by
-# Joe Miller.
+# DESCRIPTION:
+#   Designed to take sensu events, transform them into logstah JSON events
+#   and ship them to a redis server for logstash to index.  This also
+#   generates a tag with either 'sensu-ALERT' or 'sensu-RECOVERY' so that
+#   searching inside of logstash can be a little easier.
 #
-# Designed to take sensu events, transform them into logstash JSON events
-# and ship them to a redis server for logstash to index.  This also
-# generates a tag with either 'sensu-ALERT' or 'sensu-RECOVERY' so that
-# searching inside of logstash can be a little easier.
+# OUTPUT:
+#   plain text
 #
-# Written by Zach Dunn -- @SillySophist or http://github.com/zadunn
+# PLATFORMS:
+#   Linux
 #
-# Released under the same terms as Sensu (the MIT license); see LICENSE
-# for details.
+# DEPENDENCIES:
+#   gem: sensu-plugin
+#   gem: diplomat
+#
+# USAGE:
+#
+# NOTES:
+#   Heavily inspried (er, copied from) the GELF Handler written by
+#   Joe Miller.
+#
+# LICENSE:
+#   Zach Dunn @SillySophist http://github.com/zadunn
+#   Released under the same terms as Sensu (the MIT license); see LICENSE
+#   for details.
+#
 
-require 'rubygems' if RUBY_VERSION < '1.9.0'
 require 'sensu-handler'
 require 'redis'
 require 'json'
 require 'socket'
 require 'time'
 
+#
+# Logstash Handler
+#
 class LogstashHandler < Sensu::Handler
   def event_name
     @event['client']['name'] + '/' + @event['check']['name']
@@ -44,7 +61,7 @@ class LogstashHandler < Sensu::Handler
     end
   end
 
-  def handle
+  def handle # rubocop:disable all
     time = Time.now.utc.iso8601
     logstash_msg = {
       :@timestamp    => time,

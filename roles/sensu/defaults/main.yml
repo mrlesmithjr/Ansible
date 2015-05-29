@@ -10,31 +10,46 @@ default_handlers:
   - logstash
 enable_sensu_ssl: false
 enable_handlers: true      #to use handlers for events - configure config_handlers_def, config_handlers_mod, default_handler and default_handlers as appropriate
+enable_cpu_monitors: true
+enable_disk_monitors: true
+enable_es_monitors: true
+enable_haproxy_monitors: true
+enable_process_monitors: true
+enable_redis_monitors: true
 logstash_server: logstash.everythingshouldbevirtual.local    #change to your logstash server
+monitor_cpu:
+  - { name: cpu, interval: 60, sub: ALL }
+  - { name: cpu_iowait, interval: 60, sub: ALL }
+monitor_es:
+  - { name: cluster-status, interval: 60, sub: elasticsearch }
+  - { name: file-descriptors, interval: 60, sub: elasticsearch }
+#  - { name: heap, interval: 60, sub: elasticsearch }
 monitor_processes:
-  - { name: apache, sub: apache }
-  - { name: cron, sub: ALL }
-  - { name: dhcpd, sub: dhcpd }
-  - { name: dnsmasq, sub: dnsmasq }
-  - { name: elasticsearch, sub: elasticsearch }
-  - { name: exim4, sub: exim4 }
-  - { name: haproxy, sub: haproxy }
-  - { name: keepalived, sub: keepalived }
-  - { name: logstash, sub: logstash }
-  - { name: mysql, sub: mysql }
-  - { name: nginx, sub: nginx }
-  - { name: pdns_server, sub: powerdns }
-  - { name: pdns_recursor, sub: powerdns }
-  - { name: redis, sub: redis }
-  - { name: rabbitmq, sub: rabbit }
-  - { name: rsyslogd, sub: ALL }
-  - { name: sensu-api, sub: sensu }
-  - { name: sensu-client, sub: ALL }
-  - { name: sensu-server, sub: sensu }
-  - { name: snmpd, sub: ALL }
-  - { name: sshd, sub: ALL }
-  - { name: uchiwa, sub: sensu }
-  - { name: zabbix_agentd, sub: ALL }
+  - { name: apache, interval: 60, sub: apache }
+  - { name: cron, interval: 60, sub: ALL }
+  - { name: dhcpd, interval: 60, sub: dhcpd }
+  - { name: dnsmasq, interval: 60, sub: dnsmasq }
+  - { name: elasticsearch, interval: 60, sub: elasticsearch }
+  - { name: exim4, interval: 60, sub: exim4 }
+  - { name: haproxy, interval: 60, sub: haproxy }
+  - { name: keepalived, interval: 60, sub: keepalived }
+  - { name: logstash, interval: 60, sub: logstash }
+  - { name: mysql, interval: 60, sub: mysql }
+  - { name: nginx, interval: 60, sub: nginx }
+  - { name: pdns_server, interval: 60, sub: powerdns }
+  - { name: pdns_recursor, interval: 60, sub: powerdns }
+  - { name: redis, interval: 60, sub: redis }
+  - { name: rabbitmq, interval: 60, sub: rabbit }
+  - { name: rsyslogd, interval: 60, sub: ALL }
+  - { name: sensu-api, interval: 60, sub: sensu }
+  - { name: sensu-client, interval: 60, sub: ALL }
+  - { name: sensu-server, interval: 60, sub: sensu }
+  - { name: snmpd, interval: 60, sub: ALL }
+  - { name: sshd, interval: 60, sub: ALL }
+  - { name: uchiwa, interval: 60, sub: sensu }
+  - { name: zabbix_agentd, interval: 60, sub: ALL }
+monitor_redis:
+  - { name: ping, interval: 60, sub: redis }
 multiple_handlers: true     #defines the use of using multiple handlers if enable_handlers is true and more than one default_handler is required
 notification_email: larry.e.smith.jr@gmail.com      #set to email address to send alerts to
 rabbitmq_sensu_user: sensu
