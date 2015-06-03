@@ -12,14 +12,14 @@ ci-pipeline
 ns-1-2-clust-mgmr
 sensu
 
-[smtp]
-smtp
-
 [cacti-servers]
 cactimon
 
 [ci-pipeline]
 ci-pipeline
+
+[gitlab]
+gitlab
 
 [ip-services]
 ns[1:2]
@@ -30,3 +30,6 @@ ns[1:2]
 
 [sensu]
 sensu
+
+[smtp]
+smtp

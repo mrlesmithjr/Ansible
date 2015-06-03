@@ -1,0 +1,11 @@
+active_directory: true
+gitlab_email_enabled: true
+gitlab_email_from: '{{ ansible_hostname }}@{{ pri_domain_name }}'
+gitlab_email_display_name: '{{ ansible_hostname }}'
+gitlab_email_reply_to: '{{ gitlab_email_from }}'
+ldap_base_dn: 'DC=everythingshouldbevirtual,DC=local'
+ldap_bind_dn: 'gitlab'
+ldap_bind_pass: 'P@55w0rd'
+ldap_enabled: true
+ldap_server_1: dc01.everythingshouldbevirtual.local
+ldap_server_2: dc02.everythingshouldbevirtual.local

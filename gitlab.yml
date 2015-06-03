@@ -1,0 +1,12 @@
+---
+- hosts: gitlab
+  remote_user: remote
+  sudo: yes
+  roles:
+    - { role: disable-firewall, when: enable_firewall == 'false' }
+    - { role: enable-firewall, when: enable_firewall == 'true' }
+    - base
+    - { role: snmpd, when: enable_snmpd }
+    - { role: timezone, when: change_timezone }
+    - { role: collectd, when: enable_collectd_monitoring }
+    - gitlab_ce

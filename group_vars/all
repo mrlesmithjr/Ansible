@@ -16,5 +16,7 @@ remote_password:
 root_password:
 sec_dns: 10.0.101.12
 sensu_client: true
+smtp_server: smtp.everythingshouldbevirtual.local
+smtp_server_port: 25
 timezone: America/New_York
 update_hostname: true
