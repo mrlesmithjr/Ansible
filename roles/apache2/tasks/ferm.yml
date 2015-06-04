@@ -1,4 +1,6 @@
 ---
+
+# Ensure ferm is installed (Debian)
 - name: ferm | ensuring ferm is installed
   apt: name=ferm state=present
   when: ansible_os_family == "Debian"
@@ -7,6 +9,7 @@
   yum: name=ferm state=present
   when: ansible_os_family == "RedHat"
 
+# Ensure ferm is started and enabled
 - name: ferm | ensuring ferm is started and enabled
   service: name=ferm state=started enabled=yes
 
