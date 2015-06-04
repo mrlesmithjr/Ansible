@@ -1,22 +1,22 @@
 ---
-- name: config_keepalived | config | reconfiguring keepalived
+- name: config_keepalived | reconfiguring keepalived
   template: src=etc/keepalived/keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644 backup=yes
   when: config_quagga != true
 
-- name: config_keepalived | config | reconfiguring keepalived
+- name: config_keepalived | reconfiguring keepalived
   template: src=etc/keepalived/keepalived_quagga.conf.j2 dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644 backup=yes
   when: config_keepalived and sync_keepalived and config_quagga
 
 #- name: adding restart keepalived to rc.local
 #  lineinfile: dest=/etc/rc.local insertbefore='exit 0' line="sleep 30; service keepalived restart"
 
-- name: mounting gluster volumes - scripts
+- name: config_keepalived | mounting gluster volumes - scripts
   mount: name={{ item.mountpoint }} src={{ item.src }} fstype={{ item.fstype }} opts={{ item.options }} state=mounted
   with_items:
     - { mountpoint: '{{ scripts_home }}', src: '{{ primary_gfs_server }}:/{{ scripts_mnt }}', fstype: 'glusterfs', options: 'defaults,_netdev,backupvolfile-server={{ secondary_gfs_server }}' }
   when: config_keepalived and sync_keepalived
 
-- name: copying keepalived scripts
+- name: config_keepalived | copying keepalived scripts
   template: src=opt/scripts/{{ item.src }} dest='{{ scripts_home }}/{{ item.dest }}' owner=root group=root mode=0774 backup=yes
   with_items:
     - { src: backup.sh.j2, dest: backup.sh }
@@ -27,7 +27,7 @@
   run_once: true
   when: config_keepalived and sync_keepalived and config_quagga != true
 
-- name: copying keepalived scripts
+- name: config_keepalived | copying keepalived scripts
   template: src=opt/scripts/{{ item.src }} dest='{{ scripts_home }}/{{ item.dest }}' owner=root group=root mode=0774 backup=yes
   with_items:
     - { src: backup_quagga.sh.j2, dest: backup.sh }
