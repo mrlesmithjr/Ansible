@@ -1,0 +1,11 @@
+---
+enable_firewall: false
+enable_rundeck: true
+install_ansible: true
+mysql_backend: false
+rundeck_base:
+rundeck_db_name: rundeck
+rundeck_db_pass: rundeck
+rundeck_db_user: rundeck
+rundeck_dl_pkg: rundeck-2.5.1-1-GA.deb
+rundeck_dl_url: http://dl.bintray.com/rundeck/rundeck-deb/

@@ -1,0 +1,9 @@
+---
+- name: users | creating rundeck ssh folder
+  file: path=/var/lib/rundeck/.ssh state=directory owner=rundeck group=rundeck mode=0700
+
+- name: users | generating rundeck ssh key
+  user: name=rundeck generate_ssh_key=yes ssh_key_file=/var/lib/rundeck/.ssh/id_rsa ssh_key_type=rsa
+
+- name: users | downloading rundeck users ssh public key
+  fetch: src=/var/lib/rundeck/.ssh/id_rsa.pub dest=~/ssh_pub_keys/rundeck@{{ ansible_hostname }}.pub flat=yes
