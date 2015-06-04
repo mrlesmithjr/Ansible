@@ -1,0 +1,11 @@
+---
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "RedHat"
+
+# Open firewall ports
+- include: ferm.yml
+  tags: [ferm]
+  when: enable_firewall
