@@ -1,0 +1,5 @@
+---
+- name: plugins | installing logstash plugins
+  command: /opt/logstash/bin/plugin install {{ item }}
+  notify: restart logstash
+  with_items: logstash_plugins

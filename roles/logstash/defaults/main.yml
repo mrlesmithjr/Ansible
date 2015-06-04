@@ -1,3 +1,8 @@
 # Logstash version from debian repository
 ls_version: 1.5
 logstash_version: 1.5
+logstash_plugins:
+  - logstash-filter-elasticsearch
+  - logstash-filter-json_encode
+  - logstash-filter-translate
+  - logstash-filter-zeromq
