@@ -1,24 +1,25 @@
 ---
-enable_firewall: false
 config_lvm: false
 config_nfs: false
+enable_firewall: false
+es_config_lvm: '{{config_lvm}}'
 
 # NFS mount info
 nfs_mount: '10.0.101.51:/volumes/HD-Pool/elasticsearch-snapshots'
-nfs_mountpoint: '/mnt/elasticsearch-snapshots'
 nfs_mount_opts: 'defaults'
+nfs_mountpoint: '/mnt/elasticsearch-snapshots'
 
 # Elasticsearch
-elasticsearch_version: 1.4
-es_version: 1.4
+elasticsearch_version: 1.5
 es_fqdn: localhost
 es_port: 9200
+es_version: 1.5
 
 ## Plugins
 # Curator tool
-install_curator: True
-curator_max_keep_days: 14
 curator_close_after_days: 7
+curator_max_keep_days: 14
+install_curator: True
 # Head plugin
 install_head: True
 # ElasticHQ plugin
