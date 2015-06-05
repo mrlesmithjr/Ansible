@@ -3,8 +3,8 @@
   sudo: yes
   remote_user: remote
   roles:
-    - { role: disable-firewall, when: enable_firewall == 'false' }
-    - { role: enable-firewall, when: enable_firewall == 'true' }
+    - { role: disable-firewall, when: not enable_firewall }
+    - { role: enable-firewall, when: enable_firewall }
     - base
     - { role: change-hostname, when: update_hostname }
     - rsyslog

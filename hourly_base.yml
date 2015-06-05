@@ -3,8 +3,8 @@
   sudo: yes
   remote_user: remote
   roles:
-    - { role: disable-firewall, when: enable_firewall == 'false' }
-    - { role: enable-firewall, when: enable_firewall == 'true' }
+    - { role: disable-firewall, when: not enable_firewall }
+    - { role: enable-firewall, when: enable_firewall }
     - { role: change-hostname, when: update_hostname }
     - { role: snmpd, when: enable_snmpd }
     - { role: timezone, when: change_timezone }
