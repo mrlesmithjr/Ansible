@@ -1,0 +1,9 @@
+---
+- name: debian | adding mongodb repo key
+  apt_key: keyserver=keyserver.ubuntu.com id=7F0CEB10 state=present
+
+- name: debian | adding mongodb apt repo
+  apt_repository: repo="deb http://repo.mongodb.org/apt/ubuntu {{ansible_distribution_release}}/mongodb-org/stable multiverse" state=present
+
+- name: debian | installing mongodb
+  apt: name=mongodb-org state=latest
