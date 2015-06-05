@@ -1,0 +1,17 @@
+---
+enable_firewall: false
+enable_graylog_server: true
+enable_graylog_web: true
+es_replicas: 0 #set to the number of replicas to set for the elasticsearch cluster - this applies to graylog server settings and elasticsearch
+es_shards: 4 #set to the number of shards to set for the elasticsearch cluster - this applies to graylog server settings and elasticsearch
+graylog_package_url: https://packages.graylog2.org/repo/packages/graylog-1.1-repository-ubuntu14.04_latest.deb
+graylog_server_master: true #default is true unless installing multiple instances
+graylog_server_password_secret: GsILnEQr6AoYI0luuKjT2mRiGhaLWR80Y8yqFK4xvwujjYe2SdtVGBRkDYadnnvqcoNTXIQO6V8nTzD0TWjfjDKQltG3QY2W #pwgen -N 1 -s 96
+graylog_server_rest_listen_uri: http://127.0.0.1:12900/
+graylog_server_root_password: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918 #default is admin - generate new pw using echo -n yourpassword | shasum -a 256
+graylog_server_syslog_input_port: 10514 #set to port to be defined in graylog inputs
+graylog_server_syslog_input_protocol: udp #udp or tcp
+graylog_web_application_secret: 0qfXlF80j1MSu2gfz1t3ykBntO7LFiTks5qtcmD85p8HqnsyBnH9737nsBX8ats8YClBig5dxNw41BU4ZVziOPMdVYblOTNY #pwgen -N 1 -s 96
+graylog_web_server_uri: '{{graylog_server_rest_listen_uri}}' #set to same as graylog_server_rest_listen_uri unless not installing both server and web on same host
+port_redirects:  #define ports to port forward from system to graylog_server - only required for ports below 1024
+  - { syslog_dport: 514, graylog_dport: 10514, prot: udp }

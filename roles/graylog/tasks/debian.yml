@@ -1,0 +1,24 @@
+---
+- name: debian | downloading graylog repo package
+  get_url: url={{ graylog_package_url }} dest=/tmp/graylog_package.deb
+
+- name: debian | installing pre-reqs
+  apt: name={{ item }} state=present
+  with_items:
+    - apt-transport-https
+    - default-jre-headless
+    - pwgen
+
+- name: debian | installing graylog repo
+  apt: deb=/tmp/graylog_package.deb state=installed dpkg_options='force-all'
+  register: graylog_repo
+
+- name: debian | updating apt-cache
+  apt: update_cache=yes
+  when: graylog_repo.changed == True
+
+- name: debian | installing graylog
+  apt: name={{ item }} state=present cache_valid_time=86400
+  with_items:
+    - graylog-server
+    - graylog-web

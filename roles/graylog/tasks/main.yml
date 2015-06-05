@@ -1,0 +1,20 @@
+---
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_elasticsearch.yml
+
+- include: config_graylog_server.yml
+  when: enable_graylog_server
+
+- include: config_graylog_web.yml
+  when: enable_graylog_web
+
+#- include: config_debian_rsyslog.yml
+#  when: ansible_os_family == "Debian"
+
+- include: ferm.yml
+  tags: [firewall,ferm]

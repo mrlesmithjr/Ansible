@@ -1,0 +1,4 @@
+---
+- name: config_graylog_server | configuring graylog-server
+  template: src=etc/graylog/server/server.conf.j2 dest=/etc/graylog/server/server.conf owner=root group=root mode=0644
+  notify: restart graylog-server

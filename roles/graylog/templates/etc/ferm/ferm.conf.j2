@@ -1,0 +1,18 @@
+domain ip {
+    table nat {
+        chain PREROUTING {
+            policy ACCEPT;
+{% for item in port_redirects %}
+            protocol {{item.prot}} dport {{item.syslog_dport}} REDIRECT to-ports {{item.graylog_dport}};
+{% endfor %}
+        }
+        chain INPUT policy ACCEPT;
+        chain POSTROUTING policy ACCEPT;
+        chain OUTPUT policy ACCEPT;
+    }
+    table filter {
+        chain INPUT policy ACCEPT;
+        chain FORWARD policy ACCEPT;
+        chain OUTPUT policy ACCEPT;
+    }
+}

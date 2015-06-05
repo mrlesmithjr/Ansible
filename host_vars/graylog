@@ -1,0 +1,10 @@
+---
+build_from_template: false
+cpu_hotadd: false
+cpucount: 2
+datastore: Tier-3 (NAS01)
+disk1: 100
+mem_hotadd: false
+memory: 2048
+multi: false
+network: vSS-Green-Servers-VLAN101
