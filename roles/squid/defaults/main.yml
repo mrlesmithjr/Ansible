@@ -1,0 +1,14 @@
+---
+haproxy_squid_http_port: 8080
+squid_acl_localnet:
+  - 10.0.0.0/8
+  - 172.16.0.0/16
+  - 192.168.0.0/16
+squid_cache_peer:
+  - { host: squid-1.everythingshouldbevirtual.local, type: sibling, proxy_port: '{{ squid_http_port }}', icp_port: '{{ squid_icp_port }}', options: default } # do not enter fqdn for host
+  - { host: squid-2.everythingshouldbevirtual.local, type: sibling, proxy_port: '{{ squid_http_port }}', icp_port: '{{ squid_icp_port }}', options: default } # do not enter fqdn for host
+squid_cache_peering: true
+squid_http_port: 3128
+squid_icp_access: all
+squid_icp_port: 3130
+squid_transparent_proxy: false

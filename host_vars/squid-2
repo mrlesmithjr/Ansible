@@ -1,0 +1,12 @@
+---
+build_from_template: false
+cpu_hotadd: false
+cpucount: 1
+datastore: Tier-3 (NAS01)
+disk1: 36
+keepalived_router_pri: "100"
+keepalived_vrrp_state: BACKUP
+mem_hotadd: false
+memory: 512
+multi: false
+network: vSS-Green-Servers-VLAN101

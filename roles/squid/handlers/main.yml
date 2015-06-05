@@ -1,0 +1,9 @@
+---
+- name: restart squid3
+  command: service squid3 restart
+
+- name: reload haproxy
+  service: name=haproxy state=reloaded
+
+- name: restart haproxy
+  service: name=haproxy state=restarted
