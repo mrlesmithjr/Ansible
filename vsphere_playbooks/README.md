@@ -4,7 +4,7 @@
 ###gather_vm_details.yml
 ######Builds out host_vars/inventory_hostname w/ansible_ssh_host var set
 ######(will not overwrite existing contents)
-
+######Also updates and imports ssh_keys for hosts discovered
 ## Requirements
 Requires python module pysphere to be installed
 ````
