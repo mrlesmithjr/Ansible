@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    - vcenter_hostname: ''  #defined in group_vars/all/configs
+    - vcenter_user: ''  #defined in group_vars/all/accounts
+    - vcenter_pass: ''  #defined in group_vars/all/accounts
+    - datacenter: ''  #defined in group_vars/all/configs
+    - esxi_host: ''  #defined in group_vars/all/configs
+    - vcenter_resource_pool: ''  #defined in group_vars/all/configs
+    - vcenter_cluster: ''  #defined in group_vars/all/configs
+    - vm_state: present
+    - notes: Created by Ansible
+  vars_prompt:
+    - name: 'guest_name'
+      prompt: "Enter vm guest name"
+      private: no
+      register: guest_name
+  tasks:
+    - name: Snapshot vm
+      local_action:
+        module: vsphere
+        host: "{{ vcenter_host }}"
+        login: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        timeout: 60
+        guest:
+          name: "{{ guest_name }}"
+          state: running
+        snapshot:
+          name: test
+          memory: true
+          action: create

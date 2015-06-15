@@ -1,0 +1,30 @@
+---
+- hosts: vmdelete
+  gather_facts: false
+  connection: local
+  vars:
+    - vcenter_hostname: ''  #defined in group_vars/all/configs
+    - vcenter_user: ''  #defined in group_vars/all/accounts
+    - vcenter_pass: ''  #defined in group_vars/all/accounts
+    - datacenter: ''  #defined in group_vars/all/configs
+    - esxi_host: ''  #defined in group_vars/all/configs
+    - vcenter_resource_pool: ''  #defined in group_vars/all/configs
+    - vcenter_cluster: ''  #defined in group_vars/all/configs
+    - vm_state: present
+    - notes: Created by Ansible
+  vars_prompt:
+    - name: 'confirm_delete'
+      prompt: "To confirm deleting VMs enter DELETE otherwise enter none"
+      default: 'none'
+      private: no
+      when: vm_task_action == "delete"
+  tasks:
+    - name: deleting VMs
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: absent
+        force: yes
+      when: confirm_delete == "DELETE"

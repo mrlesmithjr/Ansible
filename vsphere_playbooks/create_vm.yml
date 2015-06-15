@@ -1,0 +1,140 @@
+---
+- hosts: vmcreate-Ubuntu
+  gather_facts: false
+  connection: local
+  vars:
+    - vcenter_hostname: ''  #defined in group_vars/all/configs
+    - vcenter_user: ''  #defined in group_vars/all/accounts
+    - vcenter_pass: ''  #defined in group_vars/all/accounts
+    - datacenter: ''  #defined in group_vars/all/configs
+    - esxi_host: ''  #defined in group_vars/all/configs
+    - vcenter_resource_pool: ''  #defined in group_vars/all/configs
+    - vcenter_cluster: ''  #defined in group_vars/all/configs
+    - vm_state: present
+    - notes: Created by Ansible
+  tasks:
+    - name: creating new vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: "{{ vm_state }}"
+        vm_extra_config:
+          vcpu.hotadd: "{{ cpu_hotadd }}"
+          mem.hotadd: "{{ mem_hotadd }}"
+          notes: "{{ notes }}"
+        vm_disk:
+          disk1:
+            size_gb: "{{ disk1 }}"
+            type: thin
+            datastore: "{{ datastore }}"
+        vm_nic:
+          nic1:
+            type: vmxnet3
+            network: "{{ network }}"
+            network_type: standard
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          osid: "{{ osid }}"
+          scsi: paravirtual
+        esxi:
+          datacenter: "{{ vcenter_datacenter }}"
+          hostname: "{{ vcenter_esxi_host }}"
+      when: not build_from_template and not multi
+
+    - name: creating vms from template
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        from_template: yes
+        template_src: "{{ vm_template }}"
+        cluster: "{{ vcenter_cluster }}"
+        resource_pool: "{{ vcenter_resource_pool }}"
+        vm_extra_config:
+          notes: "{{ notes }}"
+          tools.deployPkg.fileName: 'imcf-mgMNqN'
+          datacenter: "{{ vcenter_datacenter }}"
+          hostname: "{{ vcenter_esxi_host }}"
+      when: build_from_template
+
+    - name: powering on vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: powered_on
+
+- hosts: vmcreate-Windows
+  gather_facts: false
+  connection: local
+  vars:
+    - vcenter_hostname: ''  #defined in group_vars/all/configs
+    - vcenter_user: ''  #defined in group_vars/all/accounts
+    - vcenter_pass: ''  #defined in group_vars/all/accounts
+    - datacenter: ''  #defined in group_vars/all/configs
+    - esxi_host: ''  #defined in group_vars/all/configs
+    - vcenter_resource_pool: ''  #defined in group_vars/all/configs
+    - vcenter_cluster: ''  #defined in group_vars/all/configs
+    - vm_state: present
+    - notes: Created by Ansible
+  tasks:
+    - name: creating new vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: "{{ vm_state }}"
+        vm_extra_config:
+          vcpu.hotadd: "{{ cpu_hotadd }}"
+          mem.hotadd: "{{ mem_hotadd }}"
+          notes: "{{ notes }}"
+        vm_disk:
+          disk1:
+            size_gb: "{{ disk1 }}"
+            type: thin
+            datastore: "{{ datastore }}"
+        vm_nic:
+          nic1:
+            type: vmxnet3
+            network: "{{ network }}"
+            network_type: standard
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          osid: "{{ osid }}"
+          scsi: paravirtual
+        esxi:
+          datacenter: "{{ vcenter_datacenter }}"
+          hostname: "{{ vcenter_esxi_host }}"
+      when: not build_from_template and not multi
+
+    - name: creating vms from template
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        from_template: yes
+        template_src: "{{ vm_template }}"
+        cluster: "{{ vcenter_cluster }}"
+        resource_pool: "{{ vcenter_resource_pool }}"
+        vm_extra_config:
+          notes: "{{ notes }}"
+          tools.deployPkg.fileName: 'imcf-mgMNqN'
+          datacenter: "{{ vcenter_datacenter }}"
+          hostname: "{{ vcenter_esxi_host }}"
+      when: build_from_template
+
+    - name: powering on vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: powered_on

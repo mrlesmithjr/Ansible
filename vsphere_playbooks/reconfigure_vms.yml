@@ -1,0 +1,72 @@
+---
+- hosts: all
+  gather_facts: false
+  connection: local
+    
+  vars_prompt:
+    - name: 'vm_task_action'
+      prompt: 'Enter vm action to execute (none - do nothing, create - create new vms, create_from_template - create new vms from template, reconfigure_template - reconfigure resources )'
+      private: no
+
+    - name: 'vcenter_pass'
+      prompt: 'Enter vcenter password to build VMs'
+      private: yes
+      register: vcenter_pass
+
+  tasks:
+    - name: shutting down vms to reconfigure
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: powered_off
+
+    - name: reconfiguring vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: reconfigured
+        vm_extra_config:
+          notes: "{{ notes }}"
+          tools.deployPkg.fileName: 'imcf-mgMNqN'
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+          osid: "{{ osid }}"
+      when: vm_task_action == 'reconfigure'
+
+    - name: reconfiguring vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: reconfigured
+        vm_disk:
+          disk2:
+            size_gb: "{{ disk2 }}"
+            type: thin
+            datastore: "{{ datastore }}"           
+        vm_hardware:
+          memory_mb: "{{ memory }}"
+          num_cpus: "{{ cpucount }}"
+      when: vm_task_action == 'reconfigure_disk'
+
+    - name: powering on vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        state: powered_on
+
+    - name: gathering facts about vms
+      vsphere_guest:
+        vcenter_hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_pass }}"
+        guest: "{{ inventory_hostname }}"
+        vmware_guest_facts: yes
