@@ -3,13 +3,14 @@
   gather_facts: false
   connection: local
   vars:
-    - cleanup_temp: true
-    - gather_dir: ~/gather_info
-    - host_vars_dir: ~/ansible/host_vars
-    - pysphere_script_home: library
+    - ansible_root: ~/ansible  #defines where your ansible_root folder resides
+    - cleanup_temp: true  #defines cleaning up temp files/folders used in tasks....
+    - gather_dir: ~/gather_info  #defines where to temporarily store gather information
+    - host_vars_dir: '{{ ansible_root }}/host_vars'  #defines where your ansible host_vars folder resides
+    - pysphere_script_home: library  #defines script folder location for python modules used
     - ssh_known_hosts_command: ssh-keyscan
-    - ssh_known_hosts_dir: ~/.ssh
-    - ssh_known_hosts_file: known_hosts
+    - ssh_known_hosts_dir: ~/.ssh  #define the location of where you want to store your ssh_keys
+    - ssh_known_hosts_file: known_hosts  #defines the file of where you want to store your ssh_keys
 #    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
 #    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
 #    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
@@ -20,11 +21,11 @@
       when: cleanup_temp
 
     - name: cleaning up temp files
-      file: path='{{ssh_known_hosts_dir}}/{{item}}' state=absent
+      file: path='{{ ssh_known_hosts_dir }}/{{ item }}' state=absent
       run_once: true
       with_items:
-        - '{{ssh_known_hosts_file}}.clean'
-        - '{{ssh_known_hosts_file}}.old'
+        - '{{ ssh_known_hosts_file }}.clean'
+        - '{{ ssh_known_hosts_file }}.old'
       when: cleanup_temp
 
     - name: Making sure ssh_known_hosts_dir exists
@@ -40,36 +41,36 @@
       run_once: true
 
     - name: making sure host_vars/inventory_hostname file exists
-      stat: path='{{host_vars_dir}}/{{inventory_hostname}}'
+      stat: path='{{ host_vars_dir }}/{{ inventory_hostname }}'
       register: inventory_hostname_file_results
 
     - name: creating missing host_vars/inventory file
-      file: path='{{host_vars_dir}}/{{inventory_hostname}}' state=touch
+      file: path='{{ host_vars_dir }}/{{ inventory_hostname }}' state=touch
       when: not inventory_hostname_file_results.stat.exists
 
     - name: making sure inventory_hostname folder exists
-      file: path='{{gather_dir}}/{{inventory_hostname}}' state=directory
+      file: path='{{ gather_dir }}/{{ inventory_hostname }}' state=directory
 
     - name: capturing ip addresses
       script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/vm_ip_info"
 
     - name: capturing ip addresses for host_vars/inventory_hostname
-      script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{gather_dir}}/{{ inventory_hostname }}/vm_ip_info"
+      script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info"
 
     - name: cleaning up existing ansible_ssh_host value in host_vars/inventory_hostname
-      lineinfile: dest='{{host_vars_dir}}/{{inventory_hostname}}' regexp='^ansible_ssh_host=' state=absent
+      lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^ansible_ssh_host=' state=absent
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      shell: "sed -i -e 's|:||' {{ gather_dir }}/{{inventory_hostname}}/vm_ip_info"
+      replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp=':'
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      shell: "sed -i -e 's|None;|ansible_ssh_host=|' {{ gather_dir }}/{{inventory_hostname}}/vm_ip_info"
+      replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host=|'
 
     - name: adding current ansible_ssh_host to host_vars/inventory_hostname
-      shell: "cat {{gather_dir}}/{{inventory_hostname}}/vm_ip_info >> {{host_vars_dir}}/{{inventory_hostname}}"
+      shell: "cat {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info >> {{ host_vars_dir }}/{{ inventory_hostname }}"
 
     - name: cleaning up bad lines in host_vars/inventory_hostname
-      lineinfile: dest='{{host_vars_dir}}/{{inventory_hostname}}' regexp='^{{inventory_hostname}}' state=absent
+      lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^{{ inventory_hostname }}' state=absent
 
     - name: copying vm_ip_info to ip_addys
       shell: "cp {{ gather_dir }}/vm_ip_info {{ gather_dir }}/ip_addys"
@@ -80,19 +81,19 @@
       run_once: true
 
     - name: cleaning up vm_ip_info
-      shell: "sed -i -e 's|:||' {{ gather_dir }}/vm_ip_info"
+      replace: dest='{{ gather_dir }}/vm_ip_info' regexp=':'
       run_once: true
 
     - name: cleaning up vm_ip_info
-      shell: "sed -i -e 's|None;|ansible_ssh_host=|' {{ gather_dir }}/vm_ip_info"
+      replace: dest='{{ gather_dir }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host=|'
       run_once: true
 
     - name: cleaning up ip_addys
-      shell: "sed -i -e 's|:||' {{ gather_dir }}/ip_addys"
+      replace: dest='{{ gather_dir }}/ip_addys' regexp=':'
       run_once: true
 
     - name: cleaning up ip_addys
-      shell: "sed -i -e 's|None;||' {{ gather_dir }}/ip_addys"
+      replace: dest='{{ gather_dir }}/ip_addys' regexp='None;'
       run_once: true
 
     - name: cleaning up ip_addys
@@ -104,7 +105,7 @@
       run_once: true
 
     - name: cleaning up ip_hosts
-      shell: "sed -i -e 's|;| |' {{ gather_dir }}/ip_hosts.tmp"
+      replace: dest='{{ gather_dir }}/ip_hosts.tmp' regexp=';' replace=' '
       run_once: true
 
     - name: cleaning up ip_hosts
@@ -145,9 +146,9 @@
       when: cleanup_temp
 
     - name: cleaning up temp files
-      file: path='{{ssh_known_hosts_dir}}/{{item}}' state=absent
+      file: path='{{ ssh_known_hosts_dir }}/{{ item }}' state=absent
       run_once: true
       with_items:
-        - '{{ssh_known_hosts_file}}.clean'
-        - '{{ssh_known_hosts_file}}.old'
+        - '{{ ssh_known_hosts_file }}.clean'
+        - '{{ ssh_known_hosts_file }}.old'
       when: cleanup_temp
