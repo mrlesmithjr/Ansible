@@ -48,6 +48,10 @@
       file: path='{{ host_vars_dir }}/{{ inventory_hostname }}' state=touch
       when: not inventory_hostname_file_results.stat.exists
 
+    - name: making file yaml format on missing host_vars/inventory file
+      lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' line="---"
+      when: not inventory_hostname_file_results.stat.exists
+
     - name: making sure inventory_hostname folder exists
       file: path='{{ gather_dir }}/{{ inventory_hostname }}' state=directory
 
@@ -58,16 +62,16 @@
       script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info"
 
     - name: cleaning up existing ansible_ssh_host value in host_vars/inventory_hostname
-      lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^ansible_ssh_host=' state=absent
+      lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^ansible_ssh_host' state=absent
 
     - name: cleaning up inventory_hostname folder vm_ip_info
       replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp=':'
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host='
+      shell: "awk '{print $2}' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info > {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      shell: "awk '{print $2}' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info > {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
+      shell: "sed -i -e 's|None;|ansible_ssh_host: |' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
 
     - name: adding current ansible_ssh_host to host_vars/inventory_hostname
       shell: "cat {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready >> {{ host_vars_dir }}/{{ inventory_hostname }}"
