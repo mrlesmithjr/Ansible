@@ -15,12 +15,12 @@
 #    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
 #    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
   tasks:
-    - name: removing temp folder created
+    - name: removing temp folder created '{{ gather_dir }}'
       file: path='{{ gather_dir }}' state=absent
       run_once: true
       when: cleanup_temp
 
-    - name: cleaning up temp files
+    - name: cleaning up temp files '{{ ssh_known_hosts_dir}}/{{ item }}'
       file: path='{{ ssh_known_hosts_dir }}/{{ item }}' state=absent
       run_once: true
       with_items:
@@ -63,6 +63,9 @@
 
     - name: cleaning up existing ansible_ssh_host value in host_vars/inventory_hostname
       lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^ansible_ssh_host' state=absent
+
+    - name: cleaning up inventory_hostname folder vm_ip_info
+      lineinfile: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp='^ERROR' state=absent
 
     - name: cleaning up inventory_hostname folder vm_ip_info
       replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp=':'
