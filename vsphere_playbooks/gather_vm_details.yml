@@ -64,10 +64,13 @@
       replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp=':'
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host=|'
+      replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host='
+
+    - name: cleaning up inventory_hostname folder vm_ip_info
+      shell: "awk '{print $2}' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info > {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
 
     - name: adding current ansible_ssh_host to host_vars/inventory_hostname
-      shell: "cat {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info >> {{ host_vars_dir }}/{{ inventory_hostname }}"
+      shell: "cat {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready >> {{ host_vars_dir }}/{{ inventory_hostname }}"
 
     - name: cleaning up bad lines in host_vars/inventory_hostname
       lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^{{ inventory_hostname }}' state=absent
@@ -85,7 +88,7 @@
       run_once: true
 
     - name: cleaning up vm_ip_info
-      replace: dest='{{ gather_dir }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host=|'
+      replace: dest='{{ gather_dir }}/vm_ip_info' regexp='None;' replace='ansible_ssh_host='
       run_once: true
 
     - name: cleaning up ip_addys
