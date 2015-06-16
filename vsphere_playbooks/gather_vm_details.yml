@@ -8,7 +8,7 @@
     - gather_dir: ~/gather_info  #defines where to temporarily store gather information
     - host_vars_dir: '{{ ansible_root }}/host_vars'  #defines where your ansible host_vars folder resides
     - pysphere_script_home: library  #defines script folder location for python modules used
-    - ssh_known_hosts_command: ssh-keyscan
+    - ssh_known_hosts_command: 'ssh-keyscan -H -T 10 -f'
     - ssh_known_hosts_dir: ~/.ssh  #define the location of where you want to store your ssh_keys
     - ssh_known_hosts_file: known_hosts  #defines the file of where you want to store your ssh_keys
 #    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
@@ -148,15 +148,18 @@
       run_once: true
 
     - name: gathering ssh pub keys from hosts found and adding to ssh_known_hosts_file
-      shell: "{{ ssh_known_hosts_command}} -f {{ gather_dir }}/ip_hosts.ready >> {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}"
+      shell: "{{ ssh_known_hosts_command}} {{ gather_dir }}/{{ item }} >> {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}"
       run_once: true
+      with_items:
+        - ip_hosts.ready
+        - ip_hostnames.ready
 
     - name: sorting ssh_known_hosts and exporting to ssh_known_hosts.clean
       shell: "sort -u {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }} > {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}.clean"
       run_once: true
 
     - name: copying ssh_known_hosts.clean to ssh_known_hosts_file
-      shell: "cp {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}.clean {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}"
+      shell: "mv {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}.clean {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}"
       run_once: true
 
     - name: removing temp folder created
