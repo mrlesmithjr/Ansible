@@ -1,0 +1,8 @@
+---
+- include: centos.yml
+  when: ansible_os_family == 'RedHat'
+  tags: [sysdig]
+
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
+  tags: [sysdig]

@@ -1,0 +1,12 @@
+---
+- name: centos | Install Kernel Devel for RedHat OS family
+  yum: name=kernel-devel-{{ ansible_kernel }} state=latest
+
+- name: centos | Get Sysdig Key for RedHat OS family
+  rpm_key: key={{ sysdig_repokey }} state=present
+
+- name: centos | Get Sysdig repo for RedHat OS family
+  get_url: url={{ sysdig_url }} dest={{ sysdig_repo }} owner=root group=root mode=0644
+
+- name: centos | Install Sysdig for RedHat OS family
+  yum: name={{ sysdig_package }} state=latest
