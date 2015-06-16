@@ -68,10 +68,19 @@
       replace: dest='{{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info' regexp=':'
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      shell: "awk '{print $2}' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info > {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
+      shell: "awk '{print $2}' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info > {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.tmp"
 
     - name: cleaning up inventory_hostname folder vm_ip_info
-      shell: "sed -i -e 's|None;|ansible_ssh_host: |' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
+      shell: "sed -i -e 's|None;|ansible_ssh_host: |' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.tmp"
+
+    - name: cleaning up inventory_hostname folder vm_ip_info
+      shell: "sed -i -e 's|;| |' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.tmp"
+
+    - name: cleaning up inventory_hostname folder vm_ip_info
+      shell: "awk '{print $1 $2}' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.tmp > {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
+
+    - name: cleaning up inventory_hostname folder vm_ip_info
+      shell: "sed -i -e 's|ansible_ssh_host:|ansible_ssh_host: |' {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready"
 
     - name: adding current ansible_ssh_host to host_vars/inventory_hostname
       shell: "cat {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info.ready >> {{ host_vars_dir }}/{{ inventory_hostname }}"
