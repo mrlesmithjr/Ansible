@@ -3,15 +3,15 @@
   gather_facts: false
   connection: local
   vars:
-    - vcenter_hostname: ''  #defined in group_vars/all/configs
-    - vcenter_user: ''  #defined in group_vars/all/accounts
-    - vcenter_pass: ''  #defined in group_vars/all/accounts
-    - datacenter: ''  #defined in group_vars/all/configs
-    - esxi_host: ''  #defined in group_vars/all/configs
-    - vcenter_resource_pool: ''  #defined in group_vars/all/configs
-    - vcenter_cluster: ''  #defined in group_vars/all/configs
-    - vm_state: present
+#    - datacenter: ''  #defined in group_vars/all/configs
+#    - esxi_host: ''  #defined in group_vars/all/configs
     - notes: Created by Ansible
+#    - vcenter_cluster: ''  #defined in group_vars/all/configs
+#    - vcenter_hostname: ''  #defined in group_vars/all/configs
+#    - vcenter_pass: ''  #defined in group_vars/all/accounts
+#    - vcenter_resource_pool: ''  #defined in group_vars/all/configs
+#    - vcenter_user: ''  #defined in group_vars/all/accounts
+    - vm_state: present
   vars_prompt:
     - name: 'confirm_delete'
       prompt: "To confirm deleting VMs enter DELETE otherwise enter none"

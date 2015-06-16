@@ -149,6 +149,7 @@
 
     - name: gathering ssh pub keys from hosts found and adding to ssh_known_hosts_file
       shell: "{{ ssh_known_hosts_command}} {{ gather_dir }}/{{ item }} >> {{ ssh_known_hosts_dir }}/{{ ssh_known_hosts_file }}"
+      ignore_errors: true
       run_once: true
       with_items:
         - ip_hosts.ready

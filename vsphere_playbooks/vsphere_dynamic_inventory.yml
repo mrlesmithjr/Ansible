@@ -6,10 +6,10 @@
     - ansible_root: ~/ansible  #defines where your ansible_root folder resides
     - host_vars_dir: '{{ ansible_root }}/host_vars'  #defines where your ansible host_vars folder resides
     - pysphere_script_home: library
-    - vsphere_dynamic_inventory: vsphere_inventory
 #    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
 #    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
 #    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
+    - vsphere_dynamic_inventory: vsphere_inventory
   tasks:
     - name: removing existing vsphere_dynamic_inventory
       file: path='{{ ansible_root }}/{{ vsphere_dynamic_inventory }}' state=absent
