@@ -1,0 +1,74 @@
+#This play generates a new hosts inventory after dynamic inventory gathering
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  sudo: false
+  vars:
+    - destination_inventory_file: '{{ destination_inventory_file_path}}/{{ destination_inventory_file_naming }}'
+    - destination_inventory_file_naming: test_inventory  #define desired inventory name to create
+    - destination_inventory_file_path: /tmp
+    - destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
+    - inventory_group_vars_file: ./build_inventory_group_vars.yml
+    - inventory_host_vars_file: ./build_inventory_host_vars.yml
+    - inventory_template: ./build_inventory.j2
+    - source_inventory_dir: /tmp
+    - source_inventory_file: vsphere_test_inventory
+    - source_inventory_lookup: "{{ lookup('file', 'source_inventory_lookup_file') }}"
+    - source_inventory_lookup_file: "{{ source_inventory_dir }}/{{ source_inventory_file }}"
+  vars_files:
+    - '{{ inventory_group_vars_file }}'
+    - '{{ inventory_host_vars_file}}'
+  tasks:
+    - name: cleaning up old temp files
+      file: path={{ item }} state=absent
+#      run_once: true
+      with_items:
+        - '{{ destination_inventory_temp_file }}'
+
+    - name: creating temp files
+      file: path={{ item }} state=touch
+#      run_once: true
+      with_items:
+        - '{{ destination_inventory_temp_file }}'
+
+    - name: creating new inventory file
+      template: src={{ inventory_template }} dest={{ destination_inventory_file }}
+#      run_once: true
+      with_items: source_inventory_lookup
+
+    - name: adding unassigned-hosts group
+      lineinfile: dest={{ destination_inventory_file }} line="[unassigned-hosts]" insertafter=EOF state=present
+#      run_once: true
+
+    - name: creating temp file
+      lineinfile: dest={{ destination_inventory_temp_file }} line="{{ item }}" insertafter=EOF state=present
+#      run_once: true
+      with_items: source_inventory_lookup
+
+    - name: cleaning up temp file
+      shell: "sort -u {{ destination_inventory_temp_file }} > {{ destination_inventory_temp_file }}.clean"
+#      run_once: true
+
+    - name: creating new temp file
+      shell: "mv {{ destination_inventory_temp_file }}.clean {{ destination_inventory_temp_file }}"
+#      run_once: true
+
+    - name: removing already defined hosts
+      replace: dest={{ destination_inventory_temp_file }} regexp="^{{ item.name }}"
+#      run_once: true
+      with_items: hosts
+
+    - name: cleaning up temp file
+      shell: "sed -i -e '/^$/d' {{ destination_inventory_temp_file }}"
+#      run_once: true
+
+    - name: adding unassigned hosts to inventory
+      shell: "cat {{ destination_inventory_temp_file }} >> {{ destination_inventory_file }}"
+#      run_once: true
+
+    - name: cleaning up old temp files
+      file: path={{ item }} state=absent
+#      run_once: true
+      with_items:
+        - '{{ destination_inventory_temp_file }}'

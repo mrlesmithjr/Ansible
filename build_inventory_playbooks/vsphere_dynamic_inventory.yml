@@ -1,0 +1,92 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+#    - ansible_root: ~/ansible  #defines where your ansible_root folder resides
+    - destination_inventory_file: '{{ destination_inventory_file_path}}/{{ destination_inventory_file_naming }}'
+    - destination_inventory_file_naming: vsphere_test_inventory  #define desired inventory name to create
+    - destination_inventory_file_path: /tmp
+    - destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
+#    - host_vars_dir: '{{ ansible_root }}/host_vars'  #defines where your ansible host_vars folder resides
+    - python_scripts_home: library
+#    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
+#    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
+#    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
+  tasks:
+    - name: removing existing vsphere_dynamic_inventory
+      file: path='{{ destination_inventory_file }}' state=absent
+      run_once: true
+
+    - name: creating vsphere_dynamic_inventory script
+      template: src='{{ python_scripts_home }}/vsphere_query.py.j2' dest='{{ python_scripts_home }}/vsphere_query.py'
+
+    - name: building vsphere_dynamic_inventory
+      script: "{{ python_scripts_home }}/vsphere_query.py --list >> {{ destination_inventory_file }}"
+
+    - name: removing vsphere_dynamic_inventory script
+      file: path='{{ python_scripts_home }}/vsphere_query.py' state=absent
+
+    - name: cleaning up vsphere_dynamic_inventory
+      shell: "sed -i -e 's/^[ \t]*//' -e 's/[ \t]*$//' {{ destination_inventory_file }}"
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^"'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp=',$'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='"$'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^\['
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^\]'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^,$'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^}'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^{'
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      lineinfile: dest='{{ destination_inventory_file }}' regexp='^local' state=absent
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      lineinfile: dest='{{ destination_inventory_file }}' regexp='^127.0.0.1' state=absent
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      lineinfile: dest='{{ destination_inventory_file }}' regexp='^no_group' state=absent
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      lineinfile: dest='{{ destination_inventory_file }}' regexp='^hosts' state=absent
+      run_once: true
+
+    - name: cleaning up vsphere_dynamic_inventory
+      replace: dest='{{ destination_inventory_file }}' regexp='^\s*$]'
+      run_once: true
+
+    - name: sorting vsphere_dynamic_inventory
+      shell: "sort -u {{ destination_inventory_file }} > {{ destination_inventory_file }}.tmp"
+      run_once: true
+
+    - name: finalizing vsphere_dynamic_inventory
+      shell: "mv {{ destination_inventory_file }}.tmp {{ destination_inventory_file }}"
+      run_once: true

@@ -1,0 +1,31 @@
+---
+host_groups:
+  - ansible-test-servers
+  - andys-servers
+  - cacti-servers
+  - ci-pipeline
+  - db-servers
+  - desktops
+  - elk-p-broker-nodes
+  - elk-p-es-nodes
+  - elk-p-haproxy-nodes
+  - elk-p-nodes
+  - elk-p-pre-processor-nodes
+  - elk-p-processor-nodes
+  - gitlab-server
+  - grafana
+  - graylog-servers
+  - ip-services
+  - nagios
+  - nameservers
+  - plex-servers
+  - sensu-servers
+  - smtp-servers
+  - squid-servers
+  - tftp-server
+  - ubuntu-servers
+  - vmcreate-Ubuntu
+  - vmcreate-Windows
+  - vmdelete
+  - web-servers
+  - windows-servers
