@@ -1,4 +1,3 @@
-#This play generates a new hosts inventory after running vsphere_dynamic_inventory.yml
 ---
 - hosts: localhost
   connection: local
@@ -9,9 +8,9 @@
     - destination_inventory_file_naming: test_inventory  #define desired inventory name to create
     - destination_inventory_file_path: /tmp
     - destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
-    - inventory_group_vars_file: ./build_inventory_group_vars.yml
-    - inventory_host_vars_file: ./build_inventory_host_vars.yml
-    - inventory_template: ./build_inventory.j2
+    - inventory_group_vars_file: vars/group_vars.yml
+    - inventory_host_vars_file: vars/host_vars.yml
+    - inventory_template: templates/build_inventory.j2
     - source_inventory_dir: /tmp
     - source_inventory_file: vsphere_test_inventory
     - source_inventory_lookup: "{{ lookup('file', 'source_inventory_lookup_file') }}"

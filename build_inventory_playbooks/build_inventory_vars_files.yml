@@ -6,8 +6,8 @@
   vars:
     - group_vars_dir: /tmp/group_vars
     - host_vars_dir: /tmp/host_vars
-    - inventory_group_vars_file: ./build_inventory_group_vars.yml
-    - inventory_host_vars_file: ./build_inventory_host_vars.yml
+    - inventory_group_vars_file: vars/group_vars.yml
+    - inventory_host_vars_file: vars/host_vars.yml
     - timestamp: "{{ lookup('pipe', 'date +%D_%T') }}"
   vars_files:
     - '{{ inventory_group_vars_file }}'

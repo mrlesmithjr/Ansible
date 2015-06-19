@@ -31,6 +31,7 @@ host_groups:
   - web-servers
   - windows-servers
 
+# Below will be renamed to host_groups to replace above host_groups
 new_host_groups:
   - name: ansible-test-servers
   - name: andys-servers

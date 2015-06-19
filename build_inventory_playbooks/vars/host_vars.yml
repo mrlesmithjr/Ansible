@@ -1,11 +1,3 @@
-# Build Inventories
-#####Adds ability to create host_vars, group_vars and add variables to each using vars files
-#####Adds ability to create host inventory and update host_vars ansible_ssh_host to current IP address discovered from vCenter
-## Requirements
-None
-## Variables Examples
-vars/host_vars
-````
 ---
 hosts:
   - name: ans-test-1
@@ -39,18 +31,36 @@ hosts:
         value: false
         set: true
       - name: network
-        value: 'vSS-Green-Servers-VLA
-````
-## Dependencies
-None
-## Example Playbook
-````
-````
-## License
-GNU General Public License Version 2
-
-## Author Information
-Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- larry.e.smith.jr [at] gmail.com
+        value: 'vSS-Green-Servers-VLAN101'
+        set: true
+  - name: example
+    create: true
+    groups:
+      - example-server
+    vars:
+      - name: example_var
+        value: example_value
+        set: true
+  - name: ns1
+    create: true
+    groups:
+      - ubuntu-servers
+      - nameservers
+    vars:
+      - name: a_var
+        value: c_value
+        set: false
+      - name: b_var
+        value: d_value
+        set: false
+  - name: ns2
+    create: true
+    groups:
+      - ubuntu-servers
+      - nameservers
+    vars: []
+  - name: Homeserv
+    create: true
+    groups:
+      - windows-servers
+    vars: []

@@ -60,7 +60,10 @@ def grouplist():
     inventory ={}
     inventory['local'] = [ '127.0.0.1' ]
     vserver = vcenter_connect(server_fqdn,server_username,server_password)
-    vms_in_vserver = vserver.get_registered_vms(status='poweredOn')
+    #vms_in_vserver = vserver.get_registered_vms(status='poweredOff')
+    #vms_in_vserver = vserver.get_registered_vms(status='suspended')
+    #vms_in_vserver = vserver.get_registered_vms(status='poweredOn')
+    vms_in_vserver = vserver.get_registered_vms(status='{{ vsphere_query_status }}')
     inventory["no_group"] = {
         'hosts' : []
     }

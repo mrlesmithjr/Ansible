@@ -3,23 +3,25 @@
   connection: local
   gather_facts: false
   vars:
-#    - ansible_root: ~/ansible  #defines where your ansible_root folder resides
     - destination_inventory_file: '{{ destination_inventory_file_path}}/{{ destination_inventory_file_naming }}'
     - destination_inventory_file_naming: vsphere_test_inventory  #define desired inventory name to create
     - destination_inventory_file_path: /tmp
     - destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
-#    - host_vars_dir: '{{ ansible_root }}/host_vars'  #defines where your ansible host_vars folder resides
+#    - host_vars_dir: /tmp/host_vars'  #defines where your ansible host_vars folder resides
+    - inventory_template: templates/vsphere_query.py.j2
     - python_scripts_home: library
+    - timestamp: "{{ lookup('pipe', 'date +%D_%T') }}"
 #    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
 #    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
 #    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
+    - vsphere_query_status: poweredOn  #poweredOn|poweredOff|suspended  #defines status to query when building template
   tasks:
     - name: removing existing vsphere_dynamic_inventory
       file: path='{{ destination_inventory_file }}' state=absent
       run_once: true
 
     - name: creating vsphere_dynamic_inventory script
-      template: src='{{ python_scripts_home }}/vsphere_query.py.j2' dest='{{ python_scripts_home }}/vsphere_query.py'
+      template: src='{{ inventory_template }}' dest='{{ python_scripts_home }}/vsphere_query.py'
 
     - name: building vsphere_dynamic_inventory
       script: "{{ python_scripts_home }}/vsphere_query.py --list >> {{ destination_inventory_file }}"

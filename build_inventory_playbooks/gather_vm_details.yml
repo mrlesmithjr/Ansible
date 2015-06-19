@@ -3,14 +3,14 @@
   connection: local
   gather_facts: false
   vars:
-    - ansible_root: ~/ansible  #defines where your ansible_root folder resides
     - cleanup_temp: true  #defines cleaning up temp files/folders used in tasks....
     - gather_dir: ~/gather_info  #defines where to temporarily store gather information
-    - host_vars_dir: '{{ ansible_root }}/host_vars'  #defines where your ansible host_vars folder resides
+    - host_vars_dir: /tmp/host_vars'  #defines where your ansible host_vars folder resides
     - pysphere_script_home: library  #defines script folder location for python modules used
     - ssh_known_hosts_command: 'ssh-keyscan -H -T 10 -f'
     - ssh_known_hosts_dir: ~/.ssh  #define the location of where you want to store your ssh_keys
     - ssh_known_hosts_file: known_hosts  #defines the file of where you want to store your ssh_keys
+    - timestamp: "{{ lookup('pipe', 'date +%D_%T') }}"
 #    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
 #    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
 #    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
