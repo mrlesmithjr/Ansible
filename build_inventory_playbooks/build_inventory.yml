@@ -3,21 +3,22 @@
   connection: local
   gather_facts: false
   sudo: false
-  vars:
-    - destination_inventory_file: '{{ destination_inventory_file_path}}/{{ destination_inventory_file_naming }}'
-    - destination_inventory_file_naming: test_inventory  #define desired inventory name to create
-    - destination_inventory_file_path: /tmp
-    - destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
-    - inventory_group_vars_file: vars/group_vars.yml
-    - inventory_host_vars_file: vars/host_vars.yml
-    - inventory_template: templates/build_inventory.j2
-    - source_inventory_dir: /tmp
-    - source_inventory_file: vsphere_test_inventory
-    - source_inventory_lookup: "{{ lookup('file', 'source_inventory_lookup_file') }}"
-    - source_inventory_lookup_file: "{{ source_inventory_dir }}/{{ source_inventory_file }}"
+#  vars:
+#    - destination_inventory_file: '{{ destination_inventory_dir}}/{{ destination_inventory_file_naming }}'
+#    - destination_inventory_file_naming: test_inventory  #define desired inventory name to create
+#    - destination_inventory_dir: /tmp
+#    - destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
+#    - inventory_group_vars_file: vars/group_vars.yml
+#    - inventory_host_vars_file: vars/host_vars.yml
+#    - build_inventory_template: templates/build_inventory.j2
+#    - source_inventory_dir: /tmp
+#    - source_inventory_file: vsphere_test_inventory
+#    - source_inventory_lookup: "{{ lookup('file', 'source_inventory_lookup_file') }}"
+#    - source_inventory_lookup_file: "{{ source_inventory_dir }}/{{ source_inventory_file }}"
   vars_files:
-    - '{{ inventory_group_vars_file }}'
-    - '{{ inventory_host_vars_file}}'
+    - vars/common_vars.yml
+    - vars/group_vars.yml
+    - vars/host_vars.yml
   tasks:
     - name: cleaning up old temp files
       file: path={{ item }} state=absent
@@ -30,7 +31,7 @@
         - '{{ destination_inventory_temp_file }}'
 
     - name: creating new inventory file
-      template: src={{ inventory_template }} dest={{ destination_inventory_file }}
+      template: src={{ build_inventory_template }} dest={{ destination_inventory_file }}
       with_items: source_inventory_lookup
 
     - name: adding unassigned-hosts group

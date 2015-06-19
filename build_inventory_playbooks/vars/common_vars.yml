@@ -1,0 +1,31 @@
+---
+#####
+inventory_name: test_inventory
+inventory_root: /tmp  #****** DEFINES FINAL DESTINATION FOR ALL INVENTORY, HOST_VARS, GROUP_VARS and SSH KEYS ******
+#####
+build_inventory_template: templates/build_inventory.j2
+cleanup_temp: true  #defines cleaning up temp files/folders used in tasks....
+destination_inventory_file: '{{ destination_inventory_dir}}/{{ destination_inventory_file_naming }}'
+destination_inventory_file_naming: '{{ inventory_name }}'
+destination_inventory_dir: '{{ inventory_root }}'
+destination_inventory_temp_file: '{{ destination_inventory_file_naming }}.tmp'
+gather_dir: '{{ destination_inventory_dir }}/gather_info'  #defines where to temporarily store gather information
+group_vars_dir: '{{ destination_inventory_dir }}/group_vars'  #defines where your ansible group_vars folder resides
+host_vars_dir: '{{ destination_inventory_dir }}/host_vars'  #defines where your ansible host_vars folder resides
+inventory_common_vars_file: vars/common_vars.yml
+inventory_group_vars_file: vars/group_vars.yml
+inventory_host_vars_file: vars/host_vars.yml
+python_scripts_home: library  #defines script folder location for python modules used
+source_inventory_dir: '{{ destination_inventory_dir }}'
+source_inventory_file: '{{ destination_inventory_file }}'
+source_inventory_lookup: "{{ lookup('file', 'source_inventory_lookup_file') }}"
+source_inventory_lookup_file: "{{ source_inventory_dir }}/{{ source_inventory_file }}"
+ssh_known_hosts_command: 'ssh-keyscan -H -T 10 -f'
+ssh_known_hosts_dir: '{{ inventory_root }}/.ssh'  #define the location of where you want to store your ssh_keys
+ssh_known_hosts_file: known_hosts  #defines the file of where you want to store your ssh_keys
+timestamp: "{{ lookup('pipe', 'date +%D_%T') }}"
+#vcenter_hostname: ''  #defined in group_vars/all/configs or define here
+#vcenter_pass: ''  #defined in group_vars/all/accounts or define here
+#vcenter_user: ''  #defined in group_vars/all/accounts or define here
+vsphere_query_inventory_template: templates/vsphere_query.py.j2
+vsphere_query_status: poweredOn  #poweredOn|poweredOff|suspended  #defines status to query when building template

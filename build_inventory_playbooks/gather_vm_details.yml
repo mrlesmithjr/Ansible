@@ -2,18 +2,22 @@
 - hosts: all
   connection: local
   gather_facts: false
-  vars:
-    - cleanup_temp: true  #defines cleaning up temp files/folders used in tasks....
-    - gather_dir: ~/gather_info  #defines where to temporarily store gather information
-    - host_vars_dir: /tmp/host_vars'  #defines where your ansible host_vars folder resides
-    - pysphere_script_home: library  #defines script folder location for python modules used
-    - ssh_known_hosts_command: 'ssh-keyscan -H -T 10 -f'
-    - ssh_known_hosts_dir: ~/.ssh  #define the location of where you want to store your ssh_keys
-    - ssh_known_hosts_file: known_hosts  #defines the file of where you want to store your ssh_keys
-    - timestamp: "{{ lookup('pipe', 'date +%D_%T') }}"
+#  vars:
+#    - cleanup_temp: true  #defines cleaning up temp files/folders used in tasks....
+#    - gather_dir: ~/gather_info  #defines where to temporarily store gather information
+#    - host_vars_dir: /tmp/host_vars'  #defines where your ansible host_vars folder resides
+#    - python_scripts_home: library  #defines script folder location for python modules used
+#    - ssh_known_hosts_command: 'ssh-keyscan -H -T 10 -f'
+#    - ssh_known_hosts_dir: ~/.ssh  #define the location of where you want to store your ssh_keys
+#    - ssh_known_hosts_file: known_hosts  #defines the file of where you want to store your ssh_keys
+#    - timestamp: "{{ lookup('pipe', 'date +%D_%T') }}"
 #    - vcenter_hostname: ''  #defined in group_vars/all/configs or define here
 #    - vcenter_pass: ''  #defined in group_vars/all/accounts or define here
 #    - vcenter_user: ''  #defined in group_vars/all/accounts or define here
+  vars_files:
+    - vars/common_vars.yml
+    - vars/group_vars.yml
+    - vars/host_vars.yml
   tasks:
     - name: removing previous temp folder created if it exists
       file: path='{{ gather_dir }}' state=absent
@@ -56,10 +60,10 @@
       file: path='{{ gather_dir }}/{{ inventory_hostname }}' state=directory
 
     - name: capturing ip addresses from vCenter to gather_dir
-      script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/vm_ip_info"
+      script: "{{ python_scripts_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/vm_ip_info"
 
     - name: capturing ip addresses from vCenter to host_vars/inventory_hostname
-      script: "{{ pysphere_script_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info"
+      script: "{{ python_scripts_home }}/pysphere-get-vm-ips.py -s {{ vcenter_hostname }} -u {{ vcenter_user }} -p {{ vcenter_pass }} -n {{ inventory_hostname }} >> {{ gather_dir }}/{{ inventory_hostname }}/vm_ip_info"
 
     - name: cleaning up existing ansible_ssh_host value in host_vars/inventory_hostname
       lineinfile: dest='{{ host_vars_dir }}/{{ inventory_hostname }}' regexp='^ansible_ssh_host' state=absent
