@@ -12,6 +12,7 @@ host_groups:
   - elk-p-nodes
   - elk-p-pre-processor-nodes
   - elk-p-processor-nodes
+  - example-server
   - gitlab-server
   - grafana
   - graylog-servers
@@ -29,3 +30,35 @@ host_groups:
   - vmdelete
   - web-servers
   - windows-servers
+
+new_host_groups:
+  - name: ansible-test-servers
+  - name: andys-servers
+  - name: cacti-servers
+  - name: ci-pipeline
+  - name: db-servers
+  - name: desktops
+  - name: elk-p-broker-nodes
+  - name: elk-p-es-nodes
+  - name: elk-p-haproxy-nodes
+  - name: elk-p-nodes
+  - name: elk-p-pre-processor-nodes
+  - name: elk-p-processor-nodes
+  - name: example-server
+  - name: gitlab-server
+  - name: grafana
+  - name: graylog-servers
+  - name: ip-services
+  - name: nagios
+  - name: nameservers
+  - name: plex-servers
+  - name: sensu-servers
+  - name: smtp-servers
+  - name: squid-servers
+  - name: tftp-server
+  - name: ubuntu-servers
+  - name: vmcreate-Ubuntu
+  - name: vmcreate-Windows
+  - name: vmdelete
+  - name: web-servers
+  - name: windows-servers

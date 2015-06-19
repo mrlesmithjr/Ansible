@@ -1,4 +1,4 @@
-#This play generates a new hosts inventory after dynamic inventory gathering
+#This play generates a new hosts inventory after running vsphere_dynamic_inventory.yml
 ---
 - hosts: localhost
   connection: local
@@ -22,53 +22,42 @@
   tasks:
     - name: cleaning up old temp files
       file: path={{ item }} state=absent
-#      run_once: true
       with_items:
         - '{{ destination_inventory_temp_file }}'
 
     - name: creating temp files
       file: path={{ item }} state=touch
-#      run_once: true
       with_items:
         - '{{ destination_inventory_temp_file }}'
 
     - name: creating new inventory file
       template: src={{ inventory_template }} dest={{ destination_inventory_file }}
-#      run_once: true
       with_items: source_inventory_lookup
 
     - name: adding unassigned-hosts group
       lineinfile: dest={{ destination_inventory_file }} line="[unassigned-hosts]" insertafter=EOF state=present
-#      run_once: true
 
     - name: creating temp file
       lineinfile: dest={{ destination_inventory_temp_file }} line="{{ item }}" insertafter=EOF state=present
-#      run_once: true
       with_items: source_inventory_lookup
 
     - name: cleaning up temp file
       shell: "sort -u {{ destination_inventory_temp_file }} > {{ destination_inventory_temp_file }}.clean"
-#      run_once: true
 
     - name: creating new temp file
       shell: "mv {{ destination_inventory_temp_file }}.clean {{ destination_inventory_temp_file }}"
-#      run_once: true
 
     - name: removing already defined hosts
       replace: dest={{ destination_inventory_temp_file }} regexp="^{{ item.name }}"
-#      run_once: true
       with_items: hosts
 
     - name: cleaning up temp file
       shell: "sed -i -e '/^$/d' {{ destination_inventory_temp_file }}"
-#      run_once: true
 
     - name: adding unassigned hosts to inventory
       shell: "cat {{ destination_inventory_temp_file }} >> {{ destination_inventory_file }}"
-#      run_once: true
 
     - name: cleaning up old temp files
       file: path={{ item }} state=absent
-#      run_once: true
       with_items:
         - '{{ destination_inventory_temp_file }}'
