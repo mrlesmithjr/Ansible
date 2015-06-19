@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+{{ item }}
+
+# host group assignments are below
+{% for host_group in host_groups %}
+[{{ host_group }}]
+{% for host in hosts %}
+{% for host_groups in host.groups %}
+{% if host_groups == host_group %}
+{{ host.name }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% endfor %}

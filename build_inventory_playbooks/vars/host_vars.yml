@@ -1,0 +1,66 @@
+---
+hosts:
+  - name: ans-test-1
+    create: true
+    groups:
+      - ubuntu-servers
+      - ansible-test-servers
+    vars:
+      - name: build_from_template
+        value: false
+        set: true
+      - name: cpu_hotadd
+        value: false
+        set: true
+      - name: cpucount
+        value: 1
+        set: true
+      - name: datastore
+        value: 'Tier-3 (NAS01)'
+        set: true
+      - name: disk1
+        value: 36
+        set: true
+      - name: mem_hotadd
+        value: false
+        set: true
+      - name: memory
+        value: 512
+        set: true
+      - name: multi
+        value: false
+        set: true
+      - name: network
+        value: 'vSS-Green-Servers-VLAN101'
+        set: true
+  - name: example
+    create: true
+    groups:
+      - example-server
+    vars:
+      - name: example_var
+        value: example_value
+        set: true
+  - name: ns1
+    create: true
+    groups:
+      - ubuntu-servers
+      - nameservers
+    vars:
+      - name: a_var
+        value: c_value
+        set: false
+      - name: b_var
+        value: d_value
+        set: false
+  - name: ns2
+    create: true
+    groups:
+      - ubuntu-servers
+      - nameservers
+    vars: []
+  - name: Homeserv
+    create: true
+    groups:
+      - windows-servers
+    vars: []
