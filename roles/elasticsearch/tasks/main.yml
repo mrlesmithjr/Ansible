@@ -4,24 +4,22 @@
   tags: [ferm]
   when: enable_firewall
 
-# Debian
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
-# CentOS
 - include: centos.yml
   when: ansible_os_family == "RedHat"
 
-# elasticsearch config
 - include: elasticsearch_conf.yml
 
-# set elasticsearch security limits
 - include: elasticsearch_security_limits.yml
 
-# install elasticsearch plugins
 - include: plugins.yml
 
-# setup nfs mount
 - include: nfs.yml
   tags: [elasticsearch-nfs-mount]
-  when: config_nfs
+  when: es_config_nfs is defined and es_config_nfs
+
+- include: resize_lvm.yml
+  tags: [es_resize_lvm]
+  when: es_resize_lvm is defined and es_resize_lvm

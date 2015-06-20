@@ -1,12 +1,12 @@
 ---
-- name: add haproxy apt repo
+- name: debian | adding haproxy ppa
   apt_repository: repo="ppa:vbernat/haproxy-1.5" state=present update_cache=yes
 
-- name: install haproxy and socat
+- name: debian | installing haproxy and socat
   apt: name={{ item }} state=latest
   with_items:
     - haproxy
     - socat
 
-- name: enable haproxy
+- name: debian | ensuring haproxy is enabled
   service: name=haproxy enabled=yes

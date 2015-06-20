@@ -1,5 +1,4 @@
 ---
-# handlers
 - name: init logstash
   command: update-rc.d logstash defaults 96 04
 
