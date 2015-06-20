@@ -175,11 +175,18 @@
 # CLEANUP
 #
 #####
+    - name: cleanup | ensuring scripts folder exists
+      file: path=scripts state=directory
 
-    - name: host_groups | generating script to fix variable_definitions
+    - name: cleanup | generating script to fix variable_definitions
       template: src=templates/cleanup_vars.sh.j2 dest=scripts/cleanup_vars.sh mode=0775
       tags: [cleanup_script]
 
-    - name: host_groups | fixing variable_definitions
+    - name: cleanup | fixing variable_definitions
       shell: "scripts/cleanup_vars.sh"
       tags: [cleanup_script]
+
+    - name: cleanup | cleaning up temp files created
+      file: path={{ item }} state=absent
+      with_items:
+        - scripts/cleanup_vars.sh
