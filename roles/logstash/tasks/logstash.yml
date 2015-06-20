@@ -1,0 +1,4 @@
+---
+- name: logstash | configuring logstash
+  template: src=etc/logstash/conf.d/logstash.conf.j2 dest=/etc/logstash/conf.d/logstash.conf owner=root group=root mode=0644
+  notify: restart logstash

@@ -1,0 +1,15 @@
+# {{ansible_managed}}
+#
+{% if logstash_base_outputs is defined %}
+{% for item in logstash_base_outputs %}
+output {
+  {{item.output}} {
+    host => "{{item.output_host}}"
+{% if item.output == "redis" %}
+    data_type => "list"
+    key => "logstash"
+{% endif %}
+  }
+}
+{% endfor %}
+{% endif %}

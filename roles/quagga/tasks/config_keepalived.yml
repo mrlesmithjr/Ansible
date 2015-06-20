@@ -1,0 +1,12 @@
+---
+- name: config_keepalived | reconfiguring keepalived
+  template: src=etc/keepalived/keepalived_quagga.conf.j2 dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644 backup=yes
+
+- name: config_keepalived | copying keepalived scripts
+  template: src=opt/scripts/{{ item.src }} dest='{{ scripts_home }}/{{ item.dest }}' owner=root group=root mode=0774 backup=yes
+  with_items:
+    - { src: backup_quagga.sh.j2, dest: backup.sh }
+    - { src: fault_quagga.sh.j2, dest: fault.sh }
+    - { src: master_quagga.sh.j2, dest: master.sh }
+    - { src: primary-backup.sh.j2, dest: primary-backup.sh }
+  notify: restart keepalived
