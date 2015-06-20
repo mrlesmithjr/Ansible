@@ -3,7 +3,7 @@
   apt_key: url=https://packages.elasticsearch.org/GPG-KEY-elasticsearch state=present
 
 - name: debian_elasticsearch | adding elasticsearch repo
-  apt_repository: repo='deb http://packages.elasticsearch.org/elasticsearch/{{ elasticsearch_version }}/debian stable main' state=present
+  apt_repository: repo='deb http://packages.elasticsearch.org/elasticsearch/{{ es_version }}/debian stable main' state=present
 
 - name: debian_elasticsearch | installing elasticsearch and java
   apt: name={{ item }} state=latest force=yes

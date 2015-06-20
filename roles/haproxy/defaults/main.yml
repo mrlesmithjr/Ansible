@@ -1,3 +1,3 @@
 ---
-config_haproxy: false
-sync_haproxy: false
+config_haproxy: false #only set to true to actually configure a base HAProxy config which is already installed by default
+sync_haproxy: false  #this is only needed when using GlusterFS

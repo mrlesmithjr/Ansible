@@ -1,0 +1,11 @@
+---
+- name: debian | install | installing pre-reqs
+  apt: name={{ item }} state=present
+  with_items:
+    - vlan
+
+- name: debian | install | installing quagga
+  apt: name=quagga state=present
+
+- name: debian | config | enabling quagga
+  service: name=quagga state=started enabled=yes

@@ -53,4 +53,4 @@ GNU General Public License Version 2
 Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
-- larry.e.smith.jr [at] gmail.com
+- mrlesmithjr [at] gmail.com

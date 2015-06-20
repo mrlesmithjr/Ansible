@@ -1,0 +1,21 @@
+# {{ansible_managed}}
+{% for item in logstash_file_inputs %}
+input {
+  file {
+    path => "{{item.path}}"
+    type => "{{item.type}}"
+    sincedb_path => "/var/log/.{{item.type}}sincedb"
+  }
+}
+{% endfor %}
+{% for item in logstash_outputs %}
+output {
+  {{item.output}} {
+    host => "{{item.output_host}}"
+{% if item.output == "redis" %}
+    data_type => "list"
+    key => "logstash"
+{% endif %}
+  }
+}
+{% endfor %}

@@ -1,53 +1,53 @@
 ---
-- name: push config
-  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0644 owner=root group=root backup=yes
+- name: config_haproxy | configuring haproxy
+  template: src=etc/haproxy/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0644 owner=root group=root backup=yes
   run_once: true
-  when: config_haproxy and sync_haproxy == true
+  when: config_haproxy and sync_haproxy
 
-- name: push config
-  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0644 owner=root group=root backup=yes
-  when: config_haproxy and sync_haproxy == false
+- name: config_haproxy | configuring haproxy
+  template: src=etc/haproxy/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0644 owner=root group=root backup=yes
+  when: config_haproxy and not sync_haproxy
 
-- name: restarting haproxy
+- name: config_haproxy | restarting haproxy
   service: name=haproxy state=restarted
   when: config_haproxy
 
-- name: checking to see if /etc/haproxy has already been moved
+- name: config_haproxy | checking to see if /etc/haproxy has already been moved
   stat: path={{ haproxy_backup_dir }}
   register: haproxy_backup_moved
 
-- name: moving existing /etc/haproxy
+- name: config_haproxy | moving existing /etc/haproxy
   command: mv {{ haproxy_home }} {{ haproxy_backup_dir }}
   when: (haproxy_backup_moved.stat.exists != true) and config_haproxy and sync_haproxy
 
-- name: checking again if /etc/haproxy has already been moved
+- name: config_haproxy | checking again if /etc/haproxy has already been moved
   stat: path={{ haproxy_backup_dir }}
   register: haproxy_backup_stat
 
-- name: touching file in haproxy_backup_dir
+- name: config_haproxy | touching file in haproxy_backup_dir
   file: path={{ haproxy_backup_dir }}/already_moved state=touch
   when: (haproxy_backup_stat.stat.exists == true) and config_haproxy and sync_haproxy
 
-- name: mounting gluster volumes - haproxy
+- name: config_haproxy | mounting gluster volumes - haproxy
   mount: name={{ item.mountpoint }} src={{ item.src }} fstype={{ item.fstype }} opts={{ item.options }} state=mounted
   with_items:
     - { mountpoint: '{{ haproxy_home }}', src: '{{ primary_gfs_server }}:/{{ haproxy_mnt }}', fstype: 'glusterfs', options: 'defaults,_netdev,backupvolfile-server={{ secondary_gfs_server }}' }
   when: (haproxy_backup_stat.stat.exists == true) and config_haproxy and sync_haproxy
 
-- name: checking for existing haproxy.cfg
+- name: config_haproxy | checking for existing haproxy.cfg
   stat: path={{ haproxy_home }}/haproxy.cfg
   register: haproxy_cfg_stat
- 
-- name: copying existing haproxy config to new mountpoint
+
+- name: config_haproxy | copying existing haproxy config to new mountpoint
   command: cp {{ haproxy_backup_dir }}/haproxy.cfg {{ haproxy_home }}
   run_once: true
-  when: (haproxy_cfg_stat.stat.exists != true) and config_haproxy and sync_haproxy     
+  when: (haproxy_cfg_stat.stat.exists != true) and config_haproxy and sync_haproxy
 
-- name: checking for existing errors folder in haproxy
+- name: config_haproxy | checking for existing errors folder in haproxy
   stat: path={{ haproxy_home }}/errors
   register: haproxy_errors_stat
 
-- name: copying errors folder if not existing
+- name: config_haproxy | copying errors folder if not existing
   command: cp -R {{ haproxy_backup_dir }}/errors {{ haproxy_home }}
   run_once: true
   when: (haproxy_errors_stat.stat.exists !=true) and config_haproxy and sync_haproxy

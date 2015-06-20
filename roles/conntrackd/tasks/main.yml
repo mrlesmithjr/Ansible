@@ -1,0 +1,6 @@
+---
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_conntrackd.yml
+  when: enable_conntrackd and config_conntrackd

@@ -1,5 +1,4 @@
 ---
-
 # head plugin
 - include: plugins/head.yml
   when: install_head is defined and install_head

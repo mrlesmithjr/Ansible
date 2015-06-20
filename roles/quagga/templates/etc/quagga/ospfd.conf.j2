@@ -1,0 +1,48 @@
+# {{ ansible_managed }}
+!
+! Zebra configuration saved from vty
+!   2014/09/28 16:51:40
+!
+hostname {{ quagga_hostname }}
+password {{ quagga_password }}
+enable password {{ quagga_enable_password }}
+log file /var/log/quagga/ospfd.log
+log stdout
+log syslog
+log monitor
+service password-encryption
+!
+debug ospf event
+debug ospf packet all
+!
+{% for item in interfaces_lo %}
+interface {{ item.int }}
+{% endfor %}
+!
+{% for item in interfaces_config %}
+interface {{ item.int }}
+!
+{% endfor %}
+{% for item in vlan_config %}
+interface {{ item.vlan }}
+!
+{% endfor %}
+!
+router ospf
+ ospf router-id {{ quagga_ospf_routerid }}
+ log-adjacency-changes
+{% for item in ospf_redistribute %}
+ redistribute {{ item }}
+{% endfor %}
+{% for item in passive_int %}
+ passive-interface {{ item.int }}
+{% endfor %}
+{% for item in no_passive_int %}
+ no passive-interface {{ item.int }}
+{% endfor %}
+{% for item in ospf_area_config %}
+ network {{ item.network }} area {{ item.area }}
+{% endfor %}
+!
+line vty
+!

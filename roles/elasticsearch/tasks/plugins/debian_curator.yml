@@ -1,33 +1,37 @@
 ---
 # Install dependancies
 - apt: name=python-pip state=present
- 
+
 # Install Curator
 - pip: name=elasticsearch-curator
- 
+
 - name: remove old curator crontab
   file: path=/etc/cron.d/{{ item }} state=absent
   tags: [cron]
   with_items:
-    - 'curator'
-    - 'curator_clean'
-    - 'curator_close'
-    - 'curator_delete'
- 
+    - curator
+    - curator_clean
+    - curator_close
+    - curator_delete
+    - es_curator_close
+    - es_curator_delete
+    - es_curator_max_keep_days
+
 - name: install curator crontab
-  cron: name='curator_delete'
+  cron: cron_file=curator minute=30 hour=23 job="curator --host {{ es_fqdn }} -d {{ es_curator_max_keep_days | default(360) }}" user="root" name="curator"
+  cron: name='es_curator_delete'
         minute='0' hour='10'
         user='root'
-        job='/usr/local/bin/curator --host {{ es_fqdn }} delete indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ curator_max_keep_days | default(360) }}'
-        cron_file='curator_delete'
+        job='/usr/local/bin/curator --host {{ es_fqdn }} delete indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_max_keep_days | default(360) }}'
+        cron_file='es_curator_delete'
         state='present'
   tags: [cron]
- 
+
 - name: install curator crontab
-  cron: name='curator_close'
+  cron: name='es_curator_close'
         minute='45' hour='9'
         user='root'
-        job='/usr/local/bin/curator --host {{ es_fqdn }} close indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ curator_close_after_days | default(14) }}'
-        cron_file='curator_close'
+        job='/usr/local/bin/curator --host {{ es_fqdn }} close indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_close_after_days | default(14) }}'
+        cron_file='es_curator_close'
         state='present'
   tags: [cron]

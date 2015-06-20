@@ -1,11 +1,6 @@
 ---
-# setup LVM
 - include: debian_lvm.yml
-  tags: [es-config-lvm]
-  when: es_config_lvm and 'elk-d-es-nodes' in group_names
-- include: debian_lvm.yml
-  tags: [es-config-lvm]
-  when: es_config_lvm and 'elk-p-es-nodes' in group_names
+  tags: [es_config_lvm]
+  when: es_config_lvm is defined and es_config_lvm
 
-# setup elasticsearch
 - include: debian_elasticsearch.yml

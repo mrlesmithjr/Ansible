@@ -3,8 +3,6 @@
   apt: name={{ item }} state=present
   with_items:
     - keepalived
-    - conntrack
-    - conntrackd
 
 - name: debian_keepalived | allowing VIP to come up on both nodes
   sysctl: name="net.ipv4.ip_nonlocal_bind" value=1 state=present reload=yes

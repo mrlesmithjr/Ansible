@@ -13,6 +13,3 @@
 - include: config_keepalived.yml
   tags: [config_keepalived]
   when: config_keepalived
-
-- include: config_conntrackd.yml
-  when: enable_conntrackd and config_conntrackd

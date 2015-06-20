@@ -1,16 +1,11 @@
 ---
-# install elasticsearch
-
-# add elasticsearch repo key
-- name: add elasticsearch repo key 
+- name: centos_elasticsearch | adding elasticsearch repo key
   rpm_key: key="https://packages.elasticsearch.org/GPG-KEY-elasticsearch" state=present
 
-# add elasticsearch repository
-- name: add elasticsearch repo
+- name: centos_elasticsearch | adding elasticsearch repo
   template: src=elasticsearch_repo.j2 dest=/etc/yum.repos.d/elasticsearch.repo
 
-# install elasticsearch and java
-- name: install elasticsearch and java
+- name: centos_elasticsearch | installing elasticsearch and java
   yum: name={{ item }} state=latest
   with_items:
     - elasticsearch

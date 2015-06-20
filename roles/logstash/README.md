@@ -1,0 +1,47 @@
+# Role Name
+Installs logstash role
+## Requirements
+None
+## Role Variables
+````
+clear_logstash_config: false
+config_logstash: false
+logstash_config_dir: /etc/logstash/conf.d
+logstash_base_configs:
+  - 000_inputs
+  - 001_filters
+  - 999_outputs
+logstash_base_file_inputs:
+  - {path: /var/log/nginx/access.log, type: nginx-access}
+  - {path: /var/log/nginx/error.log, type: nginx-error}
+  - {path: /var/log/mail.log, type: postfix-log}
+  - {path: /var/log/redis/redis-server.log, type: redis-server}
+logstash_folder: /opt/logstash
+logstash_base_outputs:
+  - {output: redis, output_host: '{{logstash_server}}' }
+logstash_log_dir: /var/log/logstash
+logstash_plugins:
+  - logstash-filter-elasticsearch
+  - logstash-filter-json_encode
+  - logstash-filter-translate
+  - logstash-filter-zeromq
+logstash_version: 1.5
+````
+## Dependencies
+None
+## Example Playbook
+````
+- hosts: all
+  remote_user: remote
+  sudo: yes
+  roles:
+    - logstash
+````
+## License
+GNU General Public License Version 2
+
+## Author Information
+Larry Smith Jr.
+- @mrlesmithjr
+- http://everythingshouldbevirtual.com
+- mrlesmithjr [at] gmail.com
