@@ -1,5 +1,11 @@
 ---
-host_groups:
+####################
+#
+#  NOTES
+#  To specifify variable {{ var_name }} YOU MUST set value: "'{# var_name #}'" otherwise an error while evaluating variable will occur. lineinfile will replace '{# var_name #}' to '{{ var_name }}'
+#
+####################
+old_host_groups:
   - ansible-test-servers
   - andys-servers
   - cacti-servers
@@ -32,34 +38,578 @@ host_groups:
   - windows-servers
 
 # Below will be renamed to host_groups to replace above host_groups
-new_host_groups:
+host_groups:
   - name: ansible-test-servers
+    contact_info:
+      - name: contact_name
+        value: Test_User
+      - name: contact_email
+        value: test@example.org
+      - name: contact_phone
+        value: 111.222.3333
+    create: true
+    other:
+      - name: description
+        value: Group_of_test_servers_for_testing_Ansible
+      - name: DTAP
+        value: T
+    vars: []
   - name: andys-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: cacti-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: ci-pipeline
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: db-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: desktops
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: elk-p-broker-nodes
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: elk-p-es-nodes
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: elk-p-haproxy-nodes
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: elk-p-nodes
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars:
+      - name: additional_logstash_workers
+        value: true  #true=add additional workers defined in logstash_workers | false=disable
+        set: true
+      - name: config_logstash
+        value: true  #defines if logstash should be configured or not...this should be set to true unless there is a reason not to
+        set: true
+      - name: config_rabbitmq_ha
+        value: "'{# use_rabbitmq #}'"  #only define if using rabbitmq instead of redis for broker nodes and rabbitmq ha is required for redundancy of queues **recommended if using rabbitmq
+        set: true
+      - name: enable_firewall
+        value: false
+        set: true
+      - name: enable_rabbitmq_clustering
+        value: "'{# use_rabbitmq #}'"  #only define if using rabbitmq instead of redis for broker nodes and your requirements are for clustering of rabbitmq nodes **recommended if using rabbitmq
+        set: true
+      - name: es_cluster_name
+        value: logstash-prod  #define the elasticsearch cluster name to configure
+        set: true
+      - name: es_config_nfs
+        value: false  #configure and NFS mount to setup for archiving of elasticsearch data - has to be configured using the elasticsearch API or another method **recommended for long term archiving
+        set: true
+      - name: es_curator_close_after_days
+        value: 14  #define the number of days to keep elasticsearch indexes open
+        set: true
+      - name: es_curator_max_keep_days
+        value: 30  #defines data retention policy for elasticsearch...purges data to keep disk space in order... **recommend aligning this with NFS archiving
+        set: true
+      - name: es_dest
+        value: /etc/elasticsearch/elasticsearch.yml
+        set: true
+      - name: es_fielddata_cache_expire
+        value: -1  #elasticsearch tweak...research before tweaking this
+        set: true
+      - name: es_fielddata_cache_size
+        value: 30%  #elasticsearch tweak...research before tweaking this
+        set: true
+      - name: es_min_master_nodes
+        value: 2  #defines the minimum number of elasticsearch master nodes to keep from split-brain scenario in cluster....adjust based on number of elk-broker-nodes deployed. should be at least 1 more than half of nodes
+        set: true
+      - name: es_nfs_mount
+        value: 10.0.101.51:/volumes/HD-Pool/elasticsearch-snapshots  #define NFS mount to configure if setting up for archiving
+        set: true
+      - name: es_nfs_mount_opts
+        value: defaults  #adjust NFS mountpoint options...research before changing
+        set: true
+      - name: es_nfs_mountpoint
+        value: /mnt/elasticsearch-snapshots  #define NFS mountpoint to mount es_nfs_mount to
+        set: true
+      - name: es_replicas
+        value: 1  #defines the number of data replicas to maintain in elasticsearch cluster....default is 1...research before changing this
+        set: true
+      - name: es_shards
+        value: 5  #defines the number of data shards to maintain in elasticsearch cluster....default is 5...research before changing this
+        set: true
+      - name: esxinaming  #define your VMware ESXi naming standards if used...this should be set to host pattern...example - esxi01.everythingshouldbevirtual.local - define as esxi
+        value: [] #  - esxi
+        set: true
+      - name: hadoopnaming
+        value: [] #define your Hadoop naming standards if used...this should be set to host pattern...example - hd01.everythingshouldbevirtual.local - define as hd
+        set: true
+      - name: keepalived_router_id
+        value: 51  #defines the router_id to configure for keepalived...ensure not to define an already in use router_id if keepalived exists on the same subnet
+        set: true
+      - name: keepalived_vip
+        value: 10.0.101.60  #defines the VIP to be assigned to the cluster...this will be the address to access all components of ELK...create a DNS record for this address...ex - logstash.everythingshouldbevirtual.local
+        set: true
+      - name: keepalived_vip_hostname
+        value: "'{# logstash_server #}'"  #define the DNS record created for keepalived_vip  #defined in group_vars/all/configs
+        set: true
+      - name: keepalived_vip_int
+        value: eth0  #defines the network interface for keepalived to use for VIP and HAProxy (Load Balancer)
+        set: true
+      - name: kibana_elasticsearch
+        value: "'http://{# keepalived_vip_hostname #}:9200'"  #defines the url to configure Kibana UI to communicate with elasticsearch cluster..should be set to keepalived_vip or keepalived_vip_hostname
+        set: true
+      - name: kibana_host
+        value: 0.0.0.0  #defines Kibana host...should remain as 0.0.0.0 unless other requirements are required...research before changing
+        set: true
+      - name: logstash_alerts_domain
+        value: "'{# smtp_domain_name #}'"  #defines the domain to be applied to email alerts...this may be different than pri_domain_name (group_vars/all/configs) ex. everythingshouldbevirtual.local and everythingshouldbevirtual.com
+        set: true
+      - name: logstash_alerts_email
+        value: "'logstash.alerts@{# logstash_alerts_domain #}'"  #define email address to use for email alerts to be sent from logstash
+        set: true
+      - name: logstash_config_dir
+        value: /etc/logstash/conf.d  #defines the location where logstash configurations will be located....default is /etc/logstash/conf.d
+        set: true
+      - name: logstash_drop_grokparsefailures
+        value: false  #set to true if you want to drop all messages resulting in _grokparsefailure
+        set: true
+      - name: logstash_enable_alerts
+        value: true  #defines if alerts should be enabled...example is email alerts..
+        set: true
+      - name: logstash_workers
+        value: 4  #define the number of logstash worker processes to spawn
+        set: true
+      - name: netscalernaming
+        value: [] #define your Citrix Netscaler naming standards if used...this should be set to host pattern...example - nsvpx01.everythingshouldbevirtual.local - define as nsvpx
+        #  - nsvpx  #uncomment and remove [] above if setting
+        set: false
+      - name: nsxnaming
+        value: [] #define your VMware NSX naming standards if used...this should be set to host pattern...example - nsx-rt01.everythingshouldbevirtual.local - define as nsx-rt
+        #  - vShield-edge  #uncomment and remove [] above if setting
+        #  - nsx-rt  #uncomment and remove [] above if setting
+        set: false
+      - name: pfsensenaming
+        value: [] #define your PFSense firewall naming standards if used...this should be set to host pattern...example - pfsense01.everythingshouldbevirtual.local - define as pfsense
+        #  - pfsense
+        set: true
+      - name: redis_max_memory
+        value: 2048  #define the max amount of memory to use for redis
+        set: true
+      - name: redis_max_memory_policy
+        value: allkeys-lru  #defines redis max memory policy...research before changing
+        set: true
+      - name: redis_server_name
+        value: '{# keepalived_vip_hostname #}'  #define the hostname or IP address of your redis server for elk-pre-processors to send logstash output...should be set to keepalived_vip or keepalived_vip_hostname
+        set: true
+      - name: use_rabbitmq
+        value: false  #defines if rabbitmq should be used on elk-broker nodes...either use rabbitmq or redis... **recommend redis
+        set: true
+      - name: use_redis
+        value: true  #defines if redis should be used on elk-broker nodes...either use redis or rabbitmq... **recommend redis
+        set: true
   - name: elk-p-pre-processor-nodes
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: elk-p-processor-nodes
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: example-server
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: gitlab-server
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: grafana
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: graylog-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: ip-services
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: nagios
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: nameservers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: plex-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: sensu-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: smtp-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: squid-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: tftp-server
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: ubuntu-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: vmcreate-Ubuntu
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: vmcreate-Windows
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: vmdelete
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: web-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []
   - name: windows-servers
+    contact_info:
+      - name: contact_name
+        value: []
+      - name: contact_email
+        value: []
+      - name: contact_phone
+        value: []
+    create: true
+    other:
+      - name: description
+        value: []
+      - name: DTAP
+        value: []
+    vars: []

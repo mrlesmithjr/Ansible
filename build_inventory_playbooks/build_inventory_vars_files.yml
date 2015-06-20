@@ -14,66 +14,133 @@
     - vars/group_vars.yml
     - vars/host_vars.yml
   tasks:
-    - name: ensuring group_vars_dir exists
+    - name: host_groups | ensuring group_vars_dir exists
       file: path={{ group_vars_dir }} state=directory
-
-    - name: ensuring group_vars/group_name exists
-      stat: path='{{ group_vars_dir }}/{{ item }}'
+      tags: [update_group_vars]
+#####
+#
+#  group_vars
+#
+#####
+    - name: host_groups | ensuring group_vars/group_name exists
+      stat: path='{{ group_vars_dir }}/{{ item.name }}'
       register: group_name_file
-      with_items: host_groups
+      tags: [fix_group_vars,update_group_vars]
+      with_items: "{{host_groups}}"
 
-    - name: creating missing group_vars/group_name files
-      file: path='{{ group_vars_dir }}/{{ item }}' state=touch
-      with_items: host_groups
-      when: not group_name_file.results[0].stat.exists
+    - name: host_groups | creating missing group_vars/group_name files
+      file: path='{{ group_vars_dir }}/{{ item.name }}' state=touch
+      register: group_vars_created
+      tags: [fix_group_vars,update_group_vars]
+      with_items: "{{host_groups}}"
+      when: not group_name_file.results[0].stat.exists and item.create is defined and item.create
 
-    - name: ensuring file is yaml format on missing group_vars/group_name files
-      lineinfile: dest='{{ group_vars_dir }}/{{ item }}' line="---"
-      with_items: host_groups
-      when: not group_name_file.results[0].stat.exists
+    - name: host_groups | removing group_vars/group_name files ( create not defined )
+      file: path='{{ group_vars_dir }}/{{ item.name }}' state=absent
+      tags: [update_group_vars]
+      with_items: "{{host_groups}}"
+      when: item.create is not defined
 
-    - name: ensuring host_vars_dir exists
+    - name: host_groups | removing group_vars/group_name files ( not create )
+      file: path='{{ group_vars_dir }}/{{ item.name }}' state=absent
+      tags: [update_group_vars]
+      with_items: "{{host_groups}}"
+      when: item.create is defined and not item.create
+
+    - name: host_groups | ensuring file is yaml format on missing group_vars/group_name files
+      lineinfile: dest='{{ group_vars_dir }}/{{ item.name }}' line="---"
+      tags: [fix_group_vars,update_group_vars]
+      with_items: "{{host_groups}}"
+      when: not group_name_file.results[0].stat.exists and item.create is defined and item.create
+
+    - name: host_groups | adding created timestamp
+      lineinfile: dest='{{ group_vars_dir }}/{{ item.name }}' regexp="^inventory_created_on" line="inventory_created_on{{ ':' }} {{ timestamp }}" state=present
+      tags: [update_group_vars]
+      with_items: "{{host_groups}}"
+      when: group_vars_created.changed and item.create is defined and item.create
+
+    - name: host_groups | updating group contact_info details
+      lineinfile: dest='{{ group_vars_dir }}/{{ item.0.name }}' regexp="^host_group_{{ item.1.name }}" line="host_group_{{ item.1.name }}{{ ':' }} {{ item.1.value }}" state=present
+      register: group_contact_info_updated
+      tags: [update_group_contact_info]
+      with_subelements:
+        - host_groups
+        - contact_info
+      when: item[1] is defined and item[0].create is defined and item[0].create
+
+    - name: host_groups | updating group other info details
+      lineinfile: dest='{{ group_vars_dir }}/{{ item.0.name }}' regexp="^host_group_{{ item.1.name }}" line="host_group_{{ item.1.name }}{{ ':' }} {{ item.1.value }}" state=present
+      register: group_other_info_updated
+      tags: [update_group_other_info]
+      with_subelements:
+        - host_groups
+        - other
+      when: item[1] is defined and item[0].create is defined and item[0].create
+
+    - name: host_groups | defaulting existing custom group_vars variables before updating to current
+      lineinfile: dest='{{ group_vars_dir }}/{{ item.0.name }}' regexp="^{{ item.1.name }}" state=absent backrefs=true
+      register: group_vars_added
+      tags: [update_group_vars]
+      with_subelements:
+        - host_groups
+        - vars
+      when: item[1] is defined and item[1].set and item[0].create is defined and item[0].create
+
+    - name: host_groups | adding custom group_vars variables
+      lineinfile: dest='{{ group_vars_dir }}/{{ item.0.name }}' line="{{ item.1.name }}{{ ':'}} {{ item.1.value }}" state=present
+      register: group_vars_added
+      tags: [update_group_vars]
+      with_subelements:
+        - host_groups
+        - vars
+      when: item[1] is defined and item[1].set and item[0].create is defined and item[0].create
+#####
+#
+#  host_vars
+#
+#####
+    - name: hosts | ensuring host_vars_dir exists
       file: path={{ host_vars_dir }} state=directory
       tags: [update_host_vars]
 
-    - name: ensuring hosts_vars/host_name exists
+    - name: hosts | ensuring hosts_vars/host_name exists
       stat: path='{{ host_vars_dir }}/{{ item.name }}'
       register: host_name_file
       tags: [update_host_vars]
       with_items: "{{hosts}}"
 
-    - name: creating missing host_vars/host_name files
+    - name: hosts | creating missing host_vars/host_name files
       file: path='{{ host_vars_dir }}/{{ item.name }}' state=touch
       register: host_vars_created
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: not host_name_file.results[0].stat.exists and item.create is defined and item.create
 
-    - name: removing host_vars/host_name files ( create not defined )
+    - name: hosts | removing host_vars/host_name files ( create not defined )
       file: path='{{ host_vars_dir }}/{{ item.name }}' state=absent
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: item.create is not defined
 
-    - name: removing host_vars/host_name files ( not create )
+    - name: hosts | removing host_vars/host_name files ( not create )
       file: path='{{ host_vars_dir }}/{{ item.name }}' state=absent
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: item.create is defined and not item.create
 
-    - name: ensuring file is yaml format on missing host_vars/host_name files
+    - name: hosts | ensuring file is yaml format on missing host_vars/host_name files
       lineinfile: dest='{{ host_vars_dir }}/{{ item.name }}' line="---"
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: not host_name_file.results[0].stat.exists and item.create is defined and item.create
 
-    - name: adding created timestamp
+    - name: hosts | adding created timestamp
       lineinfile: dest='{{ host_vars_dir }}/{{ item.name }}' regexp="^inventory_created_on" line="inventory_created_on{{ ':' }} {{ timestamp }}" state=present
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: host_vars_created.changed and item.create is defined and item.create
 
-    - name: adding custom host_vars variables
+    - name: hosts | adding custom host_vars variables
       lineinfile: dest='{{ host_vars_dir }}/{{ item.0.name }}' regexp="^{{ item.1.name }}" line="{{ item.1.name }}{{ ':' }} {{ item.1.value }}" state=present
       register: host_vars_added
       tags: [update_host_vars]
@@ -82,13 +149,13 @@
         - vars
       when: item[1] is defined and item[1].set and item[0].create is defined and item[0].create
 
-    - name: updating timestamp on inventory
+    - name: hosts | updating timestamp on inventory
       lineinfile: dest='{{ host_vars_dir }}/{{ item.name }}' regexp="^inventory_updated_on" line="inventory_updated_on{{ ':' }} {{ timestamp }}" state=present
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: host_vars_added.changed and item.create is defined and item.create
 
-    - name: removing custom host_vars variables
+    - name: hosts | removing custom host_vars variables
       lineinfile: dest='{{ host_vars_dir }}/{{ item.0.name }}' regexp="^{{ item.1.name }}" line="{{ item.1.name }}{{ ':' }} {{ item.1.value }}" state=absent
       register: host_vars_removed
       tags: [update_host_vars]
@@ -97,8 +164,22 @@
         - vars
       when: item[1] is defined and not item[1].set and item[0].create is defined and item[0].create
 
-    - name: updating timestamp on inventory
+    - name: hosts | updating timestamp on inventory
       lineinfile: dest='{{ host_vars_dir }}/{{ item.name }}' regexp="^inventory_updated_on" line="inventory_updated_on{{ ':' }} {{ timestamp }}" state=present
       tags: [update_host_vars]
       with_items: "{{hosts}}"
       when: host_vars_removed.changed and item.create is defined and item.create
+
+#####
+#
+# CLEANUP
+#
+#####
+
+    - name: host_groups | generating script to fix variable_definitions
+      template: src=templates/cleanup_vars.sh.j2 dest=scripts/cleanup_vars.sh mode=0775
+      tags: [cleanup_script]
+
+    - name: host_groups | fixing variable_definitions
+      shell: "scripts/cleanup_vars.sh"
+      tags: [cleanup_script]
