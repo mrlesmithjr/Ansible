@@ -1,0 +1,36 @@
+#!/bin/bash
+# {{ ansible_managed }}
+#### cleans up poorly formatted vars
+
+####
+#
+# cleanup {{ group_vars_dir }}
+#
+####
+
+{% for group in host_groups %}
+{% if group.create %}
+sed -i -e "s/: '{{ '{' }}#/: \"{{ '{{' }}/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/: {{ '{' }}#/: \"{{ '{{' }}/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/#{{ '}' }}'$/{{ '}}' }}\"/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/#{{ '}' }}$/{{ '}}' }}\"/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/: \"{{ '{' }}#/: \"{{ '{{' }}/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/#{{ '}' }}\"$/\{{ '}}' }}\"/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/{{ '{' }}#/{{ '{{' }}/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/#{{ '}' }}/{{ '}}' }}/g" {{ group_vars_dir }}/{{ group.name }}
+sed -i -e "s/: '/: \"/g" {{ group_vars_dir }}/{{ group.name }}
+{% endif %}
+{% endfor %}
+
+{% for host in hosts %}
+{% if host.create %}
+sed -i -e "s/: '{{ '{' }}#/: \"{{ '{{' }}/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/: {{ '{' }}#/: \"{{ '{{' }}/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/#{{ '}' }}'$/{{ '}}' }}\"/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/#{{ '}' }}$/{{ '}}' }}\"/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/: \"{{ '{' }}#/: \"{{ '{{' }}/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/#{{ '}' }}\"$/\{{ '}}' }}\"/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/{{ '{' }}#/{{ '{{' }}/g" {{ host_vars_dir }}/{{ host.name }}
+sed -i -e "s/#{{ '}' }}/{{ '}}' }}/g" {{ host_vars_dir }}/{{ host.name }}
+{% endif %}
+{% endfor %}
