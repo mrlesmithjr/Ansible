@@ -1,0 +1,62 @@
+---
+- hosts: all
+  gather_facts: true
+  sudo: false
+  vars:
+    - inventory_root: /tmp
+    - debian_hosts_file: debian_hosts
+    - other_hosts_file: others_hosts
+    - redhat_hosts_file: redhat_hosts
+    - windows_hosts_file: windows_hosts
+  tasks:
+    - name: creating hosts_files
+      delegate_to: localhost
+      file: path='{{ inventory_root }}/{{ item }}' state=touch
+      run_once: true
+      with_items:
+        - '{{ debian_hosts_file }}'
+        - '{{ other_hosts_file }}'
+        - '{{ redhat_hosts_file }}'
+        - '{{ windows_hosts_file }}'
+        - '{{ debian_hosts_file }}.tmp'
+        - '{{ other_hosts_file }}.tmp'
+        - '{{ redhat_hosts_file }}.tmp'
+        - '{{ windows_hosts_file }}.tmp'
+
+    - name: identifying debian hosts
+      action: ping
+      register: id_debian_hosts
+      when: ansible_os_family == "Debian"
+
+    - name: identifying debian hosts
+      delegate_to: localhost
+      lineinfile: dest='{{ inventory_root }}/{{ debian_hosts_file }}.tmp' line='{{ ansible_hostname }}' state=present
+      with_items: id_debian_hosts.results 
+      when: ansible_os_family == "Debian"
+
+    - name: cleaning up debian hosts file
+      delegate_to: localhost
+      shell: "sort -u {{ inventory_root }}/{{ debian_hosts_file }}.tmp > {{ inventory_root }}/{{ debian_hosts_file }}"
+      run_once: true
+
+    - name: identifying redhat hosts
+      action: ping
+      register: id_redhat_hosts
+      when: ansible_os_family == "Redhat"
+
+    - name: identifying redhat hosts
+      delegate_to: localhost
+      lineinfile: dest='{{ inventory_root }}/{{ redhat_hosts_file }}' line='{{ ansible_hostname }}' state=present
+      with_items: id_redhat_hosts.results
+      when: ansible_os_family == "Redhat"
+
+    - name: cleaning up temp hosts_files
+      delegate_to: localhost
+      file: path='{{ inventory_root }}/{{ item }}.tmp' state=absent
+      run_once: true
+      with_items:
+        - '{{ debian_hosts_file }}'
+        - '{{ other_hosts_file }}'
+        - '{{ redhat_hosts_file }}'
+        - '{{ windows_hosts_file }}'
+
