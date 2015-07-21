@@ -1,0 +1,61 @@
+---
+ad_domain: '{{ pri_domain_name }}'  #define your active directory domain - FQDN - same as pri_domain_name?...This is for roles/domain-join
+ad_domain_netbios:  EXAMPLE # enter NETBIOS name...ex...everythingshouldbevirtual.local = EVERYTHING...This is for roles/domain-join
+ad_ou: Ansible  #define active directory OU to place computer accounts...This is for roles/domain-join
+#ad_password: '' # enter your domain user account password to join AD --- Better to prompt for this in playbook...This is for roles/domain-join
+#ad_user: '' # enter your domain user account to join AD --- Better to prompt for this in playbook...This is for roles/domain-join
+cacti_db_password:   #defines the password for cacti db monitoring
+cacti_db_user:   #defines the user for cacti db monitoring
+collectd_db_monitor_pass:
+collectd_db_monitor_user:
+create_local_users: true  #defines creating local user accounts on hosts...defined in group_vars/all/accounts
+deb_db_password:   #echo "P@55w0rd" | mkpasswd -s -m sha-512
+# To generate passwords use (replace P@55w0rd with new password).... echo "P@55w0rd" | mkpasswd -s -m sha-512
+create_users:  #defines user accounts to setup on hosts
+  - user: demo_user  #define username
+    authorized_keys: ''
+    comment: 'Demo user'  #define a comment to associate with the account
+    generate_keys: false  #generate ssh keys...true|false
+    home: ''  #define a different home directory... ''=/home/username
+    pass: demo_password  #define password for account
+    setup: false  #true=creates account|false=removes account if exists...true|false
+    shell: ''  #define a different shell for the user
+    sudo: false  #define if user should have sudo access...true|false
+    system_account: false  #define if account is a system account...true|false
+enable_jenkins_account_integration: false  #defines jenkins CI integration...Only adds jenkins ssh pub key to hosts for user remote...pub key MUST exist in roles/bootstrap/files
+enable_jenkins_sudo: false
+gitlab_ldap_bind_dn:
+gitlab_ldap_bind_pass:
+graylog_server_password_secret: #pwgen -N 1 -s 96
+graylog_server_root_password:  #generate new pw using echo -n yourpassword | shasum -a 256
+graylog_web_application_secret: #pwgen -N 1 -s 96
+mysql_root_password: #echo "P@55w0rd" | mkpasswd -s -m sha-512
+nagios_user:
+nagios_password:
+plex_smb_account:
+  - user:
+    domain:
+    passwd:
+rancid_login_password:
+rancid_login_enable_password:
+root_password: #echo "P@55w0rd" | mkpasswd -s -m sha-512
+phpmyadmin_account_info:
+  - user:
+    control_database:
+    control_password:
+    mysql_password: '{{ mysql_root_password }}'
+quagga_enable_password: # set to your preferred enable password for Quagga router configurations
+quagga_password: # set to your preferred password for Quagga router login
+rundeck_framework_ssh_user:
+rundeck_setup_rundeck_user: false
+sensu_api_pass:
+sensu_api_user:
+sensu_rabbitmq_user:
+sensu_rabbitmq_pass:
+ssh_pub_key_path: /etc/ansible/ssh_pub_keys
+vcenter_user: 'ansible@{{ pri_domain_name }}'  #defines vCenter username to connect to vCenter to provision vms
+vcenter_pass:  #defines password to connect to vCenter to provision vms
+windows_user:  #defines windows user account to connect to windows hosts for ansible
+windows_password:   #defines windows user account password to connect to windows hosts for ansible
+zabbix_login_password:
+zabbix_login_user: 

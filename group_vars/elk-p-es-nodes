@@ -1,0 +1,10 @@
+---
+es_config_lvm: true  #configure lvm for elasticsearch on datanodes...if set to true ensure that disks is set to the correct device **recommended
+es_disks: '/dev/sdb,/dev/sdc'  #define device(s) to allocate to new lvm volume for elasticsearch to be installed to for data nodes....does not apply if es_config_lvm is set to false  **recommended
+es_heap_size: 2g  #define the amount of memory to allocate to elasticsearch heap...50% of installed memory...default is 1g
+es_lvname: elasticsearch-lv  #defines LVM logical volume name to create if es_config_lvm is set to true
+es_lvextend_options: '-l +100%FREE'
+es_mntp: /var/lib/elasticsearch  #mountpoint for elasticsearch lvm volume if created
+es_vgname: elasticsearch-vg
+sensu_client_subs:
+  - elasticsearch

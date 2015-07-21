@@ -1,0 +1,15 @@
+---
+configure_postfix: false  #defines if postfix should be configured globally
+email_notifications: alerts@example.org #defines email address to send notification to
+enable_postfix_domain_rewrite: false  #defines if postfix should be configured to rewrite domain name on outgoing emails
+enable_postfix_relayhost: false  #defines if postfix should be configured to send outgoing email through a relay host
+infra_email_notifications: 'infrastructure@{{ pri_domain_name }}'
+postfix_mynetworks:  #defines which networks are allowed to relay through postfix server...this is defined for all nodes which have roles/postfix applied
+  - 127.0.0.0/8
+#  - 10.0.101.0/24
+#  - 172.16.0.0/16
+#  - 192.168.0.0/16
+postfix_rewrite_domain: '{{ smtp_domain_name }}'  #defines what domain all outgoing email should be set to for @domain.example...should be the same as smtp_domain_name
+postfix_use_tls: false  #defines enabling or disabling tls auth for postfix...default is true
+smtp_domain_name: example.com #set to resolvable external domain name
+smtp_server_port: 25

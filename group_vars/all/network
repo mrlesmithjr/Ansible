@@ -1,0 +1,11 @@
+---
+dns_nameservers: '{{ pri_dns }} {{ sec_dns }}'
+dns_search: '{{ pri_domain_name }}'
+pri_dns: 192.168.70.240  #define primary DNS server to be applied to hosts
+pri_domain_name: example.local  #define primary domain name to be applied to hosts
+sec_dns: 192.168.70.241  #define secondary DNS server to be applied to hosts
+update_dhcpclient_conf: false  #defines updating hosts dhclient.conf to default settings...useful when using VMware client customizations in particular
+update_dns_nameservers: false  #defines updating hosts /etc/network/interfaces dns-nameservers settings to match dns_nameservers...this will only apply to group_vars/group or host_vars/host when...pri_interface_method: static is set...so dhcp is not affected
+update_dns_search: false  #defines updating hosts /etc/network/interfaces dns-search settings to match pri_domain_name...this will only apply to group_vars/group or host_vars/host when...pri_interface_method: static is set...so dhcp is not affected
+update_etc_hosts: false  #defines if /etc/hosts should be updated
+update_hostname: false  #defines if hostname should be updated to match inventory (hosts) hostname

@@ -1,0 +1,5 @@
+---
+sensu_client_subs:
+  - elasticsearch
+  - nginx
+  - redis

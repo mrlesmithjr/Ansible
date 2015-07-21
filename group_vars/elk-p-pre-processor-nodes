@@ -1,0 +1,8 @@
+---
+sensu_client_subs:
+  - dnsmasq
+  - logstash
+syslog_servers:
+  - name: localhost
+    port: 10514
+    proto: tcp

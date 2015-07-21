@@ -1,0 +1,12 @@
+---
+sensu_client_subs:
+  - haproxy
+  - keepalived
+  - logstash
+syslog_servers:
+  - name: '{{ logstash_server_fqdn }}'
+    port: 514
+    proto: tcp
+  - name: 'logstash-dev.{{ pri_domain_name }}'
+    port: 514
+    proto: udp

@@ -1,0 +1,4 @@
+---
+rundeck_generate_resources_xml: false  #will rebuild resources.xml and prepare for delivery to your rundeck_server
+rundeck_resources_xml_file: resources.xml
+rundeck_resources_xml_location: /var/lib/rundeck/var

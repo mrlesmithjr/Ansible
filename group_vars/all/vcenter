@@ -1,0 +1,6 @@
+---
+vcenter_hostname: 'vcsa.{{ pri_domain_name }}'  #defines vcenter_hostname to provision vms
+vcenter_datacenter: example  #defines the vCenter datacenter to provision vms
+vcenter_esxi_host: 'esxi01.{{ pri_domain_name }}'  #defines a specific host in vCenter to provision vms
+vcenter_resource_pool: /Resources  #defines vCenter resource pool to provision vms
+vcenter_cluster: HA-DRS-CLUSTER  #defines the vCenter cluster to provision vms

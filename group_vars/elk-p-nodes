@@ -1,0 +1,50 @@
+---
+additional_logstash_workers: true  #true=add additional workers defined in logstash_workers | false=disable
+config_logstash: true  #defines if logstash should be configured or not...this should be set to true unless there is a reason not to
+config_rabbitmq_ha: '{{ use_rabbitmq }}'  #only define if using rabbitmq instead of redis for broker nodes and rabbitmq ha is required for redundancy of queues **recommended if using rabbitmq
+enable_firewall: false
+enable_rabbitmq_clustering: '{{ use_rabbitmq }}'  #only define if using rabbitmq instead of redis for broker nodes and your requirements are for clustering of rabbitmq nodes **recommended if using rabbitmq
+es_cluster_name: logstash-prod  #define the elasticsearch cluster name to configure
+es_config_nfs: false  #configure and NFS mount to setup for archiving of elasticsearch data - has to be configured using the elasticsearch API or another method **recommended for long term archiving
+es_curator_close_after_days: 14  #defined the number of days to keep elasticsearch indexes open
+es_curator_max_keep_days: 30  #defines data retention policy for elasticsearch...purges data to keep disk space in order... **recommend aligning this with NFS archiving
+es_dest: /etc/elasticsearch/elasticsearch.yml
+es_fielddata_cache_size: 40%  #elasticsearch tweak...research before tweaking this
+es_min_master_nodes: 2  #defines the minimum number of elasticsearch master nodes to keep from split-brain scenario in cluster....adjust based on number of elk-broker-nodes deployed. should be at least 1 more than half of nodes
+es_nfs_mount: 10.0.101.51:/volumes/HD-Pool/elasticsearch-snapshots  #define NFS mount to configure if setting up for archiving
+es_nfs_mount_opts: defaults  #adjust NFS mountpoint options...research before changing
+es_nfs_mountpoint: /mnt/elasticsearch-snapshots  #define NFS mountpoint to mount es_nfs_mount to
+es_replicas: 1  #defines the number of data replicas to maintain in elasticsearch cluster....default is 1...research before changing this
+es_shards: 5  #defines the number of data shards to maintain in elasticsearch cluster....default is 5...research before changing this
+esxinaming:  #define your VMware ESXi naming standards if used...this should be set to host pattern...example - esxi01.everythingshouldbevirtual.local - define as esxi
+  - esxi
+hadoop_notifications: '{{ infra_email_notifications }}'
+hadoopnaming: '' #define your Hadoop naming standards if used...this should be set to host pattern...example - hd01.everythingshouldbevirtual.local - define as hd
+#  - hd  #uncomment and remove '' above if setting
+keepalived_router_id: 51  #defines the router_id to configure for keepalived...ensure not to define an already in use router_id if keepalived exists on the same subnet
+keepalived_vip: 10.0.101.60  #defines the VIP to be assigned to the cluster...this will be the address to access all components of ELK...create a DNS record for this address...ex - logstash.everythingshouldbevirtual.local
+keepalived_vip_hostname: '{{ logstash_server_fqdn }}'  #define the DNS record created for keepalived_vip  #defined in group_vars/all/configs
+keepalived_vip_int: eth0  #defines the network interface for keepalived to use for VIP and HAProxy (Load Balancer)
+kibana_elasticsearch: 'http://{{ keepalived_vip_hostname }}:9200'  #defines the url to configure Kibana UI to communicate with elasticsearch cluster..should be set to keepalived_vip or keepalived_vip_hostname
+kibana_host: 0.0.0.0  #defines Kibana host...should remain as 0.0.0.0 unless other requirements are required...research before changing
+kibana_port: 5601
+logstash_alerts_domain: '{{ smtp_domain_name }}'  #defines the domain to be applied to email alerts...this may be different than pri_domain_name (group_vars/all/configs) ex. everythingshouldbevirtual.local and everythingshouldbevirtual.com
+logstash_alerts_email: 'logstash.alerts@{{ logstash_alerts_domain }}'  #define email address to use for email alerts to be sent from logstash
+logstash_config_dir: /etc/logstash/conf.d  #defines the location where logstash configurations will be located....default is /etc/logstash/conf.d
+logstash_drop_grokparsefailures: false  #set to true if you want to drop all messages resulting in _grokparsefailure
+logstash_enable_alerts: true  #defines if alerts should be enabled...example is email alerts..
+logstash_workers: 4  #define the number of logstash worker processes to spawn
+netscalernaming: '' #define your Citrix Netscaler naming standards if used...this should be set to host pattern...example - nsvpx01.everythingshouldbevirtual.local - define as nsvpx
+#  - nsvpx  #uncomment and remove '' above if setting
+nsxnaming: '' #define your VMware NSX naming standards if used...this should be set to host pattern...example - nsx-rt01.everythingshouldbevirtual.local - define as nsx-rt
+#  - vShield-edge  #uncomment and remove '' above if setting
+#  - nsx-rt  #uncomment and remove '' above if setting
+pfsensenaming:  #define your PFSense firewall naming standards if used...this should be set to host pattern...example - pfsense01.everythingshouldbevirtual.local - define as pfsense
+  - pfsense
+redis_max_memory: 2048  #define the max amount of memory to use for redis
+redis_max_memory_policy: allkeys-lru  #defines redis max memory policy...research before changing
+redis_server_name: '{{ keepalived_vip_hostname }}'  #define the hostname or IP address of your redis server for elk-pre-processors to send logstash output...should be set to keepalived_vip or keepalived_vip_hostname
+rundeck_logstash_host: '{{ logstash_server_fqdn }}'
+rundeck_logstash_port: 9700
+use_rabbitmq: false  #defines if rabbitmq should be used on elk-broker nodes...either use rabbitmq or redis... **recommend redis
+use_redis: true  #defines if redis should be used on elk-broker nodes...either use redis or rabbitmq... **recommend redis

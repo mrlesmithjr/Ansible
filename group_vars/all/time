@@ -1,0 +1,4 @@
+---
+change_timezone: false  #defines changing timezone for nodes to timezone value
+ntp_master: false  #defines if node is considered an NTP master server on network
+timezone: America/New_York  #defines timezone to be set on all hosts

@@ -1,0 +1,11 @@
+---
+enable_cacti_monitoring: false
+enable_collectd_monitoring: false
+enable_sensu_monitoring: false
+enable_snmpd: false  #defines if snmpd service should be enabled
+enable_zabbix_monitoring: false
+install_sysdig: false  #defines if sysdig (http://www.sysdig.org/) should be installed for troubleshooting system level issues
+sensu_client: true
+snmpd_authorized_networks:  #define read-only snmpd settings
+  - network: 10.0.101.0/24
+    community: rocommunitystring

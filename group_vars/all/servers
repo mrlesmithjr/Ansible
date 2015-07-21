@@ -1,0 +1,43 @@
+---
+ansible_server: ansible  #defines server from which ansible playbooks are ran from
+collectd_collectors:  #defines collectd servers to send metrics to if desired
+  - 'logstash-dev.{{ pri_domain_name }}'
+  - '{{ logstash_server_fqdn }}'
+gitlab_server: gitlab
+gitlab_server_fqdn: '{{ gitlab_server }}.{{ pri_domain_name }}'
+graphite_host: '{{ graphite_node }}.{{ pri_domain_name }}'
+graphite_node: grafana
+ipam_server: ipam
+ipam_server_fqdn: '{{ ipam_server }}.{{ pri_domain_name }}'
+jenkins_server: ci-pipeline
+jenkins_server_fqdn: '{{ jenkins_server }}.{{ pri_domain_name }}'
+jira_server: jira
+jira_server_fqdn: '{{ jira_server }}.{{ pri_domain_name }}'
+logstash_server: logstash
+logstash_server_fqdn: '{{ logstash_server }}.{{ pri_domain_name }}'  #define your logstash server for your environment
+ntp_master_servers:  #defines external ntp servers for internal ntp server to poll
+  - 0.ubuntu.pool.ntp.org
+  - 1.ubuntu.pool.ntp.org
+  - 2.ubuntu.pool.ntp.org
+  - 3.ubuntu.pool.ntp.org
+ntp_servers:  #defines internal ntp servers for clients to poll
+  - 'ntp1.{{ pri_domain_name }}'
+  - 'ntp2.{{ pri_domain_name }}'
+pxe_boot_server: 'tftpbuild-serv.{{ pri_domain_name }}'  #defines pxe boot server on network
+rundeck_server: ci-pipeline
+rundeck_server_fqdn: '{{ rundeck_server }}.{{ pri_domain_name }}'
+sensu_host: 'sensu.{{ pri_domain_name }}'
+sensu_server: false  #defines globally that node is a sensu server...ensures that clients do not get configured as a sensu server...actual sensu server is defined in group_vars/sensu-servers
+smtp_server: 'smtp.{{ pri_domain_name }}'  #defines smtp relay host to relay mail through...either internal or external
+syslog_servers:  #for ELK-Nodes these are defined in group_vars/elk-p-pre-processor-nodes and group_vars/elk-p-haproxy-nodes
+  - name: 'graylog.{{ pri_domain_name }}'
+    proto: udp
+    port: 514
+  - name: 'logstash.{{ pri_domain_name }}'
+    proto: tcp
+    port: 514
+  - name: 'logstash-dev.{{ pri_domain_name }}'
+    proto: udp
+    port: 514
+zabbix_server: 'zabbix-server.{{ pri_domain_name }}'
+zabbix_server_url: 'http://zabbix-server.{{ pri_domain_name }}/zabbix'

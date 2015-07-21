@@ -1,0 +1,4 @@
+---
+enable_firewall: false  #defines if firewall (ferm) should be enabled globally
+install_fail2ban: false
+ssh_manage_ssh_known_hosts: false
