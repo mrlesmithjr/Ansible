@@ -3,7 +3,7 @@
   apt_key: url=https://packages.elasticsearch.org/GPG-KEY-elasticsearch state=present
 
 - name: debian | adding logstash repo
-  apt_repository: repo='deb http://packages.elasticsearch.org/logstash/{{logstash_version}}/debian stable main' state=present
+  apt_repository: repo='deb http://packages.elasticsearch.org/logstash/{{ logstash_version }}/debian stable main' state=present
 
 - name: debian | installing logstash and java
   apt: name={{ item }} state=latest force=yes
@@ -17,6 +17,6 @@
   register: logstash_web
 
 - name: debian | disabling logstash-web
-  replace: dest=/etc/init/logstash-web.conf regexp='^start on virtual-filesystems' replace='start on never' backup=yes
+  replace: dest=/etc/init/logstash-web.conf regexp='^start on virtual-filesystems' replace='start on never'
   notify: stop logstash-web
   when: logstash_web.stat.exists

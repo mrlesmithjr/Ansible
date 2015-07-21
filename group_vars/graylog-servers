@@ -1,7 +1,0 @@
----
-enable_firewall: false
-es_cluster_name: graylog
-sensu_client_subs:
-  - elasticsearch
-  - graylog
-  - mongodb

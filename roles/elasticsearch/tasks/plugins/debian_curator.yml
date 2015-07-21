@@ -1,9 +1,15 @@
 ---
-# Install dependancies
-- apt: name=python-pip state=present
+- name: install dependencies
+  apt: name=python-pip state=present
 
-# Install Curator
-- pip: name=elasticsearch-curator
+# remove old version install via pip module
+- pip: name=elasticsearch-curator state=absent
+
+- name: adding curator apt repo
+  apt_repository: repo="deb http://packages.elasticsearch.org/curator/3/debian stable main" state=present
+
+- name: installing elasticsearch curator
+  apt: name=python-elasticsearch-curator state=present
 
 - name: remove old curator crontab
   file: path=/etc/cron.d/{{ item }} state=absent

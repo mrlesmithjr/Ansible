@@ -1,7 +1,6 @@
 ---
-# install dnsmasq
-- name: install dnsmasq
+- name: centos | installing dnsmasq
   yum: name=dnsmasq state=present
 
-- name: enable on boot and start
+- name: centos | enabling on boot and started
   service: name=dnsmasq state=started enabled=yes

@@ -1,6 +1,0 @@
----
-config_keepalived: false
-enable_firewall: false
-notify_backup_script: backup.sh
-notify_fault_script: fault.sh
-notify_master_script: master.sh

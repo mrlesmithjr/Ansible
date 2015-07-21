@@ -4,3 +4,6 @@
 
 - name: run ferm
   shell: ferm /etc/ferm/ferm.conf
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted

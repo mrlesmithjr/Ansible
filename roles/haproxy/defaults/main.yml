@@ -1,3 +1,8 @@
 ---
 config_haproxy: false #only set to true to actually configure a base HAProxy config which is already installed by default
+debian_haproxy_repo: ppa:vbernat/haproxy-1.5
+enable_haproxy_admin_page: true
+haproxy_admin_password: admin  #defines password for admin user to login to admin page
+haproxy_admin_port: 9090  #defines http port to listen on for admin page
+haproxy_admin_user: admin  #defines admin user to login to admin page
 sync_haproxy: false  #this is only needed when using GlusterFS

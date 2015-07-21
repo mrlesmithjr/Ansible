@@ -11,7 +11,7 @@ es_nfs_mountpoint: ''
 # Elasticsearch
 es_fqdn: localhost
 es_port: 9200
-es_version: 1.5
+es_version: 1.7
 
 ## Plugins
 # Curator tool

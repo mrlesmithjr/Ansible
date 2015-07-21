@@ -1,59 +1,59 @@
 ---
-- name: config_dnsmasq | config | configuring dnsmasq
+- name: config_dnsmasq | configuring dnsmasq
   template: src=etc/dnsmasq.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
   notify: restart dnsmasq
   when: config_dnsmasq
 
-- name: config_dnsmasq | config | configuring dnsmasq with dhcp
-  template: src=etc/dnsmasq_dhcp.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
-  notify: restart dnsmasq
-  when: config_dnsmasq and enable_dhcp
+#- name: config_dnsmasq | configuring dnsmasq with dhcp
+#  template: src=etc/dnsmasq_dhcp.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
+#  notify: restart dnsmasq
+#  when: config_dnsmasq and enable_dhcp
 
-- name: config_dnsmasq | config | configuring dnsmasq with dhcp
-  template: src=etc/dnsmasq_tftp.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
-  notify: restart dnsmasq
-  when: config_dnsmasq and enable_tftp
+#- name: config_dnsmasq | configuring dnsmasq with tftp
+#  template: src=etc/dnsmasq_tftp.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
+#  notify: restart dnsmasq
+#  when: config_dnsmasq and enable_tftp
 
-- name: config_dnsmasq | config | configuring dnsmasq with dhcp and tftp
-  template: src=etc/dnsmasq_dhcp_tftp.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
-  notify: restart dnsmasq
-  when: config_dnsmasq and enable_dhcp_tftp
+#- name: config_dnsmasq | configuring dnsmasq with dhcp and tftp
+#  template: src=etc/dnsmasq_dhcp_tftp.conf.j2 dest=/etc/dnsmasq.conf owner=root group=root mode=0644
+#  notify: restart dnsmasq
+#  when: config_dnsmasq and enable_dhcp_tftp
 
-- name: checking to see if /var/lib/misc has already been moved
+- name: config_dnsmasq | checking to see if /var/lib/misc has already been moved
   stat: path={{ dnsmasq_misc_backup_dir }}
   register: dnsmasq_misc_backup_moved
   when: dnsmasq_misc_backup_dir is defined
 
-- name: moving existing /var/lib/misc
+- name: config_dnsmasq | moving existing /var/lib/misc
   command: mv {{ dnsmasq_misc_home }} {{ dnsmasq_misc_backup_dir }}
   when: dnsmasq_misc_backup_dir is defined and (dnsmasq_misc_backup_moved.stat.exists != true) and config_dnsmasq and sync_dnsmasq
 
-- name: checking again if /var/lib/misc has already been moved
+- name: config_dnsmasq | checking again if /var/lib/misc has already been moved
   stat: path={{ dnsmasq_misc_backup_dir }}
   register: dnsmasq_misc_backup_stat
   when: dnsmasq_misc_backup_dir is defined
 
-- name: touching file in dnsmasq_misc_backup_dir
+- name: config_dnsmasq | touching file in dnsmasq_misc_backup_dir
   file: path={{ dnsmasq_misc_backup_dir }}/already_moved state=touch
   when: dnsmasq_misc_backup_dir is defined and (dnsmasq_misc_backup_stat.stat.exists == true) and config_dnsmasq and sync_dnsmasq
 
-- name: mounting gluster volumes - dnsmasq_misc
+- name: config_dnsmasq | mounting gluster volumes - dnsmasq_misc
   mount: name={{ item.mountpoint }} src={{ item.src }} fstype={{ item.fstype }} opts={{ item.options }} state=mounted
   with_items:
     - { mountpoint: '{{ dnsmasq_misc_home }}', src: '{{ primary_gfs_server }}:/{{ dnsmasq_misc_mnt }}', fstype: 'glusterfs', options: 'defaults,_netdev,backupvolfile-server={{ secondary_gfs_server }}' }
   when: dnsmasq_misc_home is defined and (dnsmasq_misc_backup_stat.stat.exists == true) and config_dnsmasq and sync_dnsmasq
 
-- name: checking for existing dnsmasq.leases
+- name: config_dnsmasq | checking for existing dnsmasq.leases
   stat: path={{ dnsmasq_misc_home }}/dnsmasq.leases
   register: dnsmasq_misc_leases_stat
   when: dnsmasq_misc_home is defined
 
-- name: checking for existing dnsmasq.leases in backup
+- name: config_dnsmasq | checking for existing dnsmasq.leases in backup
   stat: path={{ dnsmasq_misc_backup_dir }}/dnsmasq.leases
   register: dnsmasq_misc_backup_leases_stat
   when: dnsmasq_misc_backup_dir is defined
 
-- name: copying existing dnsmasq.leases to new mountpoint
+- name: config_dnsmasq | copying existing dnsmasq.leases to new mountpoint
   command: cp {{ dnsmasq_misc_backup_dir }}/dnsmasq.leases {{ dnsmasq_misc_home }}
   run_once: true
   when: dnsmasq_misc_backup_dir is defined and (dnsmasq_misc_leases_stat.stat.exists != true) and config_dnsmasq and sync_dnsmasq and (dnsmasq_misc_backup_leases_stat == true)

@@ -1,30 +1,29 @@
-# {{ansible_managed}}
+# {{ ansible_managed }}
 #
 {% if logstash_base_file_inputs is defined %}
-{% for item in logstash_base_file_inputs %}
+{%   for item in logstash_base_file_inputs %}
 input {
   file {
-    path => "{{item.path}}"
-    type => "{{item.type}}"
-    sincedb_path => "{{logstash_log_dir}}/.{{item.type}}sincedb"
+    path => "{{ item.path }}"
+    type => "{{ item.type }}"
+    sincedb_path => "{{ logstash_log_dir }}/.{{ item.type }}sincedb"
   }
 }
-{% endfor %}
+{%   endfor %}
 {% endif %}
-
 {% if logstash_base_inputs is defined %}
-{% for item in logstash_base_inputs %}
+{%   for item in logstash_base_inputs %}
 input {
-  {{item.prot}} {
-    type => "{{item.type}}"
-    port => "{{item.port}}"
-{% if item.format is defined %}
-    format => "{{item.format}}"
-{% endif %}
-{% if item.codec is defined %}
-    codec => "{{item.codec}}"
-{% endif %}
+  {{ item.prot }} {
+    type => "{{ item.type }}"
+    port => "{{ item.port }}"
+{%     if item.format is defined %}
+    format => "{{ item.format }}"
+{%     endif %}
+{%     if item.codec is defined %}
+    codec => "{{ item.codec }}"
+{%     endif %}
   }
 }
-{%endfor %}
+{%   endfor %}
 {% endif %}

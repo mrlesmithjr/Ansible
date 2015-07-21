@@ -4,11 +4,9 @@
   tags: [ferm]
   when: enable_firewall
 
-# Debian
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
-# CentOS
 - include: centos.yml
   when: ansible_os_family == "RedHat"
 

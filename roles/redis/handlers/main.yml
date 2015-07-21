@@ -1,9 +1,7 @@
 ---
-# Debian handlers
 - name: restart redis-server
   service: name=redis-server state=restarted
 
-# CentOS handlers
 - name: start redis
   service: name=redis state=started
 

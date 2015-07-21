@@ -7,10 +7,6 @@
   tags: [logstash]
   when: ansible_os_family == "RedHat"
 
-#- include: logstash.yml
-#  tags: [config_logstash,logstash]
-#  when: config_logstash
-
 - include: config_logstash.yml
   when: config_logstash
 

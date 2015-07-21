@@ -8,4 +8,4 @@
   when: ansible_os_family == "RedHat"
 
 - name: nfs | mounting nfs volume
-  mount: name={{es_nfs_mountpoint}} src={{es_nfs_mount}} fstype=nfs opts={{es_nfs_mount_opts}} state=mounted
+  mount: name={{ es_nfs_mountpoint }} src={{ es_nfs_mount }} fstype=nfs opts={{ es_nfs_mount_opts }} state=mounted

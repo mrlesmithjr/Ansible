@@ -1,4 +1,3 @@
 ---
-# install dnsmasq
-- name: install dnsmasq
-  apt: name=dnsmasq state=present update_cache=yes cache_valid_time=86400
+- name: debian | installing dnsmasq
+  apt: name=dnsmasq state=present

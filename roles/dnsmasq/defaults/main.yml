@@ -1,9 +1,9 @@
 ---
-enable_firewall: false
 config_dnsmasq: false
-sync_dnsmasq: false
-enable_tftp: false
+dnsmasq_misc_backup_dir: ''
+dnsmasq_misc_home: ''
 enable_dhcp: false
 enable_dhcp_tftp: false
-
-dnsmasq_domain: 'everythingshouldbevirtual.local'
+enable_firewall: false
+enable_tftp: false
+sync_dnsmasq: false

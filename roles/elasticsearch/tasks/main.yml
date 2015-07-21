@@ -15,6 +15,7 @@
 - include: elasticsearch_security_limits.yml
 
 - include: plugins.yml
+  tags: [elasticsearch-plugins]
 
 - include: nfs.yml
   tags: [elasticsearch-nfs-mount]

@@ -1,4 +1,0 @@
----
-enable_firewall: false
-config_keepalived: false
-config_quagga: false

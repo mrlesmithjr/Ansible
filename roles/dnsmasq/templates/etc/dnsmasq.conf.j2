@@ -172,11 +172,11 @@
 #dhcp-range=1234::2, 1234::500, 64, 12h
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet.
-#dhcp-range=1234::, ra-only 
+#dhcp-range=1234::, ra-only
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet, also try and
-# add names to the DNS for the IPv6 address of SLAAC-configured dual-stack 
-# hosts. Use the DHCPv4 lease to derive the name, network segment and 
+# add names to the DNS for the IPv6 address of SLAAC-configured dual-stack
+# hosts. Use the DHCPv4 lease to derive the name, network segment and
 # MAC address and assume that the host will also have an
 # IPv6 address calculated using the SLAAC alogrithm.
 #dhcp-range=1234::, ra-names
@@ -199,9 +199,9 @@
 #dhcp-range=1234::, ra-stateless, ra-names
 
 # Do router advertisements for all subnets where we're doing DHCPv6
-# Unless overriden by ra-stateless, ra-names, et al, the router 
+# Unless overriden by ra-stateless, ra-names, et al, the router
 # advertisements will have the M and O bits set, so that the clients
-# get addresses and configuration from DHCPv6, and the A bit reset, so the 
+# get addresses and configuration from DHCPv6, and the A bit reset, so the
 # clients don't use SLAAC addresses.
 #enable-ra
 
@@ -267,11 +267,11 @@
 # any machine with Ethernet address starting 11:22:33:
 #dhcp-host=11:22:33:*:*:*,set:red
 
-# Give a fixed IPv6 address and name to client with 
+# Give a fixed IPv6 address and name to client with
 # DUID 00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2
 # Note the MAC addresses CANNOT be used to identify DHCPv6 clients.
 # Note also the they [] around the IPv6 address are obilgatory.
-#dhcp-host=id:00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2, fred, [1234::5] 
+#dhcp-host=id:00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2, fred, [1234::5]
 
 # Ignore any clients which are not specified in dhcp-host lines
 # or /etc/ethers. Equivalent to ISC "deny unknown-clients".
@@ -327,7 +327,7 @@
 # Send DHCPv6 option. Note [] around IPv6 addresses.
 #dhcp-option=option6:dns-server,[1234::77],[1234::88]
 
-# Send DHCPv6 option for namservers as the machine running 
+# Send DHCPv6 option for namservers as the machine running
 # dnsmasq and another.
 #dhcp-option=option6:dns-server,[::],[1234::88]
 
@@ -629,17 +629,74 @@
 #conf-dir=/etc/dnsmasq.d
 
 # {{ ansible_managed }}
-
-domain={{ dnsmasq_domain }}
-address=/{{ dnsmasq_domain }}/{{ pri_bind_address }}
-server=/{{ dnsmasq_domain }}/{{ pri_bind_address }}
-local=/{{ dnsmasq_domain }}/
-auth-zone={{ dnsmasq_domain }},{{ pri_network }}/{{ pri_netmask_cidr }}
+#
+{% if not enable_dhcp and not enable_tftp and not enable_dhcp_tftp %}
+address=/{{ pri_domain_name }}/{{ pri_bind_address }}
 auth-sec-servers={{ pri_domain_name }}
-bogus-priv
-#interface={{ pri_bind_interface }}
-except-interface={{ pri_bind_interface }}
+auth-zone={{ pri_domain_name }},{{ pri_network }}/{{ pri_netmask_cidr }}
 bind-interfaces
+bogus-priv
+domain={{ pri_domain_name }}
+except-interface={{ pri_bind_interface }}
+local=/{{ pri_domain_name }}/
+server=/{{ pri_domain_name }}/{{ pri_bind_address }}
 {% for item in dnsmasq_nameservers %}
 server={{ item }}
 {% endfor %}
+{% endif %}
+
+{% if enable_dhcp %}
+address=/{{ pri_domain_name }}/{{ pri_bind_address }}
+auth-sec-servers={{ pri_domain_name }}
+auth-zone={{ pri_domain_name }},{{ pri_network }}/{{ pri_netmask_cidr }}
+bind-interfaces
+bogus-priv
+dhcp-client-update
+dhcp-boot={{ dhcp_boot }}
+dhcp-option=option:ntp-server,{% for server in ntp_servers %}{{ server }}{% if not loop.last %},{% endif %}{% endfor %}
+dhcp-option=option:domain-name,{{ pri_domain_name }}
+dhcp-option=option:domain-search,{{ dns_search }}
+{% for item in dhcp_range %}
+dhcp-range={{ item.start }},{{ item.end }},{{ item.netmask }}
+{% endfor %}
+domain={{ pri_domain_name }}
+except-interface={{ pri_bind_interface }}
+local=/{{ pri_domain_name }}/
+server=/{{ pri_domain_name }}/{{ pri_bind_address }}
+{% for item in dnsmasq_nameservers %}
+server={{ item }}
+{% endfor %}
+{% endif %}
+
+{% if enable_tftp %}
+bind-interfaces
+bogus-priv
+enable-tftp
+interface={{ pri_bind_interface }}
+tftp-root={{ tftpboot_dir }}
+{% endif %}
+
+{% if enable_dhcp_tftp %}
+address=/{{ pri_domain_name }}/{{ pri_bind_address }}
+auth-sec-servers={{ pri_domain_name }}
+auth-zone={{ pri_domain_name }},{{ pri_network }}/{{ pri_netmask_cidr }}
+bind-interfaces
+bogus-priv
+dhcp-boot={{ dhcp_boot }}
+dhcp-client-update
+dhcp-option=option:ntp-server,{% for server in ntp_servers %}{{ server }}{% if not loop.last %},{% endif %}{% endfor %}
+dhcp-option=option:domain-name,{{ pri_domain_name }}
+dhcp-option=option:domain-search,{{ dns_search }}
+{% for item in dhcp_range %}
+dhcp-range={{ item.start }},{{ item.end }},{{ item.netmask }}
+{% endfor %}
+domain={{ pri_domain_name }}
+enable-tftp
+except-interface={{ pri_bind_interface }}
+local=/{{ pri_domain_name }}/
+server=/{{ pri_domain_name }}/{{ pri_bind_address }}
+{% for item in dnsmasq_nameservers %}
+server={{ item }}
+{% endfor %}
+tftp-root={{ tftpboot_dir }}
+{% endif %}

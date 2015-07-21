@@ -18,7 +18,7 @@ logstash_base_file_inputs:
   - {path: /var/log/redis/redis-server.log, type: redis-server}
 logstash_folder: /opt/logstash
 logstash_base_outputs:
-  - {output: redis, output_host: '{{logstash_server}}' }
+  - {output: redis, output_host: '{{logstash_server_fqdn}}' }
 logstash_log_dir: /var/log/logstash
 logstash_plugins:
   - logstash-filter-elasticsearch

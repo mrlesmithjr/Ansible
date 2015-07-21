@@ -1,9 +1,9 @@
 # {{ ansible_managed }}
 
 global
-#        log logstash    local0 #Change logstash to your naming
-        log /dev/log    local0
-        log /dev/log    local1 notice
+# log logstash    local0 #Change logstash to your naming
+  log /dev/log    local0
+  log /dev/log    local1 notice
 #	log-send-hostname
 	chroot /var/lib/haproxy
 	user haproxy
@@ -11,20 +11,17 @@ global
 	daemon
 	maxconn 40000
 	spread-checks 3
-        stats socket /run/haproxy/admin.sock mode 660 level admin
-        stats timeout 30s
+  stats socket /run/haproxy/admin.sock mode 660 level admin
+  stats timeout 30s
 
-        # Default SSL material locations
-        ca-base /etc/ssl/certs
-        crt-base /etc/ssl/private
+  # Default SSL material locations
+  ca-base /etc/ssl/certs
+  crt-base /etc/ssl/private
 
-        # Default ciphers to use on SSL-enabled listening sockets.
-        # For more information, see ciphers(1SSL).
-        ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
-        ssl-default-bind-options no-sslv3
-
-
-
+  # Default ciphers to use on SSL-enabled listening sockets.
+  # For more information, see ciphers(1SSL).
+  ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
+  ssl-default-bind-options no-sslv3
 
 defaults
 	log     global
@@ -40,24 +37,25 @@ defaults
 	timeout connect 50000
 	timeout client 50000
 	timeout server 50000
-        errorfile 400 /etc/haproxy/errors/400.http
-        errorfile 403 /etc/haproxy/errors/403.http
-        errorfile 408 /etc/haproxy/errors/408.http
-        errorfile 500 /etc/haproxy/errors/500.http
-        errorfile 502 /etc/haproxy/errors/502.http
-        errorfile 503 /etc/haproxy/errors/503.http
-        errorfile 504 /etc/haproxy/errors/504.http
+  errorfile 400 /etc/haproxy/errors/400.http
+  errorfile 403 /etc/haproxy/errors/403.http
+  errorfile 408 /etc/haproxy/errors/408.http
+  errorfile 500 /etc/haproxy/errors/500.http
+  errorfile 502 /etc/haproxy/errors/502.http
+  errorfile 503 /etc/haproxy/errors/503.http
+  errorfile 504 /etc/haproxy/errors/504.http
 
-
+{% if enable_haproxy_admin_page %}
 userlist STATSUSERS
 	group admin users admin
-	user admin insecure-password admin
+	user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
 
-listen admin_page 0.0.0.0:9090
-        mode http
-        stats enable
-        stats refresh 60s
-        stats uri /
-        acl AuthOkay_ReadOnly http_auth(STATSUSERS)
-        acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
-        stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+listen admin_page 0.0.0.0:{{ haproxy_admin_port }}
+  mode http
+  stats enable
+  stats refresh 60s
+  stats uri /
+  acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+  acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+  stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+{% endif %}
