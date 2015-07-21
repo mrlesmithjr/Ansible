@@ -1,0 +1,53 @@
+---
+- hosts: elk-p-nodes
+  remote_user: remote
+  sudo: yes
+  roles:
+    - { role: disable-firewall, when: not enable_firewall }
+    - { role: enable-firewall, when: enable_firewall }
+    - elk-network-tweaks
+
+- hosts: elk-p-broker-nodes
+  remote_user: remote
+  sudo: yes
+  roles:
+    - { role: redis, when: use_redis }
+    - { role: rabbitmq, when: use_rabbitmq }
+    - nginx
+    - elasticsearch
+    - elk-broker
+    - elk-kibana
+    - elk-tuning
+
+- hosts: elk-p-es-nodes
+  remote_user: remote
+  sudo: yes
+  roles:
+    - elasticsearch
+    - elk-es
+    - elk-tuning
+
+- hosts: elk-p-pre-processor-nodes
+  remote_user: remote
+  sudo: yes
+  roles:
+    - logstash
+    - elk-pre-processor
+    - dnsmasq
+
+- hosts: elk-p-processor-nodes
+  remote_user: remote
+  sudo: yes
+  roles:
+    - elasticsearch
+    - logstash
+    - elk-processor
+    - dnsmasq
+
+- hosts: elk-p-haproxy-nodes
+  remote_user: remote
+  sudo: yes
+  roles:
+    - logstash
+    - haproxy
+    - elk-haproxy
