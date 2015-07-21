@@ -1,7 +1,7 @@
 ---
 gitlab_active_directory: false
 gitlab_email_enabled: false
-gitlab_ldap_base_dn: 'DC=example,DC=org’
+gitlab_ldap_base_dn: 'DC=example,DC=org'
 gitlab_ldap_enabled: false
 gitlab_ldap_servers:
   - host: 'dc01.{{ pri_domain_name }}'
