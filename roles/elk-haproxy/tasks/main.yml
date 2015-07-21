@@ -1,0 +1,26 @@
+---
+- include: haproxy.yml
+  tags: [config_haproxy,config_logstash,haproxy]
+
+- include: debian_keepalived.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos_keepalived.yml
+  when: ansible_os_family == "RedHat"
+
+- include: debian_rsyslog.yml
+  tags: [config_rsyslog]
+  when: ansible_os_family == "Debian"
+
+- include: centos_rsyslog.yml
+  tags: [config_rsyslog]
+  when: ansible_os_family == "RedHat"
+
+- include: config_logstash.yml
+  tags: [config_logstash]
+  when: config_logstash
+
+# Open firewall ports
+- include: ferm.yml
+  tags: [ferm]
+  when: enable_firewall

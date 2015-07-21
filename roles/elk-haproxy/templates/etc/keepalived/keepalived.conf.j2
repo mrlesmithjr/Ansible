@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+
+vrrp_script chk_haproxy {
+   script "killall -0 haproxy"   # verify the pid existance
+   interval 2                    # check every 2 seconds
+   weight 2                      # add 2 points of prio if OK
+}
+
+vrrp_instance VI_1 {
+   interface {{ ansible_default_ipv4.interface }}                # interface to monitor
+   state MASTER
+   virtual_router_id {{ keepalived_router_id }}          # Assign one ID for this route
+   priority {{ keepalived_router_pri }}                  # 101 on master, 100 on backup (Make sure to change this on HAPROXY node2)
+   virtual_ipaddress {
+        {{ keepalived_vip }}            # the virtual IP's
+}
+   track_script {
+       chk_haproxy
+   }
+}

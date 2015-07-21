@@ -1,0 +1,32 @@
+# {{ ansible_managed }}
+#
+{% if logstash_file_inputs is defined %}
+{%   for item in logstash_file_inputs %}
+input {
+  file {
+    path => "{{ item.path }}"
+    type => "{{ item.type }}"
+    sincedb_path => "{{ logstash_log_dir }}/.{{ item.type }}sincedb"
+  }
+}
+{%   endfor %}
+{% endif %}
+{% if logstash_inputs is defined %}
+{%   for item in logstash_inputs %}
+input {
+  {{ item.prot }} {
+    type => "{{ item.type }}"
+    port => "{{ item.port }}"
+{%     if item.format is defined %}
+    format => "{{ item.format }}"
+{%     endif %}
+{%     if item.codec is defined %}
+    codec => "{{ item.codec }}"
+{%     endif %}
+{%     if item.buffer_size is defined %}
+    buffer_size => "{{ item.buffer_size }}"
+{%     endif %}
+  }
+}
+{%   endfor %}
+{% endif %}

@@ -1,0 +1,38 @@
+---
+clear_logstash_config: false
+config_logstash: false
+enable_firewall: false
+enable_haproxy_admin_page: true
+haproxy_admin_password: admin  #defines password for admin user to login to admin page
+haproxy_admin_port: 9090  #defines http port to listen on for admin page
+haproxy_admin_user: admin  #defines admin user to login to admin page
+kibana_port: 5601
+logstash_config_dir: /etc/logstash/conf.d
+logstash_configs:
+  - 000_inputs
+#  - 001_filters
+  - 999_outputs
+logstash_file_inputs:
+  - path: /var/log/nginx/access.log
+    type: nginx-access
+  - path: /var/log/nginx/error.log
+    type: nginx-error
+  - path: /var/log/mail.log
+    type: postfix-log
+  - path: /var/log/redis/redis-server.log
+    type: redis-server
+#logstash_inputs:
+#  - prot: tcp
+#    codec: json
+#    port: '{{ rundeck_logstash_port }}'
+#    type: rundeck
+#  - prot: udp
+#    buffer_size: 1452
+#    codec: collectd
+#    port: 25826
+#    type: collectd
+logstash_log_dir: /var/log/logstash
+logstash_outputs:
+  - output: redis
+    output_host: '{{ logstash_server_fqdn }}'
+reset_logstash_config: false

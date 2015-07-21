@@ -1,0 +1,226 @@
+# {{ ansible_managed }}
+
+global
+  # log logstash    local0 #Change logstash to your naming
+  log /dev/log    local0
+  log /dev/log    local1 notice
+  #	log-send-hostname
+  chroot /var/lib/haproxy
+  user haproxy
+  group haproxy
+  daemon
+  maxconn 40000
+  spread-checks 3
+  stats socket /run/haproxy/admin.sock mode 666 level admin
+
+defaults
+  log     global
+  mode    tcp
+  maxconn 40000
+  option  httplog
+  option  dontlognull
+  option redispatch
+  option tcp-smart-accept
+  option tcp-smart-connect
+  retries 3
+  timeout queue 5000
+  timeout connect 50000
+  timeout client 50000
+  timeout server 50000
+
+{% if enable_haproxy_admin_page %}
+userlist STATSUSERS
+  group admin users admin
+  user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
+
+listen admin_page 0.0.0.0:{{ haproxy_admin_port }}
+  mode http
+  stats enable
+  stats refresh 60s
+  stats uri /
+  acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+  acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+  stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+{% endif %}
+
+listen logstash-syslog-TCP-514 {{ keepalived_vip }}:514
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:514 check
+{% endfor %}
+
+listen logstash-ESXi-TCP-1514  {{ keepalived_vip }}:1514
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:1514 check
+{% endfor %}
+
+listen logstash-vCenter-TCP-1515  {{ keepalived_vip }}:1515
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:1515 check
+{% endfor %}
+
+listen logstash-Netscaler-TCP-1517  {{ keepalived_vip }}:1517
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:1517 check
+{% endfor %}
+
+listen logstash-eventlog-TCP-3515  {{ keepalived_vip }}:3515
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:3515 check
+{% endfor %}
+
+listen logstash-iis-TCP-3525  {{ keepalived_vip }}:3525
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:3525 check
+{% endfor %}
+
+listen logstash-redis-TCP-6379  {{ keepalived_vip }}:6379
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-broker-nodes'] %}
+  server {{ host }} {{ host }}:6379 check
+{% endfor %}
+
+listen elasticsearch-TCP-9200 {{ keepalived_vip }}:9200
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-processor-nodes'] %}
+  server {{ host }} {{ host }}:9200 check
+{% endfor %}
+
+listen elasticsearch-TCP-9300 {{ keepalived_vip }}:9300
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-processor-nodes'] %}
+  server {{ host }} {{ host }}:9300 check
+{% endfor %}
+
+listen logstash-Rundeck-TCP-{{ rundeck_logstash_port }}  {{ keepalived_vip }}:{{ rundeck_logstash_port }}
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:{{ rundeck_logstash_port }} check
+{% endfor %}
+
+listen logstash-syslog-TCP-10514 {{ keepalived_vip }}:10514
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:10514 check
+{% endfor %}
+
+listen elasticsearch-Curator-TCP-28778 {{ keepalived_vip }}:28778
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-pre-processor-nodes'] %}
+  server {{ host }} {{ host }}:28778 check
+{% endfor %}
+
+listen logstash-kibana-TCP-80  {{ keepalived_vip }}:80
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-broker-nodes'] %}
+  server {{ host }} {{ host }}:{{ kibana_port}} check
+{% endfor %}
+
+listen logstash-kibana-TCP-{{ kibana_port }}  {{ keepalived_vip }}:{{ kibana_port }}
+  mode tcp
+  option tcpka
+  option tcplog
+  #balance leastconn - The server with the lowest number of connections receives the connection
+  #balance roundrobin - Each server is used in turns, according to their weights.
+  #balance source - Source IP hashed and divided by total weight of servers designates which server will receive the request
+  balance leastconn
+  default-server inter 2s downinter 5s rise 3 fall 2 slowstart 60s maxconn 256 maxqueue 128 weight 100
+{% for host in groups['elk-d-broker-nodes'] %}
+  server {{ host }} {{ host }}:{{ kibana_port }} check
+{% endfor %}

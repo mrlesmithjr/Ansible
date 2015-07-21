@@ -1,0 +1,10 @@
+---
+- name: haproxy | configuring haproxy
+  template: src=etc/haproxy/haproxy-dev.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0644 owner=root group=root backup=yes
+  notify: reload haproxy
+  when: "'elk-d-haproxy-nodes' in group_names"
+
+- name: haproxy | configuring haproxy
+  template: src=etc/haproxy/haproxy-prod.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0644 owner=root group=root backup=yes
+  notify: reload haproxy
+  when: "'elk-p-haproxy-nodes' in group_names"

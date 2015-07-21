@@ -1,0 +1,15 @@
+---
+- name: ensuring ferm is installed
+  apt: name=ferm state=present
+  when: ansible_os_family == "Debian"
+
+- name: ensuring ferm is installed (RedHat)
+  yum: name=ferm state=present
+  when: ansible_os_family == "RedHat"
+
+- name: ensuring ferm is started and enabled
+  service: name=ferm state=started enabled=yes
+
+- name: opening firewall ports
+  copy: dest=/etc/ferm/ferm.d/30-elk-haproxy.conf src=30-elk-haproxy.conf owner=root group=root mode=0700
+  notify: run ferm

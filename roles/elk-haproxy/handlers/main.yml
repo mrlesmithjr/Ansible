@@ -1,0 +1,22 @@
+---
+- name: restart haproxy
+  service: name=haproxy state=restarted
+
+- name: reload haproxy
+  service: name=haproxy state=reloaded
+
+- name: restart keepalived
+  service: name=keepalived state=restarted
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+#  command: service rsyslog restart
+
+- name: restart logstash
+  service: name=logstash state=restarted
+
+- name: reload ferm
+  shell: service ferm force-reload
+
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf
