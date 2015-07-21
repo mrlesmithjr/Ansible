@@ -1,0 +1,5 @@
+---
+- name: applying network tweaks
+  sysctl: name="{{ item.name }}" value="{{ item.value }}" state=present reload=yes
+  tags: [network_tweaks]
+  with_items: network_tweaks
