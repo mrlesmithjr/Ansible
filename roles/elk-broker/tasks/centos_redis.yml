@@ -1,0 +1,8 @@
+---
+- name: centos | configuring redis to listen on all interfaces
+  replace: dest=/etc/redis.conf regexp='^bind 127.0.0.1' replace='#bind 127.0.0.1' backup=yes
+  notify: restart redis
+
+- name: centos | tweaking redis memory
+  sysctl: name="vm.overcommit_memory" value=1 state=present reload=yes
+  notify: restart redis

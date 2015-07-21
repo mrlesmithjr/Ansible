@@ -1,0 +1,25 @@
+---
+- name: debian_redis | installing python pip
+  apt: name=python-pip state=present
+
+- name: debian_redis | install | installing redis python module
+  pip: name=redis state=present
+
+- name: debian_redis | configuring redis-server to listen on all interfaces
+  replace: dest=/etc/redis/redis.conf regexp='^bind 127.0.0.1' replace='#bind 127.0.0.1' backup=yes
+  notify: restart redis-server
+
+- name: debian_redis | tweaking redis memory
+  sysctl: name="vm.overcommit_memory" value=1 state=present reload=yes
+  notify: restart redis-server
+
+- name: debian_redis | setting redis maxmemory
+  lineinfile: dest=/etc/redis/redis.conf regexp='^maxmemory ' line="maxmemory {{ redis_max_memory }}" state=absent
+  notify: restart redis-server
+
+- name: debian_redis | changing redis memory eviction policy
+  lineinfile: dest=/etc/redis/redis.conf regexp='^maxmemory-policy' line="maxmemory-policy {{ redis_max_memory_policy }}" state=absent
+  notify: restart redis-server
+
+- name: debian_redis | ensuring redis is running
+  service: name=redis-server state=started
