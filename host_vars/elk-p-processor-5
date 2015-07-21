@@ -1,0 +1,10 @@
+---
+build_from_template: false
+cpu_hotadd: false
+cpucount: 2
+datastore: 'ELKStack (NAS01)'
+disk1: 36
+mem_hotadd: false
+memory: 1536
+multi: false
+network: vSS-Green-Servers-VLAN101

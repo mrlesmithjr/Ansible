@@ -1,0 +1,3 @@
+---
+keepalived_router_pri: 100
+keepalived_vrrp_state: BACKUP

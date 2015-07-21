@@ -1,0 +1,3 @@
+---
+keepalived_router_pri: 101
+keepalived_vrrp_state: MASTER
