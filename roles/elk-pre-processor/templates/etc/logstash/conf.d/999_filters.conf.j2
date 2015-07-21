@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+#
+filter {
+  if "_grokparsefailure" not in [tags] {
+    if "vCenter" in [tags] and "multiline" not in [tags] {
+      mutate {
+        replace => [ "message", "%{syslog_message}" ]
+      }
+    }
+  }
+}
