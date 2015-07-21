@@ -1,0 +1,10 @@
+# Allow elk-broker ports
+table filter{
+    chain ELK-RELATED-Allowed;
+    chain INPUT {
+        proto tcp dport {{ kibana_port }} jump ELK-RELATED-Allowed;
+    }
+    chain ELK-RELATED-Allowed {
+        proto tcp dport {{ kibana_port }} mod state state NEW jump LOGGING-Allowed;
+    }
+}

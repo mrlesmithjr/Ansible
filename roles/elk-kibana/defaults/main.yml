@@ -1,0 +1,9 @@
+---
+enable_firewall: false
+kibana_dir: /opt
+kibana_index: .kibana
+kibana_log: /var/log/kibana.log
+kibana_log_rotate_count: 5
+kibana_log_rotate_interval: daily
+kibana_port: 5601
+kibana_version: 4.1.1

@@ -1,0 +1,28 @@
+---
+- name: kibana | creating kibana service account
+  user: name=kibana system=yes home=/var/lib/kibana shell=/bin/false state=present
+
+- name: kibana | downloading kibana
+  get_url: url=https://download.elasticsearch.org/kibana/kibana/kibana-{{ kibana_version }}-linux-x64.tar.gz dest=/usr/local/src/kibana-{{ kibana_version }}-linux-x64.tar.gz
+
+- name: kibana | extracting and installing kibana
+  unarchive: src=/usr/local/src/kibana-{{ kibana_version }}-linux-x64.tar.gz dest={{ kibana_dir }} copy=no creates={{ kibana_dir }}/kibana-{{ kibana_version }}-linux-x64
+
+- name: kibana | configuring kibana
+  template: src=kibana.yml.j2 dest={{ kibana_dir }}/kibana-{{ kibana_version }}-linux-x64/config/kibana.yml
+  notify: restart kibana
+
+- name: kibana | configuring kibana service
+  template: src=etc/init/kibana.conf.j2 dest=/etc/init/kibana.conf
+  notify: restart kibana
+
+- name: kibana | checking for existing kibana log file
+  stat: path={{ kibana_log }}
+  register: kibana_log
+
+- name: kibana | creating kibana log file
+  file: path={{ kibana_log}} state=touch owner=kibana group=kibana mode=0644
+  when: not kibana_log.stat.exists
+
+- name: kibana | configure kibana log rotation
+  template: src=etc/logrotate.d/kibana.j2 dest=/etc/logrotate.d/kibana owner=root group=root mode=0644
