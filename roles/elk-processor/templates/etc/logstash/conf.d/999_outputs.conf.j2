@@ -1,0 +1,160 @@
+# {{ ansible_managed }}
+#
+{% for item in logstash_outputs %}
+output {
+  if "drop" not in [tags] {
+    {{ item.output }} {
+{%   if item.output_host is defined %}
+      host => "{{ item.output_host }}"
+{%   endif %}
+{%   if item.output == "elasticsearch" %}
+      cluster => "{{ es_cluster_name }}"
+{%     if item.flush_size is defined %}
+      flush_size => "{{ item.flush_size }}"
+{%     endif %}
+      manage_template => true
+      template_overwrite => true
+      template => "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
+{%     if item.workers is defined %}
+      workers => "{{ item.workers }}"
+{%     endif %}
+{%   endif %}
+{%   if item.output == "redis" %}
+      data_type => "list"
+      key => "logstash"
+{%   endif %}
+    }
+  }
+}
+{% endfor %}
+
+#output {
+#  if "drop" not in [tags] {
+#    elasticsearch {
+#      cluster => "{{ es_cluster_name }}"
+#      flush_size => "5000"
+#      manage_template => true
+#      template_overwrite => true
+#      template => "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
+#      workers => "3"
+#    }
+#  }
+#}
+#output {
+#       if [type] == "apache" and "404" in [response]  {
+#               email {
+#                       from => "{{ logstash_alerts_email }}"
+#                       subject => "HTTP Response 404 found"
+#                       to => "{{ email_notifications }}"
+#                       options => [
+#                               "smtpIporHost", "{{ smtp_server }}",
+#                               "domain", "{{ logstash_alerts_domain }}",
+#                                       "starttls", "false",
+#                                       "authenticationType", ""
+#                       ]
+#                       via => "smtp"
+#                       body => "Triggered in %{message}"
+#               }
+#       }
+#        if "SSH_Failed_Login" in [tags] {
+#                email {
+#                        from => "{{ logstash_alerts_email }}"
+#                        subject => "SSH Failed Login on %{host}"
+#                        to => "{{ email_notifications }}"
+#                        options => [
+#                                "smtpIporHost", "{{ smtp_server }}",
+#                                "domain", "{{ logstash_alerts_domain }}",
+#                                "starttls", "false",
+#                                "authenticationType", ""
+#                        ]
+#                        via => "smtp"
+#                        body => "Triggered in %{message}"
+#                }
+#        }
+#       if "deterioration_metric" in [tags] and [ "%{host}.deteriorated_events.rate_1m" ] > 1 {
+#               email {
+#                        from => "{{ logstash_alerts_email }}"
+#                        subject => "Datastore Deterioration Event"
+#                        to => "{{ email_notifications }}"
+#                        options => [
+#                                "smtpIporHost", "{{ smtp_server }}",
+#                                "domain", "{{ logstash_alerts_domain }}",
+#                                "starttls", "false",
+#                                "authenticationType", ""
+#                        ]
+#                        via => "smtp"
+#                        body => "Triggered in %{message}"
+#                }
+#       }
+#}
+#output {
+#	if [type] == "ESXi" and [syslog_program] == "storageRM" {
+#		if "Write error" in [message] {
+#			email {
+#				from => "{{ logstash_alerts_email }}"
+#				subject => "Datastore Write Errors on %{host}"
+#				to => "{{ email_notifications }}"
+#				options => [
+#					"smtpIporHost", "{{ smtp_server }}",
+#                                	"domain", "{{ logstash_alerts_domain }}",
+#                                	"starttls", "false",
+#                                	"authenticationType", ""
+#                        	]
+#                        	via => "smtp"
+#                        	body => "Triggered in %{message}"
+#			}
+#		}
+#	}
+#}
+#output {
+#       if [type] == "apache" {
+#               statsd {
+#                       host => "graphite"
+#                       port => 8125
+#                       increment => "apache.response.%{response}"
+#                       increment => "apache.method.%{method}"
+#                       count => [ "apache.bytes", "%{bytes}" ]
+#                       timing => [ "apache.duration", "%{duration}" ]
+#               }
+#       }
+#}
+#### Multicast discovery mode ####
+# Send output to the ES cluster logstash-cluster using a predefined template
+# The following settings will be used during the initial setup which will be used for using multicast ES nodes
+# When changing to unicast discovery mode you need to comment out the following section and configure the unicast discovery mode in the next section
+#
+#output {
+#       if "metric" in [tags] {
+#               statsd {
+#                       sender => "events"
+#                       host => "graphite"
+#                       count => [ "rate.1m", "%{events.rate_1m}" ]
+#                       count => [ "rate.5m", "%{events.rate_5m}" ]
+#                       count => [ "rate.15m", "%{events.rate_15m}" ]
+#               }
+#       }
+#}
+#### Unicast discovery mode ####
+# Send output to the ES cluster logstash-cluster using a predefined template
+# The settings below will be used when you change to unicast discovery mode for all ES nodes
+# Make sure to comment out the above multicast discovery mode section
+#output {
+#        elasticsearch {
+#                cluster => "logstash-cluster"
+#                host => "logstash"
+#                port => "9300"
+#                flush_size => "1000"
+#                protocol => "transport"
+#                manage_template => true
+#                template_overwrite => true
+#                template => "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
+#		workers => "4"
+#        }
+#}
+#output {
+#  if "SSH_Failed_Login" in [tags] {
+#    exec {
+#      command => "sudo iptables -A INPUT -s %{src_ip} -j DROP"
+#    }
+#  }
+#}

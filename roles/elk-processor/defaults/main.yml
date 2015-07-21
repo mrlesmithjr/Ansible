@@ -1,0 +1,122 @@
+---
+alert_throttles:
+  - tag: HardDrive-Failure
+    settings:
+      - name: period
+        value: 300
+      - name: before_count
+        value: -1
+      - name: after_count
+        value: 1
+      - name: key
+        value: "%{host}%{message}"
+clear_logstash_config: false
+config_logstash: false
+enable_dns_blacklist_filtering: true
+enable_firewall: false
+logstash_blacklists_dir: /etc/logstash/blacklists
+logstash_configs:
+  - 000_inputs
+  - 001_filters
+  - 100_filters_cisco_asa
+  - 200_filters_syslog
+  - 210_filters_iptables
+  - 220_filters_haproxy
+  - 230_filters_keepalived
+  - 240_filters_ssh
+  - 250_filters_snort
+  - 260_filters_citrix_netscaler
+  - 270_filters_apache
+  - 280_filters_nginx
+  - 290_filters_windows_eventlog
+  - 300_filters_windows_updates
+  - 310_filters_windows_iis
+  - 320_filters_exim4
+  - 330_filters_postfix
+  - 340_filters_redis
+  - 341_filters_rundeck
+  - 350_filters_zfs
+  - 360_filters_powerdns
+  - 361_filters_powerdns_blacklists
+  - 370_filters_vmware_nsx
+  - 900_filters
+  - 910_filters_source_host_ip
+  - 920_filters_alerting
+  - 990_filters_cleanup
+  - 991_filters_tagging
+  - 999_outputs
+logstash_file_inputs:
+  - path: /var/log/nginx/access.log
+    type: nginx-access
+  - path: /var/log/nginx/error.log
+    type: nginx-error
+  - path: /var/log/mail.log
+    type: postfix-log
+  - path: /var/log/redis/redis-server.log
+    type: redis-server
+logstash_grok_patterns:
+  - IPTABLES
+  - NGINXERROR
+logstash_inputs:
+  - type: redis
+    batch_count: 1000
+    threads: 2
+logstash_log_dir: /var/log/logstash
+logstash_outputs:
+  - output: elasticsearch
+    flush_size: 5000
+    workers: 2
+logstash_pre_tagging:
+  - type: apache
+    tags:
+      - apache
+  - type: eventlog
+    tags:
+      - WindowsEventLog
+  - type: exim-log
+    tags:
+      - exim-log
+  - type: iis
+    tags:
+      - IIS
+  - type: logstash-log
+    tags:
+      - logstash-log
+  - type: Netscaler
+    tags:
+      - Netscaler
+  - type: nginx
+    tags:
+      - nginx
+  - type: postfix-log
+    tags:
+      - postfix-log
+  - type: redis-server
+    tags:
+      - redis-server
+  - type: rundeck
+    tags:
+      - rundeck
+  - type: snort
+    tags:
+      - snort
+logstash_post_tagging:
+  - type: ESXi
+    tags:
+      - VMware
+  - type: NSX
+    tags:
+      - VMware
+  - type: NSX-FW
+    tags:
+      - VMware
+  - type: NSX-NAT
+    tags:
+      - VMware
+  - type: vCenter
+    tags:
+      - VMware
+powerdns_blacklists:
+#  - malware
+  - social_networking
+  - spyware

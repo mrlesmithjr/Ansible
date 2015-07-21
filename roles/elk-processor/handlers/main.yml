@@ -1,0 +1,10 @@
+---
+- name: restart elasticsearch
+  service: name=elasticsearch state=restarted
+
+- name: restart logstash
+  service: name=logstash state=restarted sleep=20
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+#  command: service rsyslog restart

@@ -1,0 +1,11 @@
+---
+- include: elasticsearch.yml
+  tags: [config_elasticsearch]
+
+- include: config_logstash.yml
+  tags: [config_blacklists,config_logstash]
+  when: config_logstash
+
+- include: config_blacklists.yml
+  tags: [config_blacklists]
+  when: enable_dns_blacklist_filtering

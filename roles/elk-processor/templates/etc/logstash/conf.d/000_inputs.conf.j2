@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+#
+{% if logstash_file_inputs is defined %}
+{%   for item in logstash_file_inputs %}
+input {
+  file {
+    path => "{{ item.path }}"
+    type => "{{ item.type }}"
+    sincedb_path => "{{ logstash_log_dir }}/.{{ item.type }}sincedb"
+  }
+}
+{%   endfor %}
+{% endif %}
+{% if logstash_inputs is defined %}
+{%   for item in logstash_inputs %}
+{%     for host in groups['elk-p-broker-nodes'] %}
+{%       if item.type == "redis" %}
+input {
+  redis {
+    host => "{{ host }}"
+    data_type => "list"
+{%         if item.batch_count is defined %}
+    batch_count => "{{ item.batch_count }}"
+{%         endif %}
+    key => "logstash"
+{%         if item.threads is defined %}
+    threads => "{{ item.threads }}"
+{%         endif %}
+  }
+}
+{%       endif %}
+{%     endfor %}
+{%   endfor %}
+{% endif %}

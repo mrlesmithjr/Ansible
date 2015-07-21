@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+#
+# Setting up HAProxy parsing
+filter {
+  if "syslog" in [tags] {
+    if [syslog_program] == "haproxy" {
+      mutate {
+        remove_field => [ "syslog_timestamp" ]
+      }
+      grok {
+        match => [
+          "message", "%{HAPROXYHTTP}",
+          "message", "%{HAPROXYTCP}",
+          "message", "%{SYSLOGTIMESTAMP:syslog_timestamp} %{IPORHOST:syslog_server} %{SYSLOGPROG}: %{GREEDYDATA:haproxy_message}"
+        ]
+        add_tag => [ "HAProxy" ]
+      }
+      geoip {
+        source => "client_ip"
+        target => "geoip"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+      }
+      mutate {
+        convert => [ "[geoip][coordinates]", "float" ]
+        rename => [ "http_status_code", "response" ]
+        rename => [ "http_request", "request" ]
+        rename => [ "client_ip", "src_ip" ]
+        replace => [ "message", "%{haproxy_message}" ]
+      }
+    }
+  }
+}
