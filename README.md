@@ -1,33 +1,33 @@
-#Ansible Playbooks and Roles
-######From me (@mrlesmithjr) to the community
-###The goal of this repo is to maintain a consistent configuration across hosts.
-#####This repo will always be updated on a continuous basis and all feedback is encouraged and welcomed.
+# Ansible Playbooks and Roles
+###### From me (@mrlesmithjr) to the community
+### The goal of this repo is to maintain a consistent configuration across hosts.
+##### This repo will always be updated on a continuous basis and all feedback is encouraged and welcomed.
 ````
 Master - Main ready to consume branch...May be extremely outdated
 Staging - Pre-Master branch...
 Dev - Development branch...Bleeding edge functionality (Initially will be completely different than Master due to redesign)
 ````
 
-##Requirements
-####The majority of variables are configurable in group_vars/all
-######The goal of this is to keep a consistent single place to update site-wide variables.
+## Requirements
+#### The majority of variables are configurable in group_vars/all
+###### The goal of this is to keep a consistent single place to update site-wide variables.
 
-##Playbooks
-####bootstrap.yml
-######Used as phase one of deployments... bootstraps hosts
-####site.yml
-######Phase two of deployments... configures base settings and install base packages that should be site-wide
-####sensu.yml
-######Installs Sensu Server and Sensu Clients
+## Playbooks
+#### bootstrap.yml
+###### Used as phase one of deployments... bootstraps hosts
+#### site.yml
+###### Phase two of deployments... configures base settings and install base packages that should be site-wide
+#### sensu.yml
+###### Installs Sensu Server and Sensu Clients
 
-####elkstack_prod.yml
-######Builds ELKStack Highly Available, Scalable environment
+#### elkstack_prod.yml
+###### Builds ELKStack Highly Available, Scalable environment
 
-##Role Name
-##Requirements
-##ELKStack - Requirements
-#####Build out the following hosts and modify hosts to reflect name changes...lines with [] define a group name to be added to hosts.
-#####Lines that contain [1:x] are regex values to define multiple hosts.
+## Role Name
+## Requirements
+## ELKStack - Requirements
+##### Build out the following hosts and modify hosts to reflect name changes...lines with [] define a group name to be added to hosts.
+##### Lines that contain [1:x] are regex values to define multiple hosts.
 ````
 elk-p-haproxy-[1:2]
 elk-p-broker-[1:3]
@@ -63,12 +63,12 @@ group_vars/elk-p-processor-nodes
 host_vars/elk-p-haproxy-1
 host_vars/elk-p-haproxy-2
 ````
-##Role Variables
+## Role Variables
 
-##Dependencies
+## Dependencies
 
-##Example Playbook
-###ELKStack example playbook....included in this repo
+## Example Playbook
+### ELKStack example playbook....included in this repo
 ````
 ---
 - hosts: elk-p-nodes
@@ -126,12 +126,11 @@ host_vars/elk-p-haproxy-2
     - elk-haproxy
 ````
 
-##License
+## License
 GNU General Public License Version 2
 
-##Author Information
+## Author Information
 Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
-
