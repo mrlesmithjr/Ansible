@@ -3,6 +3,8 @@
   remote_user: remote
   sudo: yes
   roles:
-    - { role: haproxy, when: enable_haproxy }
-    - { role: keepalived, when: enable_keepalived }
-    - squid
+    - role: ansible-haproxy
+      when: enable_haproxy
+    - role: ansible-keepalived
+      when: enable_keepalived
+    - role: ansible-squid

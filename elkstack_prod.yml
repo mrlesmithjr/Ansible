@@ -3,51 +3,49 @@
   remote_user: remote
   sudo: yes
   roles:
-    - { role: disable-firewall, when: not enable_firewall }
-    - { role: enable-firewall, when: enable_firewall }
-    - elk-network-tweaks
+    - role: ansible-network-tweaks
 
 - hosts: elk-p-broker-nodes
   remote_user: remote
   sudo: yes
   roles:
-    - { role: redis, when: use_redis }
-    - { role: rabbitmq, when: use_rabbitmq }
-    - nginx
-    - elasticsearch
-    - elk-broker
-    - elk-kibana
-    - elk-tuning
+    - role: ansible-redis
+      when: use_redis
+    - role: ansible-rabbitmq
+      when: use_rabbitmq
+    - role: ansible-nginx
+    - role: ansible-elasticsearch
+    - role: ansible-elk-broker
+    - role: ansible-elk-kibana
 
 - hosts: elk-p-es-nodes
   remote_user: remote
   sudo: yes
   roles:
-    - elasticsearch
-    - elk-es
-    - elk-tuning
+    - role: ansible-elasticsearch
+    - role: ansible-elk-es
 
 - hosts: elk-p-pre-processor-nodes
   remote_user: remote
   sudo: yes
   roles:
-    - logstash
-    - elk-pre-processor
-    - dnsmasq
+    - role: ansible-logstash
+    - role: ansible-elk-pre-processor
+    - role: ansible-dnsmasq
 
 - hosts: elk-p-processor-nodes
   remote_user: remote
   sudo: yes
   roles:
-    - elasticsearch
-    - logstash
-    - elk-processor
-    - dnsmasq
+    - role: ansible-elasticsearch
+    - role: ansible-logstash
+    - role: ansible-elk-processor
+    - role: ansible-dnsmasq
 
 - hosts: elk-p-haproxy-nodes
   remote_user: remote
   sudo: yes
   roles:
-    - logstash
-    - haproxy
-    - elk-haproxy
+    - role: ansible-logstash
+    - role: ansible-haproxy
+    - role: ansible-elk-haproxy

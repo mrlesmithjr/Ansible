@@ -3,6 +3,9 @@
   remote_user: remote
   sudo: yes
   roles:
-    - { role: mysql, when: mysql_backend }
-    - { role: rundeck, when: enable_rundeck }
-    - { role: jenkins, when: enable_jenkins }
+    - role: ansible-mysql
+      when: mysql_backend
+    - role: ansible-rundeck
+      when: enable_rundeck
+    - role: ansible-jenkins
+      when: enable_jenkins

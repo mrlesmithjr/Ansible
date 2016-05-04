@@ -2,6 +2,6 @@
   remote_user: remote
   sudo: yes
   roles:
-    - rabbitmq
-    - redis
-    - sensu
+    - role: ansible-rabbitmq
+    - role: ansible-redis
+    - role: ansible-sensu

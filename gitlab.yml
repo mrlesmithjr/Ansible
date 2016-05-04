@@ -3,10 +3,11 @@
   remote_user: remote
   sudo: yes
   roles:
-    - { role: disable-firewall, when: not enable_firewall }
-    - { role: enable-firewall, when: enable_firewall }
-    - base
-    - { role: snmpd, when: enable_snmpd }
-    - { role: timezone, when: change_timezone }
-    - { role: collectd, when: enable_collectd_monitoring }
-    - gitlab_ce
+    - role: ansible-base
+    - role: ansible-snmpd
+      when: enable_snmpd
+    - role: ansible-timezone
+      when: change_timezone
+    - role: ansible-collectd
+      when: enable_collectd_monitoring
+    - role: ansible-gitlab-ce

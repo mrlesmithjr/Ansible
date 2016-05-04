@@ -3,4 +3,4 @@
   remote_user: remote
   sudo: yes
   roles:
-    - apache2
+    - ansible-apache2

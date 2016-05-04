@@ -3,13 +3,14 @@
   remote_user: remote
   sudo: yes
   roles:
-    - { role: disable-firewall, when: not enable_firewall }
-    - { role: enable-firewall, when: enable_firewall }
-    - base
-    - collectd
-    - { role: snmpd, when: enable_snmpd }
-    - { role: timezone, when: change_timezone }
-    - { role: zabbix-agent, when: enable_zabbix_monitoring }
-    - elasticsearch
-    - mongodb
-    - graylog
+    - role: ansible-base
+    - role: ansible-collectd
+    - role: ansible-snmpd
+      when: enable_snmpd
+    - role: ansible-timezone
+      when: change_timezone
+    - role: ansible-zabbix-agent
+      when: enable_zabbix_monitoring
+    - role: ansible-elasticsearch
+    - role: ansible-mongodb
+    - role: ansible-graylog

@@ -3,10 +3,13 @@
   sudo: yes
   remote_user: remote
   roles:
-    - { role: disable-firewall, when: not enable_firewall }
-    - { role: enable-firewall, when: enable_firewall }
-    - { role: change-hostname, when: update_hostname }
-    - { role: snmpd, when: enable_snmpd }
-    - { role: timezone, when: change_timezone }
-    - { role: zabbix-agent, when: enable_zabbix_monitoring }
-    - { role: collectd, when: enable_collectd_monitoring }
+    - role: ansible-change-hostname
+      when: update_hostname
+    - role: ansible-snmpd
+      when: enable_snmpd
+    - role: ansible-timezone
+      when: change_timezone
+    - role: ansible-zabbix-agent
+      when: enable_zabbix_monitoring
+    - role: ansible-collectd
+      when: enable_collectd_monitoring
