@@ -1,0 +1,9 @@
+---
+- name: network_optimizations | optimizing network settings
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: "{{ item.state }}"
+    sysctl_set: yes
+    reload: yes
+  with_items: '{{ fluentd_network_optimizations }}'
