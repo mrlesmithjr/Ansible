@@ -1,0 +1,22 @@
+---
+- hosts: all
+  remote_user: vagrant
+  sudo: true
+  vars:
+    - default_configure_interface: false
+    - default_interface_method: dhcp
+    - host_vars_path: ./host_vars
+  roles:
+  tasks:
+    - name: grabbing interfaces
+      shell: ifconfig -a | sed 's/[ \t].*//;/^\(lo\|\)$/d'
+      register: show_interfaces
+    - name: ensuring host_vars exists
+      file: path={{ host_vars_path }} state=directory
+      delegate_to: localhost
+      sudo: false
+      run_once: true
+    - name: configuring host_vars
+      template: src=host_interfaces.j2 dest={{ host_vars_path }}/{{ inventory_hostname }}_interfaces
+      delegate_to: localhost
+      sudo: false

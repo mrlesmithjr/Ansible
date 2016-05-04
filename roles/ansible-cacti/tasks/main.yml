@@ -1,0 +1,18 @@
+---
+# tasks file for ansible-cacti
+- include: set_facts.yml
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: users.yml
+
+- include: database.yml
+
+- include: config_cacti.yml
+
+- include: templates.yml
+  when: cacti_import_templates

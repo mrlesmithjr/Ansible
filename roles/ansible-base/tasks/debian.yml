@@ -1,0 +1,43 @@
+---
+- name: debian | removing vmware tools package repo
+  apt_repository:
+    repo: "deb http://packages.vmware.com/packages/ubuntu trusty main"
+    state: absent
+
+- name: debian | running apt-get update
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+  tags:
+    - apt_update
+
+- name: debian | running apt-get update (forced)
+  apt:
+    update_cache: yes
+  tags:
+    - force-apt-update
+  when: force_apt_update is defined and force_apt_update
+
+- name: debian | installing base packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - build-essential
+   - software-properties-common
+   - curl
+   - git
+   - git-core
+   - ntp
+   - scsitools
+
+- name: debian | resetting /etc/dhcp/dhclient.conf to default
+  template:
+    src: etc/dhcp/dhclient.conf.j2
+    dest: /etc/dhcp/dhclient.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - update_dhcpclient_conf
+  when: update_dhcpclient_conf is defined and update_dhcpclient_conf

@@ -1,0 +1,16 @@
+---
+
+- name: zabbix_server | Install Zabbix agent
+  apt:
+     pkg="zabbix-agent"="{{ zabbix_server_ubuntu }}"
+     state=present
+     force=yes
+
+- name: zabbix_agent | Deploy zabbix_agentd.conf file
+  template:
+     src="agent/zabbix_agentd.conf.j2"
+     dest="/etc/zabbix/zabbix_agentd.conf"
+     owner=root
+     group=root
+     mode=0644
+  notify: restart zabbix_agent

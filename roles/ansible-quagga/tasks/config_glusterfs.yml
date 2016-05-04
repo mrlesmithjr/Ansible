@@ -1,0 +1,36 @@
+---
+- name: config_glusterfs | checking to see if /etc/quagga has already been moved
+  stat: path={{ quagga_backup_dir }}
+  register: quagga_backup_moved
+
+- name: config_glusterfs | moving existing /etc/quagga
+  command: mv {{ quagga_home }} {{ quagga_backup_dir }}
+  when: (quagga_backup_moved.stat.exists != true) and config_quagga and sync_quagga
+
+- name: config_glusterfs | checking again if /etc/quagga has already been moved
+  stat: path={{ quagga_backup_dir }}
+  register: quagga_backup_stat
+
+- name: config_glusterfs | touching file in quagga_backup_dir
+  file: path={{ quagga_backup_dir }}/already_moved state=touch
+  when: (quagga_backup_stat.stat.exists == true) and config_quagga and sync_quagga
+
+- name: config_glusterfs | mounting gluster volumes - quagga
+  mount: name={{ item.mountpoint }} src={{ item.src }} fstype={{ item.fstype }} opts={{ item.options }} state=mounted
+  with_items:
+    - { mountpoint: '{{ quagga_home }}', src: '{{ primary_gfs_server }}:/{{ quagga_mnt }}', fstype: 'glusterfs', options: 'defaults,_netdev,backupvolfile-server={{ secondary_gfs_server }}' }
+  when: (quagga_backup_stat.stat.exists == true) and config_quagga and sync_quagga
+
+- name: config_glusterfs | configuring quagga
+  template: src=etc/quagga/{{ item.src }} dest={{ quagga_root_dir }}/{{ item.dest }} owner=root group=root mode=0644 backup=yes
+  with_items:
+    - { src: daemons.j2, dest: daemons }
+    - { src: debian.conf.j2, dest: debian.conf }
+    - { src: vtysh.conf.j2, dest: vtysh.conf }
+    - { src: zebra.conf.j2, dest: zebra.conf }
+  run_once: true
+
+- name: config_glusterfs | configuring ospf
+  template: src=etc/quagga/ospfd.conf.j2 dest={{ quagga_root_dir }}/ospfd.conf owner=root group=root mode=0644
+  when: quagga_enable_ospfd is defined and quagga_enable_ospfd
+  run_once: true

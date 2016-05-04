@@ -1,0 +1,26 @@
+---
+- name: debian | definining openldap install settings
+  debconf:
+    name: "slapd"
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - question: 'slapd/internal/generated_adminpw'
+      value: '{{ openldap_admin_password }}'
+      vtype: 'password'
+    - question: 'slapd/password2'
+      value: '{{ openldap_admin_password }}'
+      vtype: 'password'
+    - question: 'slapd/internal/adminpw'
+      value: '{{ openldap_admin_password }}'
+      vtype: 'password'
+    - question: 'slapd/password1'
+      value: '{{ openldap_admin_password }}'
+      vtype: 'password'
+
+- name: debian | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: openldap_debian_packages

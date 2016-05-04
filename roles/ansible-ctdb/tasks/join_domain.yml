@@ -1,0 +1,48 @@
+---
+- name: join_domain | checking if already joined to domain
+  stat:
+    path: "{{ ctdb_glusterfs_mount }}/.domain_joined"
+  register: "domain_joined_check"
+
+- name: join_domain | restarting ctdb (if not joined to domain)
+  service:
+    name: "ctdb"
+    state: restarted
+  register: "ctdb_restarted"
+  when: not domain_joined_check.stat.exists
+
+- name: join_domain | waiting for ctdb to restart
+  wait_for:
+    delay: 60  #we wait enough time for ctdb to startup samba services in order to join domain
+    port: 445
+  when: ctdb_restarted.changed
+
+- name: join_domain | joining domain
+  shell: net ads join -U "{{ ctdb_samba_active_directory_info.domain_join_user }}"%"{{ ctdb_samba_active_directory_info.domain_join_password }}"
+  register: "domain_joined"
+  notify:
+    - restart ctdb
+  when: >
+        not domain_joined_check.stat.exists and
+        inventory_hostname == "{{ ctdb_samba_master_node }}"
+
+- name: join_domain | marking as domain joined
+  file:
+    path: "{{ ctdb_glusterfs_mount }}/.domain_joined"
+    state: touch
+    owner: root
+    group: root
+    mode: 0644
+  when: domain_joined.changed
+
+- name: join_domain | restarting ctdb #we do this again after joining the domain in order to propogate permissions
+  service:
+    name: "ctdb"
+    state: restarted
+  when: domain_joined.changed
+
+- name: join_domain | waiting for ctdb to restart
+  wait_for:
+    delay: 60  #we wait enough time for ctdb to startup samba services in order to propogate domain
+    port: 445
+  when: domain_joined.changed

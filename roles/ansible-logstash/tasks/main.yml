@@ -1,0 +1,24 @@
+---
+# tasks file for ansible-logstash
+- include: debian.yml
+  tags:
+    - logstash
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  tags:
+    - logstash
+  when: ansible_os_family == "RedHat"
+
+- include: config_logstash.yml
+  when: config_logstash
+
+- include: plugins.yml
+  tags:
+    - logstash
+    - logstash_plugins
+
+- include: validate_permissions.yml
+  tags:
+    - config_logstash
+    - logstash

@@ -1,0 +1,52 @@
+[gerrit]
+	basePath = git
+{% if gerrit_vagrant_install is defined and gerrit_vagrant_install %}
+  canonicalWebUrl = http://127.0.0.1:{{ gerrit_http_listen_port }}/
+{% elif (gerrit_vagrant_install is defined and not gerrit_vagrant_install) or gerrit_vagrant_install is not defined %}
+	canonicalWebUrl = http://{{ ansible_hostname }}.{{ pri_domain_name }}:{{ gerrit_http_listen_port }}/
+{% endif %}
+
+[database]
+{% for item in gerrit_db_info %}
+	type = {{ item.type }}
+	database = {{ item.db }}
+	hostname = {{ item.host }}
+	username = {{ item.user }}
+{% endfor %}
+[index]
+	type = LUCENE
+[auth]
+	type = {{ gerrit_auth_type }}
+[sendemail]
+	smtpServer = {{ gerrit_smtp_server }}
+[container]
+	user = {{ gerrit_account_info.name }}
+	javaHome = {{ gerrit_java_home }}
+[sshd]
+	listenAddress = *:{{ gerrit_sshd_listen_port }}
+[httpd]
+	listenUrl = http://*:{{ gerrit_http_listen_port }}/
+[cache]
+	directory = cache
+[gitweb]
+	type = gitweb
+	cgi = {{ gitweb_cgi_path }}
+{% if gerrit_auth_type == "LDAP_BIND" %}
+[ldap]
+{%   for item in gerrit_ldap_info %}
+	server = {{ item.server }}
+	accountBase = {{ item.accountbase }}
+	accountPattern = {{ item.accountpattern }}
+	accountScope = {{ item.accountscope }}
+	groupBase = {{ item.groupbase }}
+	accountFullName = {{ item.accountfullname }}
+	accountMemberField = {{ item.accountmemberfield }}
+	accountEmailAddress = {{ item.accountemailaddress }}
+	accountSshUserName = {{ item.accountsshusername }}
+	referral = {{ item.referral }}
+	{%   endfor %}
+	{% endif %}
+[plugins]
+{% if gerrit_allow_remote_admin is defined and gerrit_allow_remote_admin %}
+    allowRemoteAdmin = true
+{% endif %}

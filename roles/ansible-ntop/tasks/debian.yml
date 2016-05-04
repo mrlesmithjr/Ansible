@@ -1,0 +1,31 @@
+---
+- name: debian | downloading NTOP repo package
+  get_url: url={{ ntop_debian_apt_url }}/{{ ntop_debian_package }} dest=/opt/{{ ntop_debian_package }}
+
+- name: debian | installing NTOP repo package
+  apt: deb=/opt/{{ ntop_debian_package }}
+  register: ntop_package_added
+  always_run: yes
+
+- name: debian | updating apt cache
+  apt: update_cache=yes
+  when: ntop_package_added.changed
+
+- name: debian | installing pre-reqs
+  apt: name={{ item }} state=present
+  with_items:
+    - libgeoip-dev
+    - libglib2.0-dev
+    - libnl1
+    - libpcap-dev
+    - libxml2-dev
+
+- name: debian | installing NTOP package(s)
+  apt: name={{ item }} state=present
+  with_items:
+    - ntopng
+    - pfring
+    - nprobe
+    - ntopng-data
+    - n2disk
+    - nbox

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+{% for item in suricata_interfaces %}
+{%   if item.disable_offloading is defined and item.disable_offloading %}
+{%     for feature in item.disable_features %}
+ethtool -K {{ item.int }} {{ feature }} off
+{%     endfor %}
+{%   endif %}
+{% endfor %}

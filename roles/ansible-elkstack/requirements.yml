@@ -1,0 +1,20 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-dnsmasq.git
+- src: https://github.com/mrlesmithjr/ansible-elasticsearch.git
+- src: https://github.com/mrlesmithjr/ansible-elk-broker.git
+- src: https://github.com/mrlesmithjr/ansible-elk-es.git
+- src: https://github.com/mrlesmithjr/ansible-elk-haproxy.git
+- src: https://github.com/mrlesmithjr/ansible-elk-kibana.git
+- src: https://github.com/mrlesmithjr/ansible-elk-pre-processor.git
+- src: https://github.com/mrlesmithjr/ansible-elk-processor.git
+- src: https://github.com/mrlesmithjr/ansible-haproxy.git
+- src: https://github.com/mrlesmithjr/ansible-keepalived.git
+- src: https://github.com/mrlesmithjr/ansible-logstash.git
+- src: https://github.com/mrlesmithjr/ansible-network-tweaks.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-postfix.git
+- src: https://github.com/mrlesmithjr/ansible-rabbitmq.git
+- src: https://github.com/mrlesmithjr/ansible-redis.git
+- src: https://github.com/mrlesmithjr/ansible-rsyslog.git
+- src: https://github.com/mrlesmithjr/ansible-snmpd.git
+- src: https://github.com/mrlesmithjr/ansible-timezone.git

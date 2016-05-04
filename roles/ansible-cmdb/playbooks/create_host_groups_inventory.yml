@@ -1,0 +1,47 @@
+- hosts: all
+  sudo: true
+  remote_user: remote
+  vars:
+    - db_inventory_dir: ./db_inventory
+    - db_inventory_file: ./db_inventory.yml
+  tasks:
+    - name: creating db_inventory_dir
+      file: path="{{ db_inventory_dir }}" state=directory
+      delegate_to: localhost
+      run_once: true
+      sudo: false
+
+    - name: removing existing inventory files
+      file: path="{{ item }}" state=absent
+      delegate_to: localhost
+      with_items:
+        - "{{ db_inventory_dir }}/{{ ansible_hostname }}.yml"
+        - "{{ db_inventory_file }}"
+
+    - name: creating yaml list of groups/hosts
+      template: src=db_inventory_list.yml.j2 dest="{{ db_inventory_dir }}/{{ ansible_hostname }}.yml"
+      delegate_to: localhost
+      sudo: false
+
+    - name: merging all host inventory groups into one
+      assemble: src="{{ db_inventory_dir }}/" dest="{{ db_inventory_file }}"
+      delegate_to: localhost
+      run_once: true
+      sudo: false
+
+    - name: adding list var to inventory file
+      lineinfile: dest="{{ db_inventory_file }}" regexp="^host_groups" line="host_groups{{ ':' }}" insertbefore=BOF
+      delegate_to: localhost
+      run_once: true
+      sudo: false
+
+    - name: adding yaml formatting to inventory file
+      lineinfile: dest="{{ db_inventory_file }}" regexp="^---" line="---" insertbefore=BOF
+      delegate_to: localhost
+      run_once: true
+      sudo: false
+
+    - name: chmodding inventory file
+      file: path="{{ db_inventory_file }}" mode=0775
+      delegate_to: localhost
+      run_once: true

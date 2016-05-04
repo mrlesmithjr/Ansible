@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-mailcatcher
+- name: restart mailcatcher
+  service:
+    name: "mailcatcher"
+    state: restarted

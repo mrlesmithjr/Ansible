@@ -1,0 +1,25 @@
+---
+- name: Installs Gerrit Code Review
+  hosts: all
+  become: true
+  vars:
+    - gerrit_auth_type: OPENID  #defines authorization type...OPENID, LDAP, LDAP_BIND...
+    - gerrit_db_info:
+#        - host: localhost
+#          type: h2
+#          db: db/ReviewDB
+#          user: gerrit
+#          pass: gerrit
+        - host: localhost
+          type: mysql
+          db: reviewdb
+          user: gerrit
+          pass: gerrit
+    - gerrit_vagrant_install: true
+    - install_mysql: true
+  roles:
+    - role: ansible-apache2
+    - role: ansible-mariadb-mysql
+      when: install_mysql is defined and install_mysql
+    - role: ansible-gerrit
+  tasks:

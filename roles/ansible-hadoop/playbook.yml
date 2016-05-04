@@ -1,0 +1,9 @@
+---
+- name: Installs Hadoop
+  hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-oracle-java8
+    - role: ansible-hadoop
+  tasks:

@@ -1,0 +1,40 @@
+---
+- name: debian_lvm | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - scsitools
+
+- name: debian_lvm | installing lvm2
+  apt:
+    name: lvm2
+    state: present
+
+- name: rescanning for new disks
+  command: /sbin/rescan-scsi-bus
+
+- name: debian_lvm | creating LVM volume group
+  lvg:
+    vg: "{{ es_vgname }}"
+    pvs: "{{ es_disks|join(',') }}"
+    state: present
+
+- name: debian_lvm | creating LVM logical volume
+  lvol:
+    vg: "{{ es_vgname }}"
+    lv: "{{ es_lvname }}"
+    size: 100%FREE
+    state: present
+
+- name: debian_lvm | creating filesystem
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{ es_vgname }}/{{ es_lvname }}"
+
+- name: debian_lvm | mounting filesystem
+  mount:
+    name: "{{ es_mntp }}"
+    src: "/dev/{{ es_vgname }}/{{ es_lvname }}"
+    fstype: ext4
+    state: mounted

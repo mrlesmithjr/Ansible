@@ -1,0 +1,20 @@
+# Managed By Ansible
+default vesamenu.c32
+{% if tftp_boot_menu is defined %}
+{%   for item in tftp_boot_menu %}
+label {{ item.label }}
+  menu label ^{{ item.menu_label }}
+{%     if item.menu_default is defined and item.menu_default %}
+  menu default
+{%     endif %}
+{%     if item.localboot is defined and item.localboot %}
+  localboot 0
+{%     endif %}
+{%     if item.kernel is defined %}
+  kernel {{ item.kernel }}
+{%     endif %}
+{%     if item.append is defined %}
+  append {{ item.append }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

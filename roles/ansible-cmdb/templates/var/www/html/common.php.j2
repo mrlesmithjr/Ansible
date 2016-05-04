@@ -1,0 +1,213 @@
+<?php
+  session_start();
+  // Checking if user is logged in
+  if (empty($_SESSION['user_is_logged_in'])) {
+  // if not logged in redirect to login page
+  header("Location: login.php");
+  // Important to have die to not allow non logged in users to view page
+  die("Redirecting to login.php");
+  }
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+    <style>
+      a:link {
+        color:white;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      a.menuLinks{
+        font-weight: bold;
+        margin: 5px;
+      }
+      a:visited {
+        color:#47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      div.fixed {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+      .fixed-nav-bar {
+        position: fixed;
+        }
+      p{
+        margin: 0 0 10px 0;
+        padding: 0;
+      }
+      h3 {
+        color:#47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      h4 {
+        color:#47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      html {
+        background: url(background.jpg) no-repeat center center fixed;
+        background-size: cover;
+      }
+      body {
+        color:white;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      /* Main Navigation */
+      ul#navigation {
+      	margin:0px auto;
+      	position:relative;
+      	float:left;
+      }
+      ul#navigation li {
+        background:#47a3da;
+      	display:inline-block;
+      	font-size:12px;
+      	font-weight:bold;
+      	margin:0;
+      	padding:0;
+      	float:left;
+      	position:relative;
+      	border-top: 0 none;
+      	border-bottom: 0 none;
+      }
+      ul#navigation li a {
+      	padding:10px 25px;
+      	color: white;
+      	text-shadow: 2px 2px 4px #000000;
+      	text-decoration:none;
+      	display:inline-block;
+      	border-right: 1px solid #c9c9c9;
+      	border-left: 0 none;
+      	border-top: 0 none;
+        border-bottom: 0 none;
+      	background:#47a3da;
+      	-webkit-transition:color 0.2s linear, background 0.2s linear;
+      	-moz-transition:color 0.2s linear, background 0.2s linear;
+      	-o-transition:color 0.2s linear, background 0.2s linear;
+      	transition:color 0.2s linear, background 0.2s linear;
+      }
+      ul#navigation li a:hover {
+      	background:#f8f8f8;
+      	color:#282828;
+      }
+      ul#navigation li a.first {
+      	border-left: 0 none;
+      }
+      ul#navigation li a.last {
+      	border-right: 0 none;
+      }
+      ul#navigation li:hover > a {
+      	background:#fff;
+      }
+      /* Drop-Down Navigation */
+      ul#navigation li:hover > ul
+      {
+      /*these 2 styles are very important,
+      being the ones which make the drop-down to appear on hover */
+      	visibility:visible;
+      	opacity:1;
+      }
+      ul#navigation ul, ul#navigation ul li ul {
+      	list-style: none;
+          margin: 0;
+          padding: 0;
+      /*the next 2 styles are very important,
+      being the ones which make the drop-down to stay hidden */
+          visibility:hidden;
+          opacity:0;
+          position: absolute;
+          z-index: 99999;
+      	width:180px;
+      	background:#f8f8f8;
+      	box-shadow:1px 1px 3px #ccc;
+      /* css3 transitions for smooth hover effect */
+      	-webkit-transition:opacity 0.2s linear, visibility 0.2s linear;
+      	-moz-transition:opacity 0.2s linear, visibility 0.2s linear;
+      	-o-transition:opacity 0.2s linear, visibility 0.2s linear;
+      	transition:opacity 0.2s linear, visibility 0.2s linear;
+      }
+      ul#navigation ul {
+          top: 43px;
+          left: 1px;
+      }
+      ul#navigation ul li ul {
+          top: 0;
+          left: 181px; /* strong related to width:180px; from above */
+      }
+      ul#navigation ul li {
+      	clear:both;
+      	width:100%;
+      	border:0 none;
+      	border-bottom:1px solid #c9c9c9;
+      }
+      ul#navigation ul li a {
+      	background:none;
+      	padding:7px 15px;
+      	color: white;
+      	text-shadow: 2px 2px 4px #000000;
+      	text-decoration:none;
+      	display:inline-block;
+      	border:0 none;
+      	float:left;
+      	clear:both;
+      	width:150px;
+      }
+    </style>
+  </head>
+  <body>
+  <nav id="nav">
+    <ul id="navigation">
+      <li><a href="index.php" class="first">Home</a></li>
+      <li><a href="#">Group Actions</a>
+        <ul>
+          <li><a href="add_groups.php">Add Groups</a></li>
+          <li><a href="#">Schedule Group Maintenance</a></li>
+          <li><a href="query_group_details.php">Query Groups</a></li>
+        </ul>
+      </li>
+      <li><a href="#">Ansible Actions</a>
+        <ul>
+          <li><a href="ansible_test_jenkins_job.php">Test Jenkins Job</a></li>
+        </ul>
+      </li>
+      <li><a href="#">My Profile</a>
+        <ul>
+          <li><a href="members.php?action=aboutme">About Me</a></li>
+          <li><a href="edit_user_info.php">Edit My Info</a></li>
+          <li><a href="#">Jenkins Integration</a>
+            <ul>
+              <li><a href="members.php?action=configurejenkinsapi">Configure API Access</a></li>
+              <li><a href="#">Configure Projects</a></li>
+              <li><a href="members.php?action=viewuserjenkinsapis">View API Access</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Links</a>
+            <ul>
+              <li><a href="members.php?action=addlinks">Add External Links</a></li>
+              <li><a href="view_user_links.php">My External Links</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#">External Links</a>
+        <ul>
+{% if cmdb_web_links is defined %}
+{%   for item in cmdb_web_links %}
+          <li><a href="{{ item.url }}" target="_blank">{{ item.name }}</a></li>
+{%   endfor %}
+{% endif %}
+        </ul>
+      </li>
+      <li><a href="#" class="last">Contact</a></li>
+    </ul>
+  </nav>
+  <div class="fixed">
+    <p><a href="register_user.php" class="menuLinks">Register</a> | <a href="login.php" class="menuLinks">Login</a> | <a href="logout.php" class="menuLinks">Logout</a></p>
+  </div>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: hadoop_debian_pre_reqs
+
+- name: debian | ensuring hadoop group exists
+  group:
+    name: "{{ hadoop_user_info.group }}"
+    state: present
+
+- name: debian | ensuring hadoop user exists
+  user:
+    name: "{{ hadoop_user_info.name }}"
+    password: "{{ hadoop_user_info.password }}"
+    groups: "{{ hadoop_user_info.group }}"
+    append: yes
+    generate_ssh_key: yes
+    state: present
+
+- name: debian | ensuring hadoop_home_dir exists
+  file:
+    path: "{{ hadoop_home_dir }}"
+    state: directory
+    owner: "{{ hadoop_user_info.name }}"
+    group: "{{ hadoop_user_info.group }}"
+
+- name: debian | downloading hadoop
+  get_url:
+    url: "{{ hadoop_dl_url }}/{{ hadoop_dl_package }}"
+    dest: "{{ hadoop_home_dir }}/{{ hadoop_dl_package }}"
+
+- name: debian | extracting hadoop package
+  unarchive:
+    src: "{{ hadoop_home_dir }}/{{ hadoop_dl_package }}"
+    dest: "{{ hadoop_home_dir }}"
+    creates: "{{ hadoop_home_dir }}/hadoop-{{ hadoop_version }}/bin/hadoop"
+
+- name: debian | ensuring hadoop_home_dir permissions are correct
+  file:
+    path: "{{ hadoop_home_dir }}"
+    owner: "{{ hadoop_user_info.name }}"
+    group: "{{ hadoop_user_info.group }}"
+    recurse: yes
+    state: directory

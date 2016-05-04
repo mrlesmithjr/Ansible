@@ -1,0 +1,61 @@
+---
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libpcap
+    - libpcap-devel
+    - perl
+    - tcpdump
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing pre-reqs
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libpcap
+    - libpcap-devel
+    - perl
+    - tcpdump
+    - wget
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | installing snort daq
+  yum:
+    name: "{{ snort_redhat_daq_package }}"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing snort
+  yum:
+    name: "{{ snort_redhat_package }}"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing snort daq
+  dnf:
+    name: "{{ snort_fedora_daq_package }}"
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | installing snort
+  dnf:
+    name: "{{ snort_fedora_package }}"
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: debian | ensuring directory exists (/usr/local/lib/snort_dynamicrules)
+  file:
+    dest: "/usr/local/lib/snort_dynamicrules"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+
+- name: redhat | ensuring snort is enabled
+  service:
+    name: "snortd"
+    enabled: yes

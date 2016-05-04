@@ -1,0 +1,11 @@
+<virtualhost *:80>
+     ServerAdmin webmaster@localhost
+     ServerName {{ snorby_webserver_name }}
+     DocumentRoot {{ snorby_root_dir }}/public
+     <directory "{{ snorby_root_dir }}/public">
+          AllowOverride all
+          Order deny,allow
+          Allow from all
+          Options -MultiViews
+          </directory>
+</virtualhost>

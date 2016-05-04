@@ -1,0 +1,7 @@
+---
+- name: debian | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apt-mirror

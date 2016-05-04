@@ -1,0 +1,27 @@
+# {{ ansible_managed }}
+
+#### Below is for managing the whole stack involved in Quagga HA
+vrrp_script chk_zebra {
+   script "killall -0 zebra"   # verify the pid existance
+   interval 2                    # check every 2 seconds
+   weight 2                      # add 2 points of prio if OK
+}
+
+vrrp_instance Quagga {
+  state MASTER
+  interface {{ keepalived_vip_int }}
+  virtual_router_id {{ keepalived_router_id }}
+  priority {{ keepalived_router_pri }}
+  advert_int 1
+  virtual_ipaddress {
+    {{ keepalived_vip }}
+  }
+  virtual_ipaddress_excluded {
+{% for vip in tenant_vips %}
+          {{ vip }}
+{% endfor %}
+  }
+  notify_master {{ notify_master_script }}
+  notify_backup {{ notify_backup_script }}
+  notify_fault {{ notify_fault_script }}
+}

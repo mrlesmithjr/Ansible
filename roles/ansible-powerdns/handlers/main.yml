@@ -1,0 +1,13 @@
+---
+# handlers file for ansible-powerdns
+- name: restart_pdns
+  service: name=pdns state=restarted sleep=10
+
+- name: restart_pdns_recursor
+  service: name=pdns-recursor state=restarted
+
+- name: restart_apache2
+  service: name=apache2 state=restarted
+  
+- name: restart mysql
+  service: name=mysql state=restarted

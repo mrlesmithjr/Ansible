@@ -1,0 +1,71 @@
+# {{ ansible_managed }}
+!
+! Zebra configuration saved from vty
+!   2014/09/28 16:51:40
+!
+{% if quagga_hostname is defined %}
+hostname {{ quagga_hostname }}
+{% endif %}
+{% if quagga_hostname is not defined %}
+hostname {{ ansible_hostname }}
+{% endif %}
+password {{ quagga_password }}
+enable password {{ quagga_enable_password }}
+log file /var/log/quagga/ospfd.log
+log stdout
+log syslog
+log monitor
+service password-encryption
+!
+debug ospf event
+debug ospf packet all
+!
+{% if quagga_interfaces_lo is defined %}
+{%   for item in quagga_interfaces_lo %}
+interface {{ item.int }}
+{%   endfor %}
+{% endif %}
+!
+{% if quagga_interfaces_config is defined %}
+{%   for item in quagga_interfaces_config %}
+interface {{ item.int }}
+!
+{%   endfor %}
+{% endif %}
+{% if vlan_config is defined %}
+{%   for item in vlan_config %}
+interface {{ item.vlan }}
+!
+{%   endfor %}
+{% endif %}
+!
+{% if quagga_config_ospfd is defined and quagga_config_ospfd %}
+router ospf
+{%   if quagga_ospf_routerid is defined %}
+ ospf router-id {{ quagga_ospf_routerid }}
+{%   endif %}
+  log-adjacency-changes
+{%   if quagga_ospf_redistribute is defined %}
+{%     for item in quagga_ospf_redistribute %}
+ redistribute {{ item }}
+{%     endfor %}
+{% endif %}
+{%   if quagga_passive_int is defined %}
+{%     for item in quagga_passive_int %}
+ passive-interface {{ item.int }}
+{%     endfor %}
+{%   endif %}
+{%   if quagga_no_passive_int is defined %}
+{%     for item in quagga_no_passive_int %}
+ no passive-interface {{ item.int }}
+{%     endfor %}
+{% endif %}
+{%   if quagga_ospf_area_config is defined %}
+{%     for item in quagga_ospf_area_config %}
+ network {{ item.network }} area {{ item.area }}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+!
+line vty
+!

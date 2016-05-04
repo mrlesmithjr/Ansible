@@ -1,0 +1,33 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - acl
+#    - attr
+#    - build-essential
+    - dnsutils
+#    - docbook-xsl
+#    - gdb
+    - krb5-user
+#    - ldb-tools
+#    - libacl1-dev
+#    - libattr1-dev
+#    - libblkid-dev
+#    - libbsd-dev
+#    - libcups2-dev
+#    - libgnutls-dev
+#    - libldap2-dev
+#    - libpam0g-dev
+#    - libpopt-dev
+#    - libreadline-dev
+#    - pkg-config
+#    - python-dev
+#    - python-dnspython
+    - python-glade2
+    - samba
+    - samba-common
+#    - smbclient
+    - smbldap-tools
+    - system-config-samba

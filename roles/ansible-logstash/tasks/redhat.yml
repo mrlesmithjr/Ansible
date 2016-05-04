@@ -1,0 +1,34 @@
+---
+- name: redhat | installing logstash rpm key
+  rpm_key:
+    key: "{{ logstash_repo_key }}"
+    state: present
+
+- name: redhat | enabling logstash repository
+  template:
+    src: logstash_repo.j2
+    dest: /etc/yum.repos.d/logstash.repo
+
+- name: redhat | installing logstash
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - logstash
+    - java-1.7.0-openjdk
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing logstash
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - logstash
+    - java
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | ensuring logstash is started and enabled on boot
+  service:
+    name: logstash
+    state: started
+    enabled: yes

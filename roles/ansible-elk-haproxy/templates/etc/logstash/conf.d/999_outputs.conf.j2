@@ -1,0 +1,22 @@
+# {{ansible_managed}}
+#
+output {
+  if "metric" in [tags] {
+    stdout {
+      codec => line {
+        format => "1m rate: %{documents.rate_1m} ( %{documents.count} )"
+      }
+    }
+  }
+}
+{% for item in logstash_outputs %}
+output {
+  {{ item.output }} {
+    host => "{{ item.output_host }}"
+{% if item.output == "redis" %}
+    data_type => "list"
+    key => "logstash"
+{% endif %}
+  }
+}
+{% endfor %}

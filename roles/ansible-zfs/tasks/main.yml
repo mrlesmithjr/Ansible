@@ -1,0 +1,14 @@
+---
+# tasks file for ansible-zfs
+- include: debian.yml
+  when: ansible_distribution == "Debian"
+
+- include: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- include: manage_zfs.yml
+
+- include: tune_zfs.yml
+  when: >
+        zfs_enable_performance_tuning is defined and
+        zfs_enable_performance_tuning

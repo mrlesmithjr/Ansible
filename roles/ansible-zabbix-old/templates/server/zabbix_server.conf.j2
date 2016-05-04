@@ -1,0 +1,4 @@
+#{{ ansible_managed }}
+{% for key,value in zabbix_server_conf.iteritems() %}
+{{ key }}={{ value }}
+{% endfor %}

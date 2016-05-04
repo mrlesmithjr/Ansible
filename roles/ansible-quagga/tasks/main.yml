@@ -1,0 +1,22 @@
+---
+# tasks file for ansible-quagga
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_interfaces.yml
+  when: config_interfaces is defined and config_interfaces
+
+- include: config_glusterfs.yml
+  tags: [config_glusterfs,config_quagga]
+  when: config_interfaces is defined and config_glusterfs
+
+- include: config_quagga.yml
+  tags: [config_quagga]
+  when: config_quagga is defined and config_quagga
+
+- include: config_keepalived.yml
+  tags: [config_keepalived]
+  when: config_keepalived is defined and config_keepalived

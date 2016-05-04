@@ -1,0 +1,9 @@
+---
+- name: debian | installing squid
+  apt: name={{ item }} state=latest
+  with_items:
+    - squid
+
+- name: debian | configuring squid
+  template: src=etc/squid3/squid.conf.j2 dest=/etc/squid3/squid.conf owner=root group=root mode=0644
+  notify: restart squid3

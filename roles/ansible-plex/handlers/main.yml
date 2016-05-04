@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-plex
+- name: reload ferm
+  shell: service ferm force-reload
+
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf

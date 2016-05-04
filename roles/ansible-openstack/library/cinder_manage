@@ -1,0 +1,105 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+DOCUMENTATION = '''
+---
+module: cinder_manage
+short_description: Initialize OpenStack Block Storage (cinder) database
+description: Create the tables for the database backend used by cinder
+options:
+  action:
+    description:
+      - action to perform. Currently only dbysnc is supported
+    required: true
+  conf:
+    description:
+      - path to cinder config file.
+    required: false
+    default: /etc/cinder/cinder.conf
+requirements: [ cinder ]
+author: Lorin Hochstein
+'''
+
+EXAMPLES = '''
+cinder_manage: action=dbsync
+'''
+
+import subprocess
+
+cinder_found = True
+try:
+    from cinder.db.sqlalchemy import migration
+    try:
+        from cinder import flags
+        FLAGS = flags.FLAGS
+    except ImportError:
+        # Starting with icehouse
+        import cinder.common.config
+        FLAGS = cinder.common.config.CONF
+except ImportError:
+    cinder_found = False
+
+
+def load_config_file(conf):
+    FLAGS(args=[], project='cinder', default_config_files=[conf])
+
+def will_db_change():
+    """ Check if the database version will change after the sync.
+
+    """
+    # Load the config file options
+    current_version = migration.db_version()
+    repository = migration._find_migrate_repo()
+    repo_version = repository.latest
+    return current_version != repo_version
+
+
+def do_dbsync():
+    """Do the dbsync. Returns (returncode, stdout, stderr)"""
+    # We call cinder-manage db_sync on the shell rather than trying to
+    # do this in Python since we have no guarantees about changes to the
+    # internals.
+    args = ['cinder-manage', 'db', 'sync']
+
+    call = subprocess.Popen(args, shell=False,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = call.communicate()
+    return (call.returncode, out, err)
+
+
+def main():
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            action=dict(required=True),
+            conf=dict(required=False, default="/etc/cinder/cinder.conf")
+        ),
+        supports_check_mode=True
+    )
+
+    if not cinder_found:
+        module.fail_json(msg="cinder package could not be found")
+
+    action = module.params['action']
+    conf = module.params['conf']
+
+    if action not in ['dbsync', 'db_sync']:
+        module.fail_json(msg="Only supported action is 'dbsync'")
+
+    load_config_file(conf)
+
+    changed = will_db_change()
+    if module.check_mode:
+        module.exit_json(changed=changed)
+
+    (res, stdout, stderr) = do_dbsync()
+
+    if res == 0:
+        module.exit_json(changed=changed, stdout=stdout, stderr=stderr)
+    else:
+        module.fail_json(msg="cinder-manage returned non-zero value: %d" % res,
+                         stdout=stdout, stderr=stderr)
+
+# this is magic, see lib/ansible/module_common.py
+#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
+main()

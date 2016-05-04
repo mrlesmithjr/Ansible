@@ -1,0 +1,7 @@
+---
+# tasks file for ansible-docker
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: images.yml
+  when: docker_images is defined

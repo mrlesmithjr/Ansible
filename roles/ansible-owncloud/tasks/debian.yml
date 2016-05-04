@@ -1,0 +1,34 @@
+---
+#- name: debian | adding Owncloud repo key
+#  apt_key:
+#    url: "{{ owncloud_debian_repo_key }}"
+#    state: present
+#    validate_certs: no
+
+#- name: debian | adding Owncloud debian repo
+#  apt_repository:
+#    repo: "{{ owncloud_debian_repo }}"
+#    state: present
+
+#- name: debian | installing Owncloud
+#  apt:
+#    name: owncloud
+#    state: present
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - curl
+    - memcached
+    - php5
+    - php5-curl
+    - php5-gd
+    - php5-imagick
+    - php5-intl
+    - php5-json
+    - php5-ldap
+    - php5-mcrypt
+    - php5-memcached
+    - php5-mysql

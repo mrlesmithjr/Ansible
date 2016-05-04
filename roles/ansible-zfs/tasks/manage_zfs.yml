@@ -1,0 +1,106 @@
+---
+- name: manage_zfs | checking existing zpool(s)
+  command: 'zfs list'
+  changed_when: false
+  register: zpools
+
+- name: manage_zfs | creating basic zpool(s)
+  command: "zpool create -f {{ item.name }} {{ item.devices|join (' ') }}"
+  with_items: '{{ zfs_pools }}'
+  when: >
+        item.type == "basic" and
+        item.name not in zpools.stdout and
+        item.state == "present"
+
+- name: manage_zfs | creating mirror/zraid zpool(s)
+  command: "zpool create -f {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
+  with_items: '{{ zfs_pools }}'
+  when: >
+        item.type != "basic" and
+        item.name not in zpools.stdout and
+        item.state == "present"
+
+- name: manage_zfs | managing pools
+  zfs:
+    name: "{{ item.name }}"
+    atime: "{{ item.atime|default(omit) }}"
+    compression: "{{ item.compression|default(omit) }}"
+    dedup: "{{ item.dedup|default(omit) }}"
+    primarycache: "{{ item.primarycache|default(omit) }}"
+    quota: "{{ item.quota|default(omit) }}"
+    recordsize: "{{ item.recordsize|default(omit) }}"
+    sharenfs: "{{ item.sharenfs|default(omit) }}"
+    state: "{{ item.state }}"
+    sync: "{{ item.sync|default(omit) }}"
+  with_items: '{{ zfs_pools }}'
+
+- name: manage_zfs | managing filesystems
+  zfs:
+    name: "{{ item.pool }}/{{ item.name }}"
+    atime: "{{ item.atime|default(omit) }}"
+    compression: "{{ item.compression|default(omit) }}"
+    dedup: "{{ item.dedup|default(omit) }}"
+    quota: "{{ item.quota|default(omit) }}"
+    primarycache: "{{ item.primarycache|default(omit) }}"
+    recordsize: "{{ item.recordsize|default(omit) }}"
+    sharenfs: "{{ item.sharenfs|default(omit) }}"
+    state: "{{ item.state }}"
+    sync: "{{ item.sync|default(omit) }}"
+    logbias: "{{ item.logbias|default(omit) }}"
+  with_items: '{{ zfs_filesystems }}'
+
+- name: manage_zfs | managing volumes
+  zfs:
+    name: "{{ item.pool }}/{{ item.name }}"
+    compression: "{{ item.compression|default(omit) }}"
+    dedup: "{{ item.dedup|default(omit) }}"
+    quota: "{{ item.quota|default(omit) }}"
+    primarycache: "{{ item.primarycache|default(omit) }}"
+    recordsize: "{{ item.recordsize|default(omit) }}"
+#    shareiscsi: "{{ item.shareiscsi|default(omit) }}"
+    state: "{{ item.state }}"
+    sync: "{{ item.sync|default(omit) }}"
+    logbias: "{{ item.logbias|default(omit) }}"
+    volsize: "{{ item.volsize|default(omit) }}"
+  notify:
+    - restart iscsitarget
+  with_items: '{{ zfs_volumes }}'
+
+- name: manage_zfs | configuring iscsi devices
+  template:
+    src: "etc/iet/ietd.conf.j2"
+    dest: "/etc/iet/ietd.conf"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart iscsitarget
+  when: >
+        zfs_enable_iscsi is defined and
+        zfs_enable_iscsi
+
+- name: manage_zfs | configuring iscsi device access
+  template:
+    src: "etc/iet/initiators.allow.j2"
+    dest: "/etc/iet/initiators.allow"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart iscsitarget
+  when: >
+        zfs_enable_iscsi is defined and
+        zfs_enable_iscsi
+
+- name: manage_zfs | configuring iscsi targets access
+  template:
+    src: "etc/iet/targets.allow.j2"
+    dest: "/etc/iet/targets.allow"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart iscsitarget
+  when: >
+        zfs_enable_iscsi is defined and
+        zfs_enable_iscsi

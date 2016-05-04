@@ -1,0 +1,11 @@
+---
+# Remove vmware tools package repo - errors out trying to update
+- name: debian | removing vmware tools package repo
+  apt_repository:
+    repo: "deb http://packages.vmware.com/packages/ubuntu trusty main"
+    state: absent
+
+- name: debian | running apt-get update
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400

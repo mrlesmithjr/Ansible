@@ -1,0 +1,8 @@
+{% if zfs_volumes is defined %}
+{%   for item in zfs_volumes %}
+{%     if item.state == "present" and (item.shareiscsi is defined and item.shareiscsi == "on") %}
+{{ zfs_iscsistarget_iqn }}:storage.{{ item.name }} {% for allow_access_from in item.allow %}{{ allow_access_from }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{%     endif %}
+{%   endfor %}
+{% endif %}

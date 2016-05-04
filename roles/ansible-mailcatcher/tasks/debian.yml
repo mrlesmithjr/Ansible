@@ -1,0 +1,19 @@
+---
+- name: debian | adding ruby ppa
+  apt_repository:
+    repo: "ppa:brightbox/ruby-ng"
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ mailcatcher_debian_packages }}'
+  when: ansible_distribution == "Debian"
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ mailcatcher_debian_packages }}'
+  when: ansible_distribution == "Ubuntu"

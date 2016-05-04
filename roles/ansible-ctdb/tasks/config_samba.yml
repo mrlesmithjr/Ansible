@@ -1,0 +1,74 @@
+---
+- name: config_samba | disabling samba service  #ctdb will manage samba
+  service:
+    name: "samba"
+    enabled: no
+    state: stopped
+  notify:
+    - restart ctdb
+  when: ansible_distribution == "Debian"
+
+- name: config_samba | disabling samba service
+  service:
+    name: "smb"
+    enabled: no
+    state: stopped
+  notify:
+    - restart ctdb
+  when: ansible_distribution == "RedHat"
+
+#- name: config_samba | checking if /etc/samba/smb.conf is a symlink
+#  stat:
+#    path: "/etc/samba/smb.conf"
+#  register: smb_symlink
+
+#- name: config_samba | removing /etc/samba/smb.conf if a symlink
+#  file:
+#    path: "/etc/samba/smb.conf"
+#    state: absent
+#  when: smb_symlink.stat.islnk
+
+- name: config_samba | configuring samba {{ ctdb_samba_config }}
+  template:
+    src: "etc/samba/smb.conf.j2"
+    dest: "/etc/samba/smb.conf"
+    owner: root
+    group: root
+    mode: 0644
+    backup: "{{ ctdb_backup_configs }}"
+  register: "samba_reconfigured"
+#  notify:
+#    - restart ctdb
+#    - reload samba
+
+#- name: config_samba | creating samba link /etc/samba/smb.conf -> {{ ctdb_samba_config }}
+#  file:
+#    src: "{{ ctdb_samba_config }}"
+#    dest: "/etc/samba/smb.conf"
+#    owner: root
+#    group: root
+#    state: link
+
+- name: config_samba | configuring nssswitch
+  template:
+    src: "etc/nsswitch.conf.j2"
+    dest: "/etc/nsswitch.conf"
+    owner: root
+    group: root
+    mode: 0644
+    backup: "{{ ctdb_backup_configs }}"
+  notify:
+    - restart ctdb
+
+- name: config_samba | restarting ctdb (if samba reconfigured)  #we need to do this here before proceeding in order for Domain permissions and such to be assigned in later tasks.
+  service:
+    name: "ctdb"
+    state: restarted
+  register: "samba_ctdb_restarted"
+  when: samba_reconfigured.changed
+
+- name: config_samba | waiting for ctdb to restart
+  wait_for:
+    delay: 60  #we wait enough time for ctdb to startup samba services in order to continue
+    port: 445
+  when: samba_ctdb_restarted.changed

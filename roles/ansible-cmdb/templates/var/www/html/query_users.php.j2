@@ -1,0 +1,16 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+  $db->exec( 'PRAGMA foreign_keys = ON;' );
+  $sql = "SELECT UserName FROM Users";
+  $results = $db->query($sql);
+  while ($row = $results->fetchArray()) {
+    echo '<option value="'.$row['UserId'].'">'.$row['UserName'].'</option>';
+  }
+?>

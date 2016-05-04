@@ -1,0 +1,26 @@
+---
+- name: debian_client | adding sensu repo key
+  apt_key:
+    url: "{{ sensu_debian_repo_key }}"
+    state: present
+
+- name: debian_client | adding sensu repo
+  apt_repository:
+    repo: "{{ sensu_debian_repo }}"
+    state: present
+
+- name: debian_client | adding brightbox ruby repository
+  apt_repository:
+    repo: 'ppa:brightbox/ruby-ng'
+
+- name: debian_client | installing pre-reqs and sensu
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: sensu_client_debian_packages
+
+- name: debian_client | ensuring services are enabled and start on boot
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  with_items: sensu_client_services

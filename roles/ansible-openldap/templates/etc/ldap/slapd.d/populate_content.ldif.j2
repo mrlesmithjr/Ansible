@@ -1,0 +1,30 @@
+{% for item in openldap_organizationalunits %}
+dn: ou={{ item }},{{ openldap_base }}
+objectClass: organizationalUnit
+
+{% endfor %}
+
+{% for item in openldap_posixgroups %}
+dn: cn={{ item.name }},ou={{ item.ou }},{{ openldap_base }}
+objectClass: posixGroup
+cn: {{ item.name }}
+gidNumber: {{ item.gidNum }}
+{% endfor %}
+
+{% for item in openldap_users %}
+dn: uid={{ item.FirstName|lower }},ou={{ item.ou }},{{ openldap_base }}
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: {{ item.FirstName|lower }}
+sn: {{ item.LastName }}
+givenName: {{ item.FirstName }}
+cn: {{ item.FirstName }} {{ item.LastName }}
+displayName: {{ item.FirstName }} {{ item.LastName }}
+uidNumber: {{ item.uidNum }}
+gidNumber: {{ item.gidNum }}
+userPassword: {{ item.password }}
+gecos: {{ item.FirstName }} {{ item.LastName }}
+loginShell: {{ item.loginShell }}
+homeDirectory: {{ item.homeDirectory }}
+{% endfor %}

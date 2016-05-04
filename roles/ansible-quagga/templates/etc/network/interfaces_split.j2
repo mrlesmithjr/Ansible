@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+
+auto {{ item.vlan }}
+iface {{ item.vlan }} inet {{ item.method }}
+vlan_raw_device {{ item.raw_device }}
+up ip link set $IFACE up

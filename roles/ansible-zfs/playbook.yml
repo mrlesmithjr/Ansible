@@ -1,0 +1,23 @@
+---
+- name: Installs ZFS On Linux
+  hosts: all
+  become: true
+  vars:
+    - zfs_iscsistarget_iqn: iqn.2001-04.local.vagrant  #define your FQDN in reverse...(local.vagrant)
+    - zfs_iscsitarget_target_portals:
+        - 192.168.202.0/24
+    - zfs_enable_iscsi: true
+    - zfs_enable_nfs: true
+    - zfs_enable_performance_tuning: true  #defines if paramaters defined in zfs_performance_tuning are applied
+    - zfs_pools:  #defines zpool(s) to manage
+      - name: tank
+    #    atime: 'on'
+        compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
+        devices:  #define devices to create pool with...can define multiple by | sdb sdc sdd sde sdf | all on one line w/spaces
+          - '/dev/sdb'
+          - '/dev/sdc'
+        type: mirror  #define pool type... | basic (no-raid) | mirror | raidz | raidz2 | raidz3
+        state: present
+  roles:
+    - role: ansible-zfs
+  tasks:

@@ -1,0 +1,21 @@
+---
+- name: config_postgresql | capturing postgresql version
+  shell: pg_lsclusters -h | head -n 1 | cut -d' ' -f1
+  register: pgversion
+
+- name: config_postgresql | configuring postgresql
+  template:
+    src: "etc/postgresql/x.x/main/pg_hba.conf.j2"
+    dest: "/etc/postgresql/{{ pgversion.stdout }}/main/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: 0640
+  register: postgresql_reconfigured
+  notify:
+    - restart postgresql
+
+- name: config_postgresql | restarting postgresql (IF reconfigured)
+  service:
+    name: "postgresql"
+    state: restarted
+  when: postgresql_reconfigured.changed

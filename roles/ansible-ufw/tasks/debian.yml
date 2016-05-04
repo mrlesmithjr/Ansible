@@ -1,0 +1,8 @@
+---
+- include: ufw_package.yml
+
+- include: disable_firewall.yml
+  when: ufw_state is defined and (ufw_state == "reset" or ufw_state == "disabled")
+
+- include: configure_firewall.yml
+  when: ufw_state is defined and (ufw_state != "reset" or ufw_state != "disabled")

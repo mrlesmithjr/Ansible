@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+    <style>
+      a:link {
+        color:white;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      a.menuLinks{
+        font-weight: bold;
+        margin: 5px;
+      }
+      a:visited {
+        color:#47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      div.fixed {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+      .fixed-nav-bar {
+        position: fixed;
+        }
+      p{
+        margin: 0 0 10px 0;
+        padding: 0;
+      }
+      h3 {
+        color: #47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      h4 {
+        color: #47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      html {
+        background: url(background.jpg) no-repeat center center fixed;
+        background-size: cover;
+      }
+      body {
+        color: white;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      ul{
+        padding: 0;
+        margin: 0;
+      }
+      ul#menu li{
+        background: #47a3da;
+        float: left;
+      }
+      ul#menu li a{
+        color: #000000;
+        display: block;
+        padding: 10px 25px;
+        text-decoration: none;
+        text-shadow: none;
+        border-bottom: 2px solid #000000;
+      }
+      ul#menu li a:hover{
+        background: #72caff;
+      }
+      ul#menu li ul li{
+        float: none;
+      }
+      ul#menu li ul{
+        position: absolute;
+        display: none;
+      }
+      ul#menu li:hover ul{
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+  <h5>{{ cmdb_web_title|upper }}</h5>
+  <form action="validate_login.php" method="post"</form>
+    Username: <br><input type="text" name="username" id="username"><br>
+    Password: <br><input type="password" name="password" id="password"><br>
+    <input type="submit" value="Login">
+    <input type="reset" value="Reset">
+  </form>
+  <div class="fixed">
+    <p><a href="register_user.php" class="menuLinks">Register</a> | <a href="login.php" class="menuLinks">Login</a></p>
+  </div>
+</body>
+</html>

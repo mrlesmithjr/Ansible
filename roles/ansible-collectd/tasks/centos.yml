@@ -1,0 +1,20 @@
+---
+- name: centos | installing collectd
+  yum:
+    name: "collectd"
+    state: present
+
+- name: centos | enabling and starting collectd service
+  service:
+    name: "collectd"
+    state: started
+    enabled: yes
+
+- name: centos | configuring collectd
+  template:
+    src: "etc/collectd/collectd.conf.j2"
+    dest: "/etc/collectd.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart collectd

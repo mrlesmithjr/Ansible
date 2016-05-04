@@ -1,0 +1,59 @@
+---
+- name: database | configuring root my.cnf
+  template:
+    src: root/my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
+  when: cacti_remote_db
+
+- name: database | creating cacti DB
+  mysql_db:
+    name: "{{ cacti_db_info.db_name }}"
+    state: present
+  when: not cacti_remote_db
+
+- name: database | creating cacti DB (remote-db)
+  mysql_db:
+    name: "{{ cacti_db_info.db_name }}"
+    login_host: "{{ cacti_db_info.host }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    state: present
+  when: cacti_remote_db
+
+- name: database | assigning cacti DB permissions
+  mysql_user:
+    name: "{{ cacti_db_info.user }}"
+    password: "{{ cacti_db_info.password }}"
+    priv: "{{ cacti_db_info.db_name }}.*:ALL,GRANT"
+    state: present
+  when: >
+        not cacti_db_allow_all_hosts and
+        not cacti_remote_db
+
+- name: database | assigning cacti DB permissions
+  mysql_user:
+    name: "{{ cacti_db_info.user }}"
+    password: "{{ cacti_db_info.password }}"
+    priv: "{{ cacti_db_info.db_name }}.*:ALL,GRANT"
+    state: present
+    host: "%"
+  when: >
+        cacti_db_allow_all_hosts and
+        not cacti_remote_db
+
+- name: database | assigning cacti DB permissions (remote-db)
+  mysql_user:
+    name: "{{ cacti_db_info.user }}"
+    password: "{{ cacti_db_info.password }}"
+    priv: "{{ cacti_db_info.db_name }}.*:ALL,GRANT"
+    state: present
+    host: "%"
+    login_host: "{{ cacti_db_info.host }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  when: >
+        cacti_db_allow_all_hosts and
+        cacti_remote_db

@@ -1,0 +1,13 @@
+---
+- name: config_filebeat | configuring filebeat
+  template:
+    src: "etc/filebeat/filebeat.yml.j2"
+    dest: "/etc/filebeat/filebeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart filebeat
+
+- name: config_filebeat | loading filebeat ES Index Template
+  command: "curl -XPUT 'http://{{ es_filebeat_elasticsearch_host }}/_template/filebeat?pretty' -d@/etc/filebeat/filebeat.template.json"

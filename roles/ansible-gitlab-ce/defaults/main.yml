@@ -1,0 +1,37 @@
+---
+# defaults file for ansible-gitlab-ce
+config_gitlab: false
+gitlab_active_directory: false
+gitlab_apt_key: 'https://packages.gitlab.com/gpg.key'
+gitlab_apt_repos:
+  - 'deb https://packages.gitlab.com/gitlab/gitlab-ce/ubuntu/ trusty main'
+  - 'deb-src https://packages.gitlab.com/gitlab/gitlab-ce/ubuntu/ trusty main'
+gitlab_ce_dl_package: 'gitlab-ce_{{ gitlab_ce_version }}-ce.0_amd64.deb'
+gitlab_ce_dl_url: 'https://packages.gitlab.com/gitlab/gitlab-ce/packages/{{ ansible_distribution|lower }}/{{ ansible_distribution_release|lower }}'
+gitlab_ce_version: 8.4.1
+gitlab_email_display_name: '{{ ansible_hostname }}'
+gitlab_email_enabled: false  #define here or in group_vars/group
+gitlab_email_from: '{{ ansible_hostname }}@{{ smtp_domain_name }}'
+gitlab_email_reply_to: '{{ gitlab_email_from }}'
+gitlab_ldap_info:  #define ldap info here...will replace other ldap config in future.
+  ldap_base_dn: []  #define here or in group_vars/group
+  ldap_bind_dn: []  #define here or in group_vars/group
+  ldap_bind_pass: []  #define here or in group_vars/group
+  ldap_servers: [] #define here or in group_vars/group
+#    - host: 'dc01.{{ pri_domain_name }}'
+#      role: main
+#    - host: 'dc02.{{ pri_domain_name }}'
+#      role: secondary
+gitlab_ldap_base_dn: 'CN=Users,DC=vagrant,DC=local'  #define here or in group_vars/group
+gitlab_ldap_bind_dn: 'CN=gitlab,CN=Users,DC=vagrant,DC=local'  #define here or in group_vars/group
+gitlab_ldap_bind_pass: 'P@55w0rd'  #define here or in group_vars/group
+gitlab_ldap_enabled: false  #define here or in group_vars/group
+gitlab_ldap_servers: [] #define here or in group_vars/group
+#  - host: 'dc01.{{ pri_domain_name }}'
+#    role: main
+#  - host: 'dc02.{{ pri_domain_name }}'
+#    role: secondary
+pri_domain_name: 'example.org'  #defines primary domain name...define here or globally in group_vars/all
+smtp_domain_name: '{{ pri_domain_name }}'  #defines smtp email domain..generally same as pri_domain_name
+smtp_server: 'smtp.{{ pri_domain_name }}'
+smtp_server_port: 25

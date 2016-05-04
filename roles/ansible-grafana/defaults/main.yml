@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-grafana
+grafana_apt_key: 'https://packagecloud.io/gpg.key'
+grafana_apt_repo: 'deb https://packagecloud.io/grafana/stable/debian/ wheezy main'
+graphite_host: localhost

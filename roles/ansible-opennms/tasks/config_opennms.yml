@@ -1,0 +1,23 @@
+---
+- name: config_opennms | Auto-detect Java
+  command: "/usr/share/opennms/bin/runjava -s"
+
+- name: config_opennms | checking if OpenNMS DB setup
+  stat:
+    path: "/var/log/.opennms_db_setup"
+  register: opennms_db_setup_check
+
+- name: config_opennms | configuring OpenNMS DB
+  command: "/usr/share/opennms/bin/install -dis"
+  register: opennms_db_setup
+  notify:
+    - restart opennms
+  when: not opennms_db_setup_check.stat.exists
+
+- name: config_opennms | marking OpenNMS DB as setup
+  file:
+    dest: "/var/log/.opennms_db_setup"
+    state: touch
+  when: >
+        not opennms_db_setup_check.stat.exists and
+        opennms_db_setup.changed

@@ -1,0 +1,55 @@
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-change-hostname
+  tasks:
+
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-etc-hosts
+    - role: ansible-config-interfaces
+#    - role: ansible-network-tweaks
+    - role: ansible-ntp
+
+#- hosts: iscsi-servers
+#  become: true
+#  any_errors_fatal: true
+#  vars:
+#  roles:
+#    - role: ansible-zfs
+#      tags:
+#        - glusterfs-resize-lvm
+#  tasks:
+
+- hosts: glusterfs-nodes
+  become: true
+  any_errors_fatal: true
+  vars:
+  roles:
+    - role: ansible-open-iscsi
+      tags:
+        - glusterfs-resize-lvm
+      when: inventory_hostname not in groups['glusterfs-arbiter-nodes']
+
+- hosts: glusterfs-nodes
+  become: true
+  any_errors_fatal: true
+  vars:
+    - manage_glusterfs: true  #defines if role should be ran after initial setup
+  roles:
+    - role: ansible-glusterfs
+      when: manage_glusterfs
+  tasks:
+
+- hosts: ctdb-servers
+  become: true
+  any_errors_fatal: true
+  serial: 1  #we do this to ensure that any changes to ctdb/samba and etc do affect any existing connections.
+  vars:
+  roles:
+    - role: ansible-ctdb
+  tasks:

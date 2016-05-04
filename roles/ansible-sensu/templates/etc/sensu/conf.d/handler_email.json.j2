@@ -1,0 +1,8 @@
+{
+  "handlers": {
+    "email": {
+      "type": "pipe",
+      "command": "mail -s 'sensu event' {{ notification_email_to }}"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{% for item in gerrit_replication_info.ssh_config_info %}
+Host {{ item.host }}
+  User {{ item.user }}
+  IdentityFile {{ item.identityfile }}
+{%   if item.stricthostkeychecking %}
+  StrictHostKeyChecking yes
+{%   elif not item.stricthostkeychecking %}
+  StrictHostKeyChecking no
+{%   endif %}
+  UserKnownHostsFile /dev/null
+{% endfor %}

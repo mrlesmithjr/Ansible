@@ -1,0 +1,27 @@
+---
+
+- name: common | Install pre dependency
+  apt:
+     pkg="{{ item }}"
+     state=present
+  with_items:
+     - python-pip
+     - libcurl3-gnutls
+     - update-notifier-common
+
+- name: common | Add zabbix.com repository key
+  apt_key:
+     url=http://repo.zabbix.com/zabbix-official-repo.key
+     state=present
+  register: zabbix_server_apt_key
+
+- name: common | Add zabbix.com repository
+  apt_repository:
+     repo='deb http://repo.zabbix.com/zabbix/{{zabbix_server_major}}.{{zabbix_server_minor}}/{{ansible_distribution|lower}} {{ansible_lsb.codename}} main contrib non-free'
+     state=present
+  register: zabbix_server_apt_repo
+
+- name : common | Update apt after adding repository
+  apt :
+     update_cache="yes"
+  when: zabbix_server_apt_key | changed or zabbix_server_apt_repo | changed

@@ -1,0 +1,6 @@
+---
+# vars file for ansible-elk-haproxy
+syslog_servers:  #defines syslog_servers for elk-haproxy nodes...define here or globally in group_vars/elk-haproxy-nodes
+  - name: '{{ logstash_server_fqdn }}'
+    port: 514
+    proto: tcp

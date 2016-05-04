@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+#loglevel.default is the default log level for jobs: ERROR,WARN,INFO,VERBOSE,DEBUG
+loglevel.default=INFO
+rdeck.base={{ rundeck_base }}
+
+#rss.enabled if set to true enables RSS feeds that are public (non-authenticated)
+rss.enabled=false
+# change hostname here
+{% if (rundeck_vagrant_install is defined and not rundeck_vagrant_install) or rundeck_vagrant_install is not defined %}
+grails.serverURL=http://{{ ansible_fqdn }}:4440
+{% elif rundeck_vagrant_install is defined and rundeck_vagrant_install %}
+grails.serverURL=http://127.0.0.1:4440
+{% endif %}
+dataSource.dbCreate = update
+dataSource.url = jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true;TRACE_LEVEL_FILE=4
+{% if enable_rundeck_plugins is defined and enable_rundeck_plugins %}
+{%   if rundeck_enable_logstash_plugin is defined and rundeck_enable_logstash_plugin %}
+rundeck.execution.logs.streamingWriterPlugins=LogstashPlugin
+{%   endif %}
+{% endif %}

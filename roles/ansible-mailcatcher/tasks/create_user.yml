@@ -1,0 +1,10 @@
+---
+- name: create_user | creating mailcatcher group
+  group:
+    name: "mailcatcher"
+
+- name: create_user | creating mailcatcher user
+  user:
+    name: "mailcatcher"
+    comment: "Mailcatcher Service Account"
+    group: "mailcatcher"

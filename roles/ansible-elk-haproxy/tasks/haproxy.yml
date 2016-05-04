@@ -1,0 +1,9 @@
+---
+- name: haproxy | configuring haproxy
+  template:
+    src: "etc/haproxy/haproxy.cfg.j2"
+    dest: "/etc/haproxy/haproxy.cfg"
+    mode: 0644
+    owner: root
+    group: root
+  notify: reload haproxy

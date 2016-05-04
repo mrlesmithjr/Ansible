@@ -1,0 +1,20 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<html>
+  <body>
+    <br><br><br><br>
+    <h3>Create New External Link</h3>
+    <h4>(** - Required)</h4>
+    <form action="members.php?action=addlink" method="post">
+      Link name: (**)<br><input type="text" name="LinkName"><br>
+      Link URL: (**)<br><input type="text" name="LinkUrl"><br>
+      <input type="submit" name="Submit">
+      <input type="reset" value="Reset">
+    </form>
+  </body>
+</html>

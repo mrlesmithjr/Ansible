@@ -1,0 +1,1 @@
+{{ ( groups[zookeeper_cluster_master_group]|count / 2) | round(0, 'ceil') | int }}

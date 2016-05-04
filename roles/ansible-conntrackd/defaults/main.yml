@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-conntrackd
+config_conntrackd: false  #defines if conntrackd should be configured
+conntrackd_ignore_addresses:
+  - '{{ ansible_default_ipv4.address }}'
+  - '{{ conntrackd_sync_ip }}'
+conntrackd_sync_ip: 1.1.1.1  #defines ip address to use for syncing...each host unique...define in host_vars/host
+conntrackd_sync_int: eth1  #defines interface to use for syncing...must be a dedicated interface
+enable_conntrackd: true  #defines if conntrackd should be enabled

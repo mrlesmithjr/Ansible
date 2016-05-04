@@ -1,0 +1,90 @@
+---
+- name: ubuntu | adding zfs ppa
+  apt_repository:
+    repo: "{{ zfs_ubuntu_ppa }}"
+    state: present
+
+- name: ubuntu | installing zfs
+  apt:
+    name: "ubuntu-zfs"
+    state: present
+
+- name: ubuntu | enabling zfs module
+  modprobe:
+    name: "zfs"
+    state: present
+
+- name: ubuntu | installing iscsitarget (if enabled)
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iscsitarget
+    - iscsitarget-dkms
+  when: >
+        zfs_enable_iscsi is defined and
+        zfs_enable_iscsi
+
+- name: ubuntu | un-installing iscsitarget (if not enabled)
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - iscsitarget
+    - iscsitarget-dkms
+  when: >
+        zfs_enable_iscsi is defined and
+        not zfs_enable_iscsi
+
+- name: ubuntu | configuring iscsitarget service
+  template:
+    src: "etc/default/iscsitarget.j2"
+    dest: "/etc/default/iscsitarget"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart iscsitarget
+  when: >
+        zfs_enable_iscsi is defined and
+        zfs_enable_iscsi  
+
+- name: ubuntu | installing NFS (if enabled)
+  apt:
+    name: "nfs-kernel-server"
+    state: present
+  when: >
+        zfs_enable_nfs is defined and
+        zfs_enable_nfs
+
+- name: ubuntu | un-installing NFS (if not enabled)
+  apt:
+    name: "nfs-kernel-server"
+    state: absent
+  when: >
+        zfs_enable_nfs is defined and
+        not zfs_enable_nfs
+
+- name: ubuntu | configuring NFS Kernel Server
+  template:
+    src: "etc/exports.j2"
+    dest: "/etc/exports"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nfs-kernel-server
+    - start zfs-share
+  when: >
+        zfs_enable_nfs is defined and
+        zfs_enable_nfs
+
+- name: ubuntu | configuring ZFS
+  template:
+    src: "etc/default/zfs.j2"
+    dest: "/etc/default/zfs"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - start zfs-share

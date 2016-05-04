@@ -1,0 +1,216 @@
+---
+- name: debian_pdns | creating pdns group
+  group:
+    name: pdns
+    state: present
+
+- name: debian_pdns | creating pdns user
+  user:
+    name: pdns
+    group: pdns
+    system: yes
+    home: /var/spool/powerdns
+    shell: /bin/false
+    state: present
+
+- name: debian_pdns | downloading powerdns
+  get_url:
+    url: "{{ pdns_download_url }}/pdns-static_{{ pdns_server_version }}_amd64.deb"
+    dest: "/opt/pdns-static_{{ pdns_server_version }}_amd64.deb"
+
+- name: debian_pdns | installing powerdns
+  apt:
+    deb: "/opt/pdns-static_{{ pdns_server_version }}_amd64.deb"
+  notify: restart_pdns
+
+- name: debian_pdns | configuring powerdns
+  template:
+    src: etc/powerdns/pdns.conf.j2
+    dest: /etc/powerdns/pdns.conf
+    owner: root
+    group: root
+  register: pdns_configured
+
+- name: debian_pdns | restarting powerdns
+  service:
+    name: pdns
+    state: restarted
+    sleep: 10
+  when: pdns_configured.changed
+
+- name: debian_pdns | installing powerdns pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+    force: yes
+  with_items:
+    - git
+    - jq
+    - python-mysqldb
+
+- name: debian_pdns | creating powerdns db
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: present
+  when: not pdns_db_cluster
+
+- name: debian_pdns | creating powerdns db
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: present
+  run_once: true
+  when: pdns_db_cluster
+
+- name: debian_pdns | creating powerdns user
+  mysql_user:
+    name: "{{ pdns_db_user }}"
+    password: "{{ pdns_db_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    state: present
+  when: not pdns_db_cluster
+
+- name: debian_pdns | creating powerdns user
+  mysql_user:
+    name: "{{ pdns_db_user }}"
+    password: "{{ pdns_db_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    state: present
+  run_once: true
+  when: pdns_db_cluster
+
+- name: debian_pdns | copying db schema file
+  copy:
+    src: db_schema
+    dest: /tmp
+
+- name: debian_pdns | checking for existing db schema import
+  stat:
+    path: /var/log/db_schema_imported
+  register: db_schema_imported
+
+- name: debian_pdns | importing db schema
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: import
+    target: /tmp/db_schema
+  when: not pdns_db_cluster and db_schema_imported.stat.exists != True
+
+- name: debian_pdns | importing db schema
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: import
+    target: /tmp/db_schema
+  run_once: true
+  when: pdns_db_cluster and db_schema_imported.stat.exists != True
+
+- name: debian_pdns | marking db schema as imported
+  file:
+    path: /var/log/db_schema_imported
+    state: touch
+  when: db_schema_imported.stat.exists != True
+
+- name: debian_pdns | installing poweradmin pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - gettext
+    - libapache2-mod-php5
+    - php-pear
+    - php5
+    - php5-common
+    - php5-curl
+    - php5-dev
+    - php5-gd
+    - php5-imap
+    - php5-mcrypt
+    - php5-mhash
+    - php5-ming
+    - php5-mysql
+    - php5-sqlite
+    - php5-xmlrpc
+    - wget
+
+- name: debian_pdns | installing pear modules
+  command: pear install {{ item }}
+  ignore_errors: yes
+  with_items:
+    - 'DB'
+    - 'pear/MDB2#mysql'
+
+- name: debian_pdns | enabling php mcrypt module
+  command: php5enmod mcrypt
+  args:
+    creates: /etc/php5/cli/conf.d/20-mcrypt.ini
+  notify: restart_apache2
+
+- name: debian_pdns | downloading poweradmin
+  get_url:
+    url: "http://sourceforge.net/projects/poweradmin/files/{{ poweradmin_ver }}.tgz"
+    dest: /tmp/poweradmin.tgz
+  when: install_poweradmin is defined and install_poweradmin
+
+- name: debian_pdns | extracting poweradmin package to web_root
+  unarchive:
+    src: /tmp/poweradmin.tgz
+    dest: "{{ web_root }}"
+    copy: no
+    owner: www-data
+    group: www-data
+    creates: "{{ web_root }}/poweradmin/index.php"
+  when: install_poweradmin is defined and install_poweradmin
+
+- name: debian_pdns | checking for existing poweradmin
+  stat:
+    path: "{{ web_root }}/poweradmin"
+  register: poweradmin_moved
+  when: install_poweradmin is defined and install_poweradmin
+
+- name: debian_pdns | moving poweradmin
+  command: "mv {{ web_root }}/{{ poweradmin_ver }} {{ web_root }}/poweradmin"
+  when: install_poweradmin and poweradmin_moved.stat.exists == false
+
+- name: debian_pdns | creating poweradmin user
+  mysql_user:
+    name: "{{ poweradmin_user }}"
+    password: "{{ poweradmin_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    state: present
+  when: install_poweradmin is defined and install_poweradmin
+
+- name: debian_pdns | configuring poweradmin
+  template:
+    src: config.inc.php.j2
+    dest: "{{ web_root }}/poweradmin/inc/config.inc.php"
+    owner: www-data
+    group: www-data
+  when: install_poweradmin is defined and install_poweradmin
+
+- name: debian_pdns | removing poweradmin install directory
+  file:
+    path: "{{ web_root }}/poweradmin/install"
+    state: absent
+  when: install_poweradmin is defined and install_poweradmin
+
+- name: debian_pdns | installing nsedit
+  git:
+    repo: https://github.com/tuxis-ie/nsedit
+    recursive: yes
+    dest: "{{ web_root }}/nsedit"
+
+- name: debian_pdns | changing ownership of nsedit
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+  with_items:
+    - '{{ web_root }}/nsedit'
+    - '{{ web_root }}/etc'
+
+- name: debian_pdns | configuring nsedit
+  template:
+    src: nsedit.config.inc.php.j2
+    dest: "{{ web_root }}/nsedit/includes/config.inc.php"
+    owner: www-data
+    group: www-data

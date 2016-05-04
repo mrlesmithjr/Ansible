@@ -1,0 +1,26 @@
+[libdefaults]
+  default_realm = {{ ctdb_samba_active_directory_info.realm }}
+  ticket_lifetime = 24000
+
+# The following krb5.conf variables are only for MIT Kerberos.
+	krb4_config = /etc/krb.conf
+	krb4_realms = /etc/krb.realms
+	kdc_timesync = 1
+	ccache_type = 4
+	forwardable = true
+	proxiable = true
+
+[realms]
+  {{ ctdb_samba_active_directory_info.realm|upper }} = {
+{% for item in ctdb_samba_active_directory_info.kdc %}
+   kdc = {{ item }}:88
+{% endfor %}
+   default_domain = {{ ctdb_samba_active_directory_info.realm|lower }}
+	}
+[domain_realm]
+  .{{ ctdb_samba_active_directory_info.realm|lower }} = {{ ctdb_samba_active_directory_info.realm|upper }}
+  {{ ctdb_samba_active_directory_info.realm|lower }} = {{ ctdb_samba_active_directory_info.realm|upper }}
+
+[login]
+	krb4_convert = true
+	krb4_get_tickets = false

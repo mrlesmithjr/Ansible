@@ -1,0 +1,37 @@
+[libdefaults]
+        default_realm = {{ samba_ad_info.kerberos_realm|upper }}
+
+# The following krb5.conf variables are only for MIT Kerberos.
+        krb4_config = /etc/krb.conf
+        krb4_realms = /etc/krb.realms
+        kdc_timesync = 1
+        ccache_type = 4
+        forwardable = true
+        proxiable = true
+
+# Disable single-DES ciphers
+        allow_weak_crypto = false
+
+# The following libdefaults parameters are only for Heimdal Kerberos.
+        v4_instance_resolve = false
+        fcc-mit-ticketflags = true
+        host = {
+                rcmd = host
+                ftp = ftp
+        }
+        plain = {
+                something = something-else
+        }
+[realms]
+        {{ samba_ad_info.kerberos_realm|upper }} = {
+                kdc = 127.0.0.1
+                admin_server = 127.0.0.1
+        }
+
+[domain_realm]
+        .{{ samba_ad_info.kerberos_realm|lower }} = {{ samba_ad_info.kerberos_realm|upper }}
+        {{ samba_ad_info.kerberos_realm|lower }} = {{ samba_ad_info.kerberos_realm|upper }}
+
+[login]
+        krb4_convert = true
+        krb4_get_tickets = false

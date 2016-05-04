@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-apache2.git
+- src: https://github.com/mrlesmithjr/ansible-gerrit.git
+- src: https://github.com/mrlesmithjr/ansible-mariadb-mysql.git

@@ -1,0 +1,8 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-apache2.git
+- src: https://github.com/mrlesmithjr/ansible-mysql.git
+- src: https://github.com/mrlesmithjr/ansible-nginx.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-passenger.git
+- src: https://github.com/mrlesmithjr/ansible-snorby.git
+- src: https://github.com/mrlesmithjr/ansible-snort.git

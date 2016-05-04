@@ -1,0 +1,65 @@
+---
+#- name: config_ctdb | creating directories to share configs between nodes
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 0644
+#  with_items:
+#    - '{{ ctdb_glusterfs_mount }}/etc/samba'
+
+- name: config_ctdb | ensuring {{ ctdb_lock_directory }} exists
+  file:
+    path: "{{ ctdb_lock_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config_ctdb | enabling ctdb service
+  service:
+    name: "ctdb"
+    enabled: yes
+
+- name: config_ctdb | configuring ctdb service
+  template:
+    src: "etc/default/ctdb.j2"
+    dest: "/etc/default/ctdb"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ctdb
+  when: ansible_distribution == "Debian"
+
+- name: config_ctdb | configuring ctdb service
+  template:
+    src: "etc/sysconfig/ctdb.j2"
+    dest: "/etc/sysconfig/ctdb"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ctdb
+  when: ansible_distribution == "RedHat"
+
+- name: config_ctdb | configuring ctdb public_addresses
+  template:
+    src: "etc/ctdb/public_addresses.j2"
+    dest: "{{ ctdb_public_addresses_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ctdb
+
+- name: config_ctdb | configuring ctdb nodes
+  template:
+    src: "etc/ctdb/nodes.j2"
+    dest: "/etc/ctdb/nodes"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ctdb

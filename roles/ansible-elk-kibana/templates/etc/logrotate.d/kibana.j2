@@ -1,0 +1,7 @@
+{{ kibana_log }} {
+  rotate {{ kibana_log_rotate_count }}
+  {{ kibana_log_rotate_interval }}
+  compress
+  missingok
+  notifempty
+}

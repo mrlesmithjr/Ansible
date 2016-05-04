@@ -1,0 +1,42 @@
+---
+- name: mysql_check | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'xinetd'
+  when: >
+        ansible_os_family == "Debian"
+
+- name: mysql_check | configuring mysqlchk xinetd
+  template:
+    src: "etc/xinetd.d/mysqlchk.j2"
+    dest: "/etc/xinetd.d/mysqlchk"
+  when: >
+        ansible_os_family == "Debian"
+
+- name: mysql_check | enabling xinetd service
+  service:
+    name: "xinetd"
+    enabled: true
+  when: >
+        ansible_os_family == "Debian"
+
+- name: mysql_check | finding mysql command path
+  command: 'which mysql'
+  register: mysql_path
+
+- name: mysql_check | configuring mysqlchk.sh
+  template:
+    src: "usr/local/bin/mysqlchk.sh.j2"
+    dest: "/usr/local/bin/mysqlchk.sh"
+    owner: root
+    group: root
+    mode: 0775
+
+- name: mysql_check | configuring mysqlchk_user permissions for MySQL
+  mysql_user:
+    name: "{{ mysqlchk_user }}"
+    password: "{{ mysqlchk_pass }}"
+    priv: "*.*:SELECT"
+    state: present

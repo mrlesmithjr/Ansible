@@ -1,0 +1,26 @@
+---
+mysql_root_password: 61fea78e16dd73bd757a
+openstack_admin_pass: 29b1416692cb38014ea0  #Password of user admin
+openstack_ceilometer_dbpass: 85c4ac62a58c0a25a922  #Database password for the Telemetry service
+openstack_ceilometer_pass: c3e1b1db22e9b33cd7f4  #Password of Telemetry service user ceilometer
+openstack_ceilometer_token_secret: ce0a6f2c366dcec9548c  #defines the token secret to configure Telemtry services.
+openstack_cinder_dbpass: bcb4f4279d699c12c6ea  #Database password for the Block Storage service
+openstack_cinder_pass: d9eb36abbb2e88356208  #Password of Block Storage service user cinder
+openstack_dash_dbpass: cb77b8806e4dc8693d8e  #Database password for the dashboard
+openstack_demo_pass: 54a27efd264beeb7843d  #Password of user demo
+openstack_glance_dbpass: 295062a986b8deded530  #Database password for Image Service
+openstack_glance_pass: 60278dafa015c0cc3943  #Password of Image Service user glance
+openstack_heat_dbpass: d69d8f9bd2a70f0f1f5b  #Database password for the Orchestration service
+openstack_heat_domain_pass: 72a9474bf295fe4315bd  #Password for Heat domain in Identity service
+openstack_heat_pass: 9fd0ae5b48837ad34b31  #Password of Orchestration service user heat
+openstack_keystone_dbpass: 8ed178efd2bef6fcabe3  #Database password of Identity service
+openstack_keystone_temp_admin_token: 52f5e14ad1a9f7d54e1d  #Key for initial setup of keystone
+openstack_metadata_secret: 91c94f7734057cb3db6a  #defines shared metadata secret for metadata services
+openstack_neutron_dbpass: 7bff44471bdce25d55af  #Database password for the Networking service
+openstack_neutron_pass: 19440ed58e9ba153bbb5  #Password of Networking service user neutron
+openstack_nova_dbpass: b544e0b6881f33c82dc8  #Database password for Compute service
+openstack_nova_pass: 34e5f8990ef84cc69f91  #Password of Compute service user nova
+openstack_nova_admin_tenant_id: 59fcdd9dc6514331b7e203387041af27  #This is only required for juno install...There is no way to pre-populate this...Has to be obtained after install.
+openstack_rabbit_pass: 6bd8dbb369181e89bf3a  #Password of user guest of RabbitMQ
+openstack_trove_dbpass: c6c2792fa14319dbe9da  #Database password of Database service
+openstack_trove_pass: 892ba2ff14319c299b54  #Password of Database Service user trove

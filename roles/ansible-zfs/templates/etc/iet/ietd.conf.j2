@@ -1,0 +1,10 @@
+#
+{% if zfs_volumes is defined %}
+{%   for item in zfs_volumes %}
+{%     if item.state == "present" and (item.shareiscsi is defined and item.shareiscsi == "on") %}
+Target {{ zfs_iscsistarget_iqn }}:storage.{{ item.name }}
+    Lun {{ item.lun }} Path=/dev/zvol/{{ item.pool }}/{{ item.name }},Type=fileio
+    Alias LUN{{ item.lun }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

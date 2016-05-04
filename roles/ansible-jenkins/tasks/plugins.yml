@@ -1,0 +1,54 @@
+---
+- name: plugins | ensuring jenkins is running
+  service:
+    name: "jenkins"
+    state: started
+
+- name: plugins | waiting for jenkins to start
+  wait_for:
+    port: 8080
+    delay: 20
+
+- name: plugins | downloading jenkins-cli
+  get_url:
+    url: "http://localhost:8080/jnlpJars/jenkins-cli.jar"
+    dest: "{{ jenkins_home_dir }}/jenkins-cli.jar"
+    owner: jenkins
+    group: jenkins
+
+- name: config_jenkins | checking if secure setup
+  stat:
+    path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
+  register: jenkins_secure_setup
+  when: jenkins_config_info.use_security is defined and jenkins_config_info.use_security
+
+- name: plugins | gathering plugins with updates available
+  shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 list-plugins | grep -e ')$' | awk '{ print $1 }'"
+  register: jenkins_plugin_updates
+  changed_when: false
+  when: >
+        not jenkins_secure_setup.stat.exists
+
+- name: plugins | upgrading installed plugins
+  shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 install-plugin {{ item }}"
+  notify:
+    - restart jenkins
+  with_items: jenkins_plugin_updates.stdout_lines
+  when: >
+        not jenkins_secure_setup.stat.exists
+
+- name: plugins | gathering installed plugins
+  shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 list-plugins | cut -f 1 -d ' '"
+  register: jenkins_installed_plugins
+  changed_when: false
+  when: >
+        not jenkins_secure_setup.stat.exists
+
+- name: plugins | installing plugins
+  shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 install-plugin {{ item }}"
+  notify:
+    - restart jenkins
+  with_items: jenkins_plugins
+  when: >
+        not jenkins_secure_setup.stat.exists and
+        item not in jenkins_installed_plugins.stdout_lines

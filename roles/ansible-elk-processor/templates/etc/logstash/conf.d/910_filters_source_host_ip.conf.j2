@@ -1,0 +1,29 @@
+# Create @source_host_ip field for all devices for IP Tracking used along with src_ip and dst_ip fields
+############ IMPORTANT NOTE ****** IF YOU ENABLE THIS FILTER BELOW YOUR PROCESSING WILL DECREASE ******
+# Resolve @source_host to FQDN if possible if missing for some types of logging using source_host_ip from above
+filter {
+  if ![source_host_ip] and "_grokparsefailure" not in [tags] {
+    mutate {
+      add_field => [ "source_host_ip", "%{host}" ]
+    }
+    dns {
+      resolve => [ "source_host_ip" ]
+      action => "replace"
+    }
+    if [source_host_ip] == "127.0.1.1" {
+      mutate {
+        update => [ "source_host_ip", "" ]
+      }
+    }
+    mutate {
+      add_field => [ "resolve_hostname", "%{source_host_ip}" ]
+    }
+    dns {
+      reverse => [ "resolve_hostname" ]
+      action => "replace"
+    }
+    mutate {
+      replace => [ "host", "%{resolve_hostname}" ]
+    }
+  }
+}

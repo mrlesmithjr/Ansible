@@ -1,0 +1,26 @@
+---
+- name: config_daemon | configuring open-iscsi daemon
+  template:
+    src: "etc/iscsi/iscsid.conf.j2"
+    dest: "/etc/iscsi/iscsid.conf"
+    owner: root
+    group: root
+    mode: 0644
+  register: open_iscsi_conf
+
+- name: config_daemon | configuring default open-iscsi daemon
+  template:
+    src: "etc/default/open-iscsi.j2"
+    dest: "/etc/default/open-iscsi"
+    owner: root
+    group: root
+    mode: 0644
+  register: open_iscsi_daemon
+
+- name: config_daemon | restarting open-iscsi (if config changes)  #doing this here vs. event handler...seeing issues of assigning wrong /dev/
+  service:
+    name: "open-iscsi"
+    state: restarted
+  when: >
+        open_iscsi_conf.changed or
+        open_iscsi_daemon.changed

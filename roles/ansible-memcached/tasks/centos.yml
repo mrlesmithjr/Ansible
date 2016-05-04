@@ -1,0 +1,6 @@
+---
+- name: centos | installing memcached
+  yum: name=memcached state=present
+
+- name: centos | ensuring memcached starts on boot and is running
+  service: name=memcached state=started enabled=yes

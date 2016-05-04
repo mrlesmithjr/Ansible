@@ -1,0 +1,100 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  echo "<html>";
+  echo "<body>";
+    session_start();
+    $gid = $_SESSION['sessiongid'];
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "SELECT * FROM Groups WHERE GroupId=$gid";
+    $results = $db->query($sql);
+    while ($row = $results->fetchArray()) {
+      echo "<br><br><br><br>";
+      echo "<pre>";
+      echo "GroupId: ";
+      echo "<tr><td>" . $row['GroupId']. "</td></tr>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupName: ";
+      echo "<tr><td>" . $row['GroupName']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupDescription: ";
+      echo "<tr><td>" . $row['GroupDescription']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupDTAP: ";
+      echo "<tr><td>" . $row['GroupDTAP']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupCreatedOn: ";
+      echo "<tr><td>" . $row['GroupCreatedOn']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "LastUpdateTime: ";
+      echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+      echo "</pre><br><br>";
+    }
+  echo "</body>";
+  echo "</html>";
+?>
+<?php
+  if (isset($_POST['Submit'])) {
+    session_start();
+    $gid = $_SESSION['sessiongid'];
+    $hn = $_POST["HostName"];
+    $hd = $_POST["HostDescription"];
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql1 = "INSERT INTO Hosts
+            (HostName,HostDescription,LastUpdateTime,HostCreatedOn)
+            VALUES ('$hn','$hd',datetime('now'),datetime('now'))";
+    $sql2 = "INSERT INTO HostGroups
+            (GroupId,GroupName,HostId,HostName)
+            VALUES ( '$gid',(SELECT GroupName FROM Groups WHERE GroupId='$gid'),(SELECT HostId FROM Hosts Where HostName='$hn'),'$hn')";
+    if (empty($_POST["HostName"])) {
+      echo "Host Name has not been entered";
+    }
+    if (!empty($_POST["HostName"])) {
+      $db->exec($sql1);
+      $db->exec($sql2);
+      echo "Host $hn has been added.";
+    }
+  }
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <h3>Hosts assigned to group:</h3>
+    <form action="" id="form" name="form" method="post">
+      <select name="hostid" class="hostid">
+        <option selected="selected">--Select Host--</option>
+          <?php
+            session_start();
+            $gid = $_SESSION['sessiongid'];
+            $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+            $db->exec( 'PRAGMA foreign_keys = ON;' );
+            $sql = "SELECT GroupId,HostName FROM HostGroups WHERE GroupId=$gid";
+            $results = $db->query($sql);
+            while ($row = $results->fetchArray()) {
+              echo '<option value="'.$row['GroupId'].'">'.$row['HostName'].'</option>';
+            }
+          ?>
+      </select>
+    <button type="submit" id="submit">View Host Details</button>
+    </form>
+    <h4>(** - Denotes required field)</h4>
+    <form action="add_group_host.php" method="post">
+			Host Name: (**)<br><input type="text" name="HostName"></br>
+			Host Description: <br><input type="text" name="HostDescription"><br>
+			<input type="submit" name="Submit" value="Add Host">
+			<input type="reset" value="Reset">
+		</form>
+  </body>
+</html>

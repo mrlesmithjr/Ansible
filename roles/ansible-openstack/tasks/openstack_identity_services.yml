@@ -1,0 +1,218 @@
+---
+# Sets up and configures identity services for OpenStack
+- name: openstack_identity_services | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-pip
+    - python-mysqldb
+
+- name: openstack_identity_services | creating Keystone DB
+  mysql_db:
+    name: keystone
+    state: present
+  when: mysql_master
+
+- name: openstack_identity_services | creating Keystone DB
+  mysql_db:
+    name: keystone
+    state: present
+  when: not mysql_master
+
+- name: openstack_identity_services | granting permissions to Keystone DB
+  mysql_user:
+    name: keystone
+    password: "{{ openstack_keystone_dbpass }}"
+    priv: "keystone.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: mysql_master
+
+- name: openstack_identity_services | granting permissions to Keystone DB
+  mysql_user:
+    name: keystone
+    password: "{{ openstack_keystone_dbpass }}"
+    priv: "keystone.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: not mysql_master
+
+- name: openstack_identity_services | marking keystone to not auto start after install
+  shell: 'echo "manual" > /etc/init/keystone.override'
+  args:
+    creates: /etc/init/keystone.override
+
+- name: openstack_identity_services | installing keystone packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - keystone
+    - libapache2-mod-wsgi
+    - python-keystoneclient
+    - python-memcache
+    - python-openstackclient
+
+- name: openstack_identity_services | checking for keystone folder for pacemaker
+  stat:
+    path: /usr/lib/ocf/resource.d/openstack
+  register: pacemaker_keystone_dir
+
+- name: openstack_identity_services | creating keystone folder for pacemaker config
+  file:
+    dest: /usr/lib/ocf/resource.d/openstack
+    state: directory
+  when: not pacemaker_keystone_dir.stat.exists
+
+- name: openstack_identity_services | downloading keystone pacemaker config
+  get_url:
+    url: https://git.openstack.org/cgit/openstack/openstack-resource-agents/plain/ocf/keystone
+    dest: /usr/lib/ocf/resource.d/openstack/keystone
+  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+
+- name: openstack_identity_services | setting permissions on keystone pacemaker file
+  file:
+    path: /usr/lib/ocf/resource.d/openstack
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+
+- name: openstack_identity_services | configuring keystone
+  template:
+    src: etc/keystone/keystone.conf.j2
+    dest: /etc/keystone/keystone.conf
+    owner: root
+    group: root
+    mode: 0644
+#  notify: restart keystone
+
+### Pacemaker config below has been disabled because of Apache running Keystone in Kilo+
+#- name: openstack_identity_services | configuring pacemaker for keystone identity services
+#  pacemaker: >
+#     primitive p_keystone ocf:openstack:keystone
+#     params config="/etc/keystone/keystone.conf"
+#     os_password="{{ openstack_admin_pass }}"
+#     os_username="admin"
+#     os_tenant_name="admin"
+#     os_auth_url="{{ openstack_keystone_url}}:5000/v2.0/"
+#     op monitor interval="30s" timeout="30s"
+#  tags:
+#    - pacemaker
+#  notify:
+#    - pacemaker commit
+#  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+
+- name: openstack_identity_services | checking if keystone has been populated
+  stat:
+    path: /etc/keystone/keystone_populated
+  register: keystone_is_populated
+  always_run: yes
+
+- name: openstack_identity_services | populating keystone
+  command: su -s /bin/sh -c "keystone-manage db_sync" keystone
+  register: keystone_populated
+  when: not keystone_is_populated.stat.exists and mysql_master
+
+- name: openstack_identity_services | marking keystone as populated
+  file:
+    path: /etc/keystone/keystone_populated
+    state: touch
+  when: keystone_populated.changed
+
+- name: openstack_identity_services | disabling default apache site
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+  notify:
+    - restart apache2
+
+- name: openstack_identity_services | configuring apache
+  lineinfile:
+    dest: "/etc/apache2/apache2.conf"
+    line: "ServerName {{ inventory_hostname }}"
+  notify:
+    - restart apache2
+
+- name: openstack_identity_services | configuring identity service virtual hosts
+  template:
+    src: etc/apache2/sites-available/wsgi-keystone.conf.j2
+    dest: /etc/apache2/sites-available/wsgi-keystone.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: openstack_identity_services | enabling identity service virtual hosts
+  file:
+    src: /etc/apache2/sites-available/wsgi-keystone.conf
+    dest: /etc/apache2/sites-enabled/wsgi-keystone.conf
+    state: link
+  register: apache2_reconfigured
+  notify:
+    - restart apache2
+
+- name: openstack_identity_services | creating WSGI components folder
+  file:
+    path: /var/www/cgi-bin/keystone
+    state: directory
+
+- name: openstack_identity_services | downloading WSGI components
+  get_url:
+    url: "http://git.openstack.org/cgit/openstack/keystone/plain/httpd/keystone.py?h=stable/{{ openstack_release }}"
+    dest: "{{ item }}"
+  with_items:
+    - /var/www/cgi-bin/keystone/main
+    - /var/www/cgi-bin/keystone/admin
+
+- name: openstack_identity_services | setting permissions on WSGI folder(s)
+  file:
+    path: /var/www/cgi-bin/keystone
+    owner: keystone
+    group: keystone
+    mode: 0755
+    recurse: yes
+
+#- name: openstack_identity_services | restarting keystone
+#  service:
+#    name: keystone
+#    state: restarted
+#  when: keystone_populated.changed
+
+- name: openstack_identity_services | restarting apache2
+  service:
+    name: apache2
+    state: restarted
+  when: apache2_reconfigured.changed
+
+- name: openstack_identity_services | removing sqlite db
+  file:
+    path: /var/lib/keystone/keystone.db
+    state: absent
+
+- name: openstack_identity_services | creating cron job to clean expired tokens
+  cron:
+    name: "keystone token flush"
+    special_time: hourly
+    user: keystone
+    job: "/usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1"
+    state: present
+    cron_file: keystone_token_flush
+
+- name: openstack_identity_services | creating client script(s)  #creating this to source in order to create heat domain
+  template:
+    src: "{{ item }}-openrc.sh.j2"
+    dest: "/root/{{ item }}-openrc.sh"
+    mode: 0700
+  tags:
+    - create-openstack-client-scripts
+  with_items:
+    - admin
+    - demo

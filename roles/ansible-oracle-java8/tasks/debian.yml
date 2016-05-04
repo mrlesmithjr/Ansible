@@ -1,0 +1,28 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - software-properties-common
+
+- name: debian | adding Oracle Java8 repo
+  apt_repository:
+    repo: "{{ oracle_java8_debian_repo }}"
+    state: present
+
+- name: debian | accepting Oracle Java8 license
+  debconf:
+    name: "oracle-java8-installer"
+    question: "shared/accepted-oracle-license-v1-1"
+    value: "true"
+    vtype: "select"
+
+- name: debian | installing Oracle Java8
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - oracle-java8-installer
+    - ca-certificates
+    - oracle-java8-set-default

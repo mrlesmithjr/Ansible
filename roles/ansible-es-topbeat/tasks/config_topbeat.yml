@@ -1,0 +1,30 @@
+---
+- name: config_topbeat | configuring topbeat
+  template:
+    src: "etc/topbeat/topbeat.yml.j2"
+    dest: "/etc/topbeat/topbeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart topbeat
+
+- name: config_topbeat | loading topbeat ES Index Template
+  command: "curl -XPUT 'http://{{ es_topbeat_elasticsearch_host }}/_template/topbeat' -d@/etc/topbeat/topbeat.template.json"
+
+- name: config_topbeat | downloading topbeat dashboards
+  get_url:
+    url: "{{ es_topbeat_dashboard_dl }}"
+    dest: "/opt/{{ es_topbeat_dashboard_package }}"
+
+- name: config_topbeat | extracting topbeat dashboards
+  unarchive:
+    src: "/opt/{{ es_topbeat_dashboard_package }}"
+    dest: "/opt"
+    copy: no
+    creates: "{{ es_topbeat_dashboard_dir }}/load.sh"
+
+- name: config_topbeat | loading topbeat dashboards
+  shell: "./load.sh -url http://{{ es_topbeat_elasticsearch_host }}"
+  args:
+    chdir: "/opt/{{ es_topbeat_dashboard_dir }}"

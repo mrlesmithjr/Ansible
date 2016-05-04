@@ -1,0 +1,8 @@
+---
+- hosts: all
+  remote_user: vagrant
+  sudo: true
+  vars:
+    - config_suricata: true 
+  roles:
+    - role: ansible-suricata 

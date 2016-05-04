@@ -1,0 +1,57 @@
+{% if not ferm_clear_firewall %}
+domain ip {
+    table filter {
+{% if ferm_custom_chains is defined %}
+{%   for item in ferm_custom_chains %}
+        chain {{ item.chain }};
+{%   endfor %}
+{% endif %}
+{% for item in ferm_table_filters %}
+        chain {{ item.chain }} {
+{%   if item.policy is defined %}
+            policy {{ item.policy }};
+{%   endif %}
+{%   if item.connection_tracking is defined %}
+{%     for connection_state in item.connection_tracking %}
+            mod conntrack ctstate {{ connection_state.state }} {{ connection_state.policy }};
+{%     endfor %}
+{%   endif %}
+{%   if item.allow_local_connections is defined and item.allow_local_connections %}
+            interface lo ACCEPT;
+{%   endif %}
+{%   if item.logging is defined and item.logging %}
+            mod limit limit 2/min LOG log-prefix '{{ item.logging_prefix }}: ';
+{%   endif %}
+        }
+{% endfor %}
+    }
+{%   if ferm_nat_filters is defined %}
+    table nat {
+{%     for item in ferm_nat_filters %}
+        chain {{ item.chain }} {
+{%       if item.policy is defined %}
+            policy {{ item.policy }};
+{%       endif %}
+        }
+{%     endfor %}
+    }
+{%   endif %}
+}
+{% endif %}
+{% if ferm_clear_firewall %}
+domain ip {
+    table nat {
+        chain INPUT policy ACCEPT;
+        chain POSTROUTING policy ACCEPT;
+        chain PREROUTING policy ACCEPT;
+        chain OUTPUT policy ACCEPT;
+    }
+    table filter {
+        chain FORWARD policy ACCEPT;
+        chain INPUT policy ACCEPT;
+        chain OUTPUT policy ACCEPT;
+    }
+}
+{% endif %}
+
+@include '/etc/ferm/ferm.d/';

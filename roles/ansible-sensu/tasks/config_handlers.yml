@@ -1,0 +1,24 @@
+---
+- name: config_handlers | configuring handlers definitions
+  template:
+    src: "etc/sensu/conf.d/{{ item }}.json.j2"
+    dest: "{{ sensu_config_dir }}/{{ item }}.json"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart sensu-api
+    - restart sensu-server
+  with_items: sensu_config_handlers_def
+
+- name: config_handlers | configuring handlers modules
+  template:
+    src: "etc/sensu/handlers/{{ item }}.rb.j2"
+    dest: "{{ sensu_handlers_dir }}/{{ item }}.rb"
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart sensu-api
+    - restart sensu-server
+  with_items: sensu_config_handlers_mod

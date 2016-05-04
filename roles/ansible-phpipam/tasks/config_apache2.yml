@@ -1,0 +1,29 @@
+---
+- name: config_apache2 | reconfiguring default website
+  template:
+    src: "etc/apache2/sites-available/000-default.conf.j2"
+    dest: "/etc/apache2/sites-available/000-default.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache2
+
+- name: config_apache2 | creating phpipam web configuration
+  template:
+    src: "etc/apache2/sites-available/phpipam.conf.j2"
+    dest: "/etc/apache2/sites-available/phpipam.conf"
+    owner: root
+    group: root
+    mode: 0644
+  register: phpipam_apache2_configured
+
+- name: config_apache2 | enabling phpipam
+  command: a2ensite phpipam.conf
+  creates: "/etc/apache2/sites-enabled/phpipam.conf"
+  notify: restart apache2
+  when: phpipam_apache2_configured.changed
+
+- name: config_apache2 | enabling php mod extenstions
+  command: "php5enmod {{ item }}"
+  with_items:
+    - json

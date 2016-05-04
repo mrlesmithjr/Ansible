@@ -1,0 +1,13 @@
+---
+# tasks file for ansible-squid
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "Redhat"
+
+- include: haproxy.yml
+  when: enable_haproxy
+
+- include: config_squid_transparent_proxy.yml
+  when: squid_transparent_proxy is defined and squid_transparent_proxy

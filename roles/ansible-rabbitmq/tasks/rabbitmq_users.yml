@@ -1,0 +1,27 @@
+---
+- name: rabbitmq_users | creating rabbitmq users
+  rabbitmq_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    vhost: "{{ item.vhost }}"
+    configure_priv: "{{ item.configure_priv }}"
+    read_priv: "{{ item.read_priv }}"
+    write_priv: "{{ item.write_priv }}"
+    tags: "{{ item.tags }}"
+    state: present
+  with_items: rabbitmq_users
+  when: (enable_rabbitmq_clustering is defined and not enable_rabbitmq_clustering) or enable_rabbitmq_clustering is not defined
+
+- name: rabbitmq_users | creating rabbitmq users
+  rabbitmq_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    vhost: "{{ item.vhost }}"
+    configure_priv: "{{ item.configure_priv }}"
+    read_priv: "{{ item.read_priv }}"
+    write_priv: "{{ item.write_priv }}"
+    tags: "{{ item.tags }}"
+    state: present
+  run_once: yes
+  with_items: rabbitmq_users
+  when: (enable_rabbitmq_clustering is defined and enable_rabbitmq_clustering)

@@ -1,0 +1,15 @@
+---
+- name: config_apt_mirror_schedule | configuring apt-mirror cron (if enabled)
+  cron:
+    name: "{{ item.name }}"
+    special_time: "{{ item.special_time|default(omit) }}"
+    minute: "{{ item.minute|default(omit) }}"
+    hour: "{{ item.hour|default(omit) }}"
+    day: "{{ item.day|default(omit) }}"
+    month: "{{ item.month|default(omit) }}"
+    weekday: "{{ item.weekday|default(omit) }}"
+    user: "apt-mirror"
+    job: "{{ item.job }}"
+    cron_file: "{{ item.cron_file }}"
+  with_items: apt_mirror_schedule
+  when: apt_mirror_schedule_updates is defined and apt_mirror_schedule_updates

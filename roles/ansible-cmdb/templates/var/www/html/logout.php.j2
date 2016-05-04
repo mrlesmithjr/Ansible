@@ -1,0 +1,12 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  // Remove user data from session
+  $_SESSION = array();
+  session_destroy();
+  $user_is_logged_in = false;
+  echo "Successfully logged out.";
+  // Redirect to
+  header("Location: login.php");
+  die("Redirecting to: login.php");
+?>

@@ -1,0 +1,22 @@
+[elk-nodes]
+elk-broker  ansible_ssh_host=192.168.202.200  ansible_ssh_private_key_file=.vagrant/machines/elk-broker/virtualbox/private_key
+elk-es  ansible_ssh_host=192.168.202.201  ansible_ssh_private_key_file=.vagrant/machines/elk-es/virtualbox/private_key
+elk-pre-processor  ansible_ssh_host=192.168.202.202  ansible_ssh_private_key_file=.vagrant/machines/elk-pre-processor/virtualbox/private_key
+elk-processor  ansible_ssh_host=192.168.202.203  ansible_ssh_private_key_file=.vagrant/machines/elk-processor/virtualbox/private_key
+
+[es-cluster-nodes]
+elk-broker
+elk-es
+elk-processor
+
+[elk-broker-nodes]
+elk-broker
+
+[elk-es-nodes]
+elk-es
+
+[elk-pre-processor-nodes]
+elk-pre-processor
+
+[elk-processor-nodes]
+elk-processor

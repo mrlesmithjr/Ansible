@@ -1,0 +1,8 @@
+{% if iscsitarget_file_devices is defined %}
+{%   for item in iscsitarget_file_devices %}
+{%     if item.enabled %}
+{{ iscsitarget_iqn }}:storage.{{ item.name }} {% for allow_access_from in item.allow %}{{ allow_access_from }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{%     endif %}
+{%   endfor %}
+{% endif %}

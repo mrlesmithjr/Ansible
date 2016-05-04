@@ -1,0 +1,4 @@
+---
+- name: disable_firewall | disabling UFW and/or resetting UFW
+  ufw:
+    state: "{{ ufw_state }}"

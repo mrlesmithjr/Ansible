@@ -1,0 +1,20 @@
+# Windows Update parsing
+filter {
+  if [type] == "eventlog" and [SourceName] == "Microsoft-Windows-WindowsUpdateClient" {
+    mutate {
+      add_tag => [ "Windows-Updates" ]
+    }
+    if "Installation" in [message] {
+      grok {
+        match => [
+          "message", "Installation.%{WORD:install_status}:.*:.%{DATA:windows_update_desc}.\(KB%{DATA:windows_update_kb}\)"
+        ]
+      }
+    }
+    if [windows_update_kb] {
+      mutate {
+        add_field => [ "KB_Lookup", "http://support.microsoft.com/kb/%{windows_update_kb}" ]
+      }
+    }
+  }
+}

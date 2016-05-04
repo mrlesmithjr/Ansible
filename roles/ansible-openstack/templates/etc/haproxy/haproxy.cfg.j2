@@ -1,0 +1,241 @@
+global
+{% if (enable_haproxy_remote_syslog is defined and not enable_haproxy_remote_syslog) or enable_haproxy_remote_syslog is not defined %}
+  log /dev/log    local0
+  log /dev/log    local1 notice
+{% endif %}
+{% if (enable_haproxy_remote_syslog is defined and enable_haproxy_remote_syslog) and syslog_servers is defined %}
+# Remote syslog servers
+{%   for item in syslog_servers %}
+  log {{ item.name }}:{{ item.port }} local0
+{%   endfor %}
+  #log-send-hostname
+{% endif %}
+  chroot  /var/lib/haproxy
+  daemon
+  group  haproxy
+  maxconn  4000
+  pidfile  /var/run/haproxy.pid
+  user  haproxy
+
+defaults
+  log  global
+  maxconn  4000
+  option  redispatch
+  retries  3
+  timeout  http-request 10s
+  timeout  queue 1m
+  timeout  connect 10s
+  timeout  client 1m
+  timeout  server 1m
+  timeout  check 10s
+
+{% if enable_haproxy_admin_page is defined and enable_haproxy_admin_page %}
+userlist STATSUSERS
+  group admin users admin
+  user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
+
+listen admin_page 0.0.0.0:{{ haproxy_admin_port }}
+  mode http
+  stats enable
+  stats refresh 60s
+  stats uri /
+  acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+  acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+  stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+{% endif %}
+
+listen ceilometer_api_cluster
+  bind {{ openstack_services_vip }}:8777
+  balance  source
+  option  tcpka
+#  option  httpchk ###Fails when set to httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:8777 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen cinder_api_cluster
+  bind {{ openstack_services_vip }}:8776
+  balance  source
+  option  tcpka
+  option  httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+{%   if host == openstack_keystone_api_master %}
+server {{ host }} {{ host }}:8776 check inter 2000 rise 2 fall 5
+{%   elif host != openstack_keystone_api_master %}
+server {{ host }} {{ host }}:8776 backup check inter 2000 rise 2 fall 5
+{%   endif %}
+{% endfor %}
+
+listen dashboard_cluster-Horizon
+  bind {{ openstack_services_vip }}:80
+  balance  source
+  option  tcpka
+  option  httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:80 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen galera_cluster
+  bind {{ openstack_services_vip }}:3306
+  balance  source
+  mode tcp
+  option tcpka
+  option tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+{%   if hostvars[host]['mysql_master'] is defined and hostvars[host]['mysql_master'] %}
+  server {{ host }} {{ host }}:3306 check inter 2000 rise 2 fall 5
+{%   elif hostvars[host]['mysql_master'] is defined and not hostvars[host]['mysql_master'] or hostvars[host]['mysql_master'] is not defined %}
+  server {{ host }} {{ host }}:3306 backup check inter 2000 rise 2 fall 5
+{%   endif %}
+{% endfor %}
+
+listen glance_api_cluster
+  bind {{ openstack_services_vip }}:9292
+  balance  source
+  option  tcpka
+  option  httpchk /versions
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:9292 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen glance_registry_cluster
+  bind {{ openstack_services_vip }}:9191
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:9191 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen heatAPI
+bind {{ openstack_services_vip }}:8004
+balance  source
+option  tcpka
+option  httpchk
+option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+server {{ host }} {{ host }}:8004 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen keystone_admin_cluster
+  bind {{ openstack_services_vip }}:35357
+  balance  source
+  option  tcpka
+  option  httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+{%   if host == openstack_keystone_api_master %}
+server {{ host }} {{ host }}:35357 check inter 2000 rise 2 fall 5
+{%   elif host != openstack_keystone_api_master %}
+server {{ host }} {{ host }}:35357 backup check inter 2000 rise 2 fall 5
+{%   endif %}
+{% endfor %}
+
+listen keystone_public_internal_cluster
+  bind {{ openstack_services_vip }}:5000
+  balance  source
+  option  tcpka
+  option  httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+{%   if host == openstack_keystone_api_master %}
+server {{ host }} {{ host }}:5000 check inter 2000 rise 2 fall 5
+{%   elif host != openstack_keystone_api_master %}
+server {{ host }} {{ host }}:5000 backup check inter 2000 rise 2 fall 5
+{%   endif %}
+{% endfor %}
+
+listen mongodb
+  bind {{ openstack_services_vip }}:27017
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+{%   if hostvars[host]['openstack_mongodb_master'] is defined and hostvars[host]['openstack_mongodb_master'] %}
+  server {{ host }} {{ host }}:27017 check inter 2000 rise 2 fall 5
+{%   elif (hostvars[host]['openstack_mongodb_master'] is defined and not hostvars[host]['openstack_mongodb_master']) or hostvars[host]['openstack_mongodb_master'] is not defined %}
+  server {{ host }} {{ host }}:27017 backup check inter 2000 rise 2 fall 5
+{%   endif %}
+{% endfor %}
+
+listen neutron_api_cluster
+  bind {{ openstack_services_vip }}:9696
+  balance  source
+  option  tcpka
+  option  httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:9696 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen nova_ec2_api_cluster
+  bind {{ openstack_services_vip }}:8773
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:8773 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen nova_compute_api_cluster
+  bind {{ openstack_services_vip }}:8774
+  balance  source
+  option  tcpka
+  option  httpchk
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:8774 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen nova_metadata_api_cluster
+  bind {{ openstack_services_vip }}:8775
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:8775 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen rabbitmq_cluster
+  bind {{ openstack_services_vip }}:5672
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+{%   if host == rabbitmq_master %}
+  server {{ host }} {{ host }}:5672 check inter 2000 rise 2 fall 5
+{%   elif host != rabbitmq_master %}
+server {{ host }} {{ host }}:5672 backup check inter 2000 rise 2 fall 5
+{%   endif %}
+{% endfor %}
+
+listen rabbitmq_cluster-Admin
+  bind {{ openstack_services_vip }}:15672
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:15672 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen spice_cluster
+  bind {{ openstack_services_vip }}:6080
+  balance  source
+  option  tcpka
+  option  tcplog
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:6080 check inter 2000 rise 2 fall 5
+{% endfor %}
+
+listen swift_proxy_cluster
+  bind {{ openstack_services_vip }}:8080
+  balance  source
+  option  tcplog
+  option  tcpka
+{% for host in groups['openstack-controller-nodes'] %}
+  server {{ host }} {{ host }}:8080 check inter 2000 rise 2 fall 5
+{% endfor %}

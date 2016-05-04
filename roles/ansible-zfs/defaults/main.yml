@@ -1,0 +1,68 @@
+---
+# defaults file for ansible-zfs
+zfs_debian_package: 'zfsonlinux_{{ zfs_debian_package_version }}_all.deb'
+zfs_debian_package_key: 'http://zfsonlinux.org/4D5843EA.asc'
+zfs_debian_package_url: 'http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux'
+zfs_debian_package_version: 6
+zfs_enable_iscsi: false  #defines if iscsitarget is installed to server iSCSI volumes
+zfs_enable_nfs: false  #defines if NFS Kernel Server should be installed to serve NFS
+zfs_enable_performance_tuning: false  #defines if paramaters defined in zfs_performance_tuning are applied
+zfs_filesystems:  #defines filesystems to manage
+  - name: 'nfs'
+    pool: 'tank'
+    atime: 'off'
+    compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
+    logbias: 'latency'  # latency (default) | throughput
+    primarycache: 'all'  # all (default) | none | metadata
+    quota: '3G'
+    recordsize: '16K'  #defines recordsize.. 16K | 32K | 64K | 128K (default) | and etc.
+    sharenfs: 'on'
+    sync: 'disabled'  # standard (default) | always | disabled
+    state: 'present'
+zfs_iscsistarget_enable: '{{ zfs_enable_iscsi }}'  #defines if iscsitarget service is enabled
+zfs_iscsistarget_iqn: iqn.2001-04.org.example  #define your FQDN in reverse...(local.vagrant)
+zfs_iscsistarget_max_sleep: 3
+zfs_iscsistarget_options: ''
+zfs_iscsitarget_target_portals:
+  - ALL  #define IP address to listen for iSCSI connections | ALL (default) | cidr (x.x.x.x/xx) | disable ALL if defining cidr
+#  - 10.0.2.0/24
+#  - 192.168.2.0/24
+zfs_performance_tuning:
+  - param: 'zfs_prefetch_disable'
+    value: '1'
+  - param: 'zfs_txg_timeout'
+    value: '5'
+  - param: 'zfs_arc_max'
+    value: '{{ (ansible_memtotal_mb | int * 1024 * 1024 * 0.5) | round | int }}'  # 1/2 total system memory
+  - param: 'zfs_arc_meta_limit'
+    value: '{{ (ansible_memtotal_mb | int * 1024 * 1024 * 0.125) | round | int }}'  # 1/4 zfs_arc_max
+  - param: 'zfs_arc_min'
+    value: '{{ (ansible_memtotal_mb | int * 1024 * 1024 * 0.0625) | round | int }}'  # 1/2 zfs_arc_meta_limit
+zfs_pools:  #defines zpool(s) to manage
+  - name: tank
+#    atime: 'on'
+    compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
+    devices:  #define devices to create pool with...can define multiple by | sdb sdc sdd sde sdf | all on one line w/spaces
+      - '/dev/sdb'
+      - '/dev/sdc'
+    type: basic  #define pool type... | basic (no-raid) | mirror | raidz | raidz2 | raidz3
+    state: present
+zfs_ubuntu_ppa: 'ppa:zfs-native/stable'
+zfs_volumes:  #defines block-device volumes to manage
+  - name: 'backups'
+    pool: 'tank'
+    shareiscsi: 'on'  #defines if iscsitarget should serve volume... | on | off | or not defined
+    volsize: '1G'  #defines volsize for block devices
+    lun: 0
+    allow:
+      - ALL
+    state: 'present'
+  - name: 'data'
+    pool: 'tank'
+    shareiscsi: 'on'
+    volsize: '2G'
+    lun: 1
+    allow:
+#      - 10.0.0.0/8
+      - 192.168.202.0/24
+    state: 'present'

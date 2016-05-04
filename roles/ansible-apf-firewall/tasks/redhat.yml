@@ -1,0 +1,35 @@
+---
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - net-tools
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing pre-reqs
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+    - net-tools
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | downloading apf firewall current
+  get_url:
+    url: "{{ apf_firewall_redhat_dl_url }}/{{ apf_firewall_redhat_dl_file }}"
+    dest: "{{ apf_firewall_dl_dir }}/{{ apf_firewall_redhat_dl_file }}"
+
+- name: redhat | extracting apf firewall package
+  unarchive:
+    src: "{{ apf_firewall_dl_dir }}/{{ apf_firewall_redhat_dl_file }}"
+    dest: "{{ apf_firewall_dl_dir }}/"
+    copy: no
+    creates: "{{ apf_firewall_dl_dir }}/apf-9.7-2/install.sh"
+
+- name: redhat | installing apf firewall
+  command: './install.sh'
+  args:
+    chdir: "{{ apf_firewall_dl_dir }}/apf-9.7-2"
+    creates: "{{ apf_firewall_redhat_install_path }}/apf"

@@ -1,0 +1,5 @@
+---
+- name: installing iperf
+  apt:
+    name: iperf
+    state: present

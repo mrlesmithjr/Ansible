@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-nagios
+nagios_user: nagiosadmin  #define here or in group_vars/group
+nagios_password: nagios  #define here or in group_vars/group

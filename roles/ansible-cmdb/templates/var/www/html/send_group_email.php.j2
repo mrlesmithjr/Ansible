@@ -1,0 +1,93 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  if(isset($_POST['Submit'])) {
+    echo "<html>";
+    echo "<body>";
+      session_start();
+      $gid = $_SESSION['sessiongid'];
+      $email_message = $_POST["email_message"];
+      $email_subject = $_POST["email_subject"];
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $sql = "SELECT * FROM GroupContact WHERE GroupId=$gid";
+      $results = $db->query($sql);
+      while ($row = $results->fetchArray()) {
+        $to = $row['ContactEmail'];
+        $subject = "$email_subject";
+        $message = "<b>$email_message</b>";
+        $header = "From:{{ cmdb_notifications_from_email_address }} \r\n";
+        $header .= "MIME-Version: 1.0\r\n";
+        $header .= "Content-type: text/html\r\n";
+        $retval = mail ($to,$subject,$message,$header);
+        if( $retval == true )
+        {
+          echo "<pre>";
+          echo "Message sent successfully to $to";
+          echo "</pre>";
+        }
+        else
+        {
+          echo "Message could not be sent...";
+        }
+      }
+    echo "</body>";
+    echo "</html><br><br>";
+  }
+?>
+<?php
+  echo "<html>";
+    echo "<body>";
+    session_start();
+    $gid = $_SESSION['sessiongid'];
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "SELECT * FROM Groups WHERE GroupId=$gid";
+    $results = $db->query($sql);
+    while ($row = $results->fetchArray()) {
+      echo "<br><br><br><br>";
+      echo "<pre>";
+      echo "GroupId: ";
+      echo "<tr><td>" . $row['GroupId']. "</td></tr>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupName: ";
+      echo "<tr><td>" . $row['GroupName']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupDescription: ";
+      echo "<tr><td>" . $row['GroupDescription']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupDTAP: ";
+      echo "<tr><td>" . $row['GroupDTAP']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupCreatedOn: ";
+      echo "<tr><td>" . $row['GroupCreatedOn']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "LastUpdateTime: ";
+      echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+      echo "</pre><br><br>";
+    }
+    echo "</body>";
+  echo "</html>";
+?>
+<html>
+  <body>
+    <form action="send_group_email.php" method="post">
+      Subject:<br>
+      <input type="text" name="email_subject"><br>
+      Message:<br>
+      <textarea name="email_message" rows="10" cols="50"></textarea><br>
+      <input type="submit" name="Submit" value="Send Group E-Mail">
+      <input type="reset" value="Reset">
+    </form>
+  </body>
+</html>

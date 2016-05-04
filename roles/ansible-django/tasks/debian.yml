@@ -1,0 +1,16 @@
+---
+- name: debian | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-dev
+    - python-pip
+
+- name: debian | installing sqlite (if used)
+  apt:
+    name: "sqlite"
+    state: present
+  when: >
+        (django_db_type is defined and django_db_type == "sqlite") or
+        django_db_type is not defined

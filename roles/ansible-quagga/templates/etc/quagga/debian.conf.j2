@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+#
+# If this option is set the /etc/init.d/quagga script automatically loads
+# the config via "vtysh -b" when the servers are started.
+# Check /etc/pam.d/quagga if you intend to use "vtysh"!
+#
+vtysh_enable=yes
+zebra_options=" --daemon -A 127.0.0.1 -P 2601 -u quagga -g quagga --keep_kernel --retain"
+bgpd_options=" --daemon -A 127.0.0.1 -P 2605 -u quagga -g quagga --retain -p 179"
+ospfd_options=" --daemon -A 127.0.0.1 -P 2604 -u quagga -g quagga"
+ospf6d_options=" --daemon -A ::1 -P 2606 -u quagga -g quagga"
+ripd_options=" --daemon -A 127.0.0.1 -P 2602 -u quagga -g quagga --retain"
+ripngd_options=" --daemon -A ::1 -P 2603 -u quagga -g quagga --retain"
+isisd_options=" --daemon -A 127.0.0.1 -P 2608 -u quagga -g quagga"

@@ -1,0 +1,59 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+<?php
+  if (isset($_POST['GroupAction'])) {
+    $ga = $_POST["GroupAction"];
+  }
+  if ($ga=="AddGroups") {
+    include 'add_groups.php';
+  }
+  if ($ga=="AddGroupContact") {
+    include 'add_group_contact.php';
+  }
+  if ($ga=="AddGroupHost"){
+    include 'add_group_host.php';
+  }
+  if ($ga=="DeleteGroup") {
+    include 'delete_group.php';
+  }
+  if ($ga=="DeleteGroupContact") {
+    include 'delete_group_contact.php';
+  }
+  if ($ga=="DeleteGroupHost") {
+    include 'delete_group_host.php';
+  }
+  if ($ga=="EditGroup") {
+    include 'edit_group.php';
+  }
+  if ($ga=="EditGroupContact") {
+    include 'edit_group_contact.php';
+  }
+  if ($ga=="QueryGroups") {
+    include 'query_group_details.php';
+  }
+  if ($ga=="QueryGroupHosts") {
+    include 'query_group_hosts.php';
+  }
+  if ($ga=="RunGroupAnsiblePlaybook") {
+    include 'run_group_ansible_playbook.php';
+  }
+  if ($ga=="ScheduleGroupMaintenance") {
+    include 'schedule_group_maintenance.html';
+  }
+  if ($ga=="SendGroupEmail") {
+    include 'send_group_email.php';
+  }
+  if ($ga=="ViewGroupContactInfo") {
+    include 'query_group_contact_info.php';
+  }
+?>
+  </body>
+</html>

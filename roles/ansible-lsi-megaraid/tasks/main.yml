@@ -1,0 +1,63 @@
+---
+# tasks file for ansible-lsi-megaraid
+- name: copying MegaRaid Files
+  copy:
+    src: Linux/opt/MegaRAID
+    dest: /opt
+    owner: root
+    group: root
+    mode: 0774
+  when: ansible_os_family == "Debian"
+
+- name: generating logic device creation script
+  template:
+    src: lsi_create_ld.sh.j2
+    dest: "{{ megacli_path }}/lsi_create_ld.sh"
+    owner: root
+    group: root
+    mode: 0774
+
+- name: checking if logic devices have already been configured
+  stat:
+    path: /etc/lsi_logic_devices_created.donotremove
+  register: lsi_logic_devices_already_created
+
+- name: creating logic devices
+  shell: "{{ megacli_path }}/lsi_create_ld.sh"
+  register: lsi_logic_devices_created
+  when: not lsi_logic_devices_already_created.stat.exists and (megacli_create_logic_devices is defined and megacli_create_logic_devices)
+
+- name: marking logic devices as created
+  file:
+    dest: /etc/lsi_logic_devices_created.donotremove
+    owner: root
+    group: root
+    mode: 0600
+    state: touch
+  when: not lsi_logic_devices_already_created.stat.exists and (megacli_create_logic_devices is defined and megacli_create_logic_devices)
+
+- name: adding notes to mark file
+  lineinfile:
+    dest: /etc/lsi_logic_devices_created.donotremove
+    line: "DO NOT DELETE THIS FILE!!!! Important"
+  when: not lsi_logic_devices_already_created.stat.exists and (megacli_create_logic_devices is defined and megacli_create_logic_devices)
+
+- name: installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+     - scsitools
+  when: ansible_os_family == "Debian"
+
+- name: restarting machine
+  command: shutdown -r now "rebooting to complete logic device creation"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  when: (megacli_reboot_after_creation is defined and megacli_reboot_after_creation) and lsi_logic_devices_created.changed
+
+- name: waiting for server to come back
+  local_action: wait_for port=22 host="{{ ansible_ssh_host  | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+  sudo: false
+  when: (megacli_reboot_after_creation is defined and megacli_reboot_after_creation) and lsi_logic_devices_created.changed

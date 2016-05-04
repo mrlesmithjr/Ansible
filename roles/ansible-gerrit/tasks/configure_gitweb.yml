@@ -1,0 +1,31 @@
+---
+- name: configure_gitweb | configuring gitweb
+  template:
+    src: etc/apache2/conf-available/gitweb.conf.j2
+    dest: /etc/apache2/conf-available/gitweb.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure_gitweb | configuring gitweb
+  file:
+    src: /etc/apache2/conf-available/gitweb.conf
+    dest: /etc/apache2/conf-enabled/gitweb.conf
+    state: link
+  notify: restart apache2
+
+- name: configure_gitweb | configuring gitweb
+  template:
+    src: etc/gitweb.conf.j2
+    dest: /etc/gitweb.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure_gitweb | enabling apache2 modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  notify: restart apache2
+  with_items:
+    - cgid

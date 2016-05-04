@@ -1,0 +1,7 @@
+# Ferm transparent proxy setup for squid3
+# {{ ansible_managed }}
+table nat{
+    chain PREROUTING {
+        proto tcp dport http REDIRECT to-ports {{ squid_http_port }};
+    }
+}

@@ -1,0 +1,11 @@
+---
+- name: provisions snort
+  hosts: all
+  sudo: true
+  vars:
+    - snort_barnyard2_enable: true
+  roles:
+    - role: ansible-mysql
+      when: snort_barnyard2_enable is defined and snort_barnyard2_enable
+    - role: ansible-snort
+  tasks:

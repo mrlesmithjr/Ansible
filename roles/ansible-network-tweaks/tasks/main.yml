@@ -1,0 +1,22 @@
+---
+# tasks file for ansible-network-tweaks
+- name: enabling network tweaks
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  tags:
+    - network_tweaks
+  with_items: network_tweaks
+  when: (enable_network_tweaks is defined and enable_network_tweaks) and (item.set is defined and item.set)
+
+- name: disabling network tweaks
+  sysctl:
+    name: "{{ item.name }}"
+    state: absent
+    reload: yes
+  tags:
+    - network_tweaks
+  with_items: network_tweaks
+  when: (enable_network_tweaks is defined and not enable_network_tweaks) or ((enable_network_tweaks is defined and enable_network_tweaks) and (item.set is defined and not item.set))

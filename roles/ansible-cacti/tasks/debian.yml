@@ -1,0 +1,13 @@
+---
+- name: debian | installing php5
+  apt:
+    name: "php5"
+    state: present
+  notify:
+    - 'restart {{ cacti_webserver_handler }}'
+
+- name: debian | installing dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ cacti_debian_packages }}'

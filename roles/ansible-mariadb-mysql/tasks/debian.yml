@@ -1,0 +1,72 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-mysqldb
+    - software-properties-common
+
+- name: debian | adding mariadb repo keys
+  apt_key:
+    keyserver: "{{ mariadb_debian_repo_keyserver }}"
+    id: "{{ mariadb_debian_repo_key }}"
+    state: present
+  when: enable_mariadb_repo
+
+- name: debian | adding mariadb repo
+  apt_repository:
+    repo: "{{ mariadb_debian_repo }}"
+    state: present
+  when: enable_mariadb_repo
+
+- include: mysql_root_pw.yml
+
+- name: debian | installing mariadb mysql
+  apt:
+    name: mariadb-server
+    state: present
+
+- name: debian | configuring mariadb mysql
+  template:
+    src: etc/mysql/my.cnf.j2
+    dest: /etc/mysql/my.cnf
+  notify: restart mysql
+
+- name: debian | configuring client configuration
+  template:
+    src: etc/mysql/conf.d/client.cnf.j2
+    dest: /etc/mysql/conf.d/client.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload mysql
+
+#- name: debian | removing original my.cnf
+#  file: path=/etc/my.cfg state=absent
+
+#- name: debian | configuring debian.cnf
+#  template: src=etc/mysql/debian.cnf.j2 dest=/etc/mysql/debian.cnf
+#  notify: restart mysql
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: present
+  tags:
+    - cacti_monitoring
+  when: enable_cacti_monitoring  and cacti_server is defined
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server_fqdn }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: present
+  tags:
+    - cacti_monitoring
+  when: enable_cacti_monitoring  and cacti_server_fqdn is defined

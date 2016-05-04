@@ -1,0 +1,13 @@
+---
+- name: config_ntopng | configuring NTOPNG
+  template: src=etc/ntopng/ntopng.conf.j2 dest=/etc/ntopng/ntopng.conf owner=root group=root mode=0644
+  notify: restart ntopng
+
+- name: config_ntopng | checking for ntopng.start
+  stat: path=/etc/ntopng/ntopng.start
+  register: ntopng_start
+
+- name: config_ntopng | configuring NTOPNG
+  file: path=/etc/ntopng/ntopng.start state=touch
+  notify: restart ntopng
+  when: not ntopng_start.stat.exists

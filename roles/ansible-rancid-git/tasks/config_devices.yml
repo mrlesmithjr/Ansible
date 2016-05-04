@@ -1,0 +1,18 @@
+---
+- name: config_devices | configuring defined devices
+  lineinfile:
+    dest: "{{ rancid_base_dir }}/var/{{ item.1 }}/router.db"
+    regexp: "^{{ item.0.name }}"
+    line: "{{item.0.name }}{{ ':' }}{{ item.0.type }}{{ ':' }}{{ item.0.state }}"
+    state: present
+  with_subelements:
+    - rancid_devices
+    - groups
+
+- name: config_devices | adding cloginrc to RANCID home
+  template:
+    src: "opt/rancid/cloginrc.j2"
+    dest: "{{ rancid_home_dir }}/.cloginrc"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    mode: 0660

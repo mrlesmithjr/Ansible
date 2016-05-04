@@ -1,0 +1,45 @@
+# Filtering for SSH logins either failed or successful
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if [syslog_program] == "sshd" {
+      if "Failed password" in [message] {
+        grok {
+          break_on_match => false
+          match => [
+            "message", "invalid user %{DATA:UserName} from %{IP:src_ip}"
+#            "message", "for %{DATA:UserName} from %{IP:src_ip}"
+          ]
+        }
+        mutate {
+          add_tag => [ "SSH_Failed_Login" ]
+        }
+      }
+      if "Accepted" in [message] {
+        grok {
+          match => [
+            "message", "for %{DATA:UserName} from %{IP:src_ip}"
+          ]
+        }
+        mutate {
+          add_tag => [ "SSH_Successful_Login" ]
+        }
+      }
+      if "running command" in [message] {
+        grok {
+          match => [
+            "message", "User '%{WORD:username}' running command '%{GREEDYDATA:command}"
+          ]
+        }
+      }
+      geoip {
+        source => "src_ip"
+        target => "geoip"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+      }
+      mutate {
+        convert => [ "[geoip][coordinates]", "float" ]
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - ethtool
+    - flex
+    - iproute
+    - libpcap-dev
+    - libpcre3-dev
+    - libdumbnet-dev
+    - zlib1g-dev
+
+- name: debian | installing snort
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - oinkmaster
+    - snort
+
+- name: debian | configuring snort daemon
+  template:
+    src: "etc/snort/snort.debian.conf.j2"
+    dest: "/etc/snort/snort.debian.conf"
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart snort
+
+- name: debian | ensuring directory exists (/usr/lib/snort_dynamicrules)
+  file:
+    dest: "/usr/lib/snort_dynamicrules"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+    recurse: yes
+  when: >
+        ansible_distribution_release == "precise" or
+        ansible_distribution_release == "wheezy"

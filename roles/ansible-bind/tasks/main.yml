@@ -1,0 +1,7 @@
+---
+# tasks file for ansible-bind
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_bind.yml
+  when: config_bind

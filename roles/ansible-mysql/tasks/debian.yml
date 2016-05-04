@@ -1,0 +1,54 @@
+---
+- include: mysql_root_pw.yml
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - automysqlbackup
+    - software-properties-common
+    - python-mysqldb
+    - rsync
+
+- name: debian | installing mysql
+  apt:
+    name: mysql-server
+    state: present
+
+- name: debian | configuring mysql
+  template:
+    src: etc/mysql/my.cnf.j2
+    dest: /etc/mysql/my.cnf
+  notify: restart mysql
+
+- name: debian | configuring client configuration
+  template:
+    src: etc/mysql/conf.d/client.cnf.j2
+    dest: /etc/mysql/conf.d/client.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload mysql
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: present
+  tags:
+    - cacti_monitoring
+  when: enable_cacti_monitoring and cacti_server is defined
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server_fqdn }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: present
+  tags:
+    - cacti_monitoring
+  when: enable_cacti_monitoring and cacti_server_fqdn is defined

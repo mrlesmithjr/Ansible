@@ -1,0 +1,30 @@
+---
+- name: config_packetbeat | configuring packetbeat
+  template:
+    src: "etc/packetbeat/packetbeat.yml.j2"
+    dest: "/etc/packetbeat/packetbeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart packetbeat
+
+- name: config_packetbeat | loading packetbeat ES Index Template
+  command: "curl -XPUT 'http://{{ es_packetbeat_elasticsearch_host }}/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json"
+
+- name: config_packetbeat | downloading packetbeat dashboards
+  get_url:
+    url: "{{ es_packetbeat_dashboard_dl }}"
+    dest: "/opt/{{ es_packetbeat_dashboard_package }}"
+
+- name: config_packetbeat | extracting packetbeat dashboards
+  unarchive:
+    src: "/opt/{{ es_packetbeat_dashboard_package }}"
+    dest: "/opt"
+    copy: no
+    creates: "{{ es_packetbeat_dashboard_dir }}/load.sh"
+
+- name: config_packetbeat | loading packetbeat dashboards
+  shell: "./load.sh -url http://{{ es_packetbeat_elasticsearch_host }}"
+  args:
+    chdir: "/opt/{{ es_packetbeat_dashboard_dir }}"

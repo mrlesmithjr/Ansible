@@ -1,0 +1,20 @@
+---
+# handlers file for ansible-gitlab-ce
+- name: reconfigure gitlab
+  command: gitlab-ctl reconfigure
+
+- name: restart gitlab
+  shell: 'sleep 20 && gitlab-ctl restart'  #wait 20 secs before attempting to restart..gives reconfigure time to complete
+
+- name: upgrade gitlab
+  command: gitlab-ctl upgrade
+
+- name: restart gitlab nginx
+  command: gitlab-ctl restart nginx
+
+- name: start gitlab
+  command: gitlab-ctl start
+
+- name: wait for unicorn
+  wait_for:
+    port: 8080

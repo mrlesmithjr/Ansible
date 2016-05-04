@@ -1,0 +1,13 @@
+---
+# tasks file for ansible-apf-firewall
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_apf.yml
+  when: config_apf_firewall
+
+- include: config_bfd.yml
+  when: config_apf_firewall_bfd

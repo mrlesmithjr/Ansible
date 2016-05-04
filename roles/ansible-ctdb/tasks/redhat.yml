@@ -1,0 +1,22 @@
+---
+- name: redhat | installing ctdb
+  yum:
+    name: "ctdb"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing samba
+  yum:
+    name: "samba"
+    state: present
+  when: >
+        ctdb_install_samba and
+        ansible_distribution != "Fedora"
+
+- name: redhat | installing winbind
+  yum:
+    name: "winbind"
+    state: present
+  when: >
+        ctdb_install_winbind and
+        ansible_distribution != "Fedora"

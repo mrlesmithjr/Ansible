@@ -1,0 +1,134 @@
+---
+- name: debian | installing RANCID PRE-REQS
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - automake
+    - build-essential
+    - checkinstall
+    - expect
+    - git
+
+- name: debian | cloning RANCID repo
+  git:
+    repo: "{{ rancid_repo }}"
+    dest: "{{ rancid_source_dir }}"
+    update: no
+    depth: 1
+
+- name: debian | configuring RANCID source
+  shell: "./configure --prefix={{ rancid_base_dir }} && autoreconf && touch _configured"
+  args:
+    chdir: "{{ rancid_base_dir }}/src"
+    creates: "{{ rancid_source_dir }}/_configured"
+
+- name: debian | creating debian package and installing RANCID
+  shell: "checkinstall -D -y"
+  args:
+    chdir: "{{ rancid_base_dir }}/src"
+    creates: "{{ rancid_base_dir }}/etc/rancid.conf"
+
+- name: debian | configuring RANCID
+  template:
+    src: "opt/rancid/etc/rancid.conf.j2"
+    dest: "{{ rancid_base_dir }}/etc/rancid.conf"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    mode: 0644
+  with_items: "{{ rancid_groups }}"
+
+- name: debian | ensuring RANCID user has ownership of RANCID directory
+  file:
+    path: "{{ rancid_base_dir }}"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    state: directory
+    recurse: yes
+
+- name: debian | configuring git email address
+  template:
+    src: "gitconfig.j2"
+    dest: "{{ rancid_home_dir }}/.gitconfig"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    mode: 0664
+
+- name: debian | creating RANCID VCS Structure
+  shell: "su - rancid -c '{{ rancid_base_dir }}/bin/rancid-cvs'"
+
+- name: debian | creating RANCID link for GIT repo
+  file:
+    path: "{{ rancid_base_dir }}/var/RANCID"
+    src: "{{ rancid_base_dir }}/var/.git"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    state: link
+
+- name: debian | ensuring RANCID user has ownership of RANCID directory
+  file:
+    path: "{{ rancid_base_dir }}"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    state: directory
+    recurse: yes
+
+- name: debian | configuring git remote
+  git:
+    repo: "{{ rancid_git_remote }}"
+    dest: "{{ rancid_base_dir }}/var"
+    update: no
+    clone: no
+    accept_hostkey: yes
+  tags:
+    - config_rancid_remote_git
+
+- name: debian | checking if ssh_key_added already
+  stat:
+    path: "{{ rancid_base_dir }}/.remote_git_ssh_key_added"
+  register: ssh_key_present
+  tags:
+    - config_rancid_remote_git
+
+- name: debian | adding ssh key for remote git server
+  shell: "su - rancid -c 'ssh-keyscan -H {{ rancid_git_server }} >> .ssh/known_hosts'"
+  register: ssh_key_added
+  tags:
+    - config_rancid_remote_git
+  when: >
+        (rancid_config_remote is defined and rancid_config_remote) and
+        not ssh_key_present.stat.exists
+
+- name: debian | marking as ssh key added
+  file:
+    path: "{{ rancid_base_dir }}/.remote_git_ssh_key_added"
+    state: touch
+  tags:
+    - config_rancid_remote_git
+  when: ssh_key_added.changed
+
+- name: debian | checking if remote git has been configured
+  stat:
+    path: "{{ rancid_base_dir }}/.remote_git_configured"
+  register: remote_git
+  tags:
+    - config_rancid_remote_git
+
+- name: debian | adding git remotes if enabled
+  shell: "su - rancid -c 'cd {{ rancid_base_dir }}/var && git remote add origin {{ rancid_git_remote }}'"
+  register: remote_git_configured
+  tags:
+    - config_rancid_remote_git
+  when: >
+        (rancid_config_remote is defined and rancid_config_remote) and
+        not remote_git.stat.exists
+
+- name: debian | marking remote_git as configured
+  file:
+    path: "{{ rancid_base_dir }}/.remote_git_configured"
+    state: touch
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+  tags:
+    - config_rancid_remote_git
+  when: remote_git_configured.changed

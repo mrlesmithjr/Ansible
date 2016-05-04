@@ -1,0 +1,8 @@
+---
+# tasks file for ansible-zabbix-agent
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: configure_zabbix_agent.yml
+  when: >
+        inventory_hostname in groups[zabbix_agent_group]

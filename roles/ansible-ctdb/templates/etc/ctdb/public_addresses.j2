@@ -1,0 +1,3 @@
+{% for item in ctdb_public_addresses %}
+{{ item.address }}/{{ item.cidr }} {{ item.bind_interface }}
+{% endfor %}

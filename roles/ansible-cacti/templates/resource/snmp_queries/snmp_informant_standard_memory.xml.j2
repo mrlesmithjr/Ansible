@@ -1,0 +1,121 @@
+<query>
+        <name>Win32 - Memory Statistics</name>
+        <description>Grab the Win32_Memory statistics using SNMP-Informant</description>
+        <index_order_type>numeric</index_order_type>
+        <oid_index>.1.3.6.1.4.1.9600.1.1.2</oid_index>
+		
+	<fields>
+		<memory>
+			<name>Memory Stats</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.2</oid>
+		</memory>
+		<sinfMemAvailBytes>
+			<name>Memory Available MegaBytes</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.2.3</oid>
+		</sinfMemAvailBytes>
+		<sinfMemComBytes>
+                        <name>Memory Committed Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.4</oid>
+                </sinfMemComBytes>
+		<sinfMemCacheBytesPk>
+			<name>Memory Cache Bytes Peak</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.6</oid>
+		</sinfMemCacheBytesPk>
+		<sinfMemPageFaultsPS>
+                        <name>Memory Page Faults Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.7</oid>
+                </sinfMemPageFaultsPS>
+		<sinfMemPagesInputPS>
+			<name>Memory Pages Input Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.8</oid>
+                </sinfMemPagesInputPS>
+		<sinfMemPagesOutPS>
+                        <name>Memory Pages Output Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.9</oid>
+                </sinfMemPagesOutPS>
+                <sinfMemPagesPerSec>
+                        <name>Memory Pages Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.10</oid>
+                </sinfMemPagesPerSec>
+               	<sinfMemPNonpagedByt>
+                        <name>Memory Pool Nonpaged Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.11</oid>
+                </sinfMemPNonpagedByt>
+                <sinfMemPPagedBytes>
+                        <name>Memory Pool Paged Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.12</oid>
+                </sinfMemPPagedBytes>
+                <sinfMemPPagedResByt>
+                        <name>Memory Pool Paged Resident Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.13</oid>
+		</sinfMemPPagedResByt>
+                <sinfMemSysCacheResB>
+                        <name>Memory System Cache Resident Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.14</oid>
+                </sinfMemSysCacheResB>
+                <sinfMemSysCodeResB>
+                        <name>Memory System Code Resident Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.15</oid>
+                </sinfMemSysCodeResB>
+                <sinfMemSysCodeTotB>
+                        <name>Memory System Code Total Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.16</oid>
+                </sinfMemSysCodeTotB>
+                <sinfMemSysDrvResB>
+                        <name>Memory System Driver Resident Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.17</oid>
+                </sinfMemSysDrvResB>
+                <sinfMemSysDrvTotB>
+                        <name>Memory System Driver Total Bytes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.2.18</oid>
+                </sinfMemSysDrvTotB>
+</fields>
+</query>

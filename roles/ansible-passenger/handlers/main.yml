@@ -1,0 +1,11 @@
+---
+# handlers file for ansible-passenger
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted

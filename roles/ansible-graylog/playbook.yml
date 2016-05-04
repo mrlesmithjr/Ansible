@@ -1,0 +1,12 @@
+---
+- name: provisions graylog
+  hosts: all
+  sudo: true
+  vars:
+  roles:
+    - role: ansible-snmpd
+    - role: ansible-timezone
+    - role: ansible-elasticsearch
+    - role: ansible-mongodb
+    - role: ansible-graylog
+  tasks:

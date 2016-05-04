@@ -1,0 +1,24 @@
+---
+- name: redhat | enabling EPEL repo
+  yum:
+    name: "epel-release"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing lighttpd
+  yum:
+    name: "lighttpd"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing lighttpd
+  dnf:
+    name: "lighttpd"
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | ensuring lighttpd is enabled and started
+  service:
+    name: "lighttpd"
+    state: started
+    enabled: yes

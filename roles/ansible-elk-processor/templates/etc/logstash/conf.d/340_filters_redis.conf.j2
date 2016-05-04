@@ -1,0 +1,13 @@
+# Setup Redis server logging
+filter {
+  if [type] == "redis-server" {
+    grok {
+      match => [
+        "message", "%{REDISLOG}%{GREEDYDATA:message_body}"
+      ]
+    }
+    mutate {
+      replace => [ "message", "%{message_body}" ]
+    }
+  }
+}

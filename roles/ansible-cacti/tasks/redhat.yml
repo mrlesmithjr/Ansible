@@ -1,0 +1,20 @@
+---
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  notify:
+    - 'restart {{ cacti_webserver_handler }}'
+  with_items: '{{ cacti_redhat_packages }}'
+  when: >
+        ansible_distribution != "Fedora" and
+
+- name: redhat | installing pre-reqs
+  dnf:
+    name: "{{ item }}"
+    state: present
+  notify:
+    - 'restart {{ cacti_webserver_handler }}'
+  with_items: '{{ cacti_redhat_packages }}'
+  when: >
+        ansible_distribution == "Fedora"

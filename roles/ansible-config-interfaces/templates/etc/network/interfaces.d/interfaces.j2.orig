@@ -1,0 +1,26 @@
+
+# {{ ansible_managed }}
+
+{% if item.configure %}
+{%   if item.method == "static" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%     if item.address is defined and item.address != None %}
+address {{ item.address }}
+{%     endif %}
+{%     if item.netmask is defined and item.netmask != None %}
+netmask {{ item.netmask }}
+{%     endif %}
+{%     if item.gateway is defined and item.gateway != None %}
+gateway {{ item.gateway }}
+{%     endif %}
+{%   endif %}
+{%   if item.method == "dhcp" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%   endif %}
+{%   if item.wireless_network is defined and item.wireless_network %}
+wpa-ssid {{ item.wpa_ssid }}
+wpa-psk {{ item.wpa_psk }}
+{%   endif %}
+{% endif %}

@@ -1,0 +1,85 @@
+
+## zabbix Server version
+zabbix_server_major                   : '2'
+zabbix_server_minor                   : '4'
+zabbix_server_revision                : '4'
+
+## What compmentes to install
+zabbix_server_front_install           : False  ## Install frontend and dependency
+zabbix_server_install                 : False  ## Install server
+zabbix_server_proxy_install           : False  ## Install proxy server
+zabbix_agent_install                  : False  ## Install agent server
+
+## Zabbix Server  Configuration
+zabbix_server_host                    : "{{ ansible_ssh_host | default(inventory_hostname) }}"
+zabbix_server_name                    : "{{ inventory_hostname }}"
+zabbix_server_port                    : 10051
+zabbix_server_conf                    :
+    ListenIP                          : 0.0.0.0
+    ListenPort                        : "{{ zabbix_server_port }}"
+    LogFile                           : /var/log/zabbix/zabbix_server.log
+    LogFileSize                       : 0
+    PidFile                           : /var/run/zabbix/zabbix_server.pid
+    DBHost                            : localhost
+    DBName                            : "{{ zabbix_server_db_name }}"
+    DBUser                            : "{{ zabbix_server_db_user }}"
+    DBPassword                        : "{{ zabbix_server_db_pass }}"
+    AlertScriptsPath                  : /usr/lib/zabbix/alertscripts
+    ExternalScripts                   : /usr/lib/zabbix/externalscripts
+    FpingLocation                     : /usr/bin/fping
+    Fping6Location                    : /usr/bin/fping6
+
+## Zabbix Server Frontend
+zabbix_server_front_root              : "/var/www"
+zabbix_server_front_redirect          : True  ## Deploys an html to root of apache to redirect to /zabbix
+zabbix_server_front_apache_conf       : "/etc/zabbix/apache.conf"
+## Zabbix Server PHP
+zabbix_server_php_date_timezone       : "Europe/Berlin" ## check http://php.net/manual/en/timezones.php
+zabbix_server_php_max_input_time      : 300
+zabbix_server_php_upload_max_filesize : "2M"
+zabbix_server_php_post_max_size       : "16M"
+zabbix_server_php_memory_limit        : "128M"
+zabbix_server_php_max_execution_time  : 300
+## Zabbix API Connection (optional)
+zabbix_server_url                     : "http://{{ zabbix_server_host }}/zabbix"
+zabbix_server_front_user              : "Admin"   ## fresh installation default 'Admin' (dont change unless you changed the user)
+zabbix_server_front_pass              : "zabbix"  ## fresh installation default 'Zabbix' (dont change unless you changed the password)
+
+## Database options
+zabbix_server_db_type                 : 'pgsql' ## pgsql or mysql
+zabbix_server_db_name                 : "zabbix"
+zabbix_server_db_user                 : "zabbix"
+zabbix_server_db_pass                 : "READRdXxc&2zgvgzs_blaaaaaa"
+zabbix_server_db_host                 : "localhost"
+zabbix_server_db_port                 : 5432
+zabbix_server_db_intial_dir           : "/usr/share/zabbix-server-{{zabbix_server_db_type}}"
+
+## Zabbix agent
+zabbix_agent_conf                     :
+    PidFile                           : /var/run/zabbix/zabbix_agentpid
+    LogFile                           : "/var/log/zabbix/zabbix_agentd.log"
+    LogFileSize                       : 0    ## 0 - disable automatic log rotation.
+    DebugLevel                        : 3    ## (0) no, (1) critical info (2) error info (3) warnings (4) A lots of infor)
+    EnableRemoteCommands              : 0 ## 0 or 1
+    LogRemoteCommands                 : 0 ## 0 or 1
+    Server                            : "{{ zabbix_agent_Server }}"
+    ListenPort                        : 10050
+    ListenIP                          : "0.0.0.0"
+    StartAgents                       : 3
+    Hostname                          : "{{ inventory_hostname }}"
+    #ServerActive
+zabbix_agent_Server                   : 127.0.0.1
+zabbix_agent_Include                  :
+                                        - /etc/zabbix/zabbix_agentd.d/
+
+
+
+## Compilation of variables (No need to change them unless you have issues)
+zabbix_server_version       : "{{zabbix_server_major}}.{{zabbix_server_minor}}.{{zabbix_server_revision}}"
+zabbix_server_ubuntu        : "1:{{zabbix_server_version}}-1+precise"
+zabbix_php_db               : "{%if zabbix_server_db_type == 'pgsql' %}POSTGRESQL{% elif zabbix_server_db_type == 'mysql' %}MYSQL{% else %}ERROR_UNKNOWN_DB{% endif %}"
+
+
+
+
+

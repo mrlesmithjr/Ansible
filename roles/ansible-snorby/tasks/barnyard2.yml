@@ -1,0 +1,9 @@
+---
+- name: barnyard2 | configuring barnyard2
+  template:
+    src: "etc/snort/barnyard2.conf.j2"
+    dest: "/etc/snort/barnyard2.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart barnyard2

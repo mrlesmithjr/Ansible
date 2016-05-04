@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+		<style>
+			a:link {
+				color:orange;
+			}
+			a:visited {
+				color:lime;
+			}
+			html {
+				background: url(background.jpg) no-repeat center center fixed;
+				background-size: cover;
+			}
+			body {
+				color: orange;
+			}
+		</style>
+	</head>
+	<body>
+		<?php
+			echo "<html>";
+				echo "<body>";
+					session_start();
+					$gid = $_SESSION['sessiongid'];
+					$db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+					$db->exec( 'PRAGMA foreign_keys = ON;' );
+					$sql = "SELECT * FROM Groups WHERE GroupId=$gid";
+					$results = $db->query($sql);
+					while ($row = $results->fetchArray()) {
+						echo "<pre>";
+						echo "GroupId: ";
+						echo "<tr><td>" . $row['GroupId']. "</td></tr>";
+						echo "</pre>";
+						echo "<pre>";
+						echo "GroupName: ";
+						echo "<tr><td>" . $row['GroupName']. "</td></tr><br>";
+						echo "</pre>";
+						echo "<pre>";
+						echo "GroupDescription: ";
+						echo "<tr><td>" . $row['GroupDescription']. "</td></tr><br>";
+						echo "</pre>";
+						echo "<pre>";
+						echo "GroupDTAP: ";
+						echo "<tr><td>" . $row['GroupDTAP']. "</td></tr><br>";
+						echo "</pre>";
+						echo "<pre>";
+						echo "GroupCreatedOn: ";
+						echo "<tr><td>" . $row['GroupCreatedOn']. "</td></tr><br>";
+						echo "</pre>";
+						echo "<pre>";
+						echo "LastUpdateTime: ";
+						echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+						echo "</pre><br><br>";
+					}
+				echo "</body>";
+			echo "</html>";
+		?>
+		<h3>Select host to delete:</h3>
+		<form action="delete_group_host.php" method="post">
+			<select name="hostid" class="hostid">
+				<option selected="selected">--Select Host--</option>
+					<?php
+						$db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+						$db->exec( 'PRAGMA foreign_keys = ON;' );
+						$sql = "SELECT HostId,HostName FROM Hosts";
+						$results = $db->query($sql);
+						while ($row = $results->fetchArray()) {
+							echo '<option value="'.$row['HostId'].'">'.$row['HostName'].'</option>';
+						}
+					?>
+			</select>
+			<input type="submit" value="Delete Host">
+			<input type="reset" value="Reset">
+		</form>
+	</body>
+</html>

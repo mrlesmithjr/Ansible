@@ -1,0 +1,14 @@
+{
+  "client":{
+    "name": "{{ ansible_hostname }}",
+    "address": "{{ sensu_host }}",
+    "subscriptions": [
+{% if sensu_client_subs is defined %}
+{% for item in sensu_client_subs %}
+      "{{ item }}",
+{% endfor %}
+{% endif %}
+      "ALL"
+    ]
+  }
+}

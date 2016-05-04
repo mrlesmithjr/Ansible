@@ -1,0 +1,12 @@
+<Directory {{ owncloud_webroot }}/>
+  Options +FollowSymlinks
+  AllowOverride All
+
+ <IfModule mod_dav.c>
+  Dav off
+ </IfModule>
+
+ SetEnv HOME {{ owncloud_webroot }}
+ SetEnv HTTP_HOME {{ owncloud_webroot }}
+
+</Directory>

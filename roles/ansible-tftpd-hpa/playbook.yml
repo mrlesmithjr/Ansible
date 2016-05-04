@@ -1,0 +1,10 @@
+---
+- name: Installs a TFTP server
+  hosts: all
+  become: true
+  remote_user: vagrant
+  vars:
+  roles:
+    - role: ansible-apache2
+    - role: ansible-tftpd-hpa
+  tasks:

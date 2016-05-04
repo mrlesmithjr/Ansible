@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-tftpserver
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_tftp.yml
+  when: config_tftp is defined and config_tftp
+
+- include: build_images.yml
+  when: tftp_build_images is defined and tftp_build_images

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+		<style>
+			a:link {
+				color:orange;
+			}
+			a:visited {
+				color:lime;
+			}
+			html {
+				background: url(background.jpg) no-repeat center center fixed;
+				background-size: cover;
+			}
+			body {
+				color: orange;
+			}
+		</style>
+	</head>
+	<body>
+		<h3>Check existing groups:</h3>
+		<form action="query_group.php" id="form" name="form" method="post">
+			<select name="groupid" class="groupid">
+				<option selected="selected">--Select Group--</option>
+					<?php
+						$db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+						$db->exec( 'PRAGMA foreign_keys = ON;' );
+						$sql = "SELECT GroupId,GroupName FROM Groups";
+						$results = $db->query($sql);
+						while ($row = $results->fetchArray()) {
+							echo '<option value="'.$row['GroupId'].'">'.$row['GroupName'].'</option>';
+						}
+					?>
+			</select>
+			<button type="submit" id="submit">View Group Details</button>
+		</form><br><br>
+		<h3>Create New CMDB Group</h3>
+		<h4>(** - Denotes required field)</h4>
+		<form action="add_groups.php" method="post">
+			Group name: (**)<br><input type="text" name="GroupName"><br>
+			Group description:<br><input type="text" name="GroupDescription"><br>
+			Group DTAP: (**)<br><select name="GroupDTAP">
+				<option value="D">Development</option>
+				<option value="T">Test</option>
+				<option value="A">Acceptance</option>
+				<option value="P">Production</option>
+			</select><br>
+			<input type="submit" value="Add Group">
+			<input type="reset" value="Reset">
+		</form>
+	</body>
+</html>

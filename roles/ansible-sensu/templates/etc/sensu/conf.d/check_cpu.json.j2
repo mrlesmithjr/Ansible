@@ -1,0 +1,50 @@
+{% if item.name == "cpu" %}
+{
+  "checks": {
+    "check_{{ item.name }}": {
+      "command": "{{ sensu_plugins_dir }}/check-cpu.rb -w :::params.cpu.warning|70::: -c :::params.cpu.critical|90::: --sleep 30",
+{% if sensu_enable_handlers %}
+{% if not sensu_multiple_handlers %}
+      "handler": "{{ sensu_default_handler }}",
+{% endif %}
+{% if sensu_multiple_handlers %}
+      "handlers": [
+{% for item in sensu_default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ sensu_default_handler }}"
+      ],
+{% endif %}
+{% endif %}
+      "occurences": 3,
+      "interval": {{ item.interval }},
+      "subscribers": [ "{{ item.sub }}" ]
+    }
+  }
+}
+{% endif %}
+{% if item.name == "cpu_iowait" %}
+{
+  "checks": {
+    "check_{{ item.name }}": {
+      "command": "{{ sensu_plugins_dir }}/check-cpu.rb -w :::params.iowait.warning|30::: -c :::params.iowait.warning|50::: --iowait --sleep 30",
+{% if sensu_enable_handlers %}
+{% if not sensu_multiple_handlers %}
+      "handler": "{{ sensu_default_handler }}",
+{% endif %}
+{% if sensu_multiple_handlers %}
+      "handlers": [
+{% for item in sensu_default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ sensu_default_handler }}"
+      ],
+{% endif %}
+{% endif %}
+      "occurences": 3,
+      "interval": {{ item.interval }},
+      "subscribers": [ "{{ item.sub }}" ]
+    }
+  }
+}
+{% endif %}

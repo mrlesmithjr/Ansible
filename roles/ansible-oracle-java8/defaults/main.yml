@@ -1,0 +1,3 @@
+---
+# defaults file for ansible-oracle-java8
+oracle_java8_debian_repo: 'ppa:webupd8team/java'

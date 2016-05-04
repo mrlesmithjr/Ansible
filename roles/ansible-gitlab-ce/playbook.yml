@@ -1,0 +1,10 @@
+---
+- name: provisions Gitlab-CE
+  hosts: all
+  become: true
+  vars:
+    - config_gitlab: false
+  roles:
+    - role: ansible-postfix
+    - role: ansible-gitlab-ce
+  tasks:

@@ -1,0 +1,44 @@
+# framework.properties -
+#
+
+# ----------------------------------------------------------------
+# Rundeck server connection information
+# ----------------------------------------------------------------
+framework.server.name = {{ rundeck_framework_server_name }}
+framework.server.hostname = {{ rundeck_framework_server_hostname }}
+framework.server.port = {{ rundeck_framework_server_port }}
+framework.server.url = {{ rundeck_framework_server_url }}:{{ rundeck_framework_server_port }}
+# Username/password used by CLI tools.
+framework.server.username = {{ rundeck_framework_server_username }}
+framework.server.password = {{ rundeck_framework_server_password }}
+
+# ----------------------------------------------------------------
+# Installation locations
+# ----------------------------------------------------------------
+
+rdeck.base=/var/lib/rundeck
+
+framework.projects.dir=/var/rundeck/projects
+framework.etc.dir=/etc/rundeck
+framework.var.dir=/var/lib/rundeck/var
+framework.tmp.dir=/var/lib/rundeck/var/tmp
+framework.logs.dir=/var/lib/rundeck/logs
+framework.libext.dir=/var/lib/rundeck/libext
+
+# ----------------------------------------------------------------
+# SSH defaults for node executor and file copier
+# ----------------------------------------------------------------
+
+framework.ssh.keypath = {{ rundeck_framework_ssh_keypath }}
+framework.ssh.user = {{ rundeck_framework_ssh_user }}
+
+# ssh connection timeout after a specified number of milliseconds.
+# "0" value means wait forever.
+framework.ssh.timeout = 0
+{% if enable_rundeck_plugins %}
+# rundeck plugins
+{%   if rundeck_enable_logstash_plugin is defined and rundeck_enable_logstash_plugin %}
+framework.plugin.StreamingLogWriter.LogstashPlugin.port={{ rundeck_logstash_port }}
+framework.plugin.StreamingLogWriter.LogstashPlugin.host={{ rundeck_logstash_host }}
+{%   endif %}
+{% endif %}

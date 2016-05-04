@@ -1,0 +1,107 @@
+<query>
+      <name>Win32 - Network Statistics</name>
+      <description>Grab the Win32_Network statistics using SNMP-Informant</description>
+      <index_order_type>numeric</index_order_type>
+	<oid_index>.1.3.6.1.4.1.9600.1.1.3.1.1</oid_index>
+<oid_index_parse>OID/REGEXP:.*\.1\.(.*)$</oid_index_parse>
+	<fields>
+		<netInstance>
+			<name>Network Instance</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.3.1.1</oid>
+		</netInstance>
+		<netBytesRecPerSec>
+				<name>Network Bytes Received Per Sec</name>
+				<method>walk</method>
+				<source>value</source>
+				<direction>output</direction>
+				<oid>.1.3.6.1.4.1.9600.1.1.3.1.2</oid>
+		</netBytesRecPerSec>
+		<netBytSentPerSec>
+				<name>Network Bytes Sent Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.3</oid>
+            </netBytSentPerSec>
+		<netBytTotPerSec>
+				<name>Network Bytes Total Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.4</oid>
+		</netBytTotPerSec>
+		<netCurBandwidth>
+                        <name>Network Current Bandwidth</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.5</oid>
+            </netCurBandwidth>
+		<netOutQueueLength>
+				<name>Network Output Queue Length</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.6</oid>
+            </netOutQueueLength>
+		<netPktsOutDiscarded>
+                        <name>Network Packets Outbound Discarded</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.7</oid>
+            </netPktsOutDiscarded>
+            <netPktsOutErrors>
+                        <name>Network Packets Outbound Errors</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.8</oid>
+            </netPktsOutErrors>
+            <netPktsRecDisc>
+                        <name>Network Packets Received Discarded</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.9</oid>
+             </netPktsRecDisc>
+             <netPktsRecErr>
+                        <name>Network Packets Received Errors</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.10</oid>
+             </netPktsRecErr>
+             <netPktsRecUnk>
+                        <name>Network Packets Received Unknown</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.11</oid>
+		</netPktsRecUnk>
+            <netPktsRecPerSec>
+                        <name>Network Packets Received Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.12</oid>
+            </netPktsRecPerSec>
+            <netPktsSentPerSec>
+                        <name>Network Packets Sent Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.13</oid>
+            </netPktsSentPerSec>
+            <netPacketsPerSec>
+                        <name>Network Packets Per Sec</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.3.1.14</oid>
+            </netPacketsPerSec>
+	</fields>
+</query>

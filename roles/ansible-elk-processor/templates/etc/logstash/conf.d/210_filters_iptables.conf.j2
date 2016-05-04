@@ -1,0 +1,44 @@
+# Setting up IPTables firewall parsing
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if "IPTables" in [message] {
+      grok {
+        match => { "message" => "%{IPTABLES}" }
+        patterns_dir => [ "/opt/logstash/patterns" ]
+      }
+      mutate {
+        add_tag => [ "IPTABLES" ]
+      }
+      geoip {
+        source => "src_ip"
+        target => "geoip"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+      }
+      mutate {
+        convert => [ "[geoip][coordinates]", "float" ]
+      }
+    }
+  }
+}
+# Setting up IPTables actions
+filter {
+  if "IPTABLES" in [tags] {
+    grok {
+      match => [
+        "message", "IPTables-%{WORD:iptables_action}"
+      ]
+    }
+    grok {
+      match => [
+        "message", "PROTO=%{WORD:iptables_proto}"
+      ]
+    }
+    mutate {
+      remove_field => [ "proto" ]
+    }
+    mutate {
+      rename => [ "iptables_proto", "proto" ]
+    }
+  }
+}

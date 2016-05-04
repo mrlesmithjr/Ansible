@@ -1,0 +1,13 @@
+---
+- name: debian | installing KVM
+  apt: name={{ item }} state=present
+  with_items:
+    - bridge-utils
+    - ifenslave
+    - libvirt-bin
+    - lldpd
+    - python-libvirt
+    - python-lxml
+    - qemu-kvm
+    - ubuntu-vm-builder
+    - vlan

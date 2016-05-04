@@ -1,0 +1,22 @@
+# Monit monitoring alerts
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if [syslog_program] == "monit" {
+      if "usage" in [message] {
+        grok {
+          match => [
+            "message", "'%{IPORHOST}' %{DATA:monit_resource} of %{BASE10NUM:monit_resource_usage_percentage:float}% %{WORD} %{DATA}.\[%{DATA}>%{BASE10NUM:monit_resource_limit_percentage:float}%]",
+            "message", "'%{IPORHOST}' '%{IPORHOST}' %{DATA:monit_resource} check %{WORD:monit_check_status}.\[current %{DATA}=%{BASE10NUM:monit_current_resource_usage_percentage:float}%]"
+          ]
+        }
+      }
+      if "loadavg" in [message] and "check" not in [message] {
+        grok {
+          match => [
+            "message", "'%{IPORHOST}' %{DATA:monit_resource} of %{BASE10NUM:monit_resource_usage:float} %{WORD} %{DATA}.\[%{DATA}>%{BASE10NUM:monit_resource_limit:float}]"
+          ]
+        }
+      }
+    }
+  }
+}

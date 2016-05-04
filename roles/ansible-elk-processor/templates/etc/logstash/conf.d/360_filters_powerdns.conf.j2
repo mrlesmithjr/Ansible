@@ -1,0 +1,47 @@
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if [syslog_program] == "pdns" {
+      if "Remote" in [message] {
+        grok {
+          match => [
+            "message", "Remote %{IPORHOST:pdns_request_from}.*?'%{NOTSPACE:pdns_request}',.* packetcache %{WORD:pdns_cache_result}",
+            "message", "Remote %{IPORHOST:pdns_request_from}.*?'%{NOTSPACE:pdns_request}',.* packetcache"
+          ]
+        }
+        grok {
+          match => [
+            "pdns_request", "%{DATA:pdns_record_lookup}\|.*%{WORD:pdns_record_type}"
+          ]
+        }
+        mutate {
+          add_field => [ "tmp_record_lookup", "%{pdns_record_lookup}" ]
+        }
+        mutate {
+          remove => [ "pdns_request" ]
+        }
+      }
+      if [pdns_record_type] == "PTR" {
+        grok {
+          match => [
+            "pdns_record_lookup", "%{INT:oct_4}.%{INT:oct_3}.%{INT:oct_2}.%{INT:oct_1}",
+            "pdns_record_lookup", "%{NOTSPACE}"
+          ]
+        }
+        if [oct_1] and [oct_2] and [oct_3] and [oct_4]{
+          mutate {
+            replace => [ "pdns_record_lookup", "%{oct_1}.%{oct_2}.%{oct_3}.%{oct_4}"]
+          }
+        }
+      }
+#      if [pdns_record_lookup] == "%{oct_1}.%{oct_2}.%{oct_3}.%{oct_4}" {
+#        mutate {
+#          replace => [ "pdns_record_lookup", "%{tmp_record_lookup}" ]
+#        }
+#      }
+      mutate {
+        add_tag => [ "PowerDNS" ]
+        remove => [ "oct_1", "oct_2", "oct_3", "oct_4", "tmp_record_lookup" ]
+      }
+    }
+  }
+}

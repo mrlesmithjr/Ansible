@@ -1,0 +1,39 @@
+---
+- name: debian | install plex dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libavahi-common3
+    - libavahi-core7
+    - libdaemon0
+    - libnss-mdns
+    - libavahi-client3
+    - libavahi-common3
+    - avahi-daemon
+    - avahi-utils
+    - cifs-utils
+
+- name: debian | downloading plex
+  get_url:
+    url: "{{ plex_deb_url }}"
+    dest: "{{ plex_dl_dir }}/{{ plex_deb_file }}"
+
+- name: debian | check if plex is already installed
+  command: "dpkg -s plexmediaserver"
+  register: result
+  changed_when: False
+  ignore_errors: yes
+
+- name: debian | installing plex
+  command: "dpkg -i {{ plex_dl_dir }}/{{ plex_deb_file }}"
+  when: result|failed
+
+- name: debian | upgrading plex
+  command: "dpkg -i {{ plex_dl_dir }}/{{ plex_deb_file }}"
+  when: result
+
+- name: debian | starting plex
+  service:
+    name: plexmediaserver
+    state: started

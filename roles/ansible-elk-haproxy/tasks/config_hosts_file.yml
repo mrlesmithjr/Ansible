@@ -1,0 +1,37 @@
+---
+- name: config_hosts_file | updating /etc/hosts in case of dns lookup issues
+  lineinfile:
+    dest: "/etc/hosts"
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{ item }}"
+    state: present
+  when: hostvars[item].ansible_default_ipv4.address is defined
+  with_items: groups['all']
+  when: >
+        (vagrant_deployment is defined and
+        not vagrant_deployment) or
+        vagrant_deployment is not defined
+
+- name: config_hosts_file | updating /etc/hosts in case of dns lookup issues
+  lineinfile:
+    dest: "/etc/hosts"
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_eth1.ipv4.address }} {{ item }}"
+    state: present
+  when: hostvars[item].ansible_eth1.ipv4.address is defined
+  with_items: groups['all']
+  when: >
+        vagrant_deployment is defined and
+        vagrant_deployment
+
+- name: config_hosts_file | updating /etc/hosts in case of dns lookup issues
+  lineinfile:
+    dest: "/etc/hosts"
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_enp0s8.ipv4.address }} {{ item }}"
+    state: present
+  when: hostvars[item].ansible_enp0s8.ipv4.address is defined
+  with_items: groups['all']
+  when: >
+        vagrant_deployment is defined and
+        vagrant_deployment

@@ -1,0 +1,10 @@
+---
+- name: elasticsearch_security_limits | configuring elasticsearch security limits
+  lineinfile:
+    dest: /etc/security/limits.conf
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - 'elasticsearch soft nofile 65536'
+    - 'elasticsearch hard nofile 65536'
+    - 'elasticsearch - memlock unlimited'

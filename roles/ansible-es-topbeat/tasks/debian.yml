@@ -1,0 +1,17 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - unzip
+
+- name: debian | downloading topbeat
+  get_url:
+    url: "{{ es_topbeat_debian_dl }}"
+    dest: "/opt/{{ es_topbeat_debian_package }}"
+
+- name: debian | installing topbeat
+  apt:
+    deb: "/opt/{{ es_topbeat_debian_package }}"
+    state: present

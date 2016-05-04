@@ -1,0 +1,148 @@
+---
+- name: barnyard2 | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - autoconf
+    - bison
+    - flex
+    - libdumbnet-dev
+    - libmysqlclient-dev
+    - libpcap-dev
+    - libpcre3-dev
+    - libtool
+    - mysql-client
+  when: ansible_os_family == "Debian"
+
+- name: barnyard2 | ensuring snort_src_dir exists
+  file:
+    path: "{{ snort_src_dir }}"
+    state: directory
+
+- name: barnyard2 | downloading snort daq
+  get_url:
+    url: "https://snort.org/downloads/snort/daq-{{ snort_daq_version }}.tar.gz"
+    dest: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}.tar.gz"
+
+- name: barnyard2 | extracting snort daq
+  unarchive:
+    src: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}.tar.gz"
+    dest: "{{ snort_src_dir }}"
+    creates: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}/configure"
+    copy: no
+
+- name: barnyard2 | building snort daq
+  command: "{{ item }}"
+  args:
+    chdir: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}"
+    creates: "/usr/local/lib/daq/daq_pcap.so"
+  with_items:
+    - './configure'
+    - 'make'
+    - 'make install'
+
+- name: barnyard2 | cloning barnyard2 repo
+  git:
+    repo: "https://github.com/firnsy/barnyard2"
+    dest: "{{ snort_src_dir }}/barnyard2"
+    update: no
+
+- name: barnyard2 | building barnyard2
+  command: "{{ item }}"
+  args:
+    chdir: "{{ snort_src_dir }}/barnyard2"
+    creates: "/usr/local/bin/barnyard2"
+  with_items:
+    - './autogen.sh'
+    - './configure --with-mysql --with-mysql-libraries=/usr/lib/{{ ansible_machine }}-linux-gnu/'
+    - 'ln -s /usr/include/dumbnet.h /usr/include/dnet.h'
+    - 'ldconfig'
+    - 'make'
+    - 'make install'
+
+- name: barnyard2 | configuring barnyard2
+  template:
+    src: "etc/snort/barnyard2.conf.j2"
+    dest: "/etc/snort/barnyard2.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: barnyard2 | ensuring /var/log/barnyard2 directory exists
+  file:
+    path: "/var/log/barnyard2"
+    state: directory
+
+- name: barnyard2 | checking if barnyard2 waldo file exists
+  stat:
+    path: "{{ snort_barnyard2_waldo_file }}"
+  register: barnyard2_waldo_file
+
+- name: barnyard2 | creating barnyard2_waldo_file
+  file:
+    path: "{{ snort_barnyard2_waldo_file }}"
+    state: touch
+  when: not barnyard2_waldo_file.stat.exists
+
+- name: barnyard2 | creating snort sid-msg.map
+  shell: "./create-sidmap.pl /etc/snort/rules > /etc/snort/sid-msg.map"
+  ignore_errors: yes
+  args:
+    chdir: "/usr/share/oinkmaster/"
+    creates: "/etc/snort/sid-msg.map"
+
+- name: barnyard2 | copying MySQL schema
+  copy:
+    src: "create_mysql"
+    dest: "/tmp/create_mysql"
+
+- name: barnyard2 | creating MySQL DBs
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'archive'
+    - 'snort'
+
+- name: barnyard2 | setting MySQL DB permissions
+  mysql_user:
+    user: "{{ snort_barnyard2_db_info.user }}"
+    password: "{{ snort_barnyard2_db_info.pass }}"
+    priv: "{{ item }}.*:USAGE/{{ item }}.*:ALL"
+  with_items:
+    - 'archive'
+    - 'snort'
+
+- name: barnyard2 | checking if MySQL DB schema imported
+  stat:
+    path: "/var/log/.db_schema_imported"
+  register: db_schema_imported
+
+- name: barnyard2 | importing MySQL DB Schema
+  mysql_db:
+    name: "snort"
+    state: import
+    target: "/tmp/create_mysql"
+  register: db_schema_import
+  when: not db_schema_imported.stat.exists
+
+- name: barnyard2 | marking MySQL DB schema as imported
+  file:
+    path: "/var/log/.db_schema_imported"
+    state: touch
+  when: db_schema_import.changed
+
+- name: barnyard2 | creating barnyard2 service
+  template:
+    src: "etc/init.d/barnyard2.j2"
+    dest: "/etc/init.d/barnyard2"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: barnyard2 | starting and enabling barnyard2 service
+  service:
+    name: "barnyard2"
+    state: started
+    enabled: yes

@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+
+# Path of the Gerrit site to run.  $GERRIT_SITE/etc/gerrit.config
+# will be used to configure the process.
+GERRIT_SITE={{ gerrit_site_dir }}
+
+# Location of the gerrit.war download that we will execute.  Defaults to
+# container.war property in $GERRIT_SITE/etc/gerrit.config.
+GERRIT_WAR=/opt/gerrit/gerrit.war
+
+# If set to "1" disables Gerrit from starting.
+NO_START=0
+
+# If set to "0" disables using start-stop-daemon.  This may need to
+# be set on SuSE systems.
+START_STOP_DAEMON=1

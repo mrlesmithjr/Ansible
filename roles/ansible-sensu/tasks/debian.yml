@@ -1,0 +1,6 @@
+---
+- include: debian_server.yml
+  when: sensu_server
+
+- include: debian_client.yml
+  when: sensu_client

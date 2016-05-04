@@ -1,0 +1,29 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <br><br><br><br>
+    <h4>My Custom Links</h4>
+    <form name="weblinks">
+      <select name="viewlink" OnChange="location.href=weblinks.viewlink.options[selectedIndex].value">
+        <option selected>Choose a link:</option>
+        <?php
+          session_start();
+          $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+          $db->exec( 'PRAGMA foreign_keys = ON;' );
+          $sql = "SELECT * FROM UsersLinks WHERE UserId=$uid";
+          $results = $db->query($sql) or die('Query failed');
+          while ($row = $results->fetchArray()) {
+            echo '<option value="'.$row['Url'].'">'.$row['Name'].' - '.$row['Url'].'</option>';
+          }
+        ?>
+      </select>
+    </form>
+  </body>
+</html>

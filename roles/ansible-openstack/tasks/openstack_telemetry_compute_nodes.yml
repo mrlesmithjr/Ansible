@@ -1,0 +1,17 @@
+---
+- name: openstack_telemetry_compute_nodes | installing Telemtry packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ceilometer-agent-compute
+
+- name: openstack_telemetry_compute_nodes | configuring Ceilometer
+  template:
+    src: etc/ceilometer/ceilometer.conf.j2
+    dest: /etc/ceilometer/ceilometer.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ceilometer-agent-compute

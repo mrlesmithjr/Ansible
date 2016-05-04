@@ -1,0 +1,83 @@
+---
+- name: config_apache2_pages | configuring cmdb web pages
+  template: src='var/www/html/{{ item }}.j2' dest='{{ apache2_root }}/{{ item }}' owner='{{ cmdb_web_user }}' group='{{ cmdb_web_group }}' mode=0644
+  with_items:
+    - add_groups.php
+    - add_group_contact.php
+    - add_group_host.php
+    - add_user_links.php
+    - ansible_actions.php
+    - ansible_test_jenkins_job.php
+    - common.php
+    - common_base.php
+    - configure_user_jenkins_api.php
+    - delete_group_contact.php
+    - delete_group_host.php
+    - delete_group.php
+    - edit_group.php
+    - edit_group_contact.php
+    - edit_user_jenkins_api.php
+    - edit_user_info.php
+    - group_actions.php
+    - index.php
+    - login.php
+    - logout.php
+    - members.php
+    - php_details.php
+    - query_group.php
+    - query_group_contact_info.php
+    - query_group_details.php
+    - query_group_hosts.php
+    - query_host_details.php
+    - query_users.php
+    - register_user.php
+    - run_group_ansible_playbook.php
+    - send_group_email.php
+    - validate_login.php
+    - view_group_contact_info.php
+    - view_user_jenkins_api.php
+    - view_user_links.php
+
+- name: config_apache2_pages | copying files
+  copy: src=background.jpg dest='{{ apache2_root }}' owner='{{ cmdb_web_user }}' group='{{ cmdb_web_group }}'
+
+- name: config_apache2_pages | cleaning up old pages
+  file: path='{{ apache2_root }}/{{ item }}' state=absent
+  with_items:
+    - add_group_contact.html
+    - add_group_contact_info.html
+    - add_group_contact_info.php
+    - add_group_host.html
+    - add_groups.html
+    - add_groups_db.php
+    - add_user_links.html
+    - ansible_actions.html
+    - calendar.php
+    - create_user.html
+    - create_user.php
+    - db_actions.php
+    - db_query.php
+    - db_tables.php
+    - delete_group.html
+    - delete_group_host.html
+    - delete_group_hosts.html
+    - delete_group_hosts.php
+    - delete_groups.html
+    - delete_groups.php
+    - edit_group.html
+    - edit_group_contact.html
+    - edit_group_contact_info.html
+    - edit_group_contact_info.php
+    - email.html
+    - email_groups.html
+    - groups.html
+    - groups.php
+    - host_actions.php
+    - index.html
+    - query_groups_db.php
+    - register_user.html
+    - send_group_email.html
+    - test.php
+    - user_actions.php
+    - version.php
+    - view_jenkins_api.php

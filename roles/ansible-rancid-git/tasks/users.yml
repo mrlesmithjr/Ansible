@@ -1,0 +1,7 @@
+---
+- name: users | creating RANCID user
+  user:
+    name: "{{ rancid_user }}"
+    comment: "RANCID User"
+    home: "{{ rancid_home_dir }}"
+    generate_ssh_key: yes

@@ -1,0 +1,73 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  echo "<html>";
+    echo "<body>";
+    session_start ();
+    if(isset($_POST['groupid'])) {
+      $gid = $_POST['groupid'];
+    }
+    $_SESSION['sessiongid'] = $gid;
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "SELECT * FROM Groups WHERE GroupId=$gid";
+    $results = $db->query($sql);
+    $gn = $db->query("SELECT GroupName FROM Groups WHERE GroupId=$gid");
+    while ($row = $results->fetchArray()) {
+      echo "<br><br><br><br>";
+      echo "<h4>Group Info</h4>";
+      echo "<pre>";
+      echo "GroupId: ";
+      echo "<tr><td>" . $row['GroupId']. "</td></tr>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupName: ";
+      echo "<tr><td>" . $row['GroupName']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupDescription: ";
+      echo "<tr><td>" . $row['GroupDescription']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupDTAP: ";
+      echo "<tr><td>" . $row['GroupDTAP']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "GroupCreatedOn: ";
+      echo "<tr><td>" . $row['GroupCreatedOn']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "LastUpdateTime: ";
+      echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+      echo "</pre><br><br>";
+    }
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <form action="group_actions.php" method="post">
+      <h3>Group Actions:</h3><select name="GroupAction">
+        <option selected>Choose Group Action:</option>
+          <option value="AddGroupContact">Add Group Contact</option>
+          <option value="AddGroupHost">Add Host to Group</option>
+          <option value="DefineAnsibleGroupVars">Define Ansible Group Variables</option>
+          <option value="DeleteGroup">Delete Group</option>
+          <option value="DeleteGroupHost">Delete Host From Group</option>
+          <option value="EditGroup">Edit Group</option>
+          <option value="QueryGroupHosts">Query Group Hosts</option>
+          <option value="RequestCustomLogging">Request Custom Group Logging</option>
+          <option value="RunGroupAnsiblePlaybook">Run Ansible Playbook On Group</option>
+          <option value="ScheduleGroupMaintenance">Schedule Group Maintenance</option>
+          <option value="SendGroupEmail">Send Group Email</option>
+          <option value="ViewGroupContactInfo">View Group Contact Info</option>
+        </select>
+      <input type="submit">
+      <input type="reset" value="Reset">
+    </form>
+  </body>
+</html>

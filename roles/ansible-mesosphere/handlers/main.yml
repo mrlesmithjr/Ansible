@@ -1,0 +1,21 @@
+---
+# handlers file for ansible-mesosphere
+- name: restart marathon
+  service:
+    name: "marathon"
+    state: restarted
+    
+- name: restart mesos-master
+  service:
+    name: "mesos-master"
+    state: restarted
+
+- name: restart mesos-slave
+  service:
+    name: "mesos-slave"
+    state: restarted
+
+- name: restart zookeeper
+  service:
+    name: "zookeeper"
+    state: restarted

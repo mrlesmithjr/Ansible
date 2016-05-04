@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  connection: local
+  become: false
+  vars:
+  vars_files:
+    - ../defaults/main.yml
+  tasks:
+    - name: installing Debian/Ubuntu pre-reqs
+      apt:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+        - python-httplib2
+      when: ansible_os_family == "Debian"
+
+    - name: creating folder
+      file:
+        path: "{{ github_repo_root }}/{{ item.user }}"
+        state: directory
+      with_items: '{{ github_users }}'
+
+    - name: gathering repos
+      uri:
+        url: "https://api.github.com/users/{{ item.0.user }}/repos?per_page={{ return_items }}&page={{ item.1 }}"
+      register: github_repos
+      with_subelements:
+        - github_users
+        - pages
+
+    - name: creating repos vars file
+      template:
+        src: "../templates/query_git_repos.j2"
+        dest: "{{ repos_file }}"

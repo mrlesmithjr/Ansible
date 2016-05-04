@@ -1,0 +1,6 @@
+---
+- name: debian | configuring kibana service
+  template:
+    src: etc/init/kibana.conf.j2
+    dest: /etc/init/kibana.conf
+  notify: restart kibana

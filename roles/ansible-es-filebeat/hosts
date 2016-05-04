@@ -1,0 +1,3 @@
+es  ansible_ssh_host=192.168.202.202  ansible_ssh_private_key_file=.vagrant/machines/es/virtualbox/private_key
+logstash  ansible_ssh_host=192.168.202.203  ansible_ssh_private_key_file=.vagrant/machines/logstash/virtualbox/private_key
+filebeat  ansible_ssh_host=192.168.202.201  ansible_ssh_private_key_file=.vagrant/machines/filebeat/virtualbox/private_key

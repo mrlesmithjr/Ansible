@@ -1,0 +1,3 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-django.git
+- src: https://github.com/mrlesmithjr/ansible-mysql.git

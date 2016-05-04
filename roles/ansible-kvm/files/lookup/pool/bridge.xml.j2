@@ -1,0 +1,36 @@
+<network>
+  <name>{{ item.name }}</name>
+{% if item.uuid|d() %}
+  <uuid>{{ item.uuid }}</uuid>
+{% endif %}
+{% if item.mode == "bridge" %}
+  <bridge name="{{ item.bridge_name }}" />
+  <forward mode="{{ item.mode }}" />
+{% endif %}
+{% if item.mode == "nat" %}
+  <bridge name="{{ item.bridge_name }}" />
+  <forward mode="{{ item.mode }}" />
+{% endif %}
+{% if item.mode == "private" %}
+  <bridge name="{{ item.bridge_name }}" />
+{% endif %}
+{% if item.mode == "route" %}
+  <bridge name="{{ item.bridge_name }}" />
+  <forward mode="{{ item.mode }}" dev="{{ item.route_device }}" />
+{% endif %}
+{% if item.virtualport_type is defined %}
+  <virtualport type="{{ item.virtualport_type }}" />
+{% endif %}
+{% if item.enable_dhcp is defined and item.enable_dhcp %}
+  <domain name="{{ pri_domain_name }}" />
+  <dns>
+    <forwarder addr="{{ pri_dns }}" />
+    <forwarder addr="{{ sec_dns }}" />
+  </dns>
+  <ip address="{{ item.dhcp_gateway }}" netmask="{{ item.dhcp_netmask }}">
+    <dhcp>
+      <range start="{{ item.dhcp_scope_start }}" end="{{ item.dhcp_scope_end }}" />
+    </dhcp>
+  </ip>
+{% endif %}
+</network>

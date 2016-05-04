@@ -1,0 +1,31 @@
+---
+# tasks file for ansible-kvm
+- include: hw_virtualization_check.yml
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_kvm.yml
+  tags:
+    - config_kvm
+  when: config_kvm is defined and config_kvm
+
+- include: nfs.yml
+  tags:
+    - config_nfs
+  when: (config_nfs_mounts is defined and config_nfs_mounts) and nfs_mounts is defined
+
+- include: users.yml
+  tags:
+    - config_users
+  when: (config_kvm_users is defined and config_kvm_users) and kvm_users is defined
+
+- include: config_ssh.yml
+  tags:
+    - config_ssh
+  when: allow_root_ssh is defined and allow_root_ssh
+
+- include: config_virtual_networks.yml
+  tags:
+    - config_virtual_networks
+  when: (config_kvm_virtual_networks is defined and config_kvm_virtual_networks) and kvm_virtual_networks is defined

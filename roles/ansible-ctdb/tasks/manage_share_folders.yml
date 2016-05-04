@@ -1,0 +1,31 @@
+---
+- name: manage_share_folders | setting permissions on default share root {{ ctdb_samba_shares_root_dir }}
+  file:
+    path: "{{ ctdb_samba_shares_root_dir }}"
+    owner: "{{ ctdb_samba_shares_root_perms.owner }}"
+    group: "{{ ctdb_samba_shares_root_perms.group }}"
+    mode: "{{ ctdb_samba_shares_root_perms.directory_perms }}"
+
+- name: manage_share_folders | granting access on folders
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.directory_perms }}"
+    state: directory
+    recurse: "{{ item.recurse_directory_perms }}"
+  with_items: '{{ ctdb_samba_shares }}'
+
+- name: manage_share_folders | setting default ACL's
+  acl:
+    path: "{{ item.0.path }}"
+    entity: "{{ item.1.entity }}"
+    etype: "{{ item.1.etype }}"
+    permissions: "{{ item.1.perms }}"
+    default: "{{ item.1.default }}"
+    recursive: "{{ item.1.recurse }}"
+    state: present
+  with_subelements:
+    - '{{ ctdb_samba_shares }}'
+    - acls
+  when: ctdb_samba_join_domain

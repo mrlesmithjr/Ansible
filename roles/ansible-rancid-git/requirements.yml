@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-postfix.git
+- src: https://github.com/mrlesmithjr/ansible-rancid-git.git

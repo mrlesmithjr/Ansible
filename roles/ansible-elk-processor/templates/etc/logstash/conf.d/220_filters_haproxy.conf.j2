@@ -1,0 +1,33 @@
+# Setting up HAProxy parsing
+filter {
+  if "syslog" in [tags] {
+    if [syslog_program] == "haproxy" {
+      mutate {
+        remove_field => [ "syslog_timestamp" ]
+      }
+      grok {
+        match => [
+#          "message", "%{HAPROXYHTTP}",
+#          "message", "%{HAPROXYTCP}",
+          "message", "%{IPORHOST:syslog_server}:%{INT:client_port:} \[%{HAPROXYDATE:accept_date}\] %{NOTSPACE:frontend_name} %{NOTSPACE:backend_name}/%{NOTSPACE:server_name} %{INT:time_queue:int}/%{INT:time_backend_connect:int}/%{NOTSPACE:time_duration:int} %{NOTSPACE:bytes_read:int} %{NOTSPACE:termination_state} %{INT:actconn:int}/%{INT:feconn:int}/%{INT:beconn:int}/%{INT:srvconn:int}/%{NOTSPACE:retries:int} %{INT:srv_queue:int}/%{INT:backend_queue:int}",
+          "message", "%{SYSLOGTIMESTAMP:syslog_timestamp} %{IPORHOST:syslog_server} %{SYSLOGPROG}: %{GREEDYDATA:haproxy_message}"
+        ]
+        add_tag => [ "HAProxy" ]
+      }
+      geoip {
+        source => "client_ip"
+        target => "geoip"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+      }
+      mutate {
+        convert => [ "[geoip][coordinates]", "float" ]
+        rename => [ "http_status_code", "response" ]
+        rename => [ "http_request", "request" ]
+        rename => [ "client_ip", "src_ip" ]
+#       replace => [ "message", "%{haproxy_message}" ]
+        replace => [ "host", "%{received_from}"]
+      }
+    }
+  }
+}

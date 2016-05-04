@@ -1,0 +1,28 @@
+---
+- name: openstack_rabbitmq_config | creating RabbitMQ user
+  rabbitmq_user:
+    user: "{{ openstack_rabbit_user }}"
+    password: "{{ openstack_rabbit_pass }}"
+    vhost: "/"
+    configure_priv: ".*"
+    read_priv: ".*"
+    write_priv: ".*"
+    state: present
+    tags: administrator
+  tags:
+    - rabbitmq-users
+  when: inventory_hostname == rabbitmq_master
+
+- name: openstack_rabbitmq_config | creating RabbitMQ user
+  rabbitmq_user:
+    user: "{{ openstack_rabbit_user }}"
+    password: "{{ openstack_rabbit_pass }}"
+    vhost: "/"
+    configure_priv: ".*"
+    read_priv: ".*"
+    write_priv: ".*"
+    state: present
+    tags: administrator
+  tags:
+    - rabbitmq-users
+  when: inventory_hostname != rabbitmq_master

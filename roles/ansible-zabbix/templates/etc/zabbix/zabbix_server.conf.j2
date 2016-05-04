@@ -1,0 +1,21 @@
+AlertScriptsPath=/usr/lib/zabbix/alertscripts
+DBHost={{ zabbix_db_info.host }}
+DBName={{ zabbix_db_info.name }}
+DBPassword={{ zabbix_db_info.password }}
+DBPort={{ zabbix_db_info.port }}
+DBUser={{ zabbix_db_info.user }}
+ExternalScripts=/usr/lib/zabbix/externalscripts
+Fping6Location={{ fping6_path.stdout }}
+FpingLocation={{ fping_path.stdout }}
+ListenIP={{ zabbix_server_listen_ip }}
+ListenPort={{ zabbix_server_port }}
+LogFile={{ zabbix_server_logfile }}
+LogFileSize={{ zabbix_server_logfile_size }}
+LogSlowQueries=3000
+PidFile=/var/run/zabbix/zabbix_server.pid
+Timeout={{ zabbix_server_timeout }}
+
+############ ADVANCED PARAMETERS ################
+{% for item in zabbix_advanced_parameters %}
+{{ item.name }}={{ item.value }}
+{% endfor %}

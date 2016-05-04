@@ -1,0 +1,20 @@
+---
+# defaults file for ansible-mailcatcher
+mailcatcher_debian_packages:
+  - 'build-essential'
+  - 'libsqlite3-dev'
+  - 'ruby'
+  - 'ruby-dev'
+  - 'software-properties-common'
+mailcatcher_http_listen_address: '0.0.0.0'
+mailcatcher_http_port: '1080'
+mailcatcher_listen_address: '0.0.0.0'
+mailcatcher_ruby_version: '2.3'
+mailcatcher_smtp_listen_address: '0.0.0.0'
+mailcatcher_smtp_port: '1025'
+mailcatcher_ubuntu_packages:
+  - 'build-essential'
+  - 'libsqlite3-dev'
+  - 'ruby{{ mailcatcher_ruby_version }}'
+  - 'ruby{{ mailcatcher_ruby_version }}-dev'
+  - 'software-properties-common'

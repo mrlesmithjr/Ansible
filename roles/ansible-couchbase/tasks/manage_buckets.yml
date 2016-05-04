@@ -1,0 +1,21 @@
+---
+- name: manage_buckets | listing current buckets
+  shell: "{{ couchbase_cli }} bucket-list -c 127.0.0.1:8091 -u {{ couchbase_admin_user }} -p {{ couchbase_admin_pass }}"
+  register: couchbase_bucket_list
+  run_once: true
+
+- name: manage_buckets | creating buckets
+  shell: "{{ couchbase_cli }} bucket-create -c 127.0.0.1:8091 -u {{ couchbase_admin_user }} -p {{ couchbase_admin_pass }} --bucket={{ item.name }} --bucket-ramsize={{ item.ram_size }}"
+  run_once: true
+  with_items: couchbase_buckets
+  when: >
+        item.name not in couchbase_bucket_list.stdout and
+        item.state == "present"
+
+- name: manage_buckets | deleting buckets
+  shell: "{{ couchbase_cli }} bucket-delete -c 127.0.0.1:8091 -u {{ couchbase_admin_user }} -p {{ couchbase_admin_pass }} --bucket={{ item.name }}"
+  run_once: true
+  with_items: couchbase_buckets
+  when: >
+        item.name in couchbase_bucket_list.stdout and
+        item.state == "absent"

@@ -1,0 +1,11 @@
+---
+- name: configuring gitlab-ce
+  template:
+    src: "etc/gitlab/gitlab.rb.j2"
+    dest: "/etc/gitlab/gitlab.rb"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - reconfigure gitlab
+    - restart gitlab

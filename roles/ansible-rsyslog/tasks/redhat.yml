@@ -1,0 +1,35 @@
+---
+- name: redhat_rsyslog | ensuring rsyslog is installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+#    - python-dnf  #preparing for using dnf instead of yum
+    - rsyslog
+  when: >
+        ansible_distribution != "Fedora"
+
+- name: redhat_rsyslog | ensuring rsyslog is installed
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rsyslog
+  when: >
+        ansible_distribution == "Fedora"
+
+- name: redhat_rsyslog | configuring rsyslog
+  template:
+    src: "etc/redhat_rsyslog.conf.j2"
+    dest: "/etc/rsyslog.conf"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart rsyslog
+  when: configure_rsyslog is defined and configure_rsyslog
+
+- name: redhat_rsyslog | enabling rsyslog service
+  service:
+    name: "rsyslog"
+    enabled: yes
+    state: started

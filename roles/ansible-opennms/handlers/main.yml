@@ -1,0 +1,11 @@
+---
+# handlers file for ansible-opennms
+- name: restart opennms
+  service:
+    name: "opennms"
+    state: restarted
+    
+- name: restart postgresql
+  service:
+    name: "postgresql"
+    state: restarted

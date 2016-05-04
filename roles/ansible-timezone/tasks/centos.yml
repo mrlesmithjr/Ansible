@@ -1,0 +1,3 @@
+---
+- name: configuring /etc/localtime
+  file: src=/usr/share/zoneinfo/{{ timezone }} dest=/etc/localtime state=link force=yes

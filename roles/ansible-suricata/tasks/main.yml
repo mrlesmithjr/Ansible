@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-suricata
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: configure_suricata.yml
+  when: config_suricata is defined and config_suricata
+
+- include: configure_interface_offloading.yml

@@ -1,0 +1,14 @@
+---
+# tasks file for ansible-mariadb-galera-cluster
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "RedHat"
+
+- include: galera_monitoring.yml
+  tags:
+    - config_galera_monitoring
+  when: enable_galera_monitoring_script
+
+- include: configure_root_access.yml

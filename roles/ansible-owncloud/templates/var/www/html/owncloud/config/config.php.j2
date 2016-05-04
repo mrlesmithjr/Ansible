@@ -1,0 +1,14 @@
+<?php
+$CONFIG = array (
+  'trusted_domains' =>
+  array (
+    0 => 'localhost',
+    1 => '{{ ansible_hostname }}',
+    2 => '{{ ansible_hostname }}.{{ pri_domain_name }}',
+  ),
+  'memcache.local' => '\OC\Memcache\Memcached',
+  'memcache.distributed' => '\OC\Memcache\Memcached',
+  'memcached_servers' => array(
+     array('localhost', 11211),
+  ),
+);

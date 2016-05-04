@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-samba
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: samba_groups.yml
+
+- include: samba_users.yml
+
+- include: create_shares.yml
+
+- include: config_samba.yml
+
+- include: domain_users.yml
+  when: samba_create_domain_users is defined and samba_create_domain_users

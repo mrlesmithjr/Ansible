@@ -1,0 +1,74 @@
+# {{ ansible_managed }}
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP $mail_name
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# TLS parameters
+{% if postfix_use_tls is not defined %}
+smtpd_use_tls=yes
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+{% endif %}
+{% if postfix_use_tls %}
+smtpd_use_tls=yes
+smtpd_tls_cert_file={{ postfix_tls_cert_file }}
+smtpd_tls_key_file={{ postfix_tls_cert_key }}
+{% endif %}
+{% if not postfix_use_tls %}
+smtpd_use_tls=no
+{% endif %}
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+# information on enabling SSL in the smtp client.
+
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
+myhostname = {{ansible_fqdn}}
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mydestination = {{ansible_fqdn}}, localhost
+{% if postfix_relayhost is defined and enable_postfix_relayhost %}
+relayhost = {{postfix_relayhost}}
+{% endif %}
+{% if postfix_mynetworks is defined %}
+{% for item in postfix_mynetworks %}
+mynetworks = {{item}}
+{% endfor %}
+{% endif %}
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+inet_protocols = all
+{% if postfix_rewrite_domain is defined and enable_postfix_domain_rewrite %}
+mydomain = {{postfix_rewrite_domain}}
+{% endif %}
+{% if enable_postfix_domain_rewrite %}
+smtp_generic_maps = {{ postfix_domain_rewrite_filetype }}:{{ postfix_conf_dir }}/generic
+{% endif %}
+{% if enable_sender_canonical %}
+sender_canonical_maps = regexp:{{ postfix_conf_dir }}/canonical
+{% endif %}
+{% if enable_postifx_dkim %}
+smtpd_milters           = inet:127.0.0.1:8891
+non_smtpd_milters       = $smtpd_milters
+milter_default_action   = accept
+milter_protocol         = 2
+{% endif %}
+{% if enable_smtp_helo_name %}
+smtp_helo_name = {{ postfix_smtp_helo_name }}
+{% endif %}

@@ -1,0 +1,28 @@
+---
+- name: debian | installing pre-reqs
+  apt: name={{ item }} state=present force=yes
+  with_items:
+    - wget
+    - perl
+    - openssl
+    - python-passlib
+
+- name: debian | installing nagios
+  apt: name={{ item }} state=present force=yes
+  with_items:
+    - nagios-plugins
+    - nagios3
+    - nagios-plugins-basic
+    - nagios-plugins-extra
+    - nagios-snmp-plugins
+    - nagios-nrpe-plugin
+    - nagios3-core
+    - nagios-plugins-standard
+    - nagios3-cgi
+    - nagios-plugins-contrib
+
+- name: debian | setting nagios3 to enabled and started
+  service: name=nagios3 state=started enabled=yes
+
+- name: debian | setting up nagiosadmin access to webUI
+  htpasswd: name={{ nagios_user }} password={{ nagios_password }} path=/etc/nagios3/htpasswd.users

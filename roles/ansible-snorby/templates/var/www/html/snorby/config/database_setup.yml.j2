@@ -1,0 +1,22 @@
+# Snorby Database Configuration
+#
+# Please set your database password/user below
+# NOTE: Indentation is important.
+#
+snorby: &snorby
+  adapter: mysql
+  username: {{ snorby_db_info_setup.user }}
+  password: "{{ snorby_db_info_setup.pass }}"
+  host: {{ snorby_db_info.host }}
+
+development:
+  database: {{ snorby_db_info_setup.name }}
+  <<: *snorby
+
+test:
+  database: {{ snorby_db_info_setup.name }}
+  <<: *snorby
+
+production:
+  database: {{ snorby_db_info_setup.name }}
+  <<: *snorby

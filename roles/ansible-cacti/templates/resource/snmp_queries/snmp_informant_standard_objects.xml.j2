@@ -1,0 +1,30 @@
+<query>
+        <name>Win32 - Memory Statistics</name>
+        <description>Grab the Win32_Objects statistics using SNMP-Informant</description>
+        <index_order_type>numeric</index_order_type>
+        <oid_index>.1.3.6.1.4.1.9600.1.1.4</oid_index>
+		
+	<fields>
+		<objects>
+			<name>Objects</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.4</oid>
+		</objects>
+                <objectsprocesses>
+                        <name>Objects Processes</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.9600.1.1.4.1</oid>
+                </objectsprocesses>
+		<objectsthreads>
+			<name>Objects Threads</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.4.2</oid>
+		</objectsthreads>
+</fields>
+</query>

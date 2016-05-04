@@ -1,0 +1,13 @@
+{% if gocd_server and gocd_agent %}
+GO_SERVER=127.0.0.1
+{% elif not gocd_server and gocd_agent %}
+GO_SERVER={{ gocd_go_server }}
+{% endif %}
+export GO_SERVER
+GO_SERVER_PORT={{ gocd_go_server_port }}
+export GO_SERVER_PORT
+AGENT_WORK_DIR=/var/lib/${SERVICE_NAME:-go-agent}
+export AGENT_WORK_DIR
+DAEMON=Y
+VNC=N
+export JAVA_HOME="{{ gocd_java_home }}" # SET_BY_GO_INSTALLER__DONT_REMOVE

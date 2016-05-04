@@ -1,0 +1,5 @@
+  - name: {{ ansible_hostname }}
+    groups:
+{% for group in group_names %}
+      - {{ group }}
+{% endfor %}

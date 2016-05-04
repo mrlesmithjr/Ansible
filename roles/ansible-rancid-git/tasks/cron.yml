@@ -1,0 +1,28 @@
+---
+- name: cron | configuring RANCID Auto-Git
+  template:
+    src: "opt/rancid/auto_git.sh.j2"
+    dest: "{{ rancid_home_dir }}/auto_git.sh"
+    owner: "{{ rancid_user }}"
+    group: "{{ rancid_user }}"
+    mode: 0774
+
+- name: cron | configuring RANCID Cron
+  cron:
+    name: "RANCID Config Dumps"
+    minute: "{{ item.value.minute }}"
+    hour: "{{ item.value.hour }}"
+    user: "{{ rancid_user }}"
+    job: "{{ rancid_base_dir }}/bin/rancid-run"
+    cron_file: "rancid_config_dumps"
+  with_dict: rancid_cron
+
+- name: cron | configuring RANCID Cron Auto-Git
+  cron:
+    name: "RANCID Auto-Git"
+    minute: "{{ item.value.minute }}"
+    hour: "{{ item.value.hour }}"
+    user: "{{ rancid_user }}"
+    job: "{{ rancid_home_dir }}/auto_git.sh"
+    cron_file: "rancid_auto_git"
+  with_dict: rancid_cron

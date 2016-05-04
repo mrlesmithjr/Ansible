@@ -1,0 +1,21 @@
+---
+- name: db_monitoring | creating mysql user
+  mysql_user:
+    name: "{{ collectd_db_monitor_user }}"
+    password: "{{ collectd_db_monitor_pass }}"
+    priv: '*.*:USAGE,GRANT,PROCESS,"REPLICATION CLIENT"'
+    state: present
+
+- name: db_monitoring | creating python modules folder
+  file:
+    path: "/var/lib/collectd/modules/python"
+    state: directory
+
+- name: db_monitoring | copying mysql python monitor module
+  template:
+    src: "mysql.py.j2"
+    dest: "/var/lib/collectd/modules/python/mysql.py"
+    owner: root
+    group: root
+    mode: 0774
+  notify: restart collectd

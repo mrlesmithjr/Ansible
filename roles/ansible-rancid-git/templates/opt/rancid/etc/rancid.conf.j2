@@ -1,0 +1,14 @@
+TERM=network;export TERM
+LC_COLLATE="POSIX"; export LC_COLLATE
+umask 027
+TMPDIR={{ rancid_tmp_dir }}; export TMPDIR
+BASEDIR={{ rancid_base_dir }}/var; export BASEDIR
+PATH=/opt/rancid/bin:/usr/bin:/usr/sbin:.:/bin:/usr/local/bin:/usr/bin; export PATH
+LOGDIR=$BASEDIR/logs; export LOGDIR
+RCSSYS={{ rancid_rcs }}; export RCSSYS
+MAX_ROUNDS={{ rancid_max_rounds }}; export MAX_ROUNDS
+LOCKTIME={{ rancid_locktime }}; export LOCKTIME
+PAR_COUNT={{ rancid_simultaneous_count }}; export PAR_COUNT
+LIST_OF_GROUPS="{{ rancid_groups|join(' ') }}"; export LIST_OF_GROUPS
+HTMLMAILS={{ rancid_html_email }}; export HTMLMAILS
+MAILHEADERS=""; export MAILHEADERS

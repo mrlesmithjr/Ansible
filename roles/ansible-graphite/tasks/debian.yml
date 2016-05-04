@@ -1,0 +1,40 @@
+---
+- name: debian | installing packages
+  apt: name={{ item }} state=present
+  with_items:
+    - graphite-web
+    - graphite-carbon
+    - apache2
+    - libapache2-mod-wsgi
+
+- name: debian | removing default apache config
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+
+- name: debian | adding graphite apache config
+  file: src=/usr/share/graphite-web/apache2-graphite.conf dest=/etc/apache2/sites-enabled/apache2-graphite.conf state=link
+  notify: restart apache2
+
+- name: debian | checking if graphite db is initialized
+  stat: path=/var/log/graphite_db_initialized
+  register: graphite_db_init
+
+- name: debian | initializing db
+  command: "python /usr/lib/python2.7/dist-packages/graphite/manage.py syncdb --noinput"
+  when: graphite_db_init.stat.exists != true
+
+- name: debian | defining graphite db initialized
+  file: path=/var/log/graphite_db_initialized state=touch
+  when: graphite_db_init.stat.exists != true
+
+- name: debian | changing owner on graphite.db
+  file: path=/var/lib/graphite/graphite.db owner=_graphite group=_graphite
+
+- name: debian | enabling carbon-cache
+  template: src=etc/default/graphite-carbon.j2 dest=/etc/default/graphite-carbon owner=root group=root mode=0644
+  notify: restart carbon-cache
+  when: enable_carbon-cache
+
+- name: debian | defining storage schemas
+  template: src=etc/carbon/storage-schemas.conf.j2 dest=/etc/carbon/storage-schemas.conf owner=root group=root mode=0644
+  notify: restart carbon-cache
+  when: enable_carbon-cache

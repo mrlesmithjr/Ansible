@@ -1,0 +1,132 @@
+# {{ ansible_managed }}
+# Sample scripted installation file
+
+# Accept the VMware End User License Agreement
+vmaccepteula
+
+# Set the root password for the DCUI and ESXi Shell
+{% if esxi_root_pw is defined %}
+{%   if (esxi_root_pw_encrypted is defined and not esxi_root_pw_encrypted) or esxi_root_pw_encrypted is not defined %}
+rootpw {{ esxi_root_pw }}
+{%   endif %}
+{%   if esxi_root_pw_encrypted is defined and esxi_root_pw_encrypted %}
+rootpw {{ esxi_root_pw }} --iscrypted
+{%   endif %}
+{% endif %}
+{% if esxi_root_pw is not defined %}
+rootpw vmware
+{% endif %}
+
+# Install on the first local disk available on machine
+{{ esxi_install_disk_options }}
+{% if esxi_global_network_options is defined and esxi_create_host_kickstart_configs is defined and not esxi_create_host_kickstart_configs %}
+{%   for item in esxi_global_network_options %}
+{%     if item.create_default_portgroup %}
+# Set the network to DHCP on the first network adapater and create a portgroup for the VMs
+network --bootproto={{ item.bootproto }} --device={{ item.interface }} --addvmportgroup=1
+{%     endif %}
+{%     if not item.create_default_portgroup %}
+# Set the network to DHCP on the first network adapater and do not create a portgroup for the VMs
+network --bootproto={{ item.bootproto }} --device={{ item.interface }} --addvmportgroup=0
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if esxi_create_host_kickstart_configs is defined and esxi_create_host_kickstart_configs %}
+{%   if esxi_hosts is defined %}
+{%     for host in esxi_hosts %}
+{%       if host.bootproto == "dhcp" %}
+{%         if not host.create_default_portgroup %}
+# Set the network to DHCP on the first network adapater and do not create a portgroup for the VMs
+network --bootproto={{ host.bootproto }} --device={{ host.interface }} --addvmportgroup=0
+{%         endif %}
+{%         if host.create_default_portgroup %}
+# Set the network to DHCP on the first network adapater and create a portgroup for the VMs
+network --bootproto={{ host.bootproto }} --device={{ host.interface }} --addvmportgroup=1
+{%         endif %}
+{%       endif %}
+{%       if host.bootproto == "static" %}
+{%         if not host.create_default_portgroup %}
+# Set the network to static on the first network adapater and do not create a portgroup for the VMs
+network --bootproto={{ host.bootproto }} --device={{ host.interface }} --ip={{ host.ip }} --gateway={{ host.gateway }} --nameserver={{ host.nameservers }} --netmask={{ host.netmask }} --hostname={{ host.name }} --addvmportgroup=0
+{%         endif %}
+{%         if host.create_default_portgroup %}
+# Set the network to static on the first network adapater and create a portgroup for the VMs
+network --bootproto={{ host.bootproto }} --device={{ host.interface }} --ip={{ host.ip }} --gateway={{ host.gateway }} --nameserver={{ host.nameservers }} --netmask={{ host.netmask }} --hostname={{ host.name }} --addvmportgroup=1
+{%         endif %}
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+
+# reboot first time
+reboot
+
+%firstboot --interpreter=busybox
+
+{% if esxi_enable_ssh_and_shell is defined and esxi_enable_ssh_and_shell %}
+# Enable SSH and the ESXi Shell
+vim-cmd hostsvc/enable_ssh
+vim-cmd hostsvc/start_ssh
+vim-cmd hostsvc/enable_esx_shell
+vim-cmd hostsvc/start_esx_shell
+
+# Suppress Shell Warning in Host
+esxcli system settings advanced set -o /UserVars/SuppressShellWarning -i 1
+esxcli system settings advanced set -o /UserVars/ESXiShellTimeOut -i 1
+{% endif %}
+{% if esxi_enable_snmp is defined and esxi_enable_snmp %}
+{%   for item in esxi_snmp_options %}
+
+# Enable SNMP and configure SNMP
+esxcli system snmp set --communities {{ item.community }}
+esxcli system snmp set --enable true
+{%   endfor %}
+{% endif %}
+
+# Enter Maintenance Mode
+vim-cmd hostsvc/maintenance_mode_enter
+
+# rename local datastore
+#vim-cmd hostsvc/datastore/rename datastore1 "local-$(hostname -s)"
+{% if esxi_install_vibs is defined and esxi_install_vibs %}
+
+# Install the following VIBS
+{%   for item in esxi_vibs %}
+esxcli software vib install -v {{ item }}
+{%   endfor %}
+{% endif %}
+{% if esxi_enable_snmp is defined and esxi_enable_snmp %}
+
+# Configure Firewall to allow SNMP
+{%   for item in esxi_snmp_options %}
+esxcli network firewall ruleset set --ruleset-id snmp --allowed-all false
+esxcli network firewall ruleset allowedip add --ruleset-id snmp --ip-address {{ item.allowed_from }}
+esxcli network firewall ruleset set --ruleset-id snmp --enabled true
+{%   endfor %}
+/etc/init.d/snmpd restart
+{% endif %}
+
+# Exit Maintenance Mode
+{% if esxi_exit_maint_mode is defined and esxi_exit_maint_mode %}
+vim-cmd hostsvc/maintenance_mode_exit
+{% endif %}
+{% if esxi_addl_settings is defined %}
+
+##################################
+# Additional host configurations #
+##################################
+{%   for item in esxi_addl_settings %}
+# {{ item.desc }}
+{%     if item.command is defined %}
+{{ item.command }}
+{%     endif %}
+{%     if item.commands is defined %}
+{%       for command in item.commands %}
+{{ command }}
+{%       endfor %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+# Reboot host one last time
+reboot

@@ -1,0 +1,18 @@
+---
+- name: debian_rsyslog | configuring rsyslog
+  template:
+    src: etc/debian_rsyslog.conf.j2
+    dest: /etc/rsyslog.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart rsyslog
+
+- name: debian_rsyslog | configuring rsyslog
+  template:
+    src: etc/rsyslog.d/50-default.conf.j2
+    dest: /etc/rsyslog.d/50-default.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart rsyslog

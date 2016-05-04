@@ -1,0 +1,30 @@
+{% if zabbix_agent_enable_remote_commands %}
+EnableRemoteCommands=1
+{% elif not zabbix_agent_enable_remote_commands %}
+EnableRemoteCommands=0
+{% endif %}
+Hostname={{ ansible_hostname }}
+PidFile=/var/run/zabbix/zabbix_agentd.pid
+ListenIP={{ zabbix_agent_listen_ip }}
+ListenPort={{ zabbix_agent_listen_port }}
+LogFile={{ zabbix_agent_logfile }}
+LogFileSize={{ zabbix_agent_logfile_size }}
+{% if zabbix_agent_log_remote_commands %}
+LogRemoteCommands=1
+{% elif not zabbix_agent_log_remote_commands %}
+LogRemoteCommands=0
+{% endif %}
+Server={% for item in zabbix_agent_servers %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+ServerActive={% for item in zabbix_agent_server_active %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+StartAgents={{ zabbix_agent_start_agents }}
+{% if zabbix_agent_advanced_parameters is defined %}
+############ ADVANCED PARAMETERS ################
+{%   for item in zabbix_agent_advanced_parameters %}
+{{ item.name }}={{ item.value }}
+{%   endfor %}
+{% endif %}
+{% for item in zabbix_agent_include %}
+Include={{ item }}
+{% endfor %}

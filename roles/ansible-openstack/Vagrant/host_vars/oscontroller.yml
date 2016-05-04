@@ -1,0 +1,5 @@
+---
+ansible_ssh_host: 192.168.202.202
+ansible_ssh_private_key_file: .vagrant/machines/oscontroller/virtualbox/private_key
+mysql_master: true
+openstack_mongodb_master: true

@@ -1,0 +1,75 @@
+{% if ansible_os_family == "Debian" %}
+server.modules = (
+{%   for item in lighttpd_debian_info.server_modules %}
+  "{{ item }}",
+{%   endfor %}
+)
+compress.cache-dir = "/var/cache/lighttpd/compress/"
+compress.filetype = ( {% for item in lighttpd_debian_info.compress_filetype %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %} )
+{%   for item in lighttpd_debian_info.include_shell %}
+include_shell "{{ item }}"
+{%   endfor %}
+index-file.names = ( {% for item in lighttpd_debian_info.index_filenames %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %} )
+
+{% if lighttpd_server_bind_address == "0.0.0.0" %}
+#server.bind = "localhost"
+{% elif lighttpd_server_bind_address != "0.0.0.0" %}
+server.bind = "{{ lighttpd_server_bind_address }}"
+{% endif %}
+server.document-root = "{{ lighttpd_debian_info.default_root }}"
+server.errorlog = "/var/log/lighttpd/error.log"
+server.groupname = "www-data"
+server.max-connections = {{ (lighttpd_redhat_info.max_fds|int / 2) | round | int }}
+server.max-fds = {{ lighttpd_redhat_info.max_fds }}
+server.pid-file = "/var/run/lighttpd.pid"
+server.port = {{ lighttpd_server_port }}
+server.upload-dirs = ( "/var/cache/lighttpd/uploads" )
+server.username = "www-data"
+static-file.exclude-extensions = ( {% for item in lighttpd_debian_info.static_file_exclude_extensions %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %} )
+
+url.access-deny = ( {% for item in lighttpd_debian_info.url_access_deny %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %} )
+
+{% endif %}
+{% if ansible_os_family == "RedHat" %}
+var.cache_dir = "/var/cache/lighttpd"
+var.conf_dir = "/etc/lighttpd"
+var.home_dir = "/var/lib/lighttpd"
+var.log_root = "/var/log/lighttpd"
+var.server_root = "{{ lighttpd_redhat_info.server_root }}"
+var.socket_dir = home_dir + "/sockets"
+var.state_dir = "/var/run"
+var.vhosts_dir = server_root + "/vhosts"
+index-file.names += (
+  {% for item in lighttpd_debian_info.index_filenames %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %}
+
+)
+{% if lighttpd_server_bind_address == "0.0.0.0" %}
+#server.bind = "localhost"
+{% elif lighttpd_server_bind_address != "0.0.0.0" %}
+server.bind = "{{ lighttpd_server_bind_address }}"
+{% endif %}
+server.document-root = server_root + "/htdocs"
+server.errorlog = log_root + "/error.log"
+server.event-handler = "linux-sysepoll"
+server.follow-symlink = "enable"
+server.groupname = "lighttpd"
+server.max-connections = {{ (lighttpd_redhat_info.max_fds|int / 2) | round | int }}
+server.max-fds = {{ lighttpd_redhat_info.max_fds }}
+server.network-backend = "sendfile"
+server.pid-file = state_dir + "/lighttpd.pid"
+server.port = {{ lighttpd_server_port }}
+server.stat-cache-engine = "simple"
+server.upload-dirs = ( "/var/tmp" )
+server.username = "lighttpd"
+static-file.exclude-extensions = ( {% for item in lighttpd_redhat_info.static_file_exclude_extensions %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %} )
+
+url.access-deny = ( {% for item in lighttpd_redhat_info.url_access_deny %}"{{ item }}"{% if not loop.last %}, {% endif %}{% endfor %} )
+
+
+$HTTP["url"] =~ "\.pdf$" {
+  server.range-requests = "disable"
+}
+{%   for item in lighttpd_redhat_info.include %}
+include "{{ item }}"
+{%   endfor %}
+{% endif %}

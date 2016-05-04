@@ -1,0 +1,4 @@
+---
+# handlers file for ansible-ntop
+- name: restart ntopng
+  service: name=ntopng state=restarted

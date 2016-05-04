@@ -1,0 +1,5 @@
+---
+- name: debian | installing apf firewall
+  apt:
+    name: "apf-firewall"
+    state: present

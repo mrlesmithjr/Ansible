@@ -1,0 +1,17 @@
+---
+- name: debian | adding gocd repo key
+  apt_key:
+    url: "{{ gocd_repo_key }}"
+    state: present
+
+- name: debian | adding gocd repo
+  apt_repository:
+    repo: "{{ gocd_repo }}"
+    state: present
+
+- name: debian | installing/uninstalling additional apt packages
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: gocd_apt_packages
+  when: gocd_apt_packages is defined

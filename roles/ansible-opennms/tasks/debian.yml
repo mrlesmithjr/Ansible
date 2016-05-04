@@ -1,0 +1,16 @@
+---
+- name: debian | adding opennms repo key
+  apt_key:
+    url: "{{ opennms_debian_repo_key }}"
+    state: present
+
+- name: debian | adding opennms repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: opennms_debian_repos
+
+- name: debian | installing opennms
+  apt:
+    name: "opennms"
+    state: present

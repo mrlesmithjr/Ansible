@@ -1,0 +1,80 @@
+---
+- name: enabling ip forwarding
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  when: >
+        ferm_enable_ip_forwarding is defined and
+        ferm_enable_ip_forwarding
+
+- name: disabling ip forwarding
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: 0
+    sysctl_set: yes
+    state: present
+    reload: yes
+  when: >
+        (ferm_enable_ip_forwarding is defined and
+        not ferm_enable_ip_forwarding) or
+        ferm_enable_ip_forwarding is not defined
+
+- name: removing existing rules (if cleared)
+  file:
+    path: "/etc/ferm/ferm.d/"
+    state: absent
+  when: ferm_clear_firewall
+
+- name: creating ferm directory
+  file:
+    path: "/etc/ferm"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: creating ferm configuration directory
+  file:
+    path: "/etc/ferm/ferm.d"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: configuring ferm
+  template:
+    src: "etc/ferm/ferm.conf.j2"
+    dest: "/etc/ferm/ferm.conf"
+    owner: root
+    group: adm
+    mode: 0644
+  notify: reload ferm
+
+- name: configuring firewall rules (filter)
+  template:
+    src: "etc/ferm/ferm.d/filter_rules.conf.j2"
+    dest: "/etc/ferm/ferm.d/{{ item.1.weight }}_{{ item.0.chain }}_{{ item.1.name }}_{{ item.1.proto }}.conf"
+  notify: reload ferm
+  with_subelements:
+    - ferm_table_filters
+    - rules
+  when: >
+        (item.1 is defined and
+        item.1 != 'None') and
+        not ferm_clear_firewall
+
+- name: configuring firewall rules (nat)
+  template:
+    src: "etc/ferm/ferm.d/nat_rules.conf.j2"
+    dest: "/etc/ferm/ferm.d/{{ item.1.weight }}_{{ item.0.chain }}_{{ item.1.name }}_{{ item.1.proto }}.conf"
+  notify: reload ferm
+  with_subelements:
+    - ferm_nat_filters
+    - rules
+  when: >
+        (item.1 is defined and
+        item.1 != 'None') and
+        not ferm_clear_firewall

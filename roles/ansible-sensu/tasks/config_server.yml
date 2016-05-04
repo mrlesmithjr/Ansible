@@ -1,0 +1,31 @@
+---
+- name: config_server | configuring sensu
+  template:
+    src: "etc/sensu/conf.d/{{ item }}.j2"
+    dest: "{{ sensu_config_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart sensu-api
+    - restart sensu-client
+    - restart sensu-server
+  with_items:
+    - rabbitmq.json
+    - redis.json
+    - api.json
+
+- name: config_server | configuring uchiwa
+  template:
+    src: "etc/sensu/{{ item }}.j2"
+    dest: "{{ sensu_root_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart sensu-api
+    - restart sensu-client
+    - restart sensu-server
+    - restart uchiwa
+  with_items:
+    - uchiwa.json

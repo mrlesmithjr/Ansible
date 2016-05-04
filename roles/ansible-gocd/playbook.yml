@@ -1,0 +1,25 @@
+---
+- name: Provisions GoCD Servers
+  hosts: gocd-servers
+  become: true
+  vars:
+    - gocd_agent: true
+    - gocd_server: true
+  roles:
+    - role: ansible-gocd
+    - role: ansible-ntp
+    - role: ansible-redis
+  tasks:
+
+- name: Provisions GoCD Agents
+  hosts: gocd-agents
+  become: true
+  vars:
+    - gocd_agent: true
+    - gocd_server: false
+    - gocd_go_server: 192.168.202.201
+  roles:
+    - role: ansible-gocd
+    - role: ansible-ntp
+    - role: ansible-redis
+  tasks:

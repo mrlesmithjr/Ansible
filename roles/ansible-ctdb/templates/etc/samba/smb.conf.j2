@@ -1,0 +1,74 @@
+#
+#======================= Global Settings =======================
+{% if ctdb_samba_join_domain %}
+[global]
+  clustering = {{ ctdb_samba_global_options.clustering }}
+  deadtime = {{ ctdb_samba_global_options.deadtime }}
+  dns proxy = {{ ctdb_samba_global_options.dns_proxy }}
+  idmap config * : backend = tdb2
+  idmap config * : range = {{ ctdb_samba_global_options.idmap_range }}
+  idmap config {{ ctdb_samba_active_directory_info.workgroup|upper }} : backend = rid
+  idmap config {{ ctdb_samba_active_directory_info.workgroup|upper }} : range = {{ ctdb_samba_active_directory_info.idmap_range }}
+  log file = /var/log/samba/log.%m
+  max log size = {{ ctdb_samba_global_options.max_log_size }}
+  netbios name = {{ ctdb_samba_active_directory_info.netbios_name }}
+#  obey pam restrictions = yes
+#  pam password change = yes
+#  passwd program = /usr/bin/passwd %u
+  private dir = {{ ctdb_lock_directory }}
+  realm = {{ ctdb_samba_active_directory_info.realm|upper }}
+  restrict anonymous = {{ ctdb_samba_global_options.restrict_anonymous }}
+  security = ads
+  server role = standalone server
+  server string = {{ ctdb_samba_global_options.server_string }}
+  strict locking = {{ ctdb_samba_global_options.strict_locking }}
+  syslog = 0
+  template shell = /bin/bash
+  unix password sync = {{ ctdb_samba_global_options.unix_password_sync }}
+  usershare allow guests = {{ ctdb_samba_global_options.usershare_allow_guests }}
+  winbind enum groups = {{ ctdb_samba_active_directory_info.winbind_enum_groups }}
+  winbind enum users = {{ ctdb_samba_active_directory_info.winbind_enum_users }}
+  winbind use default domain = {{ ctdb_samba_active_directory_info.winbind_use_default_domain }}
+  workgroup = {{ ctdb_samba_active_directory_info.workgroup|upper }}
+
+# Below added from https://wiki.samba.org/index.php/Shares_with_Windows_ACLs
+  ea support = yes
+  map acl inherit = yes
+  store dos attributes = yes
+  vfs objects = acl_xattr
+
+{%   if ctdb_samba_restrict_access_to_public_addresses_only %}
+# Restrict access only to specific addresses
+  bind interfaces only = true
+  interfaces = 127.0.0.1{% for item in ctdb_public_addresses %} {{ item.address }}{% if not loop.last %}{% endif %}{% endfor %}
+
+{%   endif %}
+
+## Shares ##
+[printers]
+  comment = All Printers
+  browseable = no
+  path = /var/spool/samba
+  printable = yes
+  guest ok = no
+  read only = yes
+  create mask = 0700
+
+# Windows clients look for this share name as a source of downloadable
+# printer drivers
+[print$]
+  comment = Printer Drivers
+  path = /var/lib/samba/printers
+  browseable = yes
+  read only = yes
+  guest ok = no
+
+{%   for item in ctdb_samba_shares %}
+[{{ item.name }}]
+  comment = {{ item.comment }}
+  path = {{ item.path }}
+  read only = {{ item.read_only|lower }}
+  browseable = {{ item.browseable|lower }}
+
+{%   endfor %}
+{% endif %}

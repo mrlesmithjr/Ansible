@@ -1,0 +1,12 @@
+---
+- name: provisions OpenNMS
+  hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-ntp
+    - role: ansible-postgresql
+    - role: ansible-postfix
+    - role: ansible-oracle-java8
+    - role: ansible-opennms
+  tasks:

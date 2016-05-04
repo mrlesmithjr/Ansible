@@ -1,0 +1,20 @@
+---
+- name: users | generating jenkins ssh keys
+  user:
+    name: jenkins
+    generate_ssh_key: yes
+
+- name: users | adding jenkins to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "^jenkins ALL"
+    line: "jenkins ALL=(ALL) NOPASSWD:ALL"
+    validate: "visudo -cf %s"
+    state: present
+  when: enable_jenkins_sudo is defined and enable_jenkins_sudo
+
+- name: users | downloading jenkins ssh public key
+  fetch:
+    src: "{{ jenkins_home_dir }}/.ssh/id_rsa.pub"
+    dest: "./ssh_pub_keys/jenkins@{{ ansible_hostname }}.pub"
+    flat: yes

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: true
+  vars:
+    - pri_domain_name: 'vagrant.local'
+    - sensu_host: 127.0.0.1
+    - sensu_server: true
+  roles:
+    - role: ansible-rabbitmq
+    - role: ansible-redis
+    - role: ansible-sensu
+  tasks:

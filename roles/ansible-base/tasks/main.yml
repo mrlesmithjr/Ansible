@@ -1,0 +1,31 @@
+---
+# tasks file for ansible-base
+- include: debian.yml
+  tags:
+    - base
+  when: ansible_os_family == "Debian"
+
+- include: debian_update_dns_nameservers.yml
+  tags:
+    - update_dns_nameservers
+  when: ansible_os_family == "Debian"
+
+- include: debian_update_dns_search.yml
+  tags:
+    - update_dns_search
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  tags:
+    - base
+  when: ansible_os_family == "RedHat"
+
+- include: manage_ssh_known_hosts.yml
+  tags:
+    - manage_ssh_known_hosts
+  when: ssh_manage_ssh_known_hosts is defined and ssh_manage_ssh_known_hosts
+
+- include: generate_rundeck_resources.yml
+  tags:
+    - generate_rundeck_resources
+  when: rundeck_setup_rundeck_user is defined and rundeck_setup_rundeck_user and rundeck_generate_resources_xml is defined and rundeck_generate_resources_xml and rundeck_server is defined

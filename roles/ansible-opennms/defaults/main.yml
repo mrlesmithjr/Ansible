@@ -1,0 +1,6 @@
+---
+# defaults file for ansible-opennms
+opennms_debian_repo_key: 'https://debian.opennms.org/OPENNMS-GPG-KEY'
+opennms_debian_repos:
+  - 'deb http://debian.opennms.org stable main'
+  - 'deb-src http://debian.opennms.org stable main'

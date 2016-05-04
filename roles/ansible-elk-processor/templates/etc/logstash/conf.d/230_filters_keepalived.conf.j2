@@ -1,0 +1,10 @@
+# Setting up KeepAliveD parsing
+filter {
+  if "syslog" in [tags] {
+    if [syslog_program] =~ /Keepalived/ {
+      mutate {
+        add_tag => [ "KeepAliveD" ]
+      }
+    }
+  }
+}

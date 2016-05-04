@@ -1,0 +1,127 @@
+---
+- hosts: all
+  become: false
+  remote_user: cactiuser
+  vars:
+    - cacti_devices:
+        - name: 'node0.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+        - name: 'node1.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+        - name: 'node2.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+        - name: 'node3.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+        - name: 'node4.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+        - name: 'node5.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+        - name: 'lb-01.{{ pri_domain_name }}'
+          template: 'F5 BIG-IP'
+        - name: 'rt-02.{{ pri_domain_name }}'
+          template: 'Cisco Router'
+        - name: 'dc01.{{ pri_domain_name }}'
+          template: 'SNMP_Informant_Windows'
+        - name: 'switch01.{{ pri_domain_name }}'
+          template: 'Generic SNMP-enabled Host'
+        - name: 'smtp.{{ pri_domain_name }}'
+          template: 'Local Linux Machine'
+    - cacti_graph_trees:
+        - name: 'Development'
+          sort_method: 'alpha'
+          headers:
+            - Cisco
+            - Citrix
+            - Linux
+            - VMware
+            - Windows
+        - name: 'Infrastructure'
+          sort_method: 'alpha'  #(manual|alpha|natural|numeric)
+          headers: []
+        - name: 'OPS'
+          sort_method: 'alpha'
+          headers: []
+        - name: 'Production'
+          sort_method: 'alpha'
+          headers: []
+        - name: 'Test'
+          sort_method: 'alpha'
+          headers: []
+    - cacti_snmp_community: 'public'
+    - cacti_webserver_type: 'nginx'
+    - pri_domain_name: 'example.org'
+  roles:
+  tasks:
+    - name: setting fact Debian nginx
+      set_fact:
+        cacti_web_group: "www-data"
+        cacti_web_owner: "www-data"
+        cacti_web_root: "/usr/share/nginx/html"
+        cacti_webserver_handler: "nginx"
+      when: >
+            ansible_os_family == "Debian" and
+            cacti_webserver_type == "nginx"
+
+    - name: setting cacti cli fact
+      set_fact:
+        cacti_cli: "{{ cacti_web_root }}/cacti/cli"
+
+    - name: gathering host templates
+      shell: "php -q {{ cacti_cli }}/add_device.php --list-host-templates | awk '{if (NR > 1) {$1=\"\"; print $0}}' | sed 's| ||'"
+      register: host_templates
+
+    - name: capturing host template ids
+      shell: "php -q {{ cacti_cli }}/add_device.php --list-host-templates | grep '{{ item.template }}' | awk '{print $1}'"
+      register: host_template_id
+      with_items: '{{ cacti_devices }}'
+
+    - name: gathering devices
+      shell: "php -q {{ cacti_cli }}/add_data_query.php --list-hosts | awk '{if (NR > 1) {print $2}}'"
+      register: "cacti_hosts"
+      changed_when: false
+
+    - name: adding missing nodes
+      shell: "php {{ cacti_cli }}/add_device.php --description=\"{{ item.item.name }}\" --ip=\"{{ item.item.name }}\" --template={{ item.stdout|default ('0') }} --community={{ cacti_snmp_community|default ('public') }}"
+      with_items: '{{ host_template_id.results }}'
+      when: item.item.name not in cacti_hosts.stdout_lines
+
+    - name: discovering existing graph trees (Names)
+      shell: "php -q {{ cacti_cli }}/add_tree.php --list-trees | awk -F'\t' '{if (NR > 2) {print $3}}'"
+      register: "discovered_graph_trees"
+
+    - name: adding missing graph trees
+      shell: "php -q {{ cacti_cli }}/add_tree.php --type=tree --name=\"{{ item.name }}\" --sort-method={{ item.sort_method|default ('manual') }}"
+      with_items: '{{ cacti_graph_trees }}'
+      when: item.name not in discovered_graph_trees.stdout_lines
+
+    - name: re-discovering existing graph trees (Names)
+      shell: "php -q {{ cacti_cli }}/add_tree.php --list-trees | awk -F'\t' '{if (NR > 2) {print $3}}'"
+      register: "discovered_graph_trees"
+      changed_when: false
+
+    - name: discovering existing graph trees (IDs)
+      shell: "php -q {{ cacti_cli }}/add_tree.php --list-trees | grep {{ item.name }} | awk '{print $1}'"
+      register: "discovered_graph_tree_ids"
+      changed_when: false
+      with_items: '{{ cacti_graph_trees }}'
+      when: >
+            item.headers is defined and
+            item.headers != 'None'
+
+#    - name: discovering nodes for each graph tree
+#      shell: "php -q {{ cacti_cli }}/add_tree.php --list-nodes --tree-id={{ item }} | awk -F'\t' '{if (NR > 2) {print $0}}'"
+#      register: "discovered_graph_tree_nodes"
+#      with_items: '{{ discovered_graph_tree_ids.stdout_lines }}'
+
+    - name: adding header nodes to graph trees
+      shell: "php -q {{ cacti_cli }}/add_tree.php --type=node --node-type=header --tree-id={{ item.0.stdout }} --name={{ item.1 }}"
+      with_subelements:
+        - '{{ discovered_graph_tree_ids.results }}'
+        - item.headers
+      when: >
+            (item.1 is defined and
+            item.1 != 'None')
+
+    - name: debug
+      debug:
+        var: "discovered_graph_tree_ids"

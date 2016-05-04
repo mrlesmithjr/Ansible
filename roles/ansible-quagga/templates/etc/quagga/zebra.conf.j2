@@ -1,0 +1,53 @@
+# {{ ansible_managed }}
+
+!
+! Zebra configuration saved from vty
+!   2014/09/28 21:25:52
+!
+{% if quagga_hostname is defined %}
+hostname {{ quagga_hostname }}
+{% endif %}
+{% if quagga_hostname is not defined %}
+hostname {{ ansible_hostname }}
+{% endif %}
+password {{ quagga_password }}
+enable password {{ quagga_enable_password }}
+log file /var/log/quagga/zebra.log
+log syslog
+service password-encryption
+!
+debug zebra events
+debug zebra packet
+!
+{% if quagga_interfaces_config is defined %}
+{%   for item in quagga_interfaces_config %}
+interface {{ item.int }}
+ link-detect
+ ipv6 nd suppress-ra
+!
+{%   endfor %}
+{% endif %}
+{% if quagga_interfaces_lo is defined %}
+{%   for item in quagga_interfaces_lo %}
+interface {{ item.int }}
+ link-detect
+ ip address {{ item.ip_address }}
+!
+{%   endfor %}
+{% endif %}
+{% if vlan_config is defined %}
+{%   for item in vlan_config %}
+interface {{ item.vlan }}
+ link-detect
+ ip address {{ item.ip_address }}
+ ipv6 nd suppress-ra
+!
+{%   endfor %}
+{% endif %}
+!
+ip forwarding
+ipv6 forwarding
+!
+!
+line vty
+!

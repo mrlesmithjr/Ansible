@@ -1,0 +1,5 @@
+---
+openstack_services_vip_fqdn: 'openstack.{{ pri_domain_name }}'
+openstack_services_vip: 192.168.202.201
+openstack_keystone_auth_url: '{{ openstack_services_vip_fqdn }}'
+pri_domain_name: vagrant.local

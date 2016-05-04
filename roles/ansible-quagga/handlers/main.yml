@@ -1,0 +1,4 @@
+---
+# handlers file for ansible-quagga
+- name: restart quagga
+  service: name=quagga state=restarted

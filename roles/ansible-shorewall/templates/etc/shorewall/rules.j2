@@ -1,0 +1,21 @@
+#
+# Shorewall version 4.0 - Sample Rules File for one-interface configuration.
+# Copyright (C) 2006 by the Shorewall Team
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# See the file README.txt for further details.
+#------------------------------------------------------------------------------------------------------------
+# For information on entries in this file, type "man shorewall-rules"
+######################################################################################################################################################################################################
+#ACTION		SOURCE		DEST		PROTO	DEST	SOURCE		ORIGINAL	RATE		USER/	MARK	CONNLIMIT	TIME		HEADERS		SWITCH		HELPER
+#							PORT	PORT(S)		DEST		LIMIT		GROUP
+{% for item in shorewall_rules %}
+SECTION {{ item.section }}
+{%   for rule in item.rules %}
+{{ rule.action }}   {{ rule.source }}   {{ rule.dest }}   {{ rule.proto }}   {{ rule.dest_ports|join (',') }}
+{%   endfor %}
+{% endfor %}

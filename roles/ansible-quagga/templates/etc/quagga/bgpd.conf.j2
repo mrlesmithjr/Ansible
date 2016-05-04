@@ -1,0 +1,50 @@
+# {{ ansible_managed }}
+! -*- bgp -*-
+!
+! BGPd sample configuratin file
+!
+! $Id: bgpd.conf.sample,v 1.1 2002/12/13 20:15:29 paul Exp $
+!
+{% if quagga_hostname is defined %}
+hostname {{ quagga_hostname }}
+{% endif %}
+{% if quagga_hostname is not defined %}
+hostname {{ ansible_hostname }}
+{% endif %}
+password {{ quagga_password }}
+enable password {{ quagga_enable_password }}
+!
+log file /var/log/quagga/bgpd.log
+log stdout
+log syslog
+log monitor
+!
+service password-encryption
+!
+{% if quagga_config_bgpd is defined and quagga_config_bgpd %}
+{%   if quagga_bgp_router_configs is defined %}
+router bgp {{ item.local_as }}
+ bgp router-id {{ item.router_id }}
+ bgp log-neighbor-changes
+{%     if quagga_bgp_redistribute is defined and item.redistribute is not defined %}
+{%       for item in quagga_bgp_redistribute %}
+ redistribute {{ item }}
+{%       endfor %}
+{%     endif %}
+{%     if item.redistribute is defined %}
+{%       for redist in item.redistribute %}
+ redistribute {{ redist }}
+{%       endfor %}
+{%     endif %}
+{%     if item.network_advertisements is defined %}
+{%       for adv in item.network_advertisements %}
+ network {{ adv }}
+{%       endfor %}
+{%     endif %}
+{%     for nbr in item.neighbors %}
+ neighbor {{ nbr.neighbor }} remote-as {{ nbr.remote_as }}
+ neighbor {{ nbr.neighbor }} next-hop-self
+ neighbor {{ nbr.neighbor }} soft-reconfiguration inbound
+{%     endfor %}
+{%   endif %}
+{% endif %}

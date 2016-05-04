@@ -1,0 +1,7 @@
+#!/bin/bash
+timestamp=$(date +%D_%T)
+cd {{ rancid_home_dir }}/var
+git pull origin master
+git add .
+git commit -am "RANCID Auto-Git $timestamp"
+git push origin master

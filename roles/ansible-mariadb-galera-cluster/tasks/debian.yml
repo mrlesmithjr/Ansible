@@ -1,0 +1,153 @@
+---
+- include: mysql_root_pw.yml
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - software-properties-common
+    - python-mysqldb
+    - rsync
+
+- name: debian | adding mariadb repo keys
+  apt_key:
+    keyserver: "{{ mariadb_debian_repo_keyserver }}"
+    id: "{{ mariadb_debian_repo_key }}"
+    state: present
+
+- name: debian | adding mariadb repo
+  apt_repository:
+    repo: "{{ mariadb_debian_repo }}"
+    state: present
+
+- name: debian | installing mariadb-galera packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mariadb-galera-server
+    - galera
+
+- name: debian | unconfiguring galera cluster
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/mysql/conf.d/galera.cnf
+    - /etc/mysql/galera_cluster_configured
+  when: reconfigure_galera is defined and reconfigure_galera
+
+- name: debian | restarting mysql when reconfiguring galera cluster
+  service:
+    name: mysql
+    state: restarted
+  when: reconfigure_galera is defined and reconfigure_galera
+
+- name: debian | adding debian-sys-maintenance permissions to mysql
+  mysql_user:
+    name: debian-sys-maint
+    password: "{{ deb_db_password }}"
+    priv: "*.*:ALL,GRANT"
+    state: present
+
+#- name: debian | deleting old my.cnf
+#  command: rm /etc/my.cfg removes=/etc/my.cfg
+
+- name: debian | configuring db server and galera
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - src: etc/mysql/debian.cnf.j2
+      dest: /etc/mysql/debian.cnf
+    - src: etc/mysql/my.cnf.j2
+      dest: /etc/mysql/my.cnf
+    - src: etc/mysql/conf.d/galera.cnf.j2
+      dest: /etc/mysql/conf.d/galera.cnf
+
+- name: debian | checking if galera cluster setup
+  stat:
+    path: /etc/mysql/galera_cluster_configured
+  register: galera_cluster_configured
+
+- name: debian | stopping mysql
+  service:
+    name: mysql
+    state: stopped
+  when: not galera_cluster_configured.stat.exists
+
+- name: debian | killing lingering mysql processes
+  command: pkill mysqld
+  ignore_errors: true
+  when: not galera_cluster_configured.stat.exists
+
+- name: debian | configuring temp galera config
+  template:
+    src: etc/mysql/conf.d/temp.galera.cnf.j2
+    dest: /etc/mysql/conf.d/galera.cnf
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: debian | bootstrapping galera cluster
+  service:
+    name: mysql
+    state: restarted
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: debian | joining galera cluster
+  service:
+    name: mysql
+    state: restarted
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname != mysql_master_node
+
+- name: debian | configuring galera on mysql_master
+  template:
+    src: etc/mysql/conf.d/galera.cnf.j2
+    dest: /etc/mysql/conf.d/galera.cnf
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: debian | restarting galera on mysql_master
+  service:
+    name: mysql
+    state: restarted
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: debian | marking galera cluster as configured
+  file:
+    path: /etc/mysql/galera_cluster_configured
+    state: touch
+  when: not galera_cluster_configured.stat.exists
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: present
+  tags:
+    - cacti_monitoring
+  run_once: true
+  when: enable_cacti_monitoring and cacti_server is defined
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server_fqdn }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: present
+  tags:
+    - cacti_monitoring
+  run_once: true
+  when: enable_cacti_monitoring and cacti_server_fqdn is defined

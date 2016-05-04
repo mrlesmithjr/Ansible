@@ -1,0 +1,25 @@
+# The semantics are:
+#
+# * Without any entries no target will accept connections or be discovered
+#   on any address.
+#
+# * By default we allow all targets to accept connections and to be
+#   discovered on any address with the "ALL ALL" entry.
+#
+# * Override which targets will accept connections on and be discovered on
+#   which addresses by putting an entry for a given target followed by a
+#   comma separated list of IP addresses, separate the two with whitespace.
+#
+# * Entry processing stops at the "ALL" target entry if present.
+#
+#
+# Some examples
+#
+#iqn.2001-04.com.example:storage.disk1.sys1.xyz 192.168.0.0/16
+#iqn.2001-04.com.example:storage.disk1.sys2.xyz [3ffe:302:11:1:211:43ff:fe31:5ae2], 192.168.22.24
+#iqn.2001-04.com.example:storage.disk1.sys3.xyz ALL
+#iqn.2001-04.com.example:storage.disk1.sys4.xyz 192.168.22.3
+# ALL 192.168.0.0/16
+ALL {% for item in zfs_iscsitarget_target_portals %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+ 

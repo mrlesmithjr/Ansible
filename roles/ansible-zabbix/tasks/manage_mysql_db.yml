@@ -1,0 +1,46 @@
+---
+- name: manage_mysql_db | ensuring db exists
+  mysql_db:
+    name: "{{ zabbix_db_info.name }}"
+    state: present
+
+- name: manage_mysql_db | checking if db already imported
+  stat:
+    path: "/var/log/.db_imported"
+  register: db_imported_check
+
+- name: manage_mysql_db | importing db schema
+  mysql_db:
+    name: "{{ zabbix_db_info.name }}"
+    target: "{{ zabbix_mysql_schema_archive }}"
+    state: import
+  register: db_imported
+  when: >
+        not db_imported_check.stat.exists and
+        zabbix_version|int >= 3
+
+- name: manage_mysql_db | importing db schema
+  mysql_db:
+    name: "{{ zabbix_db_info.name }}"
+    target: "/usr/share/zabbix-server-mysql/{{ item }}"
+    state: import
+  register: db_imported
+  with_items:
+    - schema.sql
+    - images.sql
+    - data.sql
+  when: >
+        not db_imported_check.stat.exists and
+        zabbix_version|int < 3
+
+- name: manage_mysql_db | marking db as imported
+  file:
+    path: "/var/log/.db_imported"
+    state: touch
+  when: db_imported.changed
+
+- name: manage_mysql_db | setting permissions on db
+  mysql_user:
+    name: "{{ zabbix_db_info.user }}"
+    password: "{{ zabbix_db_info.password }}"
+    priv: "{{ zabbix_db_info.name }}.*:ALL"

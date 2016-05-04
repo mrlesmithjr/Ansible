@@ -1,0 +1,57 @@
+---
+- name: redhat_security | allowing SSH password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication yes"
+    state: present
+  notify: restart sshd
+
+- name: redhat_security | disabling SSH GSS API authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^GSSAPIAuthentication"
+    line: "GSSAPIAuthentication no"
+    state: present
+  notify: restart sshd
+
+- name: redhat_security | adding EPEL repo
+  yum:
+    name: epel-release
+    state: present
+  when: >
+        ansible_distribution != "Fedora"
+
+- name: redhat_security | installing fail2ban
+  yum:
+    name: fail2ban
+    state: present
+  when: >
+        (install_fail2ban is defined and install_fail2ban) and
+        ansible_distribution != "Fedora"
+
+- name: redhat_security | installing fail2ban
+  dnf:
+    name: fail2ban
+    state: present
+  when: >
+        (install_fail2ban is defined and install_fail2ban) and
+        ansible_distribution == "Fedora"
+
+- name: redhat_security | removing fail2ban
+  yum:
+    name: fail2ban
+    state: absent
+  when: >
+        ((install_fail2ban is defined and not install_fail2ban) or
+        install_fail2ban is not defined) and
+        ansible_distribution != "Fedora"
+
+- name: redhat_security | removing fail2ban
+  dnf:
+    name: fail2ban
+    state: absent
+  when: >
+        ((install_fail2ban is defined and not install_fail2ban) or
+        install_fail2ban is not defined) and
+        ansible_distribution == "Fedora"

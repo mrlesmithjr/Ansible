@@ -1,0 +1,14 @@
+---
+- name: debian | installing collectd
+  apt:
+    name: "collectd"
+    state: present
+
+- name: debian | configuring collectd
+  template:
+    src: "etc/collectd/collectd.conf.j2"
+    dest: "/etc/collectd/collectd.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart collectd

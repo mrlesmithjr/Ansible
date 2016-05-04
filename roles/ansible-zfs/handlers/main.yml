@@ -1,0 +1,16 @@
+---
+# handlers file for ansible-zfs
+- name: restart iscsitarget
+  service:
+    name: "iscsitarget"
+    state: restarted
+    
+- name: restart nfs-kernel-server
+  service:
+    name: "nfs-kernel-server"
+    state: restarted
+
+- name: start zfs-share
+  service:
+    name: "zfs-share"
+    state: started

@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-es-packetbeat
+- name: restart packetbeat
+  service:
+    name: packetbeat
+    state: restarted

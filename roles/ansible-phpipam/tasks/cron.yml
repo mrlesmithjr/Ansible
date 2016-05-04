@@ -1,0 +1,100 @@
+---
+# These are only required until newer version of phpIPAM in hopes of fixing php scripts...removing all cron jobs to ensure everything is clean...
+- name: cron | cleaning up old cron jobs
+  file:
+    path: "/etc/cron.d/{{ item }}"
+    state: absent
+  with_items:
+    - phpipam_discoveryCheck
+    - phpipam_dnsCheck
+    - phpipam_fpingDiscoveryCheck
+    - phpipam_pingCheck
+    - phpipam_resolveIP
+
+- name: cron | adding cron job for pingCheck
+  cron:
+    name: "phpipam pingCheck"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/pingCheck.php"
+    minute: "*/15"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_pingCheck"
+    state: present
+
+- name: cron | removing cron job for updating IP addresses (resolveIPaddresses.php)
+  cron:
+    name: "phpipam resolveIP"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/resolveIPaddresses.php"
+    minute: "0"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_resolveIP"
+    state: absent
+
+- name: cron | adding cron job for updating IP addresses (dnsCheck.php)
+  cron:
+    name: "phpipam dnsCheck"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/dnsCheck.php"
+    minute: "0"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_dnsCheck"
+    state: present
+
+- name: cron | removing cron job for discoveryCheck
+  cron:
+    name: "phpipam discoveryCheck"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/discoveryCheck.php"
+    minute: "*/15"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_discoveryCheck"
+    state: absent
+  when: phpipam_primary and phpipam_db_cluster
+
+- name: cron | removing cron job for discoveryCheck
+  cron:
+    name: "phpipam discoveryCheck"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/discoveryCheck.php"
+    minute: "*/15"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_discoveryCheck"
+    state: absent
+  when: not phpipam_primary and not phpipam_db_cluster
+
+- name: cron | adding cron job for fpingDiscoveryCheck
+  cron:
+    name: "phpipam fpingDiscoveryCheck"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/fpingDiscoveryCheck.php"
+    minute: "*/15"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_fpingDiscoveryCheck"
+    state: present
+  when: phpipam_primary and phpipam_db_cluster
+
+- name: cron | adding cron job for fpingDiscoveryCheck
+  cron:
+    name: "phpipam fpingDiscoveryCheck"
+    job: "/usr/bin/php {{ phpipam_root }}/functions/scripts/fpingDiscoveryCheck.php"
+    minute: "*/15"
+    hour: "*"
+    day: "*"
+    month: "*"
+    user: "www-data"
+    cron_file: "phpipam_fpingDiscoveryCheck"
+    state: present
+  when: not phpipam_primary and not phpipam_db_cluster

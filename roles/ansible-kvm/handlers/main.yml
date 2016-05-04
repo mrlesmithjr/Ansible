@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-kvm
+- name: restart kvm
+  service: name=libvirt-bin state=restarted
+
+- name: restart ssh
+  service: name=ssh state=restarted

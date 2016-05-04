@@ -1,0 +1,21 @@
+---
+- name: users | creating rundeck ssh folder
+  file:
+    path: "{{ rundeck_framework_ssh_keypath}}"
+    state: directory
+    owner: "{{ rundeck_framework_ssh_user}}"
+    group: "{{ rundeck_framework_ssh_user }}"
+    mode: 0700
+
+- name: users | generating rundeck ssh key
+  user:
+    name: "{{ rundeck_framework_ssh_user }}"
+    generate_ssh_key: yes
+    ssh_key_file: "{{ rundeck_framework_ssh_keypath_file }}"
+    ssh_key_type: rsa
+
+- name: users | downloading rundeck users ssh public key
+  fetch:
+    src: "{{ rundeck_framework_ssh_keypath_file }}.pub"
+    dest: "./ssh_pub_keys/{{ rundeck_framework_ssh_user }}@{{ ansible_hostname }}.pub"
+    flat: yes

@@ -1,0 +1,11 @@
+---
+- name: centos | configuring kibana service
+  template:
+    src: etc/systemd/system/kibana.service.j2
+    dest: /etc/systemd/system/kibana.service
+  notify: restart kibana
+
+- name: centos | ensuring kibana service is enabled on boot
+  service:
+    name: kibana
+    enabled: yes

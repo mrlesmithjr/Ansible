@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-iscsitarget
+- name: restart iscsitarget
+  service:
+    name: "iscsitarget"
+    state: restarted

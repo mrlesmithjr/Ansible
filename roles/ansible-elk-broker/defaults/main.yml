@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-elk-broker
+use_redis: true  #defines if redis is to be used for caching
+use_rabbitmq: false  #defines if rabbitmq is to be used for caching

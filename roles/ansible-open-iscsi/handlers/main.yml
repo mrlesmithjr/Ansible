@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-open-iscsi
+- name: restart open-iscsi
+  service:
+    name: "open-iscsi"
+    state: restarted

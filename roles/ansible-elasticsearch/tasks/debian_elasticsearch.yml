@@ -1,0 +1,26 @@
+---
+- name: debian_elasticsearch | adding elasticsearch repo key
+  apt_key:
+    url: "{{ es_repo_key }}"
+    state: present
+
+- name: debian_elasticsearch | adding elasticsearch repo
+  apt_repository:
+    repo: "{{ es_debian_repo }}"
+    state: present
+
+- name: debian_elasticsearch | installing elasticsearch and java
+  apt:
+    name: "{{ item }}"
+    state: latest
+    force: yes
+#  notify: init elasticsearch
+  with_items:
+    - default-jre-headless
+    - elasticsearch
+
+- name: debian_elasticsearch | ensuring elasticsearch service is started and enabled on boot
+  service:
+    name: "elasticsearch"
+    state: started
+    enabled: yes

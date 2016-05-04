@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+    <style>
+      a:link {
+        color:orange;
+      }
+      a:visited {
+        color:lime;
+      }
+      html {
+        background: url(background.jpg) no-repeat center center fixed;
+        background-size: cover;
+      }
+      body {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    {{ cmdb_web_title|upper }}<br><br><br><br>
+    <form>
+      <h3>Links:</h3>
+      <select name="menu">
+        <option selected>Choose Link:</option>
+{% if cmdb_web_links is defined %}
+{%   for item in cmdb_web_links %}
+        <option value="{{ item.url }}">{{ item.name }}</option>
+{%   endfor %}
+{% endif %}
+      </select>
+      <input type="button" onclick="location=this.form.menu.options[this.form.menu.selectedIndex].value;" value="GO!">
+      <input type="reset" value="Reset">
+    </form>
+    <br><br>
+    <form action="group_actions.php" method="post">
+      <h3>Group Actions:</h3>
+      <select name="GroupAction">
+        <option selected>Choose Group Action:</option>
+        <option value="AddGroups">Add Groups</option>
+        <option value="ScheduleGroupMaintenance">Schedule Group Maintenance</option>
+        <option value="QueryGroups">Query Groups</option>
+      </select>
+      <input type="submit" value="GO!">
+      <input type="reset" value="Reset">
+    </form>
+    <br><br>
+    <form>
+      <h3>Ansible Actions:</h3>
+      <select name="menu">
+        <option selected>Choose Ansible Action:</option>
+        <option value="ansible_actions.html">Ansible Actions</option>
+      </select>
+      <input type="button" onClick="location=this.form.menu.options[this.form.menu.selectedIndex].value;" value="GO!">
+      <input type="reset" value="Reset">
+    </form>
+    <h5><a href="create_user.html">Create User</a></h5>
+  </body>
+</html>

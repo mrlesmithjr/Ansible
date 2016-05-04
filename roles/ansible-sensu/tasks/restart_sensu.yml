@@ -1,0 +1,20 @@
+---
+- name: restart_sensu | restarting sensu services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - sensu-api
+    - sensu-client
+    - sensu-server
+  when: >
+        ansible_os_family == "Debian" and
+        sensu_server
+
+- name: restart_sensu | restarting sensu services
+  service:
+    name: "sensu-client"
+    state: restarted
+  when: >
+        ansible_os_family == "Debian" and
+        not sensu_server

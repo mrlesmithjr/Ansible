@@ -1,0 +1,228 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  echo "<html>";
+    echo "<body>";
+      session_start ();
+      if(isset($_POST['groupid'])) {
+        $gid = $_POST['groupid'];
+      }
+      $gid = $_SESSION['sessiongid'];
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $sql = "SELECT * FROM Groups WHERE GroupId=$gid";
+      $results = $db->query($sql);
+      $gn = $db->query("SELECT GroupName FROM Groups WHERE GroupId=$gid");
+      while ($row = $results->fetchArray()) {
+        echo "<br><br><br><br>";
+        echo "<h4>Group Info</h4>";
+        echo "<pre>";
+        echo "GroupId: ";
+        echo "<tr><td>" . $row['GroupId']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "GroupName: ";
+        echo "<tr><td>" . $row['GroupName']. "</td></tr><br>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "GroupDescription: ";
+        echo "<tr><td>" . $row['GroupDescription']. "</td></tr><br>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "GroupDTAP: ";
+        echo "<tr><td>" . $row['GroupDTAP']. "</td></tr><br>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "GroupCreatedOn: ";
+        echo "<tr><td>" . $row['GroupCreatedOn']. "</td></tr><br>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "LastUpdateTime: ";
+        echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+        echo "</pre><br><br>";
+      }
+    echo "</body>";
+  echo "</html>";
+?>
+<?php
+if(isset($_POST['hostid'])) {
+  session_start ();
+  if(isset($_POST['groupid'])) {
+    $gid = $_POST['groupid'];
+  }
+  $gid = $_SESSION['sessiongid'];
+  $hid = $_POST['hostid'];
+  $_SESSION['sessionhid'] = $hid;
+  $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+  $db->exec( 'PRAGMA foreign_keys = ON;' );
+  $hn = $db->querySingle("SELECT HostName FROM Hosts WHERE HostId=$hid");
+  $_SESSION['sessionhn'] = $hn;
+  echo "<form action=\"query_host_details.php\" method=\"post\">";
+    echo "<h3>Host Actions:</h3><select name=\"HostAction\">";
+      echo "<option selected>Choose Host Action:</option>";
+      echo "<option value=\"ViewHostDetails\">View Host Details</option>";
+      echo "<option value=\"ViewLogs\">View Host Logs</option>";
+    echo "</select>";
+    echo "<input type=\"submit\">";
+    echo "<input type=\"reset\" value=\"Reset\">";
+  echo "</form>";
+  }
+?>
+<?php
+  if(isset($_POST['HostAction'])) {
+    $ha = $_POST['HostAction'];
+    if ($ha=="ViewHostDetails") {
+      session_start ();
+      if(isset($_POST['groupid'])) {
+        $gid = $_POST['groupid'];
+      }
+      $gid = $_SESSION['sessiongid'];
+      $hid = $_SESSION['sessionhid'];
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $sql = "SELECT * FROM HostDetails WHERE HostId=$hid";
+      $results = $db->query($sql);
+      echo "<h4>Details about host:</h4>";
+      while ($row = $results->fetchArray()) {
+        echo "<pre>";
+        echo "hostId: ";
+        echo "<tr><td>" . $row['HostId']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "FQDN: ";
+        echo "<tr><td>" . $row['HostFQDN']. "</td></tr><br>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "Architecture: ";
+        echo "<tr><td>" . $row['HostArchitecture']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "BIOSDate: ";
+        echo "<tr><td>" . $row['HostBIOSDate']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "BIOSVersion: ";
+        echo "<tr><td>" . $row['HostBIOSVersion']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "Distribution: ";
+        echo "<tr><td>" . $row['HostDistribution']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "DistributionRelease: ";
+        echo "<tr><td>" . $row['HostDistributionRelease']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "DistributionVersion: ";
+        echo "<tr><td>" . $row['HostDistributionVersion']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "HardDrive: ";
+        echo "<tr><td>" . $row['HostHardDrive']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "HardDrivePartions: ";
+        echo "<tr><td>" . $row['HostHardDrivePartions']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "HardDriveSize: ";
+        echo "<tr><td>" . $row['HostHardDriveSize']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "Interface: ";
+        echo "<tr><td>" . $row['HostInterface']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "InterfaceAddress: ";
+        echo "<tr><td>" . $row['HostInterfaceAddress']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "InterfaceGateway: ";
+        echo "<tr><td>" . $row['HostInterfaceGateway']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "InterfaceMAC: ";
+        echo "<tr><td>" . $row['HostInterfaceMAC']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "InterfaceNetmask: ";
+        echo "<tr><td>" . $row['HostInterfaceNetmask']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "Kernel: ";
+        echo "<tr><td>" . $row['HostKernel']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "MemFreeMB: ";
+        echo "<tr><td>" . $row['HostMemFreeMB']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "MemTotalMB: ";
+        echo "<tr><td>" . $row['HostMemTotalMB']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "Mounts: ";
+        echo "<tr><td>" . $row['HostMounts']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "OSFamily: ";
+        echo "<tr><td>" . $row['HostOSFamily']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "Processor: ";
+        echo "<tr><td>" . $row['HostProcessor']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "ProcessorCores: ";
+        echo "<tr><td>" . $row['HostProcessorCores']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "ProcessorCount: ";
+        echo "<tr><td>" . $row['HostProcessorCount']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "ProductName: ";
+        echo "<tr><td>" . $row['HostProductName']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "SwapFree: ";
+        echo "<tr><td>" . $row['HostSwapFree']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "SwapTotal: ";
+        echo "<tr><td>" . $row['HostSwapTotal']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "SystemVendor: ";
+        echo "<tr><td>" . $row['HostSystemVendor']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "TimeZone: ";
+        echo "<tr><td>" . $row['HostTimeZone']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "VirtualizationType: ";
+        echo "<tr><td>" . $row['HostVirtualizationType']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "LastUpdateTime: ";
+        echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr>";
+        echo "</pre>";
+      }
+    }
+    if ($ha=="ViewLogs") {
+      session_start();
+      $hn = $_SESSION['sessionhn'];
+      echo "<html>";
+      echo "<body>";
+      echo "<p align=center><iframe src=\"http://{{ logstash_server_fqdn }}:5601/#/discover?_g=()&_a=(columns:!(_source),index:%5Blogstash-%5DYYYY.MM.DD,interval:auto,query:(query_string:(analyze_wildcard:!t,query:'host:%20%22$hn%22')),sort:!('@timestamp',desc))\" width=\"100%\" height=\"800\" style=\"border:none\"></iframe></p>";
+      echo "</body>";
+      echo "</html>";
+    }
+  }
+?>

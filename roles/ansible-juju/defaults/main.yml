@@ -1,0 +1,3 @@
+---
+# defaults file for ansible-juju
+juju_debian_ppa: 'ppa:juju/stable'

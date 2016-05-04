@@ -1,0 +1,28 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  if(isset($_POST['Submit'])) {
+    $aa = $_POST["AnsibleAction"];
+    if ($aa=="TestJenkinsJob") {
+      include 'ansible_test_jenkins_job.php';
+    }
+  }
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <form action="ansible_actions.php" method="post">
+      <h3>Ansible Actions:</h3><select name="AnsibleAction">
+        <option selected>Choose Ansible Action:</option>
+        <option value="TestJenkinsJob">Test Jenkins Job</option>
+      </select><br>
+      <input type="submit" name="Submit" value="Submit">
+      <input type="reset" value="Reset"
+    </form>
+  </body>
+</html>

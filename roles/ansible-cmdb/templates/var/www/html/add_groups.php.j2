@@ -1,0 +1,62 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  if(isset($_POST['Submit'])) {
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "INSERT INTO Groups
+            (GroupName,GroupDescription,GroupDTAP,GroupCreatedOn,LastUpdateTime)
+            VALUES('$gn','$gd','$gdtap',datetime('now'),datetime('now'))";
+    $gn = $_POST["GroupName"];
+    $gd = $_POST["GroupDescription"];
+    $gdtap = $_POST["GroupDTAP"];
+    if (empty($_POST["GroupName"])) {
+      echo "Group Name has not been entered";
+    }
+    if (!empty($_POST["GroupName"])) {
+      $db->exec($sql);
+      echo "Group $gn has been added.";
+    }
+  }
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <br><br><br><br>
+    <h3>Check existing groups:</h3>
+		<form action="query_group.php" id="form" name="form" method="post">
+			<select name="groupid" class="groupid">
+				<option selected="selected">--Select Group--</option>
+					<?php
+						$db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+						$db->exec( 'PRAGMA foreign_keys = ON;' );
+						$sql = "SELECT GroupId,GroupName FROM Groups";
+						$results = $db->query($sql);
+						while ($row = $results->fetchArray()) {
+							echo '<option value="'.$row['GroupId'].'">'.$row['GroupName'].'</option>';
+						}
+					?>
+			</select>
+			<button type="submit" id="submit">View Group Details</button>
+		</form><br><br>
+    <h3>Create New CMDB Group</h3>
+    <h4>(** - Denotes required field)</h4>
+    <form action="add_groups.php" method="post">
+      Group name: (**)<br><input type="text" name="GroupName"><br>
+      Group description:<br><input type="text" name="GroupDescription"><br>
+      Group DTAP: (**)<br><select name="GroupDTAP">
+        <option value="D">Development</option>
+        <option value="T">Test</option>
+        <option value="A">Acceptance</option>
+        <option value="P">Production</option>
+      </select><br>
+      <input type="submit" name="Submit" value="Add Group">
+      <input type="reset" value="Reset">
+    </form>
+  </body>
+</html>

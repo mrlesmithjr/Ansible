@@ -1,0 +1,8 @@
+---
+- name: users | creating cacti user
+  user:
+    name: "{{ cacti_user_info.name }}"
+    password: "{{ cacti_user_info.password }}"
+    comment: "{{ cacti_user_info.comment|default(omit) }}"
+    generate_ssh_key: yes
+    

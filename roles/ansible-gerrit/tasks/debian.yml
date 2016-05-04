@@ -1,0 +1,16 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - default-jre-headless
+    - git
+    - gitweb
+    - python-mysqldb
+
+#- name: debian | installing gitweb (if enabled)
+#  apt:
+#    name: gitweb
+#    state: present
+#  when: gerrit_gitweb_integration is defined and gerrit_gitweb_integration

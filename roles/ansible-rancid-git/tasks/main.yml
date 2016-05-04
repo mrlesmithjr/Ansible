@@ -1,0 +1,27 @@
+---
+# tasks file for ansible-rancid-git
+- include: users.yml
+  tags:
+    - rancid
+    - rancid_user
+
+- include: debian.yml
+  tags:
+    - rancid
+  when: ansible_os_family == "Debian"
+
+- include: config_devices.yml
+  tags:
+    - rancid
+    - rancid_config_devices
+  when: rancid_config_devices is defined and rancid_config_devices
+
+- include: cron.yml
+  tags:
+    - rancid
+    - rancid_cron
+
+- include: config_email_aliases.yml
+  tags:
+    - rancid
+    - rancid_email

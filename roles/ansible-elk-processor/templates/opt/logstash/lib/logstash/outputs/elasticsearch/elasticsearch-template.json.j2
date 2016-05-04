@@ -1,0 +1,59 @@
+{
+  "template" : "logstash-*",
+  "settings" : {
+    "index.refresh_interval" : "5s"
+  },
+  "mappings" : {
+    "_default_" : {
+       "_all" : {"enabled" : true},
+       "dynamic_templates" : [ {
+         "string_fields" : {
+           "match" : "*",
+           "match_mapping_type" : "string",
+           "mapping" : {
+             "type" : "string", "index" : "analyzed", "omit_norms" : true,
+               "fields" : {
+                 "raw" : {"type": "string", "index" : "not_analyzed", "ignore_above" : 256}
+               }
+           }
+         }
+       } ],
+       "properties" : {
+         "@version": { "type": "string", "index": "not_analyzed" },
+         "geoip"  : {
+           "type" : "object",
+             "dynamic": true,
+             "path": "full",
+             "properties" : {
+               "location" : { "type" : "geo_point" }
+             }
+         },
+        "actconn": { "type": "long", "index": "not_analyzed" },
+        "backend_queue": { "type": "long", "index": "not_analyzed" },
+        "beconn": { "type": "long", "index": "not_analyzed" },
+        "bytes": { "type": "long", "index": "not_analyzed" },
+        "bytes_read": { "type": "long", "index": "not_analyzed" },
+        "datastore_latency_from": { "type": "long", "index": "not_analyzed" },
+        "datastore_latency_to": { "type": "long", "index": "not_analyzed" },
+        "feconn": { "type": "long", "index": "not_analyzed" },
+        "msg_delay": { "type": "long", "index": "not_analyzed" },
+        "msg_delay_a": { "type": "long", "index": "not_analyzed" },
+        "msg_delay_b": { "type": "long", "index": "not_analyzed" },
+        "msg_delay_c": { "type": "long", "index": "not_analyzed" },
+        "msg_delay_d": { "type": "long", "index": "not_analyzed" },
+        "msg_rcpts": { "type": "long", "index": "not_analyzed" },
+        "msg_size": { "type": "long", "index": "not_analyzed" },
+        "response_time": { "type": "long", "index": "not_analyzed" },
+        "retries": { "type": "long", "index": "not_analyzed" },
+        "srv_queue": { "type": "long", "index": "not_analyzed" },
+        "srvconn": { "type": "long", "index": "not_analyzed" },
+        "time_backend_connect": { "type": "long", "index": "not_analyzed" },
+        "time_backend_response": { "type": "long", "index": "not_analyzed" },
+        "time_duration": { "type": "long", "index": "not_analyzed" },
+        "time_queue": { "type": "long", "index": "not_analyzed" },
+        "time_request": { "type": "long", "index": "not_analyzed" },
+        "value": { "type": "long", "index": "not_analyzed" }
+       }
+    }
+  }
+}

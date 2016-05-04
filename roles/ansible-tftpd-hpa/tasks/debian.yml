@@ -1,0 +1,12 @@
+---
+- name: debian | updating apt-cache
+  apt:
+    update_cache: true
+    cache_valid_time: 86400
+
+- name: debian | installing packages
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - tftpd-hpa
+    - inetutils-inetd

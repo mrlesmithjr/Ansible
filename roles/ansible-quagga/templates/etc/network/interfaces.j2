@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+{% if quagga_interfaces_lo is not defined %}
+auto lo
+iface lo inet loopback
+{% endif %}
+{% if quagga_interfaces_lo is defined %}
+{%   for item in quagga_interfaces_lo %}
+auto {{ item.int }}
+iface {{ item.int }} inet {{ item.method }}
+
+{%   endfor %}
+{% endif %}

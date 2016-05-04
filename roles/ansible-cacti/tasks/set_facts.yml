@@ -1,0 +1,60 @@
+---
+- name: setting fact Debian apache2
+  set_fact:
+    cacti_web_group: "www-data"
+    cacti_web_owner: "www-data"
+    cacti_web_root: "/var/www/html"
+    cacti_webserver_handler: "apache2"
+  when: >
+        ansible_os_family == "Debian" and
+        cacti_webserver_type == "apache2"
+
+- name: setting fact Debian lighttpd
+  set_fact:
+    cacti_web_group: "www-data"
+    cacti_web_owner: "www-data"
+    cacti_web_root: "/var/www"
+    cacti_webserver_handler: "lighttpd"
+  when: >
+        ansible_os_family == "Debian" and
+        cacti_webserver_type == "lighttpd"
+
+- name: setting fact Debian nginx
+  set_fact:
+    cacti_web_group: "www-data"
+    cacti_web_owner: "www-data"
+    cacti_web_root: "/usr/share/nginx/html"
+    cacti_webserver_handler: "nginx"
+  when: >
+        ansible_os_family == "Debian" and
+        cacti_webserver_type == "nginx"
+
+- name: setting fact RedHat apache2
+  set_fact:
+    cacti_web_group: "apache"
+    cacti_web_owner: "apache"
+    cacti_web_root: "/var/www/html"
+    cacti_webserver_handler: "httpd"
+  when: >
+        ansible_os_family == "RedHat" and
+        cacti_webserver_type == "apache2"
+
+- name: setting fact RedHat lighttpd
+  set_fact:
+    cacti_web_group: "lighttpd"
+    cacti_web_owner: "lighttpd"
+    cacti_web_root: "/srv/www"
+    cacti_webserver_handler: "lighttpd"
+  when: >
+        ansible_os_family == "RedHat" and
+        cacti_webserver_type == "lighttpd"
+
+- name: setting fact RedHat nginx
+  set_fact:
+    cacti_web_group: "nginx"
+    cacti_web_owner: "nginx"
+    cacti_web_root: "/usr/share/nginx/html"
+    cacti_webserver_handler: "nginx"
+  when: >
+        ansible_os_family == "RedHat" and
+        cacti_webserver_type == "nginx"

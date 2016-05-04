@@ -1,0 +1,45 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  if(isset($_POST['Delete_Group']) && $_POST['Delete_Group'] == 'Yes') {
+    session_start();
+    $gid = $_SESSION['sessiongid'];
+    $gn = $_SESSION['sessiongn'];
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "DELETE FROM Groups
+            WHERE GroupId=$gid";
+    $db->exec($sql);
+    echo "Group $gn has been deleted.";
+  }
+  if(isset($_POST['Delete_Group']) && $_POST['Delete_Group'] == 'No') {
+    $url = 'query_group.php';
+    session_start();
+    $gid = $_SESSION['sessiongid'];
+    $_SESSION['sessiongid'] = $gid;
+  }
+  if(isset($url)) {
+    header("Location: $url");
+    exit;
+  }
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <form action="delete_group.php" method="post">
+      <h4>(** - Are you sure you want to delete $gn ??)</h4>
+      <select name="Delete_Group">
+        <option selected>Delete?:</option><br>
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+      <input type="submit" name="Submit">
+      <input type="reset" value="Reset">
+    </form>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+# Setup Postfix Log parsing
+filter {
+  if [type] == "postfix-log" {
+    grok {
+      match => [
+        "message", "%{SYSLOGBASE} (?<queue_id>[0-9A-F]{10,11}): from=<%{NOTSPACE:from_addr}>, size=%{INT:msg_size}, nrcpt=%{INT:msg_rcpts} %{GREEDYDATA}",
+        "message", "%{SYSLOGBASE} (?<queue_id>[0-9A-F]{10,11}): to=<%{NOTSPACE:to_addr}>, orig_to=<%{NOTSPACE:orig_to}>, relay=(?:%{HOSTNAME:relay_host}(?:\[%{IP:relay_ip}\](?::[0-9]+(.[0-9]+)?)?)?), delay=%{NUMBER:msg_delay}, delays=%{NUMBER:msg_delay_a}/%{NUMBER:msg_delay_b}/%{NUMBER:msg_delay_c}/%{NUMBER:msg_delay_d}, dsn=%{NOTSPACE:dsn}, status=%{WORD:msg_status} \(%{DATA:msg_reason}\)",
+        "message", "%{SYSLOGBASE} (?<queue_id>[0-9A-F]{10,11})(?<postfix_message>%{GREEDYDATA})",
+        "message", "%{SYSLOGBASE} %{GREEDYDATA:postfix_message}"
+      ]
+    }
+    # Removing redundant fields prior to next Grok match
+    mutate {
+      remove => [ "logsource", "pid", "program", "queue_id" ]
+    }
+    grok {
+      match => [
+        "message", "%{SYSLOGBASE} (?<queue_id>[0-9A-F]{10,11}): %{GREEDYDATA:message_body}"
+      ]
+    }
+    mutate {
+      replace => [ "message", "%{message_body}" ]
+    }
+  }
+}

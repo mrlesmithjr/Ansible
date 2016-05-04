@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+    <style>
+      a:link {
+        color:orange;
+      }
+      a:visited {
+        color:lime;
+      }
+      html {
+        background: url(background.jpg) no-repeat center center fixed;
+        background-size: cover;
+      }
+      body {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    {{ cmdb_web_title|upper }}<br><br><br><br>
+    <form action="ansible_actions.php" method="post">
+      <h3>Ansible Actions:</h3><select name="AnsibleAction">
+        <option selected>Choose Ansible Action:</option>
+        <option value="TestJenkinsJob">Test Jenkins Job</option>
+      </select><br>
+      <input type="submit" value="Submit">
+      <input type="reset" value="Reset"
+    </form>
+    <br><br><br><br>
+    <button onclick="location.href='index.html'">Home</button>
+    <button onclick="goBack()">Go Back</button>
+    <script>
+      function goBack() {
+        window.history.back();
+    }
+    </script>
+  </body>
+</html>

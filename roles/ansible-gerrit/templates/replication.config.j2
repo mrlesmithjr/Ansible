@@ -1,0 +1,8 @@
+[remote "{{ gerrit_replication_info.name }}"]
+  url = {{ gerrit_replication_info.url }}:{{ gerrit_replication_info.owner }}/${name}.git
+  push = +refs/heads/*:refs/heads/*
+  push = +refs/tags/*:refs/tags/*
+  timeout = {{ gerrit_replication_info.timeout }}
+  threads = {{ gerrit_replication_info.threads }}
+  remoteNameStyle = dash
+  authGroup = {{ gerrit_replication_info.authgroup }}

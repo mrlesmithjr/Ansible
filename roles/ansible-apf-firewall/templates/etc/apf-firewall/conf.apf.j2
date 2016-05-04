@@ -1,0 +1,579 @@
+#!/bin/bash
+#
+# APF 9.7 [apf@r-fx.org]
+# Copyright (C) 1999-2007, R-fx Networks <proj@r-fx.org>
+# Copyright (C) 2007, Ryan MacDonald <ryan@r-fx.org>
+# This program may be freely redistributed under the terms of the GNU GPL
+#
+# NOTE: This file should be edited with word/line wrapping off,
+#       if your using pico/nano please start it with the -w switch
+#       (e.g: pico -w filename)
+# NOTE: All options in this file are integer values unless otherwise
+#       indicated. This means value of 0 = disabled and 1 = enabled.
+
+##
+# [Main]
+##
+# !!! Do not leave set to (1) !!!
+# When set to enabled; 5 minute cronjob is set to stop the firewall. Set
+# this off (0) when firewall is determined to be operating as desired.
+{% if apf_firewall_devel_mode %}
+DEVEL_MODE="1"
+{% elif not apf_firewall_devel_mode %}
+DEVEL_MODE="0"
+{% endif %}
+
+# The installation path of APF; this can be changed but it is not recommended.
+{% if ansible_os_family != "RedHat" %}
+INSTALL_PATH="{{ apf_firewall_install_path }}"
+{% elif ansible_os_family == "RedHat" %}
+INSTALL_PATH="{{ apf_firewall_redhat_install_path }}"
+{% endif %}
+
+# Untrusted Network interface(s); all traffic on defined interface will be
+# subject to all firewall rules. This should be your internet exposed
+# interfaces. Only one interface is accepted for each value.
+IFACE_IN="{{ apf_firewall_iface_in }}"
+IFACE_OUT="{{ apf_firewall_iface_out }}"
+
+# Trusted Network interface(s); all traffic on defined interface(s) will by-pass
+# ALL firewall rules, format is white space or comma separated list.
+IFACE_TRUSTED="{{ apf_firewall_iface_trusted }}"
+
+# This option will allow for all status events to be displayed in real time on
+# the console as you use the firewall. Typically, APF used to operate silent
+# with all logging piped to $LOG_APF. The use of this option will not disable
+# the standard log file displayed by apf --status but rather compliment it.
+{% if apf_firewall_set_verbose %}
+SET_VERBOSE="1"
+{% elif not apf_firewall_set_verbose %}
+SET_VERBOSE="0"
+{% endif %}
+
+# The fast load feature makes use of the iptables-save/restore facilities to do
+# a snapshot save of the current firewall rules on an APF stop then when APF is
+# instructed to start again it will restore the snapshot. This feature allows
+# APF to load hundreds of rules back into the firewall without the need to
+# regenerate every firewall entry.
+# Note: a) if system uptime is below 5 minutes, the snapshot is expired
+#       b) if snapshot age exceeds 12 hours, the snapshot is expired
+#       c) if conf or a .rule has changed since last load, snapshot is expired
+#       d) if it is your first run of APF since install, snapshot is generated
+#       - an expired snapshot means APF will do a full start rule-by-rule
+{% if not apf_firewall_set_fast_load %}
+SET_FASTLOAD="0"
+{% elif apf_firewall_set_fast_load %}
+SET_FASTLOAD="1"
+{% endif %}
+
+# Virtual Network Sub-System (VNET) creates independent policy rule set for
+# each IP on a system to /etc/apf-firewall/vnet/IP.rules. These rule files can be
+# configured with conf.apf variables for unique but convenient firewall
+# policies or custom iptables entries for even greater flexibility.
+{% if not apf_firewall_set_vnet %}
+SET_VNET="0"
+{% elif apf_firewall_set_vnet %}
+SET_VNET="0"
+{% endif %}
+
+# This feature firewalls any additional interfaces on the server as untrusted
+# through the VNET sub-system. Excluded are interfaces that have already been
+# defined by IFACE_* variables. This feature is ideal for systems running
+# private interfaces where not all hosts on the private network are trusted or
+# are otherwise exposed to "open" networks through this private interface
+# (i.e: the Internet, network accessible storage LAN, corporate WAN, etc..)
+{% if not apf_firewall_set_addiface %}
+SET_ADDIFACE="0"
+{% elif apf_firewall_set_addiface %}
+SET_ADDIFACE="1"
+{% endif %}
+
+# This allows the firewall to work around modular kernel issues by assuming
+# that the system has all required firewall modules compiled directly into
+# kernel. This mode of operation is not generally recommended but can be used
+# scale APF to unique situations.
+{% if not apf_firewall_set_monokern %}
+SET_MONOKERN="0"
+{% elif apf_firewall_set_monokern %}
+SET_MONOKERN="1"
+{% endif %}
+
+# This controls how often, if at all, we want the trust system to refresh rules.
+# The firewall will flush & reload all static rules, redownload global rules and
+# re-resolve any dns names in the rules. This is ideal when using dynamic dns
+# names or downloadable global trust rules. [value in minutes, 0 to disable]
+SET_REFRESH="{{ apf_firewall_set_refresh }}"
+
+# This is the total amount of rules allowed inside of the deny trust system.
+# When this limit is reached, the deny rule files will begin to purge older
+# entries to maintain the set limit. [value is max lines, 0 for unlimited]
+SET_TRIM="{{ apf_firewall_set_trim }}"
+
+# Verifies that the IFACE_* and IFACE_TRUSTED interfaces are actually routed
+# to something. If configured interfaces are found with no routes setup then
+# APF will exit with an error to prevent further issues (such as being locked
+# out of the system).
+VF_ROUTE="1"
+
+# Verifies that crond is running when DEVEL_MODE=1; if not then APF will not
+# try to load as if lock-up occurs no cron service to flush firewall.
+VF_CROND="1"
+
+# Verifies that all inbound traffic is sourced from a defined local gateway MAC
+# address. All other traffic that does not match this MAC address will be
+# rejected as untrusted traffic. It is quite easy to forge a MAC address and as
+# such this feature executes NO default accept policy. Leave this option empty
+# to disable or enter a 48-bit MAC address to enable.
+VF_LGATE=""
+
+##
+# [Reactive Address Blocking]
+##
+# The use of RAB is such that it allows the firewall to track an address as it
+# traverses the firewall rules and subsequently associate that address across
+# any number of violations. This allows the firewall to react to critical
+# policy violations by blocking addresses temporarily on the assumed precaution
+# that we are protecting the host from what the address may do on the pretext
+# of what the address has already done. The interface that allows RAB to work
+# resides inside the kernel and makes use of the iptables 'ipt_recent' module,
+# so there is no external programs causing any additional load.
+{% if not apf_firewall_rab %}
+RAB="0"
+{% elif apf_firewall_rab %}
+RAB="1"
+{% endif %}
+
+# This enables RAB for sanity violations, which is when an address breaks a
+# strict conformity standard such as trying to spoof an address or modify
+# packet flags. It is strongly recommended that this option NOT be disabled.
+RAB_SANITY="1"
+
+# This enables RAB for port scan violations, which is when an address attempts
+# to connect to a port that has been classified as malicious. These types of
+# ports are those which are not commonly used in today's Internet but are
+# the subject of scrutiny by attackers, such as ports 1,7,9,11. Each security
+# level defines the amount of ports that RAB will react against. The port
+# security groups can be customized in 'internals/rab.ports'.
+# 0 = disabled | 1 = low security  | 2 = medium security | 3 = high security
+RAB_PSCAN_LEVEL="{{ apf_firewall_rab_pscan_level }}"
+
+# This controls the amount of violation hits an address must have before it
+# is blocked. It is a good idea to keep this very low to prevent evasive
+# measures. The default is 0 or 1, meaning instant block on first violation.
+RAB_HITCOUNT="{{ apf_firewall_rab_hitcount }}"
+
+# This is the amount of time (in seconds) that an address gets blocked for if
+# a violation is triggered, the default is 300s (5 minutes).
+RAB_TIMER="{{ apf_firewall_rab_timer }}"
+
+# This allows RAB to 'trip' the block timer back to 0 seconds if an address
+# attempts ANY subsiquent communication while still on the inital block period.
+RAB_TRIP="1"
+
+# This controls if the firewall should log all violation hits from an address.
+# The use of LOG_DROP variable set to 1 will override this to force logging.
+RAB_LOG_HIT="1"
+
+# This controls if the firewall should log all subsiqent traffic from an address
+# that is already blocked for a violation hit, this can generate allot of logs.
+# The use of LOG_DROP variable set to 1 will override this to force logging.
+RAB_LOG_TRIP="0"
+
+##
+# [Packet Filtering/Handling]
+##
+# How to handle TCP packet filtering?
+#
+#  RESET (sends a tcp-reset; TCP/IP default)
+#  DROP  (drop the packet; stealth ?)
+#  REJECT (reject the packet)
+TCP_STOP="{{ apf_firewall_tcp_stop | upper }}"
+
+# How to handle UDP packet filtering?
+#
+#  RESET (sends a icmp-port-unreachable; TCP/IP default)
+#  DROP  (drop the packet; stealth ?)
+#  REJECT (reject the packet)
+#  PROHIBIT (send an icmp-host-prohibited)
+UDP_STOP="{{ apf_firewall_udp_stop | upper }}"
+
+# How to handle all other packet filtering?
+#
+#  DROP  (drop the packet)
+#  REJECT (reject the packet)
+ALL_STOP="{{ apf_firewall_all_stop | upper }}"
+
+# The sanity options control the way packets are scrutinized as they flow
+# through the firewall. The main PKT_SANITY option is a top level toggle for
+# all SANITY options and provides general packet flag sanity as a pre-scrub
+# for the other sanity options. In short, this makes sure that all packets
+# coming and going conform to strict TCP/IP standards. In doing so we make it
+# very difficult for attackers to inject raw/custom packets into the server.
+PKT_SANITY="1"
+
+# Block any packets that do not conform as VALID, this feature is safe for most
+# but some may experience protocol issues with broken remote clients. This is
+# very similar to PKT_SANITY but has a wider scope and as such has the ability
+# to affect many application protocols in undesirable ways.
+PKT_SANITY_INV="0"
+
+# Block any fragmented UDP packets, this is safe as no UDP packets should
+# ever be fragmented.
+PKT_SANITY_FUDP="1"
+
+# Block packets with a source or destination of port 0, this is safe as
+# nothing should ever communicate on port 0 (technically does not exist).
+PKT_SANITY_PZERO="1"
+
+# Block traffic that has a destination or source of a known bad broadcast
+# addresses - that under normal circumstances a server has no business
+# communicating with.
+PKT_SANITY_STUFFED="0"
+
+# Default Type of Service (TOS); These values should be set to a comma
+# separated list of ports which you would like marked with the given TOS level.
+#
+# Set the default TOS value [0,2,4,8,16]
+TOS_DEF="0"
+
+# Set the default TOS port range
+TOS_DEF_RANGE="512:65535"
+
+# 0: Ports for Normal-Service
+TOS_0=""
+
+# 2: Ports for Minimize-Cost
+TOS_2=""
+
+# 4: Ports for Minimize Delay - Maximize Reliability
+TOS_4=""
+
+# 8: Ports for Maximum Throughput - Minimum Delay
+TOS_8="21,20,80"
+
+# 16: Ports for No Delay - Moderate Throughput - High Reliability
+TOS_16="25,110,143"
+
+# Allow traceroute requests on the defined range of ports. This feature
+# is not required for normal operations and some even prefer it disabled.
+# Enable Traceroute 	# Traceroute ports
+TCR_PASS="1"		TCR_PORTS="33434:33534"
+
+# Set a reasonable packet/time ratio for ICMP packets, exceeding this flow
+# will result in dropped ICMP packets. Supported values are in the form of:
+# pkt/s (packets/seconds), pkt/m (packets/minutes)
+# Set value to 0 for unlimited, anything above is enabled.
+ICMP_LIM="30/s"
+
+# Creates firewall rules based on the local name servers as defined in the
+# /etc/resolv.conf file. This is the preferred secure method for client side
+# name server requests. This option has no bearing on a locally hosted DNS
+# service.
+RESV_DNS="1"
+
+# When RESV_DNS is enabled, all the untrusted name server traffic can fill the
+# logs with client DNS traffic. This can be suppressed with an implicit drop
+# of all such traffic (sport 53 inbound) as so to avoid log chains. If you run
+# applications that have unique name servers configured, this may break them.
+RESV_DNS_DROP="1"
+
+# A common set of known Peer-To-Peer (p2p) protocol ports that are often
+# considered undesirable traffic on public Internet servers. These ports
+# are also often abused on web hosting servers where clients upload p2p
+# client agents for the purpose of distributing or downloading pirated media.
+# Format is comma separated for single ports and an underscore separator for
+# ranges (4660_4678).
+BLK_P2P_PORTS="1214,2323,4660_4678,6257,6699,6346,6347,6881_6889,6346,7778"
+
+# These are common Internet service ports that are understood in the wild
+# services you would not want logged under normal circumstances. All ports
+# that are defined here will be implicitly dropped with no logging for
+# TCP/UDP traffic inbound or outbound. Format is comma separated for single
+# ports and an underscore separator for ranges (135_139).
+BLK_PORTS="135_139,111,513,520,445,1433,1434,1234,1524,3127"
+
+# You need multicasting if you intend to participate in the MBONE, a high
+# bandwidth network on top of the Internet which carries audio and video
+# broadcasts. More about MBONE at: www-itg.lbl.gov/mbone/, this is generally
+# safe to enable.
+BLK_MCATNET="0"
+
+# Block all private ipv4 addresses, this is address space reserved for private
+# networks or otherwise unroutable on the Internet. If this host resides behind
+# a router with NAT or routing scheme that otherwise uses private addressing,
+# leave this option OFF. Refer to the 'internals/private.networks' file for
+# listing of private address space.
+BLK_PRVNET="0"
+
+# Block all ipv4 address space marked reserved for future use (unassigned),
+# such networks have no business talking on the Internet. However they may at
+# some point become live address space. The USE_RD option further in this file
+# allows for dynamic updating of this list on every full restart of APF. Refer
+# to the 'internals/reserved.networks' file for listing of address space.
+BLK_RESNET="1"
+
+# Block all ident (tcp 113) requests in and out of the server IF the port is
+# not already opened in *_TCP_CPORTS. This uses a REJECT target to make sure
+# the ident requests terminate quickly. You can see an increase in irc and
+# other connection performance with this feature.
+BLK_IDENT="0"
+
+# This is the maximum number of "sessions" (connection tracking entries) that
+# can be handled simultaneously by the firewall in kernel memory. Increasing
+# this value too high will simply waste memory - setting it too low may result
+# in some or all connections being refused, in particular during denial of
+# service attacks.
+SYSCTL_CONNTRACK="34576"
+
+# These are system control (sysctl) option changes to disable TCP features
+# that can be abused in addition to tweaking other TCP features for increased
+# performance and reliability.
+SYSCTL_TCP="1"
+
+# These are system control (sysctl) option changes intended to help mitigate
+# syn-flood attacks by lowering syn retry, syn backlog & syn time-out values.
+SYSCTL_SYN="1"
+
+# These are system control (sysctl) option changes to provide protection from
+# spoofed packets and ip/arp/route redirection. If you are performing advanced
+# routing policies on this host such as NAT/MASQ you should disable this.
+SYSCTL_ROUTE="0"
+
+# This system control (sysctl) option will log all network traffic that is
+# from impossible source addresses. This option can discover attacks or issues
+# on your network you may otherwise not be aware of.
+SYSCTL_LOGMARTIANS="0"
+
+# This system control (sysctl) option will allow you to control ECN support
+# (Explicit Congestion Notification). This feature provides an improved method
+# for congestion avoidance by allowing the network to mark packets for
+# transmission later, rather than dropping them from the queue. Please also
+# see related USE_ECNSHAME option further down in this file.
+SYSCTL_ECN="0"
+
+# This system control (sysctl) option will allow you to make use of SynCookies
+# support. This feature will send out a 'syn-cookie' when the syn backlog for a
+# socket becomes overflowed. The cookie is used to interrupt the flow of syn
+# transmissions with a hashed sequence number that must be correlated with the
+# sending host. The hash is made up of the sending host address, packet flags
+# etc..; if the sending host does not validate against the hash then the tcp
+# hand-shake is terminated. In short, this helps to mitigate syn-flood attacks.
+# Note: syncookies seriously violates TCP protocol and can result in serious
+#       degradation of some services (i.e. SMTP); visible not by you, but your
+#       clients and relays whom are contacting your system.
+SYSCTL_SYNCOOKIES="1"
+
+# This system control (sysctl) option allows for the use of Abort_On_Overflow
+# support. This feature will help mitigate burst floods if a listening service
+# is too slow to accept new connections. This option is an alternative for
+# SynCookies and both should NEVER be enabled at once.
+# Note: This option can harm clients contacting your system. Enable option only
+#       if you are sure that the listening daemon can not be tuned to accept
+#       connections faster.
+SYSCTL_OVERFLOW="0"
+
+# The helper chains are designed to assist applications in working with the
+# stateful firewall in a more reliable fashion. You should keep these settings
+# current with the ports SSH and FTP are operating on. Please DO NOT CONFUSE
+# these settings with opening the SSH/FTP port as they have no bearing on
+# actually connecting to the services. They are only for helping maintain your
+# connection to the services [ESTABLISHED,RELATED connection states, not NEW].
+HELPER_SSH="1"
+HELPER_SSH_PORT="22"
+
+HELPER_FTP="1"
+HELPER_FTP_PORT="21"
+HELPER_FTP_DATA="20"
+
+# Configure inbound (ingress) accepted services. This is an optional
+# feature; services and customized entries may be made directly to an ip's
+# virtual net file located in the vnet/ directory. Format is comma separated
+# and underscore separator for ranges.
+#
+# Example:
+# IG_TCP_CPORTS="21,22,25,53,80,443,110,143,6000_7000"
+# IG_UDP_CPORTS="20,21,53,123"
+# IG_ICMP_TYPES="3,5,11,0,30,8"
+
+# Common inbound (ingress) TCP ports
+IG_TCP_CPORTS="{% for item in apf_firewall_allow_tcp_ports_in %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+# Common inbound (ingress) UDP ports
+IG_UDP_CPORTS="{% for item in apf_firewall_allow_udp_ports_in %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+# Common ICMP inbound (ingress) types
+# 'internals/icmp.types' for type definition; 'all' is wildcard for any
+IG_ICMP_TYPES="{% for item in apf_firewall_allow_icmp_types_in %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+# Configure outbound (egress) accepted services. This is an optional
+# feature; services and customized entries may be made directly to an ip's
+# virtual net file located in the vnet/ directory.
+#
+# Outbound (egress) filtering is not required but makes your firewall setup
+# complete by providing full inbound and outbound packet filtering. You can
+# toggle outbound filtering on or off with the EGF variable. Format is comma
+# separated and underscore separator for ranges.
+#
+# Example:
+# EG_TCP_CPORTS="21,25,80,443,43"
+# EG_UDP_CPORTS="20,21,53"
+# EG_ICMP_TYPES="all"
+
+# Outbound (egress) filtering
+EGF="0"
+
+# Common outbound (egress) TCP ports
+EG_TCP_CPORTS="21,25,80,443,43"
+
+# Common outbound (egress) UDP ports
+EG_UDP_CPORTS="20,21,53"
+
+# Common ICMP outbound (egress) types
+# 'internals/icmp.types' for type definition; 'all' is wildcard for any
+EG_ICMP_TYPES="all"
+
+# Configure user-id specific outbound (egress) port access. This is a more
+# granular feature to limit the scope of outbound packet flows with user-id
+# conditioning. Format is comma separated and underscore separator for ranges.
+# This is NOT A FILTERING FEATURE, this is an ACCESS CONTROL feature. That
+# means EG_TCP_UID and EG_UDP_UID are intended to ALLOW outbound access for
+# specified users, not DENY.
+#
+# Format: EG_[TCP|UDP]_UID="uid:port"
+# Example:
+# Allow outbound access to destination port 22 for uid 0
+# EG_TCP_UID="0:22"
+
+# UID-Match outbound (egress) TCP ports
+EG_TCP_UID=""
+
+# UID-Match outbound (egress) UDP ports
+EG_UDP_UID=""
+
+# Configure executable specific outbound (egress) filtering. This is a more
+# granular feature to limit the scope of outbound packet flows with executable
+# conditioning. The packet filtering is based on the CMD process field being
+# passed along to iptables. All logged events for these rules will also include
+# the executable CMD name in the log chain. This is A FILTERING FEATURE, not an
+# ACCESS CONTROL feature. That means EG_DROP_CMD is intended to DENY outbound
+# access for specified programs, not ALLOW.
+#
+# Format is comma separated list of executable names you wish to ban from being
+# able to transmit data out of your server.
+
+# CMD-Match outbound (egress) denied applications
+EG_DROP_CMD="eggdrop psybnc bitchx BitchX init udp.pl"
+
+##
+# [Remote Rule Imports]
+##
+# Project Honey Pot is the first and only distributed system for identifying
+# spammers and the spambots they use to scrape addresses from your website.
+# This aggregate list combines Harvesters, Spammers and SMTP Dictionary attacks
+# from the PHP IP Data at:  http://www.projecthoneypot.org/list_of_ips.php
+DLIST_PHP="0"
+
+DLIST_PHP_URL="rfxn.com/downloads/php_list"
+DLIST_PHP_URL_PROT="http"
+
+# The Spamhaus Don't Route Or Peer List (DROP) is an advisory "drop all
+# traffic" list, consisting of stolen 'zombie' netblocks and netblocks
+# controlled entirely by professional spammers. For more information please
+# see http://www.spamhaus.org/drop/.
+DLIST_SPAMHAUS="0"
+
+DLIST_SPAMHAUS_URL="www.spamhaus.org/drop/drop.lasso"
+DLIST_SPAMHAUS_URL_PROT="http"
+
+# DShield collects data about malicious activity from across the Internet.
+# This data is cataloged, summarized and can be used to discover trends in
+# activity, confirm widespread attacks, or assist in preparing better firewall
+# rules. This is a list of top networks that have exhibited suspicious activity.
+DLIST_DSHIELD="0"
+
+DLIST_DSHIELD_URL="feeds.dshield.org/top10-2.txt"
+DLIST_DSHIELD_URL_PROT="http"
+
+# The reserved networks list is addresses which ARIN has marked as reserved
+# for future assignement and have no business as valid traffic on the internet.
+# Such addresses are often used as spoofed (Fake) hosts during attacks, this
+# will update the reserved networks list in order to prevent new ip assignments
+# on the internet from getting blocked; this option is only important when
+# BLK_RESNET is set to enabled.
+DLIST_RESERVED="0"
+
+DLIST_RESERVED_URL="rfxn.com/downloads/reserved.networks"
+DLIST_RESERVED_URL_PROT="http"
+
+# ECN is an extension which helps reduce congestion. Unfortunately some
+# clueless software/hardware vendors have setup their sites or implemented
+# TCP/IP in a very broken manner. If you try to talk to these sites with ECN
+# turned on, they will drop all packets from you. This feature uses the ECN
+# hall of shame list to turn off ECN in packets to these hosts so your traffic
+# is accepted as intended. This option is dependent on setting SYSCTL_ECN="1"
+# otherwise it stays disabled.
+DLIST_ECNSHAME="0"
+
+DLIST_ECNSHAME_URL="rfxn.com/downloads/ecnshame.lst"
+DLIST_ECNSHAME_URL_PROT="http"
+
+##
+# Global Trust
+##
+# This is an implementation of the trust rules (allow/deny_hosts) but
+# on a global perspective. You can define below remote addresses from
+# which the glob_allow/deny.rules files should be downloaded from on
+# a daily basis. The files can be maintained in a static fashion by
+# leaving USE_RGT=0, ideal for a host serving the files.
+USE_RGT="0"
+
+GA_URL="yourhost.com/glob_allow.rules"
+GA_URL_PROT="http"
+
+GD_URL="yourhost.com/glob_deny.rules"
+GD_URL_PROT="http"
+
+##
+# [Logging and control settings]
+##
+# Log all traffic that is filtered by the firewall
+{% if not apf_firewall_log_drop %}
+LOG_DROP="0"
+{% elif apf_firewall_log_drop %}
+LOG_DROP="1"
+{% endif %}
+
+# What log level should we send all log data too?
+# refer to man syslog.conf for levels
+LOG_LEVEL="{{ apf_firewall_log_level | lower }}"
+
+# Where should we send all the logging data?
+# ULOG (Allow ulogd to handle the logging)
+# LOG (Default; sends logging to kernel log)
+LOG_TARGET="LOG"
+
+# Log interactive access over telnet & ssh; uses
+# custom log prefix of ** SSH ** & ** TELNET **
+LOG_IA="1"
+
+# Log all foreign gateway traffic
+LOG_LGATE="0"
+
+# Extended logging information; this forces the output of tcp options and
+# ip options for packets passing through the log chains
+LOG_EXT="0"
+
+# Max firewall events to log per/minute. Log events exceeding these limits
+# will be lost (1440 minutes/day * 30 events/minute = 43200 events per/day)
+LOG_RATE="{{ apf_firewall_log_rate }}"
+
+# Location of the apf status log; all startup, shutdown and runtime status
+# sends outputs to this file
+LOG_APF="{{ apf_firewall_log }}"
+
+##
+# [Import misc. conf]
+##
+# Internal variable file
+CNFINT="$INSTALL_PATH/internals/internals.conf"
+. $CNFINT

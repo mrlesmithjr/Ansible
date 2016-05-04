@@ -1,0 +1,11 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ open_iscsi_debian_pre_req_packages }}'
+
+- name: debian | installing open-iscsi
+  apt:
+    name: "open-iscsi"
+    state: present

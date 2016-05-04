@@ -1,0 +1,8 @@
+---
+- name: Installs Juju
+  hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-juju
+  tasks:

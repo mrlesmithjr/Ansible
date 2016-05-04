@@ -1,0 +1,8 @@
+---
+- name: Installs APF Firewall
+  hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-apf-firewall
+  tasks:

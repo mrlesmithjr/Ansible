@@ -1,0 +1,10 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-change-hostname.git
+- src: https://github.com/mrlesmithjr/ansible-config-interfaces.git
+- src: https://github.com/mrlesmithjr/ansible-ctdb.git
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts.git
+- src: https://github.com/mrlesmithjr/ansible-glusterfs.git
+- src: https://github.com/mrlesmithjr/ansible-network-tweaks.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-open-iscsi.git
+- src: https://github.com/mrlesmithjr/ansible-zfs.git

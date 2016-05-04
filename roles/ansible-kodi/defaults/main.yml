@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-kodi
+kodi_debian_repo: 'deb http://http.debian.net/debian {{ ansible_distribution_release|lower }}-backports main'
+kodi_ubuntu_repo: 'ppa:team-xbmc/ppa'

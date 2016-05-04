@@ -1,0 +1,27 @@
+---
+# Install dependancies
+- name: redhat_curator | Installing pre-reqs
+  yum:
+    name: python-pip
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat_curator | Installing pre-reqs
+  dnf:
+    name: python-pip
+    state: present
+  when: ansible_distribution == "Fedora"
+
+# Install Curator
+- name: redhat_curator | installing ES curator
+  pip:
+    name: elasticsearch-curator
+
+- name: redhat_curator | installing curator crontab
+  cron:
+    cron_file: curator
+    minute: 30
+    hour: 23
+    job: "curator --host {{ es_fqdn }} -d {{ max_keep_days | default(360) }}"
+    user: "root"
+    name: "curator"

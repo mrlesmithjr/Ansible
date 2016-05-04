@@ -1,0 +1,64 @@
+<?php
+  session_start();
+  // Checking if user is logged in
+  if (empty($_SESSION['user_is_logged_in'])) {
+  // if not logged in redirect to login page
+  header("Location: login.php");
+  // Important to have die to not allow non logged in users to view page
+  die("Redirecting to login.php");
+  }
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+    <style>
+      a:link {
+        color:white;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      a.menuLinks{
+        font-weight: bold;
+        margin: 5px;
+      }
+      a:visited {
+        color:#47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      div.fixed {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+      p{
+        margin: 0 0 10px 0;
+        padding: 0;
+      }
+      h3 {
+        color: #47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      h4 {
+        color: #47a3da;
+        text-shadow: 2px 2px 4px #000000;
+      }
+      html {
+        background: url(background.jpg) no-repeat center center fixed;
+        background-size: cover;
+      }
+      body {
+        color: white;
+        text-shadow: 2px 2px 4px #000000;
+      }
+    </style>
+  </head>
+  <body>
+  <div class="fixed">
+    <p><a href="register_user.php" class="menuLinks">Register</a> | <a href="login.php" class="menuLinks">Login</a> | <a href="logout.php" class="menuLinks">Logout</a></p>
+  </div>
+  </body>
+</html>

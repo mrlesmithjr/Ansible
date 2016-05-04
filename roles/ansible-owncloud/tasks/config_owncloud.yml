@@ -1,0 +1,76 @@
+---
+- name: config_owncloud | downloading owncloud
+  get_url:
+    url: "{{ owncloud_dl_url }}/{{ owncloud_dl_file }}"
+    dest: "/opt/{{ owncloud_dl_file }}"
+    validate_certs: no
+
+- name: config_owncloud | extracting owncloud
+  unarchive:
+    src: "/opt/{{ owncloud_dl_file }}"
+    dest: "{{ apache2_webroot }}"
+    copy: no
+    creates: "{{ owncloud_webroot }}/index.php"
+
+- name: config_owncloud | configuring directory permissions
+  file:
+    dest: "{{ owncloud_webroot }}/"
+    owner: www-data
+    group: www-data
+    state: directory
+    recurse: yes
+
+- name: config_owncloud | creating owncloud Apache2 config
+  template:
+    src: "etc/apache2/sites-available/owncloud.conf.j2"
+    dest: "/etc/apache2/sites-available/owncloud.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart apache2
+
+- name: config_owncloud | enabling Apache2 modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - dir
+    - env
+    - headers
+    - mime
+    - rewrite
+  notify:
+    - restart apache2
+
+- name: config_owncloud | configuring owncloud
+  command: 'sudo -u www-data php occ maintenance:install --database "mysql" --database-name "{{ owncloud_db_name }}" --database-user "root" --database-pass "{{ mysql_root_password }}" --admin-user "{{ owncloud_admin_user }}" --admin-pass "{{ owncloud_admin_pass }}"'
+  args:
+    chdir: "{{ owncloud_webroot }}"
+    creates: "{{ owncloud_webroot }}/config/config.php"
+
+- name: config_owncloud | reconfiguring owncloud
+  replace:
+    dest: "{{ owncloud_webroot }}/config/config.php"
+    regexp: "http://localhost"
+    replace: "http://{{ ansible_hostname }}.{{ pri_domain_name }}/owncloud"
+
+- name: config_owncloud | reconfiguring owncloud
+  lineinfile:
+    dest: "{{ owncloud_webroot }}/config/config.php"
+    insertafter: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: "^    0 => 'localhost',"
+      line: "    1 => '{{ ansible_hostname }}',"
+    - regexp: "    1 => '{{ ansible_hostname }}',"
+      line: "    2 => '{{ ansible_hostname }}.{{ pri_domain_name }}',"
+## Below is not working
+#    - regexp: "  'dbtype' => 'mysql',"
+#      line: "    'memcache.local' => '\\OC\\Memcache\\APCu',"
+#    - regexp: "    'memcache.local' => '\\OC\\Memcache\\APCu',"
+#      line: "      'memcached_servers' => array("
+#    - regexp: "      'memcached_servers' => array("
+#      line: "           array('localhost', 11211),"
+#    - regexp: "           array('localhost', 11211),"
+#      line: "     ),"

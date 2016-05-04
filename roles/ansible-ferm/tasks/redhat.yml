@@ -1,0 +1,39 @@
+---
+- name: installing epel repo (RedHat)
+  yum:
+    name: "epel-release"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing pre-reqs
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | installing ferm
+  yum:
+    name: "ferm"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing ferm
+  dnf:
+    name: "ferm"
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | ensuring ferm is enabled
+  service:
+    name: "ferm"
+    enabled: yes

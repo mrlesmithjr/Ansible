@@ -1,0 +1,156 @@
+<query>
+        <name>Win32 - Disk Statistics</name>
+        <description>Grab the Win32_Disk statistics using SNMP-Informant</description>
+        <index_order_type>numeric</index_order_type>
+        <oid_index>.1.3.6.1.4.1.9600.1.1.1.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.1\.(.*)$</oid_index_parse>
+	<fields>
+		<lDiskInstance>
+			<name>Disk Instances</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.1</oid>
+		</lDiskInstance>
+		<PercentDiskReadTime>
+			<name>Percent Disk Read Time</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.2</oid>
+		</PercentDiskReadTime>
+		<PercentDiskTime>
+			<name>Percent Disk Time</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.3</oid>
+		</PercentDiskTime>
+		<PercentDiskWriteTime>
+			<name>Percent Disk Write Time</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.4</oid>
+		</PercentDiskWriteTime>
+		<PercentFreeSpace>
+			<name>Percent Free Space</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.5</oid>
+		</PercentFreeSpace>
+		<PercentIdleTime>
+			<name>Percent Idle Time</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.6</oid>
+		</PercentIdleTime>
+		<AvgDiskQueueLength>
+			<name>Average Disk Queue Length</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.7</oid>
+		</AvgDiskQueueLength>
+		<AvgDiskReadQueueLength>
+			<name>Average Disk Read Queue Length</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.8</oid>
+		</AvgDiskReadQueueLength>
+		<AvgDiskWriteQueueLength>
+			<name>Average Disk Write Queue Length</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.9</oid>
+		</AvgDiskWriteQueueLength>
+		<AvgDiskSecPerRead>
+			<name>Average Disk Reads Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.10</oid>
+		</AvgDiskSecPerRead>
+		<AvgDiskSecPerTransfer>
+			<name>Average Disk Transfers Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.11</oid>
+		</AvgDiskSecPerTransfer>
+		<AvgDiskSecPerWrite>
+			<name>Average Disk Writes Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.12</oid>
+		</AvgDiskSecPerWrite>
+		<CurrentDiskQueueLength>
+			<name>current Disk Queue Length</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.13</oid>
+		</CurrentDiskQueueLength>
+		<DiskBytesPerSec>
+			<name>Disk Bytes Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.14</oid>
+		</DiskBytesPerSec>
+		<DiskReadBytesPerSec>
+			<name>Disk Read Bytes Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.15</oid>
+		</DiskReadBytesPerSec>
+		<DiskReadsPerSec>
+			<name>Disk Reads Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.16</oid>
+		</DiskReadsPerSec>
+		<DiskTransfersPerSec>
+			<name>Disk Transfers Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.17</oid>
+		</DiskTransfersPerSec>
+		<DiskWriteBytesPerSec>
+			<name>Disk Write Bytes Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.18</oid>
+		</DiskWriteBytesPerSec>
+		<DiskWritesPerSec>
+			<name>Disk Writes Per Second</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.19</oid>
+		</DiskWritesPerSec>
+		<FreeMegabytes>
+			<name>Free Megabytes</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.20</oid>
+		</FreeMegabytes>
+		<SplitIOPerSec>
+			<name>Split IO Per Sec</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.1.1.21</oid>
+		</SplitIOPerSec>
+	</fields>
+</query>

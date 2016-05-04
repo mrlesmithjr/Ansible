@@ -1,0 +1,14 @@
+---
+- name: nfs | installing pre-reqs
+  apt: name={{ item }} state=present
+  with_items:
+    - nfs-common
+
+- name: nfs | mounting NFS volumes
+  mount: name={{ item.mountpoint }} src={{ item.server }}:{{ item.export }} fstype=nfs opts={{ item.mount_options }} state=mounted
+  with_items: nfs_mounts
+
+- name: nfs | configuring NFS permissions on mountpoints
+  file: path={{ item.mountpoint }} owner=root group=root mode=0755 state=directory recurse=yes
+  with_items: nfs_mounts
+  when: config_nfs_permissions is defined and config_nfs_permissions

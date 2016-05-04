@@ -1,0 +1,43 @@
+---
+### gathers info from hosts and creates a sql file to inject into db to update host details
+- hosts: all
+  sudo: true
+  remote_user: remote
+  vars:
+    - cmdb_web_group: www-data
+    - cmdb_web_user: www-data
+    - db_hostvars_dir: ./db_hostvars
+    - db_hostvars_file: ./db_hostvars.sql
+    - db_inventory_dir: ./db_inventory
+    - db_inventory_file: ./db_inventory.yml
+  tasks:
+    - name: creating hostvars for hosts
+      template: src=./create_db_hostdetails.sql.j2 dest="{{ db_hostvars_dir }}/{{ ansible_hostname }}"
+      delegate_to: localhost
+      sudo: false
+
+    - name: merging all hostvars into one sql
+      assemble: src="{{ db_hostvars_dir }}/" dest="{{ db_hostvars_file }}"
+      delegate_to: localhost
+      run_once: true
+      sudo: false
+
+- hosts: cmdb
+  sudo: true
+  remote_user: remote
+  vars:
+    - apache2_root: /var/www/html
+    - cmdb_sqlite_db_file: '{{ cmdb_sqlite_db_path }}/cmdb.db'
+    - cmdb_sqlite_db_path: '{{ apache2_root }}/../db'
+    - cmdb_web_group: www-data
+    - cmdb_web_user: www-data
+    - db_hostvars_dir: ./db_hostvars
+    - db_hostvars_file: ./db_hostvars.sql
+    - db_inventory_dir: ./db_inventory
+    - db_inventory_file: ./db_inventory.yml
+  tasks:
+    - name: copying sql file
+      copy: src="{{ db_hostvars_file }}" dest='{{ cmdb_sqlite_db_path }}' owner='{{ cmdb_web_user }}' group='{{ cmdb_web_group }}'
+
+    - name: adding data to sqlite3
+      shell: "cat {{ cmdb_sqlite_db_path }}/{{ db_hostvars_file }} | sqlite3 {{ cmdb_sqlite_db_file }}"

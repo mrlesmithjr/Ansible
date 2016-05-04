@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-mesosphere
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_zookeeper.yml
+  when: inventory_hostname in groups[zookeeper_cluster_master_group]
+
+- include: config_mesos.yml
+
+- include: config_marathon.yml
+  when: inventory_hostname in groups[zookeeper_cluster_master_group]

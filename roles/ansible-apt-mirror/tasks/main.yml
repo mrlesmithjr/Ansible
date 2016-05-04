@@ -1,0 +1,30 @@
+---
+# tasks file for ansible-apt-mirror
+- include: debian.yml
+  when: >
+        ansible_os_family == "Debian" and
+        (apt_mirror_client is defined and not apt_mirror_client)
+
+- include: config_apt_mirror.yml
+  when: >
+        ansible_os_family == "Debian" and
+        apt_mirror_client is defined and
+        not apt_mirror_client
+
+- include: config_apt_mirror_client.yml
+  when: >
+        ansible_os_family == "Debian" and
+        apt_mirror_client is defined and
+        apt_mirror_client
+
+- include: config_apt_mirror_schedule.yml
+  when: >
+        ansible_os_family == "Debian" and
+        (apt_mirror_client is defined and not apt_mirror_client) and
+        (apt_mirror_schedule_updates is defined and apt_mirror_schedule_updates)
+
+- include: config_apache2_symlinks.yml
+  when: >
+        ansible_os_family == "Debian" and
+        (apt_mirror_client is defined and not apt_mirror_client) and
+        (apt_mirror_schedule_updates is defined and apt_mirror_schedule_updates)

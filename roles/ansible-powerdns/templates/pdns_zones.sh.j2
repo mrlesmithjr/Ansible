@@ -1,0 +1,11 @@
+#!/bin/bash
+{% if pdns_fwd_zones is defined %}
+{%   for item in pdns_fwd_zones %}
+curl -X POST -d '{"name": "{{ item }}", "kind": "{{ pdns_zone_types }}", "masters": [], "nameservers": ["{{ pdns_ns1 }}", "{{ pdns_ns2 }}"]}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{%   endfor %}
+{% endif %}
+{% if pdns_rev_zones is defined %}
+{%   for item in pdns_rev_zones %}
+curl -X POST -d '{"name": "{{ item }}", "kind": "{{ pdns_zone_types }}", "masters": [], "nameservers": ["{{ pdns_ns1 }}", "{{ pdns_ns2 }}"]}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{%   endfor %}
+{% endif %}

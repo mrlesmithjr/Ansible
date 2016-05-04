@@ -1,0 +1,14 @@
+---
+- name: config_targets | discovering targets
+  open_iscsi:
+    discover: "{{ item.discover }}"
+    portal: "{{ item.portal }}"
+  with_items: '{{ open_iscsi_targets }}'
+
+- name: config_targets | configuring targets
+  open_iscsi:
+    discover: "{{ item.discover }}"
+    login: "{{ item.login }}"
+    portal: "{{ item.portal }}"
+    target: "{{ item.target|default(omit) }}"
+  with_items: '{{ open_iscsi_targets }}'

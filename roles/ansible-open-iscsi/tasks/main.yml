@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-open-iscsi
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_daemon.yml
+  when: config_open_iscsi
+
+- include: config_targets.yml
+  when: config_open_iscsi_targets

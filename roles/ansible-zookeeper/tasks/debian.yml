@@ -1,0 +1,16 @@
+---
+- name: debian | adding cloudera repo key
+  apt_key:
+    url: "{{ zookeeper_debian_repo_key }}"
+    state: present
+
+- name: debian | adding cloudera repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: zookeeper_debian_repos
+
+- name: debian | installing zookeeper
+  apt:
+    name: "zookeeper"
+    state: present

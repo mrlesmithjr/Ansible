@@ -1,0 +1,12 @@
+---
+interfaces:
+{% for item in show_interfaces.stdout_lines %}
+  - name: {{ item }}
+    address:
+    configure: {{ default_configure_interface|lower }}
+    gateway:
+    method: {{ default_interface_method }}
+    netmask:
+    netmask_cidr:
+    network:
+{% endfor %}

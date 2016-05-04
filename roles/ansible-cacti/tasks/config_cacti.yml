@@ -1,0 +1,100 @@
+---
+- name: config_cacti | downloading cacti
+  get_url:
+    url: "{{ cacti_dl_url }}/{{ cacti_dl_file }}"
+    dest: "{{ cacti_web_root }}/{{ cacti_dl_file }}"
+
+- name: config_cacti | extracting cacti
+  unarchive:
+    src: "{{ cacti_web_root }}/{{ cacti_dl_file }}"
+    dest: "{{ cacti_web_root }}"
+    copy: no
+    creates: "{{ cacti_web_root }}/cacti-{{ cacti_version }}/index.php"
+
+- name: config_cacti | creating cacti symlink
+  file:
+    src: "{{ cacti_web_root }}/cacti-{{ cacti_version }}"
+    dest: "{{ cacti_site_dir }}"
+    state: link
+- name: config_cacti | copying new cacti.sql
+  template:
+    src: "cacti.sql.j2"
+    dest: "{{ cacti_site_dir }}/cacti.sql"
+    owner: "{{ cacti_web_owner }}"
+    group: "{{ cacti_web_group }}"
+  when: cacti_replace_cacti_db_schema
+
+- name: config_cacti | checking if cacti DB already populated
+  stat:
+    path: "{{ cacti_web_root }}/.cacti_db_populated"
+  register: cacti_db_already_populated
+
+- name: config_cacti | populating cacti DB
+  mysql_db:
+    name: "{{ cacti_db_info.db_name }}"
+    target: "{{ cacti_site_dir }}/cacti.sql"
+    state: import
+  register: cacti_db_populated
+  ignore_errors: true  #defined to get around clustered setup...may remove at a later time
+  when: >
+        not cacti_db_already_populated.stat.exists and
+        not cacti_remote_db
+
+- name: config_cacti | populating cacti DB
+  mysql_db:
+    name: "{{ cacti_db_info.db_name }}"
+    target: "{{ cacti_site_dir }}/cacti.sql"
+    state: import
+    login_host: "{{ cacti_db_info.host }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  register: cacti_db_populated
+  ignore_errors: true  #defined to get around clustered setup...may remove at a later time
+  when: >
+        not cacti_db_already_populated.stat.exists and
+        cacti_remote_db
+
+- name: config_cacti | marking cacti DB as populated
+  file:
+    dest: "{{ cacti_web_root }}/.cacti_db_populated"
+    state: touch
+  when: cacti_db_populated.changed
+
+- name: config_cacti | setting site permissions
+  file:
+    path: "{{ cacti_web_root }}/cacti-{{ cacti_version }}"
+    state: directory
+    recurse: yes
+    owner: "{{ cacti_web_owner }}"
+    group: "{{ cacti_web_group }}"
+
+- name: config_cacti | configuring cacti settings
+  template:
+    src: "config.php.j2"
+    dest: "{{ cacti_site_dir }}/include/config.php"
+    owner: "{{ cacti_web_owner }}"
+    group: "{{ cacti_web_group }}"
+    mode: 0644
+
+- name: config_cacti | configuring rra directory permissions
+  file:
+    path: "{{ cacti_site_dir }}/{{ item }}"
+    state: directory
+    recurse: yes
+    owner: "{{ cacti_user_info.name }}"
+    group: "{{ cacti_web_group }}"
+    mode: 0775
+  with_items:
+    - log
+    - rra
+
+- name: config_cacti | creating cacti poller cron
+  cron:
+    name: "Cacti poller cron"
+    user: "{{ cacti_user_info.name }}"
+    minute: "{{ cacti_cron_schedule.minute }}"
+    hour: "{{ cacti_cron_schedule.hour }}"
+    day: "{{ cacti_cron_schedule.day }}"
+    month: "{{ cacti_cron_schedule.month }}"
+    job: "php {{ cacti_site_dir }}/poller.php 2>&1 >/dev/null"
+    cron_file: "cacti_poller"

@@ -1,0 +1,28 @@
+---
+##
+## Deploy pre dep for postgresql if set
+- hosts: all
+  sudo : True
+  vars_files:
+     - defaults/main.yml
+  tasks:
+
+    - name: install predep for UBUNTU
+      apt:
+        pkg="{{item}}"
+        state=present
+        update_cache="yes"
+      with_items:
+        - python-psycopg2
+        - python-pycurl
+      when: "zabbix_server_db_install == True and zabbix_server_db_type == 'pgsql'"
+
+##
+## Deploy Database postgresql if set
+## Deploy Zabbix server
+- hosts: all
+  sudo: True
+  roles:
+    - { role: postgresql, when: "zabbix_server_db_install == True and zabbix_server_db_type == 'pgsql'" }
+    - { role: ansible-zabbix_server}
+

@@ -1,0 +1,5 @@
+---
+- name: remove_logstash | uninstalling logstash
+  apt:
+    name: logstash
+    state: absent

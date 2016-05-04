@@ -1,0 +1,12 @@
+---
+- name: config_email_aliases | adding group email to /etc/aliases
+  lineinfile:
+    dest: "/etc/aliases"
+    regexp: "^rancid-{{ item.0.name }}"
+    line: "rancid-{{ item.0.name }}{{ ':' }}\t{{ item.1.name }}"
+    state: present
+  notify: newaliases
+  with_subelements:
+    - rancid_groups_email
+    - email
+  when: item.0 is defined and item.1.name is defined

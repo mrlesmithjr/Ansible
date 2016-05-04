@@ -1,0 +1,63 @@
+---
+- name: config_oinkmaster | configuring oinkmaster
+  template:
+    src: "etc/oinkmaster.conf.j2"
+    dest: "/etc/oinkmaster.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_os_family == "Debian"
+
+- name: config_oinkmaster | configuring oinkmaster cron job
+  cron:
+    name: "oinkmaster rules update"
+    special_time: daily
+    user: "root"
+    job: "/usr/sbin/oinkmaster -C /etc/oinkmaster.conf -o {{ snort_rule_path }}"
+    cron_file: oinkmaster_rule_updates
+  when: ansible_os_family == "Debian"
+
+- name: config_oinkmaster | downloading oinkmaster package
+  get_url:
+    url: "{{ snort_oinkmaster_dl_url }}/{{ snort_oinkmaster_dl_package }}"
+    dest: "/usr/local/src/{{ snort_oinkmaster_dl_package }}"
+  when: ansible_os_family == "RedHat"
+
+- name: config_oinkmaster | extracting oinkmaster package
+  unarchive:
+    src: "/usr/local/src/{{ snort_oinkmaster_dl_package }}"
+    dest: "/etc/"
+    copy: no
+    creates: "/etc/oinkmaster-2.0/oinkmaster.pl"
+  when: ansible_os_family == "RedHat"
+
+- name: config_oinkmaster | creating symlink for oinkmaster
+  file:
+    src: "/etc/oinkmaster-2.0"
+    dest: "/etc/oinkmaster"
+    state: link
+  when: ansible_os_family == "RedHat"
+
+- name: config_oinkmaster | configuring oinkmaster
+  template:
+    src: "etc/oinkmaster.conf.j2"
+    dest: "/etc/oinkmaster/oinkmaster.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_os_family == "RedHat"
+
+- name: config_oinkmaster | configuring oinkmaster cron job
+  cron:
+    name: "oinkmaster rules update"
+    special_time: daily
+    user: "root"
+    job: "/etc/oinkmaster/oinkmaster.pl -C /etc/oinkmaster/oinkmaster.conf -o {{ snort_rule_path }}"
+    cron_file: oinkmaster_rule_updates
+  when: ansible_os_family == "RedHat"
+
+- name: config_oinkmaster | pulling initial rules
+  command: "/etc/oinkmaster/oinkmaster.pl -C /etc/oinkmaster/oinkmaster.conf -o {{ snort_rule_path }}"
+  args:
+    creates: "{{ snort_rule_path }}/emerging.conf"
+  when: ansible_os_family == "RedHat"

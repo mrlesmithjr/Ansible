@@ -1,0 +1,4 @@
+---
+# tasks file for ansible-apt-cacher-ng
+- include: debian.yml
+  when: ansible_os_family == "Debian"

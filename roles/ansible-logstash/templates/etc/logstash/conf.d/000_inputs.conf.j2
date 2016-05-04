@@ -1,0 +1,73 @@
+# {{ ansible_managed }}
+#
+{% if logstash_base_file_inputs is defined %}
+{%   for item in logstash_base_file_inputs %}
+input {
+  file {
+    path => "{{ item.path }}"
+    type => "{{ item.type }}"
+    sincedb_path => "/dev/null"
+  }
+}
+{%   endfor %}
+{% endif %}
+
+{% if logstash_base_inputs is defined and logstash_base_inputs != 'None'%}
+{%   for item in logstash_base_inputs %}
+{%     if item.prot is defined %}
+input {
+  {{ item.prot }} {
+    type => "{{ item.type }}"
+    port => "{{ item.port }}"
+{%     if item.format is defined %}
+    format => "{{ item.format }}"
+{%     endif %}
+{%     if item.codec is defined %}
+    codec => "{{ item.codec }}"
+{%     endif %}
+  }
+}
+{%     endif %}
+{%     if item.type is defined and item.prot is not defined %}
+{%       if item.type == "redis" %}
+input {
+  redis {
+    host => "{{ item.host }}"
+    data_type => "list"
+{%         if item.batch_count is defined %}
+    batch_count => "{{ item.batch_count }}"
+{%         endif %}
+    key => "logstash"
+{%         if item.threads is defined %}
+    threads => "{{ item.threads }}"
+{%         endif %}
+  }
+}
+{%       endif %}
+{%       if item.type == "rabbitmq" %}
+input {
+  rabbitmq {
+    host => "{{ item.host }}"
+{%         if item.exchange is defined %}
+    exchange => "{{ item.exchange }}"
+{%         endif %}
+  }
+}
+{%       endif %}
+{%       if item.type == "beats" %}
+input {
+  beats {
+    port => {{ item.port }}
+  }
+}
+{%       endif %}
+{%       if item.type == "syslog" %}
+input {
+  syslog {
+    port => {{ item.port }}
+  }
+}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}

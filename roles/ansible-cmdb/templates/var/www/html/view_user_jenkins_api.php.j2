@@ -1,0 +1,33 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <br><br><br><br>
+    <h4>My Jenkins API Access Tokens</h4>
+    <form action="members.php?action=viewuserjenkinsapi" method="post">
+      <select name="userjenkinsapi">
+        <option selected>Choose API:</option>
+        <?php
+          session_start();
+          $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+          $db->exec( 'PRAGMA foreign_keys = ON;' );
+          $sql = "SELECT *
+                  FROM UsersExtAPILinks
+                  WHERE UserId=$uid";
+          $results = $db->query($sql) or die('Query failed');
+          while ($row = $results->fetchArray()) {
+            echo '<option value="'.$row['JenkinsUserAPIToken'].'">'.$row['JenkinsAPITokenUserId'].' - '.$row['JenkinsURL'].'</option>';
+          }
+        ?>
+      </select>
+      <input type="submit" name="Submit">
+      <input type="reset" value="Reset">
+    </form>
+  </body>
+</html>

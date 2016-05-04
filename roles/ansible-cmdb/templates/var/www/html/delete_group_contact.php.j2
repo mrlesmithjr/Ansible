@@ -1,0 +1,31 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <?php
+      session_start();
+      $cid = $_SESSION['sessioncid'];
+      $gid = $_SESSION['sessiongid'];
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $sql1 = "SELECT ContactName FROM GroupContact
+              WHERE ContactId=$cid";
+      $results = $db->query($sql1);
+      while ($row = $results->fetchArray()) {
+        $cn = $row['ContactName'];
+      }
+      $sql2 = "DELETE FROM GroupContact
+              WHERE ContactId=$cid";
+      $db->exec($sql2);
+      echo "Group contact $cn has been deleted.";
+    ?>
+  <p>
+  </p>
+  </body>
+</html>

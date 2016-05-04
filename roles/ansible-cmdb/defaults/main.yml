@@ -1,0 +1,53 @@
+---
+allow_www_data_sudo: false
+apache2_root: /var/www/html
+cmdb_notifications_from_email: '{{ infra_email_notifications }}'
+cmdb_notifications_from_email_address: '{{ infra_email_notifications }}'
+cmdb_sqlite_db_file: '{{ cmdb_sqlite_db_path }}/cmdb.db'
+cmdb_sqlite_db_path: '{{ apache2_root }}/../db'
+cmdb_web_author: '{{ pri_domain_name }}'
+cmdb_web_body: '{{ pri_domain_name }} - CMDB'
+cmdb_web_description: 'One Stop Portal for All THINGS DevOps'
+cmdb_web_group: www-data
+cmdb_web_keywords: 'Jenkins, Rundeck, Ansible, CMDB, Logstash, ELK, PHPIpam, DDI, DNS, DevOps'
+cmdb_web_links:
+  - name: 'DDI - NSEdit'
+    url: 'http://{{ ipam_server_fqdn }}/nsedit'
+  - name: 'DDI - PHPIpam'
+    url: 'http://{{ ipam_server_fqdn }}/phpipam'
+  - name: 'ELK Stack - ES Cluster Status'
+    url: 'http://{{ logstash_server_fqdn }}:9200/_plugin/HQ'
+  - name: 'ELK Stack - HAProxy Stats'
+    url: 'http://{{ logstash_server_fqdn }}:9090'
+  - name: 'ELK Stack - Logstash'
+    url: 'http://{{ logstash_server_fqdn }}'
+  - name: Gitlab
+    url: 'http://{{ gitlab_server_fqdn }}'
+  - name: 'Jenkins - CI'
+    url: 'http://{{ jenkins_server_fqdn }}:8080'
+  - name: Jira
+    url: 'http://{{ jira_server_fqdn }}:8080'
+  - name: 'RANCID - NCM - Network Configs'
+    url: 'http://{{ gitlab_server_fqdn}}/rancid/rancid/tree/master'
+  - name: 'Rundeck - CI'
+    url: 'http://{{ rundeck_server_fqdn }}:4440'
+  - name: 'Sensu - Monitoring'
+    url: 'http://sensu.{{ pri_domain_name }}:3000'
+  - name: 'PHP Server Info'
+    url: 'php_details.php'
+cmdb_web_title: '{{ pri_domain_name }} - CMDB'
+cmdb_web_user: www-data
+enable_php_syslog: false
+gitlab_server_fqdn: 'gitlab.{{ pri_domain_name }}'
+infra_email_notifications: 'infrastructure@{{ pri_domain_name }}'
+install_ansible: true
+install_php_sqlite: true
+install_php: true
+ipam_server_fqdn: 'ipam.{{ pri_domain_name }}'
+jenkins_api_token: 4758714d940c7a5c9dc2e7dbd00310e6
+jenkins_server_fqdn: 'jenkins.{{ pri_domain_name }}'
+jira_server_fqdn: 'jira.{{ pri_domain_name }}'
+logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'
+php_sendmail_path: '/usr/sbin/sendmail -t -i'
+pri_domain_name: 'example.org'
+rundeck_server_fqdn: 'rundeck.{{ pri_domain_name }}'

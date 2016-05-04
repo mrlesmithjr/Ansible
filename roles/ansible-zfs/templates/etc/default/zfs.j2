@@ -1,0 +1,29 @@
+# ZoL userland configuration.
+
+# Wait this many seconds during system start for pool member devices to appear
+# before attempting import and starting mountall.
+ZFS_AUTOIMPORT_TIMEOUT='30'
+
+# Run `zfs share -a` during system start?
+# nb: The shareiscsi, sharenfs, and sharesmb dataset properties.
+{% if (zfs_enable_nfs is defined and not zfs_enable_nfs) or zfs_enable_nfs is not defined %}
+ZFS_SHARE='no'
+{% elif zfs_enable_nfs is defined and zfs_enable_nfs %}
+ZFS_SHARE='yes'
+{% endif %}
+
+# Run `zfs unshare -a` during system stop?
+ZFS_UNSHARE='no'
+
+# Build kernel modules with the --enable-debug switch?
+ZFS_DKMS_ENABLE_DEBUG='no'
+
+# Build kernel modules with the --enable-debug-dmu-tx switch?
+ZFS_DKMS_ENABLE_DEBUG_DMU_TX='no'
+
+# Keep debugging symbols in kernel modules?
+ZFS_DKMS_DISABLE_STRIP='no'
+
+# Wait for this many seconds in the initrd pre_mountroot?
+# This delays startup and should be '0' on most systems.
+ZFS_INITRD_PRE_MOUNTROOT_SLEEP='0'

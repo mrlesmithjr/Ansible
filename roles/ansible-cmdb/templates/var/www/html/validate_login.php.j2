@@ -1,0 +1,45 @@
+<?php
+if(isset($_POST['username']) && isset($_POST['password'])) {
+  session_start();
+  // Grab User submitted information
+  $username = $_POST['username'];
+  $password = $_POST['password'];
+  $hash = password_hash($password, PASSWORD_DEFAULT);
+
+  // Connect to the database
+  $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+  $db->exec( 'PRAGMA foreign_keys = ON;' );
+  $sql = "SELECT UserId,UserName,Password
+          FROM Users
+          WHERE UserName='$username'
+          LIMIT 1";
+  $results = $db->query($sql) or die('Query failed');
+  // Credentials match so we create session variables
+  while ($row = $results->fetchArray()) {
+    if (password_verify($_POST['password'], $row['Password'])) {
+      $_SESSION['UserId'] = $row['UserId'];
+      $_SESSION['UserName'] = $row['UserName'];
+      $_SESSION['user_is_logged_in'] = true;
+      // After assigning the session variables,
+      // set the url to redirect the user to members page.
+      $url = 'index.php';
+    }
+    else {
+      // If not, then redirect the user the login page with an error
+      $url = 'login.php?error=true';
+    }
+  }
+}
+if(!isset($_POST['username']) && !isset($_POST['password'])) {
+  // If login information not sent redirect back to login page
+  $url = 'login.php?error=true';
+}
+if(isset($url)) {
+  header("Location: $url");
+  exit;
+}
+if(!isset($url)) {
+  header("Location: index.php");
+  exit;
+}
+?>

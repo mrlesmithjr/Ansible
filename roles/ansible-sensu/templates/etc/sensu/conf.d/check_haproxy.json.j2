@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "check_haproxy": {
+      "command": "{{ sensu_plugins_dir }}/check-haproxy.rb -S /run/haproxy/admin.sock -A",
+{% if sensu_enable_handlers %}
+{% if not sensu_multiple_handlers %}
+      "handler": "{{ sensu_default_handler }}",
+{% endif %}
+{% if sensu_multiple_handlers %}
+      "handlers": [
+{% for item in sensu_default_handlers %}
+        "{{ item }}",
+{% endfor %}
+        "{{ sensu_default_handler }}"
+      ],
+{% endif %}
+{% endif %}
+      "occurences": 3,
+      "interval": 60,
+      "subscribers": [ "haproxy" ]
+    }
+  }
+}

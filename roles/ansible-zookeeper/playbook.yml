@@ -1,0 +1,9 @@
+---
+- name: Installs zookeeper
+  hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-oracle-java8
+    - role: ansible-zookeeper
+  tasks:

@@ -1,0 +1,11 @@
+---
+- name: opensuse | installing dnsmasq
+  zypper:
+    name: "dnsmasq"
+    state: present
+
+- name: opensuse | enabling on boot and started
+  service:
+    name: dnsmasq
+    state: started
+    enabled: yes

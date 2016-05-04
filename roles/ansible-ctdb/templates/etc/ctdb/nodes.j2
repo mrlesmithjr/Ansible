@@ -1,0 +1,17 @@
+{% for host in groups[ctdb_nodes_group] %}
+{%   if ctdb_nodes_cluster_address_int == 'enp0s3' and ansible_enp0s3 is defined %}
+{{ hostvars[host].ansible_enp0s3.ipv4.address }}
+{%   endif %}
+{%   if ctdb_nodes_cluster_address_int == 'enp0s8' and ansible_enp0s8 is defined %}
+{{ hostvars[host].ansible_enp0s8.ipv4.address }}
+{%   endif %}
+{%   if ctdb_nodes_cluster_address_int == 'eth0' and ansible_eth0 is defined %}
+{{ hostvars[host].ansible_eth0.ipv4.address }}
+{%   endif %}
+{%   if ctdb_nodes_cluster_address_int == 'eth1' and ansible_eth1 is defined %}
+{{ hostvars[host].ansible_eth1.ipv4.address }}
+{%   endif %}
+{%   if ctdb_nodes_cluster_address_int == 'eth2' and ansible_eth2 is defined %}
+{{ hostvars[host].ansible_eth2.ipv4.address }}
+{%   endif %}
+{% endfor %}

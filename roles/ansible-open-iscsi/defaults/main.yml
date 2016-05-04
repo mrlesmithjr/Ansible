@@ -1,0 +1,20 @@
+---
+# defaults file for ansible-open-iscsi
+config_open_iscsi: false
+config_open_iscsi_lvm_groups: false
+config_open_iscsi_targets: false
+open_iscsi_debian_pre_req_packages:
+  - lvm2
+  - scsitools
+  - xfsprogs
+open_iscsi_lvm_groups:
+  - 'glusterfs-vg'
+open_iscsi_mode: 'automatic'
+open_iscsi_targets:
+  - name: '{{ ansible_hostname }}'
+    discover: true
+    automatic: true
+    portal: 'node0.{{ pri_domain_name }}'
+    target: 'iqn.2001-04.org.example:storage.{{ ansible_hostname }}'
+    login: true
+pri_domain_name: 'example.org'

@@ -1,0 +1,147 @@
+---
+- name: install_gerrit | creating gerrit install directory
+  file:
+    path: "{{ gerrit_install_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: install_gerrit | downloading gerrit
+  get_url:
+    url: "{{ item.url }}/{{ item.filename }}"
+    dest: "{{ gerrit_install_dir }}/{{ item.filename }}"
+    sha256sum: "{{ item.sha256sum }}"
+    validate_certs: false
+  with_items: gerrit_dl_info
+
+- name: install_gerrit | creating gerrit symlink
+  file:
+    src: "{{ gerrit_install_dir }}/{{ item.filename }}"
+    dest: "{{ gerrit_install_dir }}/gerrit.war"
+    owner: root
+    group: root
+    state: link
+  with_items: gerrit_dl_info
+
+- name: install_gerrit | creating gerrit group
+  group:
+    name: "{{ gerrit_account_info.name }}"
+    system: yes
+    state: present
+
+- name: install_gerrit | creating gerrit user
+  user:
+    name: "{{ gerrit_account_info.name }}"
+    comment: "{{ gerrit_account_info.comment }}"
+    home: "{{ gerrit_account_info.home }}"
+    group: "{{ gerrit_account_info.group }}"
+    generate_ssh_key: yes
+    system: yes
+    state: present
+
+- name: install_gerrit | creating MySQL DB (if used)
+  mysql_db:
+    name: "{{ item.db }}"
+    state: present
+  with_items: gerrit_db_info
+  when: item.type is defined and item.type == "mysql"
+
+- name: install_gerrit | creating MySQL DB User(s) (if used)
+  mysql_user:
+    name: "{{ item.user }}"
+    password: "{{ item.pass }}"
+    priv: "{{ item.db }}.*:ALL"
+    state: present
+  with_items: gerrit_db_info
+  when: item.type is defined and item.type == "mysql"
+
+- name: install_gerrit | creating gerrit site directory
+  file:
+    path: "{{ gerrit_site_dir }}"
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+    mode: 0755
+    state: directory
+
+- name: install_gerrit | creating gerrit etc directory
+  file:
+    path: "{{ gerrit_site_dir }}/etc"
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+    mode: 0755
+    state: directory
+
+- name: install_gerrit | configuring gerrit
+  template:
+    src: gerrit.config.j2
+    dest: "{{ gerrit_site_dir }}/etc/gerrit.config"
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+    mode: 0644
+  notify: restart gerrit
+
+- name: install_gerrit | configuring gerrit secure settings
+  template:
+    src: secure.config.j2
+    dest: "{{ gerrit_site_dir }}/etc/secure.config"
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+    mode: 0600
+  notify: restart gerrit
+
+- name: install_gerrit | initializing gerrit
+  sudo_user: "{{ gerrit_account_info.name }}"
+  command: "{{ gerrit_init }}"
+  args:
+    creates: "{{ gerrit_site_dir }}/bin/gerrit.sh"
+  register: gerrit_initialization
+
+- name: install_gerrit | installing mysql connector
+  get_url:
+    url: "{{ gerrit_mysql_connector_url }}/{{ gerrit_mysql_connector_file }}"
+    dest: "{{ gerrit_site_dir }}/lib/{{ gerrit_mysql_connector_file }}"
+  sudo_user: "{{ gerrit_account_info.name }}"
+
+- name: install_gerrit | reindexing gerrit
+  sudo_user: "{{ gerrit_account_info.name }}"
+  command: "java -jar {{ gerrit_install_dir }}/gerrit.war reindex -d {{ gerrit_site_dir }}"
+  when: gerrit_initialization.changed
+
+- name: install_gerrit | configuring gerrit default service settings
+  template:
+    src: gerritcodereview.j2
+    dest: /etc/default/gerritcodereview
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart gerrit
+
+- name: install_gerrit | configuring gerrit init file link
+  file:
+    src: "{{ gerrit_site_dir }}/bin/gerrit.sh"
+    dest: /etc/init.d/gerrit
+    state: link
+
+- name: install_gerrit | ensuring gerrit service is started and starts on boot
+  service:
+    name: "{{ gerrit_service_name }}"
+    state: started
+    enabled: yes
+
+- name: install_gerrit | installing gerrit plugins
+  get_url:
+    url: "{{ item.url }}/{{ item.name }}"
+    dest: "{{ gerrit_site_dir }}/plugins/{{ item.name }}"
+  notify: restart gerrit
+  with_items: gerrit_plugins
+  when: gerrit_install_plugins is defined and gerrit_install_plugins
+
+- name: install_gerrit | validating permissions on gerrit plugins
+  file:
+    path: "{{ gerrit_site_dir }}/plugins"
+    state: directory
+    recurse: yes
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+  notify: restart gerrit

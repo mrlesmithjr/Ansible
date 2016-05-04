@@ -1,0 +1,31 @@
+---
+- name: upgrade_sensu | upgrading sensu to the latest version
+  apt:
+    name: "sensu"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: latest
+  register: sensu_packages
+  when: ansible_os_family == "Debian"
+
+- name: upgrade_sensu | restarting services if packages upgraded
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - sensu-api
+    - sensu-client
+    - sensu-server
+  when: >
+        ansible_os_family == "Debian" and
+        sensu_packages.changed and
+        sensu_server
+
+- name: upgrade_sensu | restarting services if packages upgraded
+  service:
+    name: "sensu-client"
+    state: restarted
+  when: >
+        ansible_os_family == "Debian" and
+        sensu_packages.changed and
+        not sensu_server

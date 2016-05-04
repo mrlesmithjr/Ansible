@@ -1,0 +1,11 @@
+---
+#### Below is for Ansible 2.0 when monit module is available
+#    - name: enabling monit monitoring of processes
+#      monit: name={{ item.name }} state=monitored
+#      with_items: monit_monitor_services
+#      when: item.monitored is defined and item.monitored
+
+#    - name: disable monit monitoring of processes
+#      monit: name={{ item.name }} state=unmonitored
+#      with_items: monit_monitor_services
+#      when: item.monitored is defined and not item.monitored

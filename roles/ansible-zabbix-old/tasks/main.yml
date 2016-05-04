@@ -1,0 +1,22 @@
+---
+
+- include: common.yml
+  when: zabbix_server_front_install or zabbix_server_install or zabbix_server_proxy_install or zabbix_agent_install
+
+- include: postgresql.yml
+  when: "zabbix_server_db_type == 'pgsql'"
+
+- include: mysql.yml
+  when: "zabbix_server_db_type == 'mysql'"
+
+- include: server.yml
+  when: zabbix_server_install
+
+- include: frontend.yml
+  when: zabbix_server_front_install
+
+- include: agent.yml
+  when: zabbix_agent_install
+
+- include: mysql_init.yml
+  when: "zabbix_server_db_type == 'mysql'"

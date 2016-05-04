@@ -1,0 +1,20 @@
+- name: debian_keepalived | installing keepalived
+  apt:
+    name: "keepalived"
+    state: present
+
+- name: debian_keepalived | allowing VIP to come up on both nodes
+  sysctl:
+    name: "net.ipv4.ip_nonlocal_bind"
+    value: 1
+    state: present
+    reload: yes
+
+- name: debian_keepalived | configuring keepalived
+  template:
+    src: "etc/keepalived/keepalived.conf.j2"
+    dest: "/etc/keepalived/keepalived.conf"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart keepalived

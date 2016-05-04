@@ -1,0 +1,41 @@
+---
+- name: adding repo for ruby
+  apt_repository:
+    repo: "ppa:brightbox/ruby-ng"
+    state: present
+
+- name: installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - gcc
+    - git
+    - libmysqlclient-dev
+    - make
+    - nodejs
+    - ruby2.2
+    - ruby2.2-dev
+    - zlib1g-dev
+
+- name: installing Ruby Gems
+  gem:
+    name: "{{ item }}"
+    state: present
+    user_install: no
+#  sudo: false
+  with_items:
+    - jekyll
+    - jekyll-import
+    - github-pages
+
+- name: installing jekyll import gems (If defined)
+  gem:
+    name: "{{ item.1 }}"
+    state: present
+    user_install: no
+  with_subelements:
+    - jekyll_importers
+    - gems
+  when: item.0 is defined

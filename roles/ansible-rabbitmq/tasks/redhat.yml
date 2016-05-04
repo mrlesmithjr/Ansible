@@ -1,0 +1,50 @@
+---
+- name: redhat | installing pre-reqs (yum)
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - dnf
+    - epel-release
+    - python-dnf
+  when: >
+        ansible_distribution != "Fedora"
+
+- name: redhat | installing pre-reqs (dnf)
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - wget
+
+- name: redhat | installing erlang
+  dnf:
+    name: "erlang"
+    state: present
+
+- name: redhat | adding RabbitMQ public GPG key
+  rpm_key:
+    key: "{{ rabbitmq_redhat_repo_key }}"
+    state: present
+
+- name: redhat | downloading RabbitMQ
+  get_url:
+    url: "{{ rabbitmq_redhat_url }}/{{ rabbitmq_redhat_package }}"
+    dest: "/opt/{{ rabbitmq_redhat_package }}"
+
+- name: redhat | installing RabbitMQ
+  dnf:
+    name: "/opt/{{ rabbitmq_redhat_package }}"
+    state: present
+
+- name: redhat | starting and enabling RabbitMQ service
+  service:
+    name: "rabbitmq-server"
+    state: started
+    enabled: yes
+
+- name: redhat | enabling the RabbitMQ Management Console
+  rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+  notify: restart rabbitmq-server

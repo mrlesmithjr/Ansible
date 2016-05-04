@@ -1,0 +1,24 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libpq-dev
+    - python-dev
+    - python-pip
+
+- name: debian | installing python modules
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - psycopg2
+
+- name: debian | installing postgresql
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - postgresql
+    - postgresql-contrib

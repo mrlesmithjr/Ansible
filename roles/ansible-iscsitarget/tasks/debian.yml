@@ -1,0 +1,75 @@
+---
+- name: debian | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: iscsitarget_debian_packages
+
+- name: debian | configuring iscsitarget service
+  template:
+    src: "etc/default/iscsitarget.j2"
+    dest: "/etc/default/iscsitarget"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart iscsitarget
+
+- name: debian | formatting dedicated hard drive for iscsi lun creation
+  filesystem:
+    fstype: "ext4"
+    dev: "{{ iscsitarget_dedicated_hd }}"
+  when: >
+        (iscsitarget_use_dedicated_hd is defined and
+        iscsitarget_use_dedicated_hd) and
+        iscsitarget_dedicated_hd is defined
+
+- name: debian | mounting dedicated hard drive for iscsi lun creation
+  mount:
+    name: "{{ iscsitarget_device_dir }}"
+    src: "{{ iscsitarget_dedicated_hd }}"
+    fstype: "ext4"
+    state: mounted
+  when: >
+        (iscsitarget_use_dedicated_hd is defined and
+        iscsitarget_use_dedicated_hd) and
+        iscsitarget_dedicated_hd is defined
+
+- name: debian | ensuring iscsitarget_device_dir exists
+  file:
+    path: "{{ iscsitarget_device_dir }}"
+    state: directory
+
+- name: debian | creating file based iscsi devices
+  shell: 'dd if=/dev/zero of={{ iscsitarget_device_dir }}/{{ item.name }} bs={{ item.bs }} count={{ item.count }}'
+  args:
+    creates: "{{ iscsitarget_device_dir }}/{{ item.name }}"
+  with_items: iscsitarget_file_devices
+  when: item.enabled
+
+- name: debian | deleting file based iscsi devices
+  file:
+    path: "{{ iscsitarget_device_dir }}/{{ item.name }}"
+    state: absent
+  with_items: iscsitarget_file_devices
+  when: not item.enabled
+
+- name: debian | configuring iscsi devices
+  template:
+    src: "etc/iet/ietd.conf.j2"
+    dest: "/etc/iet/ietd.conf"
+    owner: root
+    group: root
+    mode: 0600
+  notify:
+    - restart iscsitarget
+
+- name: debian | configuring iscsi device access
+  template:
+    src: "etc/iet/initiators.allow.j2"
+    dest: "/etc/iet/initiators.allow"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart iscsitarget

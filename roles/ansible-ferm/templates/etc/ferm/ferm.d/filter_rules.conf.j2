@@ -1,0 +1,9 @@
+table filter {
+    chain {{ item.0.chain }} {
+{% if item.1.proto == "any" %}
+        {% if item.1.source is defined %}saddr {{ item.1.source }}{% endif %}{% if item.1.destination is defined %} daddr {{ item.1.destination }}{% endif %}{% if item.1.dport is defined and item.1.dport != "any" %} dport {{ item.1.dport }}{% endif %}{% if item.1.jump is defined %} jump {{ item.1.jump }}{% elif item.1.jump is not defined %} {{ item.1.target }}{% endif %};
+{% elif item.1.proto != "any" %}
+        {% if item.1.source is defined %}saddr {{ item.1.source }}{% endif %}{% if item.1.destination is defined %} daddr {{ item.1.destination }}{% endif %} proto {{ item.1.proto }}{% if item.1.dport is defined %} dport {{ item.1.dport }}{% endif %}{% if item.1.jump is defined %} jump {{ item.1.jump }}{% elif item.1.jump is not defined %} {{ item.1.target }}{% endif %};
+{% endif %}
+    }
+}

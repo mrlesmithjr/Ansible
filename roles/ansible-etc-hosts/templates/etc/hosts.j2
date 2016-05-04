@@ -1,0 +1,11 @@
+127.0.0.1	localhost
+{% if etc_hosts_static_ip is defined and etc_hosts_static_ip %}
+{{ ansible_default_ipv4.address }} {{ ansible_hostname }}.{{ pri_domain_name }} {{ ansible_hostname }}
+{% elif (etc_hosts_static_ip is defined and not etc_hosts_static_ip) or etc_hosts_static_ip is not defined %}
+127.0.1.1 {{ ansible_hostname }}.{{ pri_domain_name }} {{ ansible_hostname }}
+{% endif %}
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters

@@ -1,0 +1,13 @@
+---
+# defaults file for ansible-hadoop
+hadoop_debian_pre_reqs:
+  - rsync
+  - ssh
+hadoop_dl_package: 'hadoop-{{ hadoop_version }}.tar.gz'
+hadoop_dl_url: 'http://apache.arvixe.com/hadoop/common/hadoop-{{ hadoop_version }}'
+hadoop_home_dir: /opt/hadoop
+hadoop_user_info:
+  name: 'hduser'
+  group: 'hadoop'
+  password: 'P@55w0rd'
+hadoop_version: 2.7.2

@@ -1,0 +1,8 @@
+---
+- name: config_keepalived | reconfiguring keepalived
+  template: src=etc/keepalived/keepalived_quagga.conf.j2 dest=/etc/keepalived/keepalived.conf owner=root group=root mode=0644
+
+- name: config_keepalived | copying keepalived scripts
+  template: src=opt/scripts/{{ item }}.j2 dest={{ keepalived_scripts_home }}/{{ item }} owner=root group=root mode=0774
+  notify: restart keepalived
+  with_items: keepalived_scripts

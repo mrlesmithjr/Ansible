@@ -1,0 +1,14 @@
+---
+- name: Installs Rundeck
+  hosts: all
+  become: true
+  vars:
+    - rundeck_mysql_backend: false
+    - rundeck_vagrant_install: true  #defines if installing under Vagrant
+  roles:
+    - role: ansible-mariadb-mysql
+      when: >
+            rundeck_mysql_backend is defined and
+            rundeck_mysql_backend
+    - role: ansible-rundeck
+  tasks:

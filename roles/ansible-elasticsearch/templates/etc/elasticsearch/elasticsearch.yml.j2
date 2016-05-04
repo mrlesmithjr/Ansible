@@ -1,0 +1,138 @@
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+#       Before you set out to tweak and tune the configuration, make sure you
+#       understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please see the documentation for further information on configuration options:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html>
+#
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+# cluster.name: my-application
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+# node.name: node-1
+#
+# Add custom attributes to the node:
+#
+# node.rack: r1
+#
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+# path.data: /path/to/data
+#
+# Path to log files:
+#
+# path.logs: /path/to/logs
+#
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
+# bootstrap.mlockall: true
+#
+# Make sure that the `ES_HEAP_SIZE` environment variable is set to about half the memory
+# available on the system and that the owner of the process is allowed to use this limit.
+#
+# Elasticsearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+# network.host: 192.168.0.1
+#
+# Set a custom port for HTTP:
+#
+# http.port: 9200
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+# Block initial recovery after a full cluster restart until N nodes are started:
+#
+# gateway.recover_after_nodes: 3
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-gateway.html>
+#
+# --------------------------------- Discovery ----------------------------------
+#
+# Elasticsearch nodes will find each other via unicast, by default.
+#
+# Pass an initial list of hosts to perform discovery when new node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+# discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+#
+# Prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
+#
+# discovery.zen.minimum_master_nodes: 3
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html>
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Disable starting multiple nodes on a single system:
+#
+# node.max_local_storage_nodes: 1
+#
+# Require explicit names when deleting indices:
+#
+# action.destructive_requires_name: true
+
+### Specific settings set below using Ansible
+{% if es_cluster_name is defined %}
+cluster.name: {{ es_cluster_name }}
+{% if es_replicas is defined %}
+index.number_of_replicas: {{ es_replicas }}
+{% endif %}
+{% if es_shards is defined %}
+index.number_of_shards: {{ es_shards }}
+{% endif %}
+{% endif %}
+{% if es_data_node is defined %}
+node.data: {{ es_data_node|lower }}
+{% endif %}
+{% if es_master_node is defined %}
+node.master: {{ es_master_node|lower }}
+{% endif %}
+node.name: {{ ansible_hostname }}
+bootstrap.mlockall: true
+{% if es_network_publish_host is defined %}
+network.publish_host: {{ es_network_publish_host }}
+{% endif %}
+{% if es_cluster_setup is defined and es_cluster_setup %}
+discovery.zen.minimum_master_nodes: {{ ( groups[es_config_master_group]|count /2 ) | round (0, 'ceil') | int }}
+{% endif %}
+{% if es_memory_tuning is defined %}
+{%   for item in es_memory_tuning %}
+{%     if item.set %}
+{{ item.name }}: {{ item.value }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if (es_allow_remote_connections is defined and es_allow_remote_connections) and es_version == "2.x" %}
+network.host: 0.0.0.0
+{% endif %}
+{% if es_config_unicast is defined and es_config_unicast %}
+discovery.zen.ping.unicast.hosts: [{% for host in groups[es_config_unicast_group] %}"{{ host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}
+{% if es_config_path_data %}
+path.data: [{% for item in es_path_data_info %}"{{ item.path }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+
+{% endif %}

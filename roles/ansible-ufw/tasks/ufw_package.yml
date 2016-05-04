@@ -1,0 +1,5 @@
+---
+- name: ufw_package | ensuring UFW is installed
+  apt:
+    name: ufw
+    state: present

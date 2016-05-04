@@ -1,0 +1,22 @@
+---
+- name: debian | installing pre-reqs
+  apt: name={{ item }} state=present
+  notify: restart apache2
+  with_items:
+    - apache2
+    - curl
+    - libapache2-mod-php5
+    - libcurl3
+    - libsqlite3-dev
+    - php5-curl
+    - php5-mcrypt
+    - php5-sqlite
+    - sqlite3
+
+- name: debian | adding ansible ppa
+  apt_repository: repo='ppa:ansible/ansible'
+  when: install_ansible is defined and install_ansible
+
+- name: debian | installing ansible
+  apt: name=ansible state=latest
+  when: install_ansible is defined and install_ansible

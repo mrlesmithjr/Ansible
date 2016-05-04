@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-cmdb
+- include: debian.yml
+
+- include: config_php5_apache2.yml
+  tags: [config_php5_apache2]
+
+- include: config_sqlite.yml
+  tags: [config_sqlite]
+
+- include: config_apache2_pages.yml
+  tags: [config_apache2_pages]

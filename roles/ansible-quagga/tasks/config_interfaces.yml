@@ -1,0 +1,25 @@
+---
+- name: configuring interfaces and vlans with dhcp mgmt
+  template: src=etc/network/interfaces_dhcp.j2 dest=/etc/network/interfaces owner=root group=root mode=0644 backup=yes
+  with_items: vlan_config
+  when: (vlan_config is defined and vlan_config) and quagga_mgmt_method == "dhcp"
+
+- name: configuring interfaces and vlans with static mgmt
+  template: src=etc/network/interfaces_static.j2 dest=/etc/network/interfaces owner=root group=root mode=0644 backup=yes
+  with_items: vlan_config
+  when: (vlan_config is defined and vlan_config) and quagga_mgmt_method == "static"
+
+- name: Create the directory for interface cfg files
+  file: path={{ net_config_dir }} state=directory
+  when: ansible_os_family == "Debian"
+
+- name: Create the network configuration file for ethernet devices
+  template: src=etc/network/interfaces_split.j2 dest={{ net_config_dir }}/ifcfg-{{ item.vlan }}
+  with_items: vlan_config
+  when: vlan_config is defined
+  register: ether_result
+
+- name: reinitializing interfaces
+  shell: ifdown {{ item.item.vlan }}; ifup {{ item.item.vlan }}
+  with_items: ether_result.results
+  when: vlan_config is defined and item.changed

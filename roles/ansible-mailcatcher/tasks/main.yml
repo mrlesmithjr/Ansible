@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-mailcatcher
+- include: create_user.yml
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: install.yml
+
+- include: config.yml

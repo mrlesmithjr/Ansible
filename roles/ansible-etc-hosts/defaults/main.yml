@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-etc-hosts
+etc_hosts_static_ip: false  #defines if node has static IP.
+etc_hosts_add_all_hosts: false  #defines if all nodes in play should be added to each hosts /etc/hosts

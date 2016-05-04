@@ -1,0 +1,17 @@
+---
+# handlers file for ansible-apf-firewall
+- name: reload apf-firewall rules  #Non-RedHat
+  command: apf -r
+
+- name: reload apf rules  #RedHat
+  command: "{{ apf_firewall_redhat_install_path }}/apf -r"
+
+- name: restart apf-firewall
+  service:
+    name: "apf-firewall"
+    state: restarted
+
+- name: restart apf
+  service:
+    name: "apf"
+    state: restarted

@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+## Do not modify this file....Any changes made here will be overwritten via Ansible....Create new interfaces in /etc/network/interfaces.d OR create them using the Ansible playbook.
+
+{% for item in quagga_interfaces_lo %}
+auto {{ item.int }}
+iface {{ item.int }} inet {{ item.method }}
+
+{% endfor %}
+auto {{ quagga_mgmt_int }}
+iface {{ quagga_mgmt_int }} inet {{ pri_interface_method }}
+address {{ quagga_mgmt_ip }}
+netmask {{ quagga_mgmt_netmask }}
+up route add default gw {{ quagga_mgmt_gateway }}
+dns-nameservers {{ quagga_mgmt_nameservers }}
+dns-search {{ quagga_mgmt_dns_search }}
+
+{% for item in quagga_interfaces_config %}
+{% if item.int != conntrackd_sync_int %}
+#auto {{ item.int }}
+#iface {{ item.int }} inet {{ item.method }}
+#address {{ sec_bind_address }}
+#netmask {{ sec_netmask }}
+{% endif %}
+{% if item.int == conntrackd_sync_int %}
+auto {{ item.int }}
+iface {{ item.int }} inet {{ item.method }}
+address {{ conntrackd_sync_ip }}
+netmask {{ conntrackd_sync_netmask }}
+{% endif %}
+
+{% endfor %}
+
+source /etc/network/interfaces.d/*

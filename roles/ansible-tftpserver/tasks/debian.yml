@@ -1,0 +1,5 @@
+---
+- name: debian | installing pre-reqs
+  apt: name={{ item }} state=absent
+  with_items:
+    - nfs-kernel-server

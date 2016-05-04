@@ -1,0 +1,28 @@
+---
+- name: debian | adding mesosphere repo key
+  apt_key:
+    keyserver: "{{ mesosphere_debian_repo_key_server }}"
+    id: "{{ mesosphere_debian_repo_key_id }}"
+    state: present
+
+- name: debian | adding mesosphere repo
+  apt_repository:
+    repo: "{{ mesosphere_debian_repo }}"
+    state: present
+
+- name: debian | installing mesosphere packages (master-nodes)
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mesos
+    - marathon
+  when: inventory_hostname in groups[zookeeper_cluster_master_group]
+
+- name: debian | installing mesosphere packages (slave-nodes)
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mesos
+  when: inventory_hostname in groups[zookeeper_cluster_slave_group]

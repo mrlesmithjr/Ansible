@@ -1,0 +1,36 @@
+---
+- name: installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - curl
+    - ca-certificates
+    - postfix
+
+#- name: checking to see if gitlab is already installed
+#  stat: path=/usr/bin/gitlab-ctl
+#  register: gitlab_installed
+
+- name: installing gitlab repo key(s)
+  apt_key:
+    url: "{{ gitlab_apt_key }}"
+    state: present
+
+- name: adding gitlab apt repositories
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: gitlab_apt_repos
+
+- name: installing gitlab-ce
+  apt:
+    name: gitlab-ce
+    state: present
+
+- name: reconfiguring gitlab-ce (first-time)
+  command: gitlab-ctl reconfigure
+  args:
+    creates: /var/opt/gitlab/bootstrapped
+  failed_when: false
+  notify: restart gitlab

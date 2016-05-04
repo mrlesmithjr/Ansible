@@ -1,0 +1,50 @@
+---
+# Playbook to install ELKStack specific roles to configure environment...Run elkstack-core.yml to initially provision environment and/or update core roles.
+- name: Configure ELK-Broker-Nodes
+  hosts: elk-broker-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - kibana_version: 4.4.0
+  roles:
+    - role: ansible-elk-kibana
+    - role: ansible-elk-broker
+
+- name: Configure ELK-ES-Nodes
+  hosts: elk-es-nodes
+  remote_user: remote
+  become: true
+  roles:
+    - role: ansible-elk-es
+
+- name: Configure ELK-Processor-Nodes
+  hosts: elk-processor-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - logstash_outputs:
+        - output: elasticsearch
+          hosts: '192.168.202.201:9200'
+          protocol: http  #node, transport or http....http is the only protocol supported in 2.x+
+          flush_size: 5000
+          workers: 2
+  roles:
+    - role: ansible-elk-processor
+
+- name: Configure ELK-Pre-Processor-Nodes
+  hosts: elk-pre-processor-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - logstash_outputs:
+        - output: redis
+          host: '192.168.202.200'
+  roles:
+    - role: ansible-elk-pre-processor
+
+- name: Configure ELK-Haproxy-Nodes
+  hosts: elk-haproxy-nodes
+  remote_user: remote
+  become: true
+  roles:
+    - role: ansible-elk-haproxy

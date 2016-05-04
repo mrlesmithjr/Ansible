@@ -1,0 +1,7 @@
+---
+- name: config_plugins | installing sensu plugins
+  gem:
+    name: "{{ item }}"
+    user_install: no
+    state: latest
+  with_items: sensu_plugins

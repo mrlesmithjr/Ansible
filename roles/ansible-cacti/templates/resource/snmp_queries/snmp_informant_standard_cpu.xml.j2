@@ -1,0 +1,86 @@
+<query>
+	<name>Win32 - CPU Statistics</name>
+	<description>Grab the Win32_CPU statistics using SNMP-Informant</description>
+	<index_order_type>numeric</index_order_type>
+	<oid_index>.1.3.6.1.4.1.9600.1.1.5.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.1\.5\.1\.1\.(.*)$</oid_index_parse>
+	<fields>
+		<cpuInstance>
+			<name>CPU Instance</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.1</oid>
+		</cpuInstance>
+		<cpuPercentDPCTime>
+			<name>CPU Percent DPC Time</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.2</oid>
+		</cpuPercentDPCTime>
+		<cpuPercentInterruptTimeTOOLONG>
+			<name>CPU Percent Interrupt Time Too Long</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.3</oid>
+		</cpuPercentInterruptTimeTOOLONG>
+		<cpuPercentPrivilegedTimeTOOLONG>
+			<name>CPU Percent Privileged Time Too Long</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.4</oid>
+		</cpuPercentPrivilegedTimeTOOLONG>
+		<cpuPercentProcessorTimeTOOLONG>
+			<name>CPU Percent Processor Time Too Long</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.5</oid>
+		</cpuPercentProcessorTimeTOOLONG>
+		<cpuPercentUserTime>
+			<name>CPU Percent User Time</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.6</oid>
+		</cpuPercentUserTime>
+		<cpuAPCBypassesPerSecTOOLONG>
+			<name>CPU APC Bypasses Per Sec Too Long</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.7</oid>
+		</cpuAPCBypassesPerSecTOOLONG>
+		<cpuDPCBypassesPerSecTOOLONG>
+			<name>CPU DPC Bypasses Per Sec Too Long</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.8</oid>
+		</cpuDPCBypassesPerSecTOOLONG>
+		<cpuDPCRate>
+			<name>CPU DPC Rate</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.9</oid>
+		</cpuDPCRate>
+		<cpuDPCsQueuedPerSec>
+			<name>CPU DPCs Queued Per Sec</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.10</oid>
+		</cpuDPCsQueuedPerSec>
+		<cpuInterruptsPerSec>
+			<name>CPU Interrupts Per Sec</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.9600.1.1.5.1.11</oid>
+		</cpuInterruptsPerSec>
+	</fields>
+</query>

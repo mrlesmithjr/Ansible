@@ -1,0 +1,43 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+
+- name: debian | adding passenger repo key
+  apt_key:
+    keyserver: "{{ passenger_debian_repo_keyserver }}"
+    id: "{{ passenger_debian_repo_key }}"
+    state: present
+
+- name: debian | adding passenger repo
+  apt_repository:
+    repo: "{{ passenger_debian_repo }}"
+    state: present
+
+- name: debian | installing passenger for Apache
+  apt:
+    name: "libapache2-mod-passenger"
+    state: present
+  notify: restart apache2
+  when: passenger_webserver == "apache2"
+
+- name: debian | enabling apache passenger mod
+  apache2_module:
+    name: passenger
+    state: present
+  notify: restart apache2
+  when: passenger_webserver == "apache2"
+
+- name: debian | installing passenger for NGINX
+  apt:
+    name: "{{ item }}"
+    state: present
+  notify: restart nginx
+  with_items:
+    - nginx-extras
+    - passenger
+  when: passenger_webserver == "nginx"

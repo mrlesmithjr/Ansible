@@ -1,0 +1,7 @@
+---
+# tasks file for ansible-shorewall
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_shorewall.yml
+  when: config_shorewall

@@ -1,0 +1,10 @@
+---
+- name: openstack_telemetry_storage_nodes | configuring Cinder
+  template:
+    src: etc/cinder/cinder.conf.j2
+    dest: /etc/cinder/cinder.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart cinder-volume

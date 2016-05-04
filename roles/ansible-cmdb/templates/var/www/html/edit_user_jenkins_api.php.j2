@@ -1,0 +1,31 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  session_start();
+  $juapitoken = $_SESSION['sessionjuapitoken'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <br><br><br><br>
+    <h3>Change Jenkins API Token</h3>
+    <h4>(** - Required)</h4>
+    <form action="members.php?action=editjenkinsapi" method="post">
+      Jenkins URL: (**) <input type="text" name="JenkinsURL"><br><br>
+      Jenkins API Token (User ID): (**) <input type="text" name="JenkinsAPITokenUserId"><br><br>
+      Jenkins API Token: (**) <input type="password" name="JenkinsUserAPIToken"><br><br>
+      <input type="submit" name="Submit" value="Change">
+      <input type="reset" value="Reset">
+    </form>
+    <br><br><br><br>
+    <h3>Delete Jenkins API Token</h3>
+    <form action="members.php?action=deletejenkinsapi" method="post">
+      <input type="submit" name="Submit" value="Delete">
+    </form>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+---
+- name: gems | installing ruby gems
+  gem:
+    name: "{{ item.name }}"
+    state: present
+    user_install: no
+    version: "{{ item.version|default(omit) }}"
+  with_items:
+#    - name: wkhtmltopdf
+    - name: bundler
+#    - name: rails
+#    - name: rake
+#      version: 0.9.2

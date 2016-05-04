@@ -1,0 +1,55 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-software-properties
+
+- name: debian | adding glusterfs apt repo key
+  apt_key:
+    keyserver: "{{ glusterfs_ubuntu_repo_info.keyserver }}"
+    id: "{{ glusterfs_ubuntu_repo_info.id }}"
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | adding glusterfs apt repo key
+  apt_key:
+    url: "{{ glusterfs_debian_repo_info.key_url }}"
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: debian | adding glusterfs apt repo
+  apt_repository:
+    repo: '{{ glusterfs_ubuntu_repo_info.repo }}'
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | adding glusterfs apt repo
+  apt_repository:
+    repo: '{{ glusterfs_debian_repo_info.repo }}'
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: debian | installing glusterfs server
+  apt:
+    name: "glusterfs-server"
+    state: present
+  when: >
+        inventory_hostname in groups[glusterfs_server_group] or
+        inventory_hostname in groups[glusterfs_arbiter_group]
+
+- name: debian | installing glusterfs client
+  apt:
+    name: "glusterfs-client"
+    state: present
+  when: inventory_hostname in groups[glusterfs_client_group]
+
+- name: debian | starting GlusterFS
+  service:
+    name: "glusterfs-server"
+    state: started
+    enabled: yes
+  when: >
+        inventory_hostname in groups[glusterfs_server_group] or
+        inventory_hostname in groups[glusterfs_arbiter_group]

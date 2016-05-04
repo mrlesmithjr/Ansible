@@ -1,0 +1,60 @@
+---
+- name: config_shorewall | configuring shorewall startup
+  template:
+    src: "etc/default/shorewall.j2"
+    dest: "/etc/default/shorewall"
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart shorewall
+
+- name: config_shorewall | configuring interfaces
+  template:
+    src: "etc/shorewall/interfaces.j2"
+    dest: "/etc/shorewall/interfaces"
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart shorewall
+
+- name: config_shorewall | configuring zones
+  template:
+    src: "etc/shorewall/zones.j2"
+    dest: "/etc/shorewall/zones"
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart shorewall
+
+- name: config_shorewall | configuring policies
+  template:
+    src: "etc/shorewall/policy.j2"
+    dest: "/etc/shorewall/policy"
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart shorewall
+
+- name: config_shorewall | configuring rules
+  template:
+    src: "etc/shorewall/rules.j2"
+    dest: "/etc/shorewall/rules"
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart shorewall
+
+- name: config_shorewall | configuring masquerading
+  template:
+    src: "etc/shorewall/masq.j2"
+    dest: "/etc/shorewall/masq"
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart shorewall

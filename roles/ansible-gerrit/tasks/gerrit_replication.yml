@@ -1,0 +1,18 @@
+---
+- name: gerrit_replication | configuring gerrit replication
+  template:
+    src: "replication.config.j2"
+    dest: "{{ gerrit_site_dir }}/etc/replication.config"
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+    mode: 0644
+  notify: restart gerrit
+
+- name: gerrit_replication | configuring gerrit ssh configuration
+  template:
+    src: "ssh_config.j2"
+    dest: "{{ gerrit_site_dir }}/.ssh/config"
+    owner: "{{ gerrit_account_info.name }}"
+    group: "{{ gerrit_account_info.group }}"
+    mode: 0644
+    backup: yes  #added to ensure to not overwrite current settings if exists.

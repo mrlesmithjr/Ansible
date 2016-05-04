@@ -1,0 +1,21 @@
+---
+- name: debian | adding haproxy ppa
+  apt_repository:
+    repo: "{{ debian_haproxy_repo }}"
+    state: present
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | installing haproxy and socat
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - haproxy
+    - hatop
+    - socat
+
+- name: debian | ensuring haproxy is enabled
+  service:
+    name: haproxy
+    enabled: yes

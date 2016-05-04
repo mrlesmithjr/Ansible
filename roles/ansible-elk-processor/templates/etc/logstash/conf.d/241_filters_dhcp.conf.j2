@@ -1,0 +1,21 @@
+# Filtering for dhcp server messages
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if [syslog_program] == "dhcpd" {
+      if "balanced pool" in [message] {
+        grok {
+          match => [
+            "message", "%{IP:dhcp_scope}/%{INT:dhcp_netmask_cidr}.*total %{INT:dhcp_total_addresses}.*free %{INT:dhcp_free_addresses}.*backup %{INT:dhcp_backup_addresses}.*lts %{INT:dhcp_leases_to_send}.*max-misbal %{INT:dhcp_max_misblanace}"
+          ]
+        }
+      }
+      if "balancing pool" in [message] {
+        grok {
+          match => [
+            "message", "%{IP:dhcp_scope}/%{INT:dhcp_netmask_cidr}.*total %{INT:dhcp_total_addresses}.*free %{INT:dhcp_free_addresses}.*backup %{INT:dhcp_backup_addresses}.*lts %{INT:dhcp_leases_to_send}.*max-own \(\+\/\-\)%{INT:dhcp_max_own}"
+          ]
+        }
+      }
+    }
+  }
+}

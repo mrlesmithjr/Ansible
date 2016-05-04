@@ -1,0 +1,58 @@
+---
+
+- name: agent_script | Deploy Zabbix sudeors file
+  template:
+     src=conf/zabbix-sudeors.j2
+     dest=/etc/sudoers.d/zabbix-sudeors
+     owner=root
+     group=root
+     mode=0640
+     validate='visudo -cf %s'
+  register: zabbixSudo
+  notify: restart zabbix_agent
+
+- name: agent_script | Copy User parameters file to zabbix_agentd.d
+  copy:
+     src="{{item}}"
+     dest=/etc/zabbix/zabbix_agentd.d/
+     owner=root
+     group=root
+     mode=0644
+  with_fileglob: zabbix_agent_parameters_files
+  notify: restart zabbix_agent
+
+- name: agent_script | Generate User parameters to zabbix_agentd.d
+  template:
+     src="conf/userparam.j2"
+     dest="/etc/zabbix/zabbix_agentd.d/userparameter_{{item.name}}.conf"
+     owner=root
+     group=root
+     mode=0644
+  with_items: zabbix_agent_parameters
+  notify: restart zabbix_agent
+
+- name: agent_script | Create zabbix_custom_scripts Directory
+  file:
+     path="{{zabbix_agent_dir_custom}}"
+     owner=root
+     group=root
+     state=directory
+
+- name: agent_script | Copy custom scripts (discovery, ...)
+  copy:
+     src="{{item}}"
+     dest="{{zabbix_agent_dir_custom}}"
+     owner=root
+     group=root
+     mode=0755
+  with_fileglob:
+     - "zabbix_custom_scripts/*"
+  tags: zabbix_agent
+  notify: restart zabbix_agent
+
+- name: agent_script | apt package for custom scripts
+  apt:
+    pkg="{{ item }}"
+  with_items: zabbix_agent_custom_apt
+  tags: zabbix_agent
+  notify: restart zabbix_agent

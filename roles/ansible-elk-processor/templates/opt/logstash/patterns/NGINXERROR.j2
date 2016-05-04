@@ -1,0 +1,5 @@
+NGINXERRORCOMMON1 (?<timestamp>%{YEAR}[/-]%{MONTHNUM}[/-]%{MONTHDAY} %{TIME}) \[%{LOGLEVEL:severity}\] %{POSINT:pid}#%{NUMBER}: %{GREEDYDATA:errormessage}(?:, client: %{IPORHOST:clientip})(?:, server: %{IPORHOST:server})(?:, request: "%{WORD:verb} %{NOTSPACE:request} HTTP/%{NUMBER:httpversion}")
+NGINXERRORCOMMON2 (?:, host: %{QS:host})
+NGINXERROR1 (?:, upstream: %{QS:upstream})(?:, host: %{QS:host})(?:, referrer: %{QS:referrer})
+NGINXERROR2 (?:, referrer: %{QS:referrer})
+NGINXERROR (%{NGINXERRORCOMMON1}|%{NGINXERRORCOMMON2}|%{NGINXERROR1}|%{NGINXERROR2})

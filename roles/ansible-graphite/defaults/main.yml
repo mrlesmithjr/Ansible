@@ -1,0 +1,3 @@
+---
+# defaults file for ansible-graphite
+enable_carbon-cache: true

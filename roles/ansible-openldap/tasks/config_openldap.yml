@@ -1,0 +1,31 @@
+---
+- name: config_openldap | configuring ldap
+  template:
+    src: "etc/ldap/ldap.conf.j2"
+    dest: "/etc/ldap/ldap.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config_openldap | configuring phpldapadmin
+  template:
+    src: "etc/phpldapadmin/config.php.j2"
+    dest: "/etc/phpldapadmin/config.php"
+    owner: root
+    group: www-data
+    mode: 0640
+
+- name: config_openldap | creating database population config
+  template:
+    src: "etc/ldap/slapd.d/populate_content.ldif.j2"
+    dest: "/etc/ldap/slapd.d/populate_content.ldif"
+    owner: root
+    group: root
+    mode: 0640
+
+- name: config_openldap | populating openLDAP
+  shell: 'ldapadd -x -D {{ openldap_bind_id }} -w {{ openldap_admin_password }} -f /etc/ldap/slapd.d/populate_content.ldif'
+  ignore_errors: yes  #set to get around erroring out that items already exist
+  when: >
+        openldap_populate is defined and
+        openldap_populate

@@ -1,0 +1,27 @@
+---
+- name: config_sqlite | creating db folder cmdb
+  file: path='{{ cmdb_sqlite_db_path }}' owner='{{ cmdb_web_user }}' group='{{ cmdb_web_group }}' mode=0774 state=directory
+
+- name: config_sqlite | checking for existing db for cmdb
+  stat: path='{{ cmdb_sqlite_db_file }}'
+  register: db_file
+
+- name: config_sqlite | creating db for cmdb
+  file: path='{{ cmdb_sqlite_db_file }}' owner='{{ cmdb_web_user }}' group='{{ cmdb_web_group }}' mode=0774 state=touch
+  when: not db_file.stat.exists
+
+- name: config_sqlite | copying cmdb schema
+  copy: src=cmdb_schema.sql dest='{{ cmdb_sqlite_db_path }}' owner='{{ cmdb_web_user }}' group='{{ cmdb_web_group }}'
+
+#- name: config_sqlite | checking if cmdb schema already imported
+#  stat: path='{{ cmdb_sqlite_db_path }}/.schema_imported'
+#  register: cmdb_schema
+
+- name: config_sqlite | importing cmdb schema
+  shell: "cat {{ cmdb_sqlite_db_path }}/cmdb_schema.sql | sqlite3 {{ cmdb_sqlite_db_file }}"
+#  register: cmdb_schema_imported
+#  when: not cmdb_schema.stat.exists
+
+#- name: config_sqlite | marking cmdb schema as imported
+#  file: path='{{ cmdb_sqlite_db_path }}/.schema_imported' state=touch
+#  when: cmdb_schema_imported.changed

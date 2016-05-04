@@ -1,0 +1,69 @@
+---
+- hosts: all
+  sudo: true
+  remote_user: remote
+  vars:
+    - db_inventory_file: db_inventory
+    - clear_inventory: true
+  tasks:
+    - name: pinging hosts
+      local_action: ping
+      register: id_hosts
+
+    - name: delete inventory file
+      file: path="{{ db_inventory_file }}" state=absent
+      delegate_to: localhost
+      run_once: true
+      when: clear_inventory is defined and clear_inventory
+
+    - name: checking if inventory file exists
+      stat: path="{{ db_inventory_file }}"
+      register: db_inventory
+      delegate_to: localhost
+      run_once: true
+
+    - name: creating inventory file if not exists
+      file: path="{{ db_inventory_file }}" state=touch
+      delegate_to: localhost
+      run_once: true
+      when: not db_inventory.stat.exists
+
+    - name: populating db inventory
+      lineinfile: dest="{{ db_inventory_file }}" line="{{ group_names }}"
+      delegate_to: localhost
+      with_items: id_hosts.results
+
+    - name: cleaning up groups
+      shell: "sed -i -e \"s/[][]//g\" {{ db_inventory_file }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: cleaning up groups
+      shell: "sed -i -e \"s/'//g\" {{ db_inventory_file }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: cleaning up groups
+      shell: "tr -s ', ' '\n  ' < {{ db_inventory_file }} > {{ db_inventory_file }}.clean"
+      delegate_to: localhost
+      run_once: true
+
+    - name: removing duplicate group_names
+      shell: "sort -u {{ db_inventory_file }}.clean > {{ db_inventory_file }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: reformatting inventory into a usable variable list
+      shell: "sed -i -e 's/^/  - /' {{ db_inventory_file }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: adding variable name for list
+      lineinfile: dest="{{ db_inventory_file }}" regexp="^host_groups" line="host_groups{{ ':' }}" insertbefore=BOF
+      delegate_to: localhost
+      run_once: true
+
+    - name: adding yaml formatting
+      lineinfile: dest="{{ db_inventory_file }}" regexp="^---" line="---" insertbefore=BOF
+      delegate_to: localhost
+      run_once: true

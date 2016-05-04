@@ -1,0 +1,38 @@
+# ferm base configuration
+# {{ ansible_managed }}
+domain ip {
+    table filter {
+        chain LOGGING-Allowed;
+        chain LOGGING-Dropped;
+        chain INPUT {
+            policy ACCEPT;
+
+            mod state state (RELATED ESTABLISHED) jump LOGGING-Allowed;
+
+            interface lo jump LOGGING-Allowed;
+
+            protocol icmp jump LOGGING-Allowed;
+
+            protocol tcp dport 22 jump LOGGING-Allowed;
+
+            protocol udp dport (67:68) jump LOGGING-Allowed;
+        }
+        chain FORWARD {
+            policy ACCEPT;
+            mod state state (RELATED ESTABLISHED) jump LOGGING-Allowed;
+            protocol tcp dport 22 jump LOGGING-Allowed;
+        }
+        chain LOGGING-Allowed {
+            mod limit limit 2/min LOG log-prefix 'IPTables-Allowed: ';
+            ACCEPT;
+        }
+        chain OUTPUT {
+            policy ACCEPT;
+
+            # connection tracking
+            mod state state (RELATED ESTABLISHED) jump LOGGING-Allowed;
+        }
+    }
+}
+
+@include '/etc/ferm/ferm.d/';

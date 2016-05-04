@@ -1,0 +1,97 @@
+# {{ ansible_managed }}
+auto lo
+iface lo inet loopback
+
+{% if interfaces is defined %}
+{%   for item in interfaces %}
+{%     if item.comment is defined %}
+# {{ item.comment }}
+{%     endif %}
+{%     if item.configure %}
+{%       if item.method == "static" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%         if item.address is defined and item.address != None %}
+address {{ item.address }}
+{%         endif %}
+{%         if item.netmask is defined and item.netmask != None %}
+netmask {{ item.netmask }}
+{%         endif %}
+{%         if item.gateway is defined and item.gateway != None %}
+gateway {{ item.gateway }}
+{%         endif %}
+{%       endif %}
+{%       if item.method == "dhcp" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%       endif %}
+{%         if item.wireless_network is defined and item.wireless_network %}
+wpa-ssid {{ item.wpa_ssid }}
+wpa-psk {{ item.wpa_psk }}
+{%         endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+{% if ovs_bridges is defined %}
+{%   for item in ovs_bridges %}
+{%     if item.state == "present" %}
+{%       if item.config_etc_interfaces is defined and item.config_etc_interfaces %}
+{%         if item.interfaces is defined and (item.add_interfaces is defined and item.add_interfaces) %}
+{%           for int in item.interfaces %}
+{%             if int != "None" %}
+{%               if item.comment is defined %}
+
+# {{ item.comment }}
+{%               endif %}
+# auto {{ int }}
+allow-{{ item.name }} {{ int }}
+iface {{ int }} inet manual
+ovs_bridge {{ item.name }}
+ovs_type OVSPort
+{%               if item.wireless_network is defined and item.wireless_network %}
+wpa-ssid {{ item.wpa_ssid }}
+wpa-psk {{ item.wpa_psk }}
+{%               endif %}
+{%             endif %}
+{%           endfor %}
+{%         endif %}
+
+# {{ item.comment }}
+auto {{ item.name }}
+allow-ovs {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%         if item.method != "DHCP" and item.method != "dhcp" %}
+{%           if item.address is defined %}
+address {{ item.address }}
+{%           endif %}
+{%           if item.netmask is defined %}
+netmask {{ item.netmask }}
+{%           endif %}
+{%           if item.gateway is defined %}
+gateway {{ item.gateway }}
+{%           endif %}
+ovs_type OVSBridge
+{%           if item.interfaces is defined and (item.add_interfaces is defined and item.add_interfaces) %}
+ovs_ports {% for int in item.interfaces %}{% if int != "None" %}{{ int }}{% if not loop.last %} {% endif %}{% endif %}{% endfor %}
+
+{%           endif %}
+{%         endif %}
+{%       endif %}
+{%       if item.method == "DHCP" or item.method == "dhcp" %}
+ovs_type OVSBridge
+{%         if item.interfaces is defined and (item.add_interfaces is defined and item.add_interfaces) %}
+ovs_ports {% for int in item.interfaces %}{% if int != "None" %}{{ int }}{% if not loop.last %} {% endif %}{% endif %}{% endfor %}
+
+{%         endif %}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+{% if dns_nameservers is defined %}
+dns-nameservers {{ dns_nameservers }}
+{% endif %}
+{% if dns_search is defined %}
+dns-search {{ dns_search }}
+{% endif %}

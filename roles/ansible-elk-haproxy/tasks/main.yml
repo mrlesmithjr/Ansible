@@ -1,0 +1,33 @@
+---
+# tasks file for ansible-elk-haproxy
+- include: config_hosts_file.yml
+  when: >
+        config_hosts_file is defined and
+        config_hosts_file
+
+- include: haproxy.yml
+  tags:
+    - config_haproxy
+    - config_logstash
+    - haproxy
+
+- include: debian_keepalived.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat_keepalived.yml
+  when: ansible_os_family == "RedHat"
+
+- include: debian_rsyslog.yml
+  tags:
+    - config_rsyslog
+  when: ansible_os_family == "Debian"
+
+- include: redhat_rsyslog.yml
+  tags:
+    - config_rsyslog
+  when: ansible_os_family == "RedHat"
+
+- include: config_logstash.yml
+  tags:
+    - config_logstash
+  when: config_logstash

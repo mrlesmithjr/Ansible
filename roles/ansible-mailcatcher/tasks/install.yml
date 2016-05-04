@@ -1,0 +1,6 @@
+---
+- name: install | installing mailcatcher
+  gem:
+    name: "mailcatcher"
+    state: present
+    user_install: no

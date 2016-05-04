@@ -1,0 +1,35 @@
+- hosts: localhost
+  sudo: true
+  remote_user: remote
+  vars:
+    - apache2_root: /var/www/html
+    - cmdb_sqlite_db_file: '{{ cmdb_sqlite_db_path }}/cmdb.db'
+    - cmdb_sqlite_db_path: '{{ apache2_root }}/db'
+    - sql1: "\"PRAGMA foreign_keys = ON;INSERT OR IGNORE INTO Groups(GroupName,GroupDTAP,GroupCreatedOn,LastUpdateTime) VALUES ('{{ item[1] }}','U',datetime('now'),datetime('now'));\""
+#    - sql2: "\"INSERT OR IGNORE INTO Hosts (HostName,HostCreatedOn,LastUpdateTime,HostGroup) VALUES ('{{ item[0].name }}',datetime('now'),datetime('now'),(SELECT GroupId from Groups WHERE '{{ item[1] }}'=GroupName));\""
+    - sql3: "\"PRAGMA foreign_keys = ON;INSERT OR IGNORE INTO Hosts (HostName,HostCreatedOn,LastUpdateTime) VALUES ('{{ item[0].name }}',datetime('now'),datetime('now'));\""
+    - sql4: "\"PRAGMA foreign_keys = ON;INSERT OR IGNORE INTO HostGroups (GroupId,GroupName,HostId,HostName) VALUES ( (SELECT GroupId FROM Groups WHERE GroupName='{{ item[1] }}'),(SELECT GroupName FROM Groups WHERE GroupName='{{ item[1] }}'),(SELECT HostId FROM Hosts Where HostName='{{ item[0].name }}'),(SELECT HostName FROM Hosts Where HostName='{{ item[0].name }}') );\""
+
+  vars_files:
+    - ./db_inventory.yml
+  tasks:
+    - name: importing groups into db
+      shell: "sqlite3 {{ cmdb_sqlite_db_file }} {{ sql1 }}"
+      delegate_to: cmdb
+      with_subelements:
+        - host_groups
+        - groups
+
+    - name: importing hosts into db
+      shell: "sqlite3 {{ cmdb_sqlite_db_file }} {{ sql3 }}"
+      delegate_to: cmdb
+      with_subelements:
+        - host_groups
+        - groups
+
+    - name: adding hosts to groups in db
+      shell: "sqlite3 {{ cmdb_sqlite_db_file }} {{ sql4 }}"
+      delegate_to: cmdb
+      with_subelements:
+        - host_groups
+        - groups

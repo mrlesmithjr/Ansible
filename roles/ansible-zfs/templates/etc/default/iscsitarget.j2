@@ -1,0 +1,11 @@
+ISCSITARGET_ENABLE={{ zfs_iscsistarget_enable|lower }}
+ISCSITARGET_MAX_SLEEP={{ zfs_iscsistarget_max_sleep }}
+
+
+# ietd options
+# See ietd(8) for details
+{% if zfs_iscsistarget_options is defined %}
+ISCSITARGET_OPTIONS="{{ zfs_iscsistarget_options }}"
+{% elif zfs_iscsistarget_options is not defined %}
+ISCSITARGET_OPTIONS=""
+{% endif %}

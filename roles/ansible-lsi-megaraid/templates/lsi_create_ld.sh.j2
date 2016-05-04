@@ -1,0 +1,4 @@
+#!/bin/bash
+{% for item in megacli_config_logic_device %}
+{{ megacli_path}}/{{ megacli_bin }} -CfgLdAdd -r{{ item.raid_level }} [{% for slot in item.slots %}{{ item.enclosure_id }}:{{ slot }}{% if not loop.last %},{% endif %}{% endfor %}] -a{{ item.controller }}
+{% endfor %}

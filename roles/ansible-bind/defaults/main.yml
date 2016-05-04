@@ -1,0 +1,20 @@
+---
+# defaults file for ansible-bind
+bind_acls:  #define acls for defining ip addresses or networks allowed to query bind
+  - name: 'lan'
+    networks:
+      - '10.0.0.0/8'
+      - 'localhost'
+      - 'localnets'
+  - name: 'wireless'
+    networks:
+      - '172.16.0.0/16'
+  - name: 'dmz'
+    networks:
+      - '192.168.0.0/16'
+bind_caching_server: true  #defines if bind should query root-hints servers for unknown queries...set bind_forwarding_server: false
+bind_forwarding_server: false  #defines if bind should forward unknown queries to bind_forwarders...set bind_caching_server: false
+bind_forwarders:  #Define forwarding addresses to be used if bind_forwarding_server: true
+  - 8.8.8.8
+  - 8.8.4.4
+config_bind: true

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+    <style>
+      a:link {
+        color:orange;
+      }
+      a:visited {
+        color:lime;
+      }
+      html {
+        background: url(background.jpg) no-repeat center center fixed;
+        background-size: cover;
+      }
+      body {
+        color: orange;
+      }
+    </style>
+  </head>
+  <body>
+  <?php
+    $username = $_POST['UserName'];
+    $firstname = $_POST['FirstName'];
+    $lastname = $_POST['LastName'];
+    $email = $_POST['Email'];
+    $phone = $_POST['Phone'];
+    $password = $_POST['Password'];
+    $passwordhash = hash("sha256", $password);
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "INSERT INTO Users (UserName,Email,FirstName,LastName,Password,Phone) VALUES ('$username','$email','$firstname','$lastname','$passwordhash','$phone')";
+    if (empty($username)) {
+      echo "<pre>";
+      echo "Username was not entered..";
+      echo "</pre>";
+    }
+    if (empty($firstname)) {
+      echo "<pre>";
+      echo "First name was not entered..";
+      echo "</pre>";
+    }
+    if (empty($lastname)) {
+      echo "<pre>";
+      echo "Last name was not entered..";
+      echo "</pre>";
+    }
+    if (empty($email)) {
+      echo "<pre>";
+      echo "Email was not entered..";
+      echo "</pre>";
+    }
+    if (empty($password)) {
+      echo "<pre>";
+      echo "Password was not entered..";
+      echo "</pre>";
+    }
+    if (!empty($username) && !empty($firstname) && !empty($lastname) && !empty($email) && !empty($password)) {
+      $db->exec($sql);
+      echo "User $username has been created.";
+    }
+  ?>
+<br><br><br><br>
+<button onclick="location.href='index.html'">Home</button>
+<button onclick="goBack()">Go Back</button>
+<script>
+function goBack() {
+    window.history.back();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+<!--    <h2>{{ cmdb_web_title|upper }}</h2> -->
+    <br><br><br><br>
+    <h3>Check existing groups:</h3>
+    <form action="query_group.php" id="form" name="form" method="post">
+      <select name="groupid" class="groupid">
+        <option selected="selected">--Select Group--</option>
+          <?php
+            $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+            $db->exec( 'PRAGMA foreign_keys = ON;' );
+            $sql = "SELECT GroupId,GroupName FROM Groups";
+            $results = $db->query($sql);
+            while ($row = $results->fetchArray()) {
+              echo '<option value="'.$row['GroupId'].'">'.$row['GroupName'].'</option>';
+            }
+          ?>
+      </select>
+      <button type="submit" id="submit">View Group Details</button>
+    </form>
+  </body>
+</html>

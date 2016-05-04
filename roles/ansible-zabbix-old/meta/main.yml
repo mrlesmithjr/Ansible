@@ -1,0 +1,10 @@
+galaxy_info:
+  author: Adham Helal
+  description: "Deploy Zabbix server for Ubuntu 12.04"
+  min_ansible_version: 1.7
+  platforms:
+  - name: Ubuntu
+    versions:
+    - precise
+  categories:
+  - monitoring

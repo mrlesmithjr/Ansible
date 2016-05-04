@@ -1,0 +1,27 @@
+---
+- name: config_jenkins | configuring jenkins
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ jenkins_home_dir }}/{{ item }}"
+    owner: jenkins
+    group: jenkins
+  notify:
+    - restart jenkins
+  with_items:
+    - 'config.xml'
+    - 'hudson.tasks.Mailer.xml'
+    - 'org.jenkinsci.plugins.ansible.AnsibleInstallation.xml'
+
+- name: config_jenkins | checking if secure setup
+  stat:
+    path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
+  register: jenkins_secure_setup
+  when: jenkins_config_info.use_security is defined and jenkins_config_info.use_security
+
+- name: config_jenkins | marking as secure setup
+  file:
+    dest: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
+    state: touch
+  when: >
+        not jenkins_secure_setup.stat.exists and
+        (jenkins_config_info.use_security is defined and jenkins_config_info.use_security)

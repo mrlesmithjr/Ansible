@@ -1,0 +1,9 @@
+{% if iscsitarget_file_devices is defined %}
+{%   for item in iscsitarget_file_devices %}
+{%     if item.enabled %}
+Target {{ iscsitarget_iqn }}:storage.{{ item.name }}
+    Lun {{ item.lun }} Path={{ iscsitarget_device_dir }}/{{ item.name }},Type=fileio
+    Alias LUN{{ item.lun }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

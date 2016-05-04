@@ -1,0 +1,33 @@
+---
+- name: debian | installing ctdb
+  apt:
+    name: "ctdb"
+    state: present
+
+- name: debian | installing samba
+  apt:
+    name: "samba"
+    state: present
+  when: ctdb_install_samba
+
+- name: debian | installing winbind packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+#    - 'krb5-config'
+#    - 'krb5-locales'
+    - 'krb5-user'
+    - 'libnss-winbind'
+    - 'libpam-winbind'
+    - 'winbind'
+  when: ctdb_install_winbind
+
+- name: debian | ensuring /var/lib/run/ctdb exists
+  file:
+    path: "/var/lib/run/ctdb"
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_distribution == "Ubuntu"

@@ -1,0 +1,59 @@
+server:
+{% if unbound_listen_addresses is defined %}
+{%   for item in unbound_listen_addresses %}
+  interface: {{ item }}
+{%   endfor %}
+{% endif %}
+{% if unbound_access_control is defined %}
+{%   for item in unbound_access_control %}
+  access-control: {{ item.subnet }} {{ item.action }}
+{%   endfor %}
+{% endif %}
+  cache-min-ttl: {{ unbound_cache_min_ttl }}
+  cache-max-ttl: {{ unbound_cache_max_ttl }}
+{% if unbound_enable_prefetch is defined and unbound_enable_prefetch %}
+  prefetch: yes
+{% endif %}
+{% if unbound_enable_optimizations %}
+
+  ###<--- Begin Optimizations -->
+  #Use all CPUs
+  num-threads: {{ unbound_optimizations.num_threads }}
+
+  #Power of 2 close to num-threads
+  msg-cache-slabs: {{ unbound_optimizations.msg_cache_slabs }}
+  rrset-cache-slabs: {{ unbound_optimizations.rrset_cache_slabs }}
+  infra-cache-slabs: {{ unbound_optimizations.infra_cache_slabs }}
+  key-cache-slabs: {{ unbound_optimizations.key_cache_slabs }}
+
+  #Cache Memory
+  rrset-cache-size: {{ unbound_optimizations.rrset_cache_size }}
+  msg-cache-size: {{ unbound_optimizations.msg_cache_size }}
+  
+  ###<--- End Optimizations -->
+
+{% endif %}
+{% if unbound_hide_identity is defined and unbound_hide_identity %}
+  hide-identity: yes
+{% endif %}
+{% if unbound_hide_version is defined and unbound_hide_version %}
+  hide-version: yes
+{% endif %}
+{% if unbound_use_syslog is defined and unbound_use_syslog %}
+  use-syslog: yes
+{% elif unbound_use_syslog is defined and not unbound_use_syslog %}
+  use-syslog: no
+  logfile: {{ unbound_logfile }}
+{% endif %}
+{% if unbound_log_queries is defined and unbound_log_queries %}
+  log-queries: yes
+{% endif %}
+{% if unbound_forward_zones is defined and unbound_setup_forward_zones %}
+{%   for item in unbound_forward_zones %}
+  forward-zone:
+    name: "{{ item.zone }}"
+{%     for fa in item.forward_addresses %}
+    forward-addr: {{ fa }}
+{%     endfor %}
+{%   endfor %}
+{% endif %}

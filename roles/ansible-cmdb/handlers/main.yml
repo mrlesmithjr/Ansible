@@ -1,0 +1,13 @@
+---
+# handlers file for ansible-cmdb
+- name: restart apache2
+  service: name=apache2 state=restarted
+
+- name: reload apache2
+  service: name=apache2 state=reloaded
+
+- name: reload ferm
+  shell: service ferm force-reload
+
+- name: run ferm
+  shell: ferm /etc/ferm/ferm.conf

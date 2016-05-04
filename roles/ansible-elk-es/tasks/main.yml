@@ -1,0 +1,8 @@
+---
+# tasks file for ansible-elk-es
+- name: system tweaks
+  tags: [elkstack,tuning]
+  sysctl: name={{ item.name }} value={{ item.value }} state=present reload=yes
+  with_items:
+    - name: vm.swappiness
+      value: 1

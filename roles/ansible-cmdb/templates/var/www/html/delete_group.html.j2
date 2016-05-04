@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+		<style>
+			a:link {
+				color:orange;
+			}
+			a:visited {
+				color:lime;
+			}
+			html {
+				background: url(background.jpg) no-repeat center center fixed;
+				background-size: cover;
+			}
+			body {
+				color: orange;
+			}
+		</style>
+	</head>
+	<body>
+		<form action="delete_group.php" method="post">
+			<select name="groupname" class="groupname">
+				<option selected="selected">--Select Group--</option>
+					<?php
+						$db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+						$db->exec( 'PRAGMA foreign_keys = ON;' );
+						$sql = "SELECT GroupId,GroupName FROM Groups";
+						$results = $db->query($sql);
+						while ($row = $results->fetchArray()) {
+							echo '<option value="'.$row['GroupId'].'">'.$row['GroupName'].'</option>';
+						}
+					?>
+			</select>
+			<input type="submit">
+			<input type="reset" value="Reset">
+		</form>
+	</body>
+</html>

@@ -1,0 +1,30 @@
+---
+- name: debian_security | allowing SSH password authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication yes"
+    state: present
+  notify: restart ssh
+
+- name: debian_security | disabling SSH GSS API authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^GSSAPIAuthentication"
+    line: "GSSAPIAuthentication no"
+    state: present
+  notify: restart ssh
+
+- name: debian_security | installing fail2ban
+  apt:
+    name: fail2ban
+    state: present
+  when: install_fail2ban is defined and install_fail2ban
+
+- name: debian_security | removing fail2ban
+  apt:
+    name: fail2ban
+    state: absent
+  when: >
+        (install_fail2ban is defined and not install_fail2ban) or
+        install_fail2ban is not defined

@@ -1,0 +1,9 @@
+---
+- name: redhat_rsyslog | configuring rsyslog
+  template:
+    src: "etc/centos_rsyslog.conf.j2"
+    dest: "/etc/rsyslog.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart rsyslog

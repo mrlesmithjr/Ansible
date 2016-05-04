@@ -1,0 +1,37 @@
+---
+- name: debian_server | adding sensu repo key
+  apt_key:
+    url: "{{ sensu_debian_repo_key }}"
+    state: present
+
+- name: debian_server | adding sensu repo
+  apt_repository:
+    repo: "{{ sensu_debian_repo }}"
+    state: present
+
+- name: debian_server | installing pre-reqs and sensu
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: sensu_server_debian_packages
+
+- name: debian_server | creating sensu rabbitmq vhost
+  rabbitmq_vhost:
+    name: "{{ sensu_rabbitmq_info.vhost }}"
+    state: present
+
+- name: debian_server | creating sensu rabbitmq user
+  rabbitmq_user:
+    user: "{{ sensu_rabbitmq_info.user }}"
+    password: "{{ sensu_rabbitmq_info.password }}"
+    vhost: "{{ sensu_rabbitmq_info.vhost }}"
+    configure_priv: ".*"
+    read_priv: ".*"
+    write_priv: ".*"
+    state: present
+
+- name: debian_server | ensuring services are enabled and start on boot
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  with_items: sensu_server_services

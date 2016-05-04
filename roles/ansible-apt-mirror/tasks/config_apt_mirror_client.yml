@@ -1,0 +1,15 @@
+---
+- name: config_apt_mirror_client | configuring apt sources
+  template:
+    src: "etc/apt/sources.list.j2"
+    dest: "/etc/apt/sources.list"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes  #we do this to have a copy of the original sources.list
+  register: client_configured
+
+- name: config_apt_mirror_client | updating apt-cache
+  apt:
+    update_cache: yes
+  when: client_configured.changed

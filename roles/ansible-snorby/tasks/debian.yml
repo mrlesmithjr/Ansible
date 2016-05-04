@@ -1,0 +1,30 @@
+---
+#- name: debian | adding ruby ppa
+#  apt_repository:
+#    repo: "ppa:brightbox/ruby-ng"
+#    state: present
+#    validate_certs: no
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apache2-prefork-dev
+    - build-essential
+#    - bundler
+    - default-jre
+    - git
+    - imagemagick
+    - libmagickwand-dev
+    - libmysqlclient-dev
+    - libreadline-gplv2-dev
+    - libssl-dev
+    - libxml2-dev
+    - libxslt-dev
+    - libyaml-dev
+    - ruby-text-format
+    - ruby1.9.1-dev
+    - ruby1.9.3
+    - wkhtmltopdf
+    - zlib1g-dev

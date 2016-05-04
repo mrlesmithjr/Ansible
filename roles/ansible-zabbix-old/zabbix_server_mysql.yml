@@ -1,0 +1,26 @@
+---
+##
+## Deploy pre dep for mysql if set
+- hosts: all
+  sudo : True 
+  tasks:
+    - debug: var={{zabbix_server_db_install}}
+      with_items:
+        - zabbix_server_db_install
+        - zabbix_server_db_type
+    - name: update
+      apt:
+        update_cache="yes"
+      with_items:
+        - python-pycurl
+      when: "zabbix_server_db_install == True and zabbix_server_db_type == 'mysql'"
+
+##
+## Deploy Database mysql if set
+## Deploy Zabbix server
+- hosts: all
+  sudo: True
+  roles:
+    - { role:  Ansibles.mysql, when: "zabbix_server_db_install == True and zabbix_server_db_type == 'mysql'" }
+    - { role: ansible-zabbix_server }
+

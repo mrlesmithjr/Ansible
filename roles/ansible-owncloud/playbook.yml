@@ -1,0 +1,15 @@
+---
+- name: provisions owncloud
+  hosts: all
+  sudo: true
+  vars:
+    - apt_mirror_client: false
+    - mysql_root_password: root
+    - pri_domain_name: everythingshouldbevirtual.local
+  roles:
+    - role: ansible-apache2
+    - role: ansible-apt-mirror
+      when: apt_mirror_client is defined and apt_mirror_client
+    - role: ansible-mariadb-mysql
+    - role: ansible-owncloud
+  tasks:

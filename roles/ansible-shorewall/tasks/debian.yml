@@ -1,0 +1,5 @@
+---
+- name: debian | installing shorewall
+  apt:
+    name: "shorewall"
+    state: present

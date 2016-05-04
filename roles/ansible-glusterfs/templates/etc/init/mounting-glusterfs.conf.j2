@@ -1,0 +1,8 @@
+description "Block the mounting event for glusterfs filesystems until the network interfaces are running"
+
+instance $MOUNTPOINT
+
+start on mounting TYPE=glusterfs
+task
+#exec start wait-for-state WAIT_FOR=static-network-up WAITER=mounting-glusterfs-$MOUNTPOINT
+exec start wait-for-state WAIT_FOR=networking WAITER=mounting-glusterfs-$MOUNTPOINT

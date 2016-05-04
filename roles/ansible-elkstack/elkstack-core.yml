@@ -1,0 +1,88 @@
+---
+# Playbook to provion core ELKStack components...Only required on initial provisioning and/or role updates
+- name: Configure Common Roles on ELK-Nodes
+  hosts: elk-nodes
+  remote_user: remote
+  become: true
+  roles:
+    - role: ansible-network-tweaks
+    - role: ansible-ntp
+    - role: ansible-postfix
+    - role: ansible-rsyslog
+    - role: ansible-snmpd
+    - role: ansible-timezone
+  tasks:
+    - name: updating /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
+        line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
+        state: present
+      with_items: groups['all']
+
+- name: Configure ELK-Broker-Nodes
+  hosts: elk-broker-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - es_allow_remote_connections: true  #defines if remote connections should be allowed....version 2.x
+    - es_config_unicast: true  #defines if unicast discovery should be configured...ES 2.x
+    - es_plugin_install: install
+    - es_plugin_list: list
+    - es_version: 2.x
+  roles:
+    - role: ansible-redis
+      when: use_redis is defined and use_redis
+    - role: ansible-rabbitmq
+      when: use_rabbitmq is defined and use_rabbitmq
+    - role: ansible-elasticsearch
+
+- name: Configure ELK-ES-Nodes
+  hosts: elk-es-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - es_allow_remote_connections: true  #defines if remote connections should be allowed....version 2.x
+    - es_config_unicast: true  #defines if unicast discovery should be configured...ES 2.x
+    - es_plugin_install: install
+    - es_plugin_list: list
+    - es_version: 2.x
+  roles:
+    - role: ansible-elasticsearch
+
+- name: Configure ELK-Processor-Nodes
+  hosts: elk-processor-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - es_allow_remote_connections: true  #defines if remote connections should be allowed....version 2.x
+    - es_config_unicast: true  #defines if unicast discovery should be configured...ES 2.x
+    - es_plugin_install: install
+    - es_plugin_list: list
+    - es_version: 2.x
+    - logstash_version: 2.0
+  roles:
+    - role: ansible-elasticsearch
+    - role: ansible-logstash
+    - role: ansible-dnsmasq
+
+- name: Configure ELK-Pre-Processor-Nodes
+  hosts: elk-pre-processor-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - logstash_version: 2.0
+  roles:
+    - role: ansible-logstash
+    - role: ansible-dnsmasq
+
+- name: Configure ELK-Haproxy-Nodes
+  hosts: elk-haproxy-nodes
+  remote_user: remote
+  become: true
+  vars:
+    - logstash_version: 2.0
+  roles:
+    - role: ansible-logstash
+    - role: ansible-keepalived
+    - role: ansible-haproxy

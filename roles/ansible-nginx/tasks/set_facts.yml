@@ -1,0 +1,14 @@
+---
+- name: setting Debian facts
+  set_fact:
+    nginx_web_group: "www-data"
+    nginx_web_owner: "www-data"
+    nginx_web_root: "/usr/share/nginx/html"
+  when: ansible_os_family == "Debian"
+
+- name: setting RedHat facts
+  set_fact:
+    nginx_web_group: "nginx"
+    nginx_web_owner: "nginx"
+    nginx_web_root: "/usr/share/nginx/html"
+  when: ansible_os_family == "RedHat"

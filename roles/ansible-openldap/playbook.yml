@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  vars:
+    - openldap_base: 'dc=vagrant,dc=local'
+    - pri_domain_name: vagrant.local
+  roles:
+    - role: ansible-etc-hosts
+    - role: ansible-openldap

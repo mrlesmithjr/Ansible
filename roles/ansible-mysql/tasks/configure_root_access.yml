@@ -1,0 +1,42 @@
+---
+- name: configure_root_access | ensuring MySQL service is running (Non Docker install)
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  when: >
+        (mysql_docker_install is defined and
+        not mysql_docker_install) or
+        mysql_docker_install is not defined
+
+- name: configure_root_access | ensuring MySQL service is running (Docker install)
+  shell: "/usr/bin/mysqld_safe > /dev/null 2>&1 &"
+  when: >
+        mysql_docker_install is defined and
+        mysql_docker_install
+
+- name: configure_root_access | waiting for MySQL service
+  wait_for:
+    port: "{{ mysql_port }}"
+    delay: 10
+
+- name: configure_root_access | updating root passwords
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ mysql_root_password }}"
+#    login_password: "{{ mysql_root_password }}"
+#    login_user: root
+  with_items:
+    - '{{ ansible_hostname }}'
+    - '127.0.0.1'
+    - '::1'
+    - localhost
+
+- name: configure_root | configuring root my.cnf
+  template:
+    src: root/my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600

@@ -1,0 +1,17 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libssl-dev
+
+- name: debian | downloading couchbase server
+  get_url:
+    url: "{{ couchbase_debian_package_dl }}{{ couchbase_debian_package }}"
+    dest: "/opt/{{ couchbase_debian_package }}"
+
+- name: debian | installing couchbase server
+  apt:
+    deb: "/opt/{{ couchbase_debian_package }}"
+    state: present

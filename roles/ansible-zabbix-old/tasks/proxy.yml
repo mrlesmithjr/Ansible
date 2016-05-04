@@ -1,0 +1,20 @@
+---
+
+- name: zabbix_proxy | Install Zabbix proxy
+  apt:
+     pkg="zabbix-proxy-{{ zabbix_server_db_type }}"="{{ zabbix_server_ubuntu }}"
+     state=present
+     force=yes
+
+- name: zabbix_proxy | Zabbix server conf file
+  template:
+     src=zabbix_server/zabbix_server.conf.j2
+     dest=/etc/zabbix/zabbix_server.conf
+     owner=zabbix
+     group=zabbix
+     mode=600
+  notify: restart zabbix_proxy
+
+
+
+

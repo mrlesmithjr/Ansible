@@ -1,0 +1,8 @@
+---
+- name: hw_virtualization_check | checking if hardware virtualization is supported
+  command: egrep -c '(vmx|svm)' /proc/cpuinfo
+  register: hw_check
+
+- name: hw_virtualization_check | fail if hardware virtualization not supported
+  fail: msg="Hardware Virtualization Not Supported on this platform!!!!"
+  when: hw_check.stdout == "0"

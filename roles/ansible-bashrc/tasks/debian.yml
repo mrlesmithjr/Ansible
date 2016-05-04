@@ -1,0 +1,8 @@
+---
+- name: debian | configuring default bashrc and backing up
+  template: src=etc/bash.bashrc.j2 dest=/etc/bash.bashrc owner=root group=root mode=0644 backup=yes
+  when: (bashrc_backups is defined and bashrc_backups) or bashrc_backups is not defined
+
+- name: debian | configuring default bashrc
+  template: src=etc/bash.bashrc.j2 dest=/etc/bash.bashrc owner=root group=root mode=0644 backup=yes
+  when: bashrc_backups is defined and not bashrc_backups

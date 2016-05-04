@@ -1,0 +1,15 @@
+---
+- name: provisions RANCID
+  hosts: all
+  sudo: true
+  vars:
+    - pri_domain_name: 'everythingshouldbevirtual.local'
+    - rancid_git_remote: 'mrlesmithjr@{{ rancid_git_server }}:29418/rancid.git'
+    - rancid_git_server: '192.168.202.201'
+    - rancid_login_enable_password: 'P@55w0rd'
+    - rancid_login_password: 'P@55w0rd'
+  roles:
+    - role: ansible-ntp
+    - role: ansible-postfix
+    - role: ansible-rancid-git
+  tasks:

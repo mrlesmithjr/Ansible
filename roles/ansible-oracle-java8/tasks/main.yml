@@ -1,0 +1,4 @@
+---
+# tasks file for ansible-oracle-java8
+- include: debian.yml
+  when: ansible_os_family == "Debian"

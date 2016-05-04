@@ -1,0 +1,10 @@
+---
+- hosts: all
+  sudo: true
+  vars:
+    - logstash_server_fqdn: redis
+    - skip_validation: true
+  roles:
+    - role: ansible-logstash
+    - role: ansible-elk-pre-processor
+  tasks:

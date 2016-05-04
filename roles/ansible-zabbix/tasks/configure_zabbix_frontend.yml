@@ -1,0 +1,20 @@
+---
+- name: configure_zabbix_frontend | configuring apache configuration
+  template:
+    src: "etc/zabbix/apache.conf.j2"
+    dest: "/etc/zabbix/apache.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart apache2
+  when: ansible_os_family == "Debian"
+
+- name: configure_zabbix_frontend | configuring server web
+  template:
+    src: "etc/zabbix/web/zabbix.conf.php.j2"
+    dest: "/etc/zabbix/web/zabbix.conf.php"
+    owner: www-data
+    group: www-data
+  when: ansible_os_family == "Debian"
+    

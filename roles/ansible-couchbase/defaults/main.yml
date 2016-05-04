@@ -1,0 +1,22 @@
+---
+# defaults file for ansible-couchbase
+couchbase_admin_pass: 'P@55w0rd'
+couchbase_admin_user: 'admin'
+couchbase_buckets:
+  - name: test01
+    ram_size: 256
+    state: absent
+  - name: test-01
+    ram_size: 256
+    state: present
+  - name: test-02
+    ram_size: 256
+    state: present
+couchbase_cli: '/opt/couchbase/bin/couchbase-cli'
+couchbase_cluster_ram_multiplier: 0.5
+couchbase_cluster_ram_quota: '{{ (ansible_memtotal_mb | int * couchbase_cluster_ram_multiplier) | round | int }}'
+couchbase_config_cluster: false  #defines if couchbase cluster should be initialized
+couchbase_debian_package: 'couchbase-server-community_{{ couchbase_version }}-{{ ansible_distribution|lower }}{{ ansible_distribution_version }}_amd64.deb'
+couchbase_debian_package_dl: 'http://packages.couchbase.com/releases/{{ couchbase_version }}/'
+couchbase_manage_buckets: false  #defines if buckets should be managed
+couchbase_version: '4.0.0'

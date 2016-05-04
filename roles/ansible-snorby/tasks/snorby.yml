@@ -1,0 +1,129 @@
+---
+- name: snorby | cloning snorby from GitHub
+  git:
+    repo: "https://github.com/Snorby/snorby"
+    dest: "{{ snorby_root_dir }}"
+    update: no
+
+- name: snorby | configuring Gemfile
+  template:
+    src: "var/www/html/snorby/Gemfile.j2"
+    dest: "{{ snorby_root_dir }}/Gemfile"
+    owner: root
+    group: root
+    mode: 0644
+  when: snorby_reconfigure_gemfile is defined and snorby_reconfigure_gemfile
+
+- name: snorby | building snorby
+  bundler:
+    state: present
+    chdir: "{{ snorby_root_dir }}"
+##    extra_args: "--path vendor/cache"
+
+- name: snorby | checking if snorby has already been setup
+  stat:
+    path: "{{ snorby_root_dir }}/.setup_complete"
+  register: snorby_setup_check
+
+- name: snorby | capturing wkhtmltopdf path
+  command: "which wkhtmltopdf"
+  register: wkhtmltopdf_path
+
+- name: snorby | configuring snorby
+  template:
+    src: "var/www/html/snorby/config/snorby_config.yml.j2"
+    dest: "{{ snorby_root_dir }}/config/snorby_config.yml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: snorby | configuring snorby db (Initial Setup)
+  template:
+    src: "var/www/html/snorby/config/database_setup.yml.j2"
+    dest: "{{ snorby_root_dir }}/config/database.yml"
+    owner: root
+    group: root
+    mode: 0644
+  when: not snorby_setup_check.stat.exists
+
+#- name: snorby | creating snorby db
+#  mysql_db:
+#    name: "{{ snorby_db_info.name }}"
+#    state: present
+
+- name: snorby | setting up snorby
+  command: "rake snorby:setup"
+  args:
+    chdir: "{{ snorby_root_dir }}"
+  register: snorby_setup
+  when: not snorby_setup_check.stat.exists
+
+- name: snorby | marking snorby as setup
+  file:
+    path: "{{ snorby_root_dir }}/.setup_complete"
+    state: touch
+  when: snorby_setup.changed
+
+- name: snorby | configuring snorby Apache2 site
+  template:
+    src: "etc/apache2/sites-available/snorby.conf.j2"
+    dest: "/etc/apache2/sites-available/snorby.conf"
+  register: snorby_apache2_site_created
+  notify: restart apache2
+  when: snorby_webserver == "apache2"
+
+- name: snorby | checking if default Apache2 default site exists
+  stat:
+    path: "/etc/apache2/sites-enabled/000-default.conf"
+  register: apache2_default_site
+  when: snorby_webserver == "apache2"
+
+- name: snorby | removing Apache2 default site
+  command: "a2dissite 000-default.conf"
+  notify: restart apache2
+  when: >
+        apache2_default_site.stat.exists and
+        snorby_webserver == "apache2"
+
+- name: snorby | enabling snorby Apache2 site
+  command: "a2ensite snorby.conf"
+  notify: restart apache2
+  when: >
+        snorby_apache2_site_created.changed and
+        snorby_webserver == "apache2"
+
+- name: snorby | ensuring snorby production log exists
+  stat:
+    path: "{{ snorby_root_dir }}/log/production.log"
+  register: snorby_production_log
+
+- name: snorby | creating snorby production log (If not exists)
+  file:
+    path: "{{ snorby_root_dir }}/log/production.log"
+    state: touch
+    owner: www-data
+    group: www-data
+    mode: 0666
+  when: not snorby_production_log.stat.exists
+
+- name: snorby | setting MySQL DB permissions
+  mysql_user:
+    user: "{{ snorby_db_info.user }}"
+    password: "{{ snorby_db_info.pass }}"
+    priv: "snorby.*:ALL"
+
+- name: snorby | configuring snorby db (Final)
+  template:
+    src: "var/www/html/snorby/config/database.yml.j2"
+    dest: "{{ snorby_root_dir }}/config/database.yml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: snorby | ensuring all snorby folder ownership is correct
+  file:
+    path: "{{ snorby_root_dir }}"
+    owner: www-data
+    group: www-data
+    recurse: yes
+    state: directory

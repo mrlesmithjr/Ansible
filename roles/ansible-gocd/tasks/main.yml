@@ -1,0 +1,13 @@
+---
+# tasks file for ansible-gocd
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: python_modules.yml
+  when: gocd_python_modules is defined
+
+- include: gocd_server.yml
+  when: gocd_server is defined and gocd_server
+
+- include: gocd_agent.yml
+  when: gocd_agent is defined and gocd_agent

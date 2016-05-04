@@ -1,0 +1,9 @@
+---
+- name: network_tweaks | Tweaking network settings
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: "{{ item.state }}"
+    reload: yes
+  with_items: '{{ es_network_tweaks }}'

@@ -1,0 +1,33 @@
+- name: redhat_keepalived | installing keepalived
+  yum:
+    name: "keepalived"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat_keepalived | installing keepalived
+  dnf:
+    name: "keepalived"
+    state: present
+  when: ansible_distribution == "Fedora"
+
+- name: redhat_keepalived | enabling keepalived on boot and start
+  service:
+    name: "keepalived"
+    state: started
+    enabled: yes
+
+- name: redhat_keepalived | allowing VIP to come up on both nodes
+  sysctl:
+    name: "net.ipv4.ip_nonlocal_bind"
+    value: 1
+    state: present
+    reload: yes
+
+- name: redhat_keepalived | configuring keepalived
+  template:
+    src: "etc/keepalived/keepalived.conf.j2"
+    dest: "/etc/keepalived/keepalived.conf"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart keepalived

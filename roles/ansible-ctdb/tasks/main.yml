@@ -1,0 +1,24 @@
+---
+# tasks file for ansible-ctdb
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_ctdb.yml
+  when: config_ctdb
+
+- include: config_samba.yml
+  when: ctdb_manages_samba
+  tags:
+    - ctdb_manage_shares
+
+- include: join_domain.yml
+  when: ctdb_samba_join_domain
+  tags:
+    - ctdb_join_domain
+
+- include: manage_share_folders.yml
+  tags:
+    - ctdb_manage_shares

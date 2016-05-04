@@ -1,0 +1,549 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>, and others
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+import datetime
+import traceback
+import re
+import shlex
+import os
+
+DOCUMENTATION = '''
+---
+module: command
+version_added: historical
+short_description: Executes a command on a remote node
+description:
+     - The M(command) module takes the command name followed by a list of space-delimited arguments.
+     - The given command will be executed on all selected nodes. It will not be
+       processed through the shell, so variables like C($HOME) and operations
+       like C("<"), C(">"), C("|"), and C("&") will not work (use the M(shell)
+       module if you need these features).
+options:
+  free_form:
+    description:
+      - the command module takes a free form command to run
+    required: true
+    default: null
+    aliases: []
+notes:
+    -  If you want to run a command through the shell (say you are using C(<),
+       C(>), C(|), etc), you actually want the M(shell) module instead. The
+       M(command) module is much more secure as it's not affected by the user's
+       environment.
+author: Michael DeHaan
+'''
+
+EXAMPLES = '''
+# Example from Ansible Playbooks
+- command: /sbin/shutdown -t now
+
+# Run the command if the specified file does not exist
+- command: /usr/bin/make_database.sh arg1 arg2
+'''
+
+
+REX = re.compile(
+    r"""([^ ]+)(=(['"])((?:\\.|(?!\3).)*)\3|)""",
+    re.DOTALL | re.VERBOSE)
+
+
+class BaseParser(object):
+    id_name = None
+    id = None
+    partial_compare = False
+    module = None
+    no_delete = False
+
+    def __init__(self, args, module=None):
+        if module:
+            self.module = module
+        self.cib = self.parse(args)
+        self.command = self.cib["command"]
+        if self.id_name:
+            self.id = self.cib[self.id_name]
+
+    def parse(self, args):
+        raise NotImplementedError()
+
+    def is_same(self, obj):
+        obj_key = obj.cib.keys()
+        for key, value in self.cib.iteritems():
+            if key not in obj_key:
+                return False
+            if value != obj.cib.get(key):
+                return False
+            obj_key.remove(key)
+        if len(obj_key) and not self.partial_compare:
+            return False
+        return True
+
+
+class PrimitiveParser(BaseParser):
+    id_name = "rsc"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            rsc=args.pop(0),
+            type=args.pop(0),
+            )
+        mode = None
+        while (len(args) > 0):
+            arg = args.pop(0)
+            if (arg in ["params", "meta", "utilization",
+                        "operations", "op"]):
+                mode = arg
+                if (arg == "op"):
+                    op_type = args.pop(0)
+                continue
+    
+            if '=' not in arg:
+                raise Exception("no key=value option: %s" % arg)
+
+            key, value = arg.split("=")
+            if key == "":
+                self.module.fail_json(
+                    rc=258, msg="no key in key=value option")
+            if value == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no value in key=value option (key=%s)" % key)
+
+            if mode not in ret:
+                ret[mode] = {}
+            if (mode == "op"):
+                if op_type not in ret[mode]:
+                    ret[mode][op_type] = {}
+                ret[mode][op_type][key] = value
+            else:
+                if mode not in ret:
+                    ret[mode] = {}
+                ret[mode][key] = value
+
+        return ret
+
+
+class MonitorParser(BaseParser):
+    id_name = "rsc"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            rsc=args.pop(0),
+            interval=args.pop(0),
+            )
+        return ret
+
+
+class GroupParser(BaseParser):
+    id_name = "name"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            name=args.pop(0),
+            rsc=[],
+            )
+        mode = None
+        while (args):
+            arg = args.pop(0)
+            if (arg in ["params", "meta"]):
+                mode = arg
+                continue
+
+            if mode is None:
+                rsc.append(arg)
+                continue
+
+            key, value = arg.split("=")
+            if key == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no key in key=value option")
+            if value == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no value in key=value option (key=%s)" % key)
+            if mode not in ret:
+                ret[mode] = {}
+            ret[mode][key] = value
+
+        return ret
+
+
+class CloneParser(BaseParser):
+    id_name = "name"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            name=args.pop(0),
+            rsc=args.pop(0),
+            )
+        mode = None
+        while (args):
+            arg = args.pop(0)
+            if (arg in ["params", "meta"]):
+                mode = arg
+                continue
+    
+            if mode is None:
+                self.module.fail_json(rc=258, msg="no params or meta")
+    
+            key, value = arg.split("=")
+            if key == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no key in key=value option")
+            if value == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no value in key=value option (key=%s)" % key)
+            if mode not in ret:
+                ret[mode] = {}
+            ret[mode][key] = value
+    
+        return ret
+
+
+class MsParser(CloneParser):
+    id_name = "name"
+
+
+class RscTemplateParser(PrimitiveParser):
+    id_name = "name"
+
+
+class LocationParser(BaseParser):
+    id_name = "id"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            id=args.pop(0),
+            rsc=args.pop(0),
+            )
+        arg = args.pop(0)
+        if arg != "rules":
+            ret["score"] = args.pop(0)
+            ret["node"] = args.pop(0)
+            return ret
+        else:
+            ret["rules"] = []
+
+        newrule = None
+        while (args):
+            arg = args.pop(0)
+
+            if arg == "rule":
+                if newrule:
+                    ret["rules"].append(newrule)
+                newrule = dict(expression=[])
+                arg = args.pop(0)
+                while arg.startswith("$"):
+                    key, value = arg.split("=")
+                    if value == "":
+                        self.module.fail_json(
+                            rc=258,
+                            msg="no value in key=value option (key=%s)" % key)
+                    newargs[key] = value
+                    arg = args.pop(0)
+                if arg.endswith(":"):
+                    newargs["score"] = arg
+                else:
+                    self.module.fail_json(
+                        rc=258,
+                        msg="no score in rule for location (id=%s)" % ret["id"])
+
+            elif newrule is not None:
+                newrule["expression"].append(args)
+
+            else:
+                self.module.fail_json(
+                    rc=258,
+                    msg="no rule for location (id=%s)" % ret["id"])
+        if newrule:
+            ret["rules"].append(newrule)
+
+        return ret
+
+
+class ColocationParser(BaseParser):
+    id_name = "id"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            id=args.pop(0),
+            score=args.pop(0),
+            rsc=args[:],
+            )
+        return ret
+
+
+class OrderParser(BaseParser):
+    id_name = "id"
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            id=args.pop(0),
+            kind_or_score=args.pop(0),
+            rsc=args[:],
+            )
+        return ret
+
+
+class PropertyParser(BaseParser):
+    partial_compare = True
+    no_delete = True
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            )
+        if args[0].startswith("$id"):
+            args.pop(0)
+
+        if args[0].startswith("cib-bootstrap-options:"):
+            args.pop(0)
+    
+        while (args):
+            arg = args.pop(0)
+            if '=' not in arg:
+                self.module.fail_json(
+                    rc=258,
+                    msg="no key-value :%s" % arg)
+            key, value = arg.split("=")
+    
+            if key == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no key in key=value option")
+            if value == "":
+                self.module.fail_json(
+                    rc=258,
+                    msg="no value in key=value option (key=%s)" % key)
+            ret[key] = value
+    
+        return ret
+
+
+class RscDefaultsParser(PropertyParser):
+    partial_compare = True
+    no_delete = True
+
+
+class FencingTopologyParser(BaseParser):
+    partial_compare = True
+    no_delete = True
+
+    def parse(self, args):
+        ret = dict(
+            command=args.pop(0),
+            )
+        if not args[0].endswith(":"):
+            ret["stonith_resources"] = args
+            return ret
+
+        newnode = None
+        newfence = None
+        while(args):
+            arg = args.pop(0)
+            if arg.endswith(":"):
+                if newnode:
+                    ret[newnode] = newfence
+                newnode = arg
+                newfence = []
+            else:
+                newfence.append(arg)
+        if newnode:
+            ret[newnode] = newfence
+    
+        return ret
+
+
+def splitter(args):
+    ret = []
+    for a, b, c, d in REX.findall(args):
+        if len(b) == 0:
+            ret.append(a)
+        else:
+            ret.append(a+b)
+    return ret
+
+
+class CIBParser(object):
+
+    cib_parser_class = {
+        'primitive': PrimitiveParser,
+        'monitor': MonitorParser,
+        'group': GroupParser,
+        'clone': CloneParser,
+        'ms': MsParser,
+        'rsc_template': RscTemplateParser,
+        'location': LocationParser,
+        'colocation': ColocationParser,
+        'order': OrderParser,
+        'property': PropertyParser,
+        'rsc_defaults': RscDefaultsParser,
+        'fencing_topology': FencingTopologyParser,
+        }
+
+    def __init__(self, module):
+        self.module = module
+
+    def parse_cib(self, args):
+        if args[0] in self.cib_parser_class:
+            return self.cib_parser_class[args[0]]\
+                    (args[:], module=self.module)
+        return None
+
+    def parse_cibs(self, lines):
+        cibs = []
+        new_line = ""
+        for line in lines:
+            new_line += line.strip()
+            if new_line.endswith('\\'):
+                new_line = new_line.rstrip('\\')
+            else:
+                if len(new_line) == 0:
+                    continue
+                args = splitter(new_line)
+                cib = self.parse_cib(args)
+                if cib:
+                    cibs.append(cib)
+                new_line = ""
+        return cibs
+
+
+def main():
+
+    # the command module is the one ansible module that does not take key=value args
+    # hence don't copy this one if you are looking to build others!
+    module = PacemakerModule(argument_spec=dict())
+
+    state = module.params['state']
+    need_commit = module.params['commit']
+    args = splitter(module.params['args'])
+    changed = False
+
+    if len(args) == 0:
+        module.fail_json(rc=256, msg="no command given")
+
+    if args[0] == "commit":
+        rc, out, err = module.run_command(["crm", "configure", "commit"])
+        if rc:
+            module.fail_json(rc=256, msg="crm command failed")
+        module.exit_json(args=args, changed=True)
+
+    parser = CIBParser(module)
+    new = parser.parse_cib(args)
+
+    crm_args = ["crm", "configure", "show"]
+    rc, out, err = module.run_command(crm_args)
+    if rc:
+        module.fail_json(rc=256, msg="crm command failed")
+
+    is_same = None
+    for cur in parser.parse_cibs(out.splitlines()):
+        if new.command != cur.command:
+            continue
+        if new.id != cur.id:
+            continue
+        is_same = new.is_same(cur)
+        break
+
+    need_delete = False
+    need_append = False
+    if state == 'absent':
+        if is_same is None:
+            module.exit_json(args=args, changed=False)
+        elif is_same:
+            if new.id is None:
+                module.fail_json(rc=256, msg="can't delete %s" % new.command)
+            need_delete = True
+    else:
+        if is_same:
+            module.exit_json(args=args, changed=False)
+        elif is_same is False and not new.no_delete:
+            need_delete = True
+        need_append = True
+
+    crm_config_commands = []
+    if need_delete:
+        crm_config_commands.append(["resource", "stop", new.id])
+        crm_config_commands.append(["configure", "delete", new.id])
+    if need_append:
+        crm_config_commands.append(["configure"] + args)
+    if need_commit:
+        crm_config_commands.append(["configure", "commit"])
+    for command in crm_config_commands:
+        rc, out, err = module.run_command(["crm", "-F"] + command)
+        if rc:
+            module.fail_json(rc=256, msg="crm command failed")
+            #FIXME: Re-enable error messages.
+            #module.fail_json(rc=256, msg="crm command failed \n%s"%err)
+
+    module.exit_json(args=args, changed=True)
+
+
+# import module snippets
+from ansible.module_utils.basic import *
+
+# only the command module should ever need to do this
+# everything else should be simple key=value
+
+class PacemakerModule(AnsibleModule):
+
+    def _handle_aliases(self):
+        return {}
+
+    def _check_invalid_arguments(self):
+        pass
+
+    def _load_params(self):
+        ''' read the input and return a dictionary and the arguments string '''
+        args = MODULE_ARGS
+        params = {}
+
+        params["state"] = "present"
+        params["commit"] = True
+        r = re.compile(r'(^|\s)(state)=(?P<quote>[\'"])?(.*?)(?(quote)(?<!\\)(?P=quote))((?<!\\)(?=\s)|$)')
+        for m in r.finditer(args):
+            v = m.group(4).replace("\\", "")
+            if m.group(2) == "state":
+                if v not in ["present", "absent"]:
+                    self.fail_json(
+                            rc=256, msg="state= is either present or absent")
+                params['state'] = v
+            if m.group(2) == "commit":
+                if v not in ["yes", "no"]:
+                    self.fail_json(
+                            rc=256, msg="commit= is either yes or no")
+                if v == 'yes':
+                    params['commit'] = True
+        args = r.sub("", args)
+
+        params["args"] = args.strip()
+        return (params, params["args"])
+
+main()

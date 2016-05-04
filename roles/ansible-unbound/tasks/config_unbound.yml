@@ -1,0 +1,10 @@
+---
+- name: config_unbound | configuring unbound
+  template:
+    src: "etc/unbound/unbound.conf.d/local.conf.j2"
+    dest: "{{ unbound_config_dir }}/local.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart unbound

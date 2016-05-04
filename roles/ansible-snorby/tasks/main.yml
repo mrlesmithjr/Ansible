@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-snorby
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: gems.yml
+
+- include: snorby.yml
+
+- include: barnyard2.yml

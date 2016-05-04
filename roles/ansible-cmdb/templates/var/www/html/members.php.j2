@@ -1,0 +1,184 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+$action = $_GET['action'];
+  if($action == 'aboutme') {
+    echo "<br><br><br><br>";
+    echo "<h4>My Info</h4>";
+    $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+    $db->exec( 'PRAGMA foreign_keys = ON;' );
+    $sql = "SELECT *
+            FROM Users
+            WHERE UserName='$username'
+            LIMIT 1";
+    $results = $db->query($sql) or die('Query failed');
+    // Credentials match so we create session variables
+    while ($row = $results->fetchArray()) {
+      echo "<pre>";
+      echo "Username: ";
+      echo "<tr><td>" . $row['UserName']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "First name: ";
+      echo "<tr><td>" . $row['FirstName']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "Last name: ";
+      echo "<tr><td>" . $row['LastName']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "E-Mail: ";
+      echo "<tr><td>" . $row['Email']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "Phone: ";
+      echo "<tr><td>" . $row['Phone']. "</td></tr><br>";
+      echo "</pre>";
+      echo "<pre>";
+      echo "Site role: ";
+      echo "<tr><td>" . $row['Role']. "</td></tr><br>";
+      echo "</pre>";
+    }
+  }
+  if($action == 'addlinks') {
+    include 'add_user_links.php';
+  }
+  if($action == 'addlink') {
+    if(isset($_POST['Submit'])) {
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $ln = $_POST["LinkName"];
+      $lu = $_POST["LinkUrl"];
+      $sql = "INSERT INTO UsersLinks
+              (Name,Url,UserId)
+              VALUES('$ln','$lu','$uid')";
+      if (empty($ln)) {
+        echo "Link Name has not been entered";
+      }
+      if (empty($lu)) {
+        echo "Link Url has not been entered";
+      }
+      if (!empty($ln) && !empty($lu)) {
+        $db->exec($sql);
+        echo "Link $ln $lu has been added.";
+      }
+    }
+  }
+  if($action == 'configurejenkinsapi') {
+    include 'configure_user_jenkins_api.php';
+  }
+  if($action == 'configurejenkinsapi') {
+    if(isset($_POST['Submit'])) {
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $jurl = $_POST["JenkinsURL"];
+      $juser = $_POST["JenkinsAPITokenUserId"];
+      $juapitoken = $_POST["JenkinsUserAPIToken"];
+      $sql = "INSERT INTO UsersExtAPILinks
+              (JenkinsURL,JenkinsAPITokenUserId,JenkinsUserAPIToken,UserId)
+              VALUES('$jurl','$juser','$juapitoken','$uid')";
+      if (empty($jurl)) {
+        echo "JenkinsURL has not been entered";
+      }
+      if (empty($juser)) {
+        echo "JenkinsUser has not been entered";
+      }
+      if (empty($juapitoken)) {
+        echo "JenkinsUserAPIToken has not been entered";
+      }
+      if (!empty($jurl) && !empty($juser) && !empty($juapitoken)) {
+        $db->exec($sql);
+        echo "Jenkins API Configuration has been added.";
+      }
+    }
+  }
+  if($action == 'deletejenkinsapi') {
+    if(isset($_POST['Submit'])) {
+      session_start();
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $juapitoken = $_SESSION['sessionjuapitoken'];
+      $db->exec("DELETE FROM UsersExtAPILinks WHERE UserId='$uid' AND JenkinsUserAPIToken='$juapitoken'");
+    }
+  }
+  if($action == 'editjenkinsapi') {
+    if(isset($_POST['Submit'])) {
+      session_start();
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $juapitoken = $_SESSION['sessionjuapitoken'];
+      if(isset($_POST["JenkinsURL"]) && !empty($_POST["JenkinsURL"])) {
+        $jurl = $_POST["JenkinsURL"];
+        $db->exec("UPDATE UsersExtAPILinks SET JenkinsURL='$jurl' WHERE UserId='$uid' AND JenkinsUserAPIToken='$juapitoken'");
+      }
+      if(isset($_POST["JenkinsAPITokenUserId"]) && !empty($_POST["JenkinsAPITokenUserId"])) {
+        $juser = $_POST["JenkinsAPITokenUserId"];
+        $db->exec("UPDATE UsersExtAPILinks SET JenkinsAPITokenUserId='$juser' WHERE UserId='$uid' AND JenkinsUserAPIToken='$juapitoken'");
+      }
+      if(isset($_POST["JenkinsUserAPIToken"]) && !empty($_POST["JenkinsUserAPIToken"])) {
+        $newjuapitoken = $_POST["JenkinsUserAPIToken"];
+        $db->exec("UPDATE UsersExtAPILinks SET JenkinsUserAPIToken='$newjuapitoken' WHERE UserId='$uid' AND JenkinsUserAPIToken='$juapitoken'");
+      }
+    }
+  }
+  if($action == 'edituserinfo') {
+    if(isset($_POST['Submit'])) {
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}') or die('Create db failed');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      if(isset($_POST['FirstName']) && !empty($_POST['FirstName'])) {
+        $firstname = $_POST['FirstName'];
+        $db->exec("UPDATE Users SET FirstName='$firstname' WHERE UserId='$uid'");
+      }
+      if(isset($_POST['LastName']) && !empty($_POST['LastName'])) {
+        $lastname = $_POST['LastName'];
+        $db->exec("UPDATE Users SET LastName='$lastname' WHERE UserId='$uid'");
+      }
+      if(isset($_POST['Email']) && !empty($_POST['Email'])) {
+        $email = $_POST['Email'];
+        $db->exec("UPDATE Users SET Email='$email' WHERE UserId='$uid'");
+      }
+      if(isset($_POST['Phone']) && !empty($_POST['Phone'])) {
+        $phone = $_POST['Phone'];
+        $db->exec("UPDATE Users SET Phone='$phone' WHERE UserId='$uid'");
+      }
+    }
+  }
+  if($action == 'viewuserjenkinsapis') {
+    include 'view_user_jenkins_api.php';
+  }
+  if($action == 'viewuserjenkinsapi') {
+    if(isset($_POST['Submit'])) {
+      echo "<br><br><br><br>";
+      echo "<h4>My Jenkins API Token</h4>";
+      session_start();
+      $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+      $db->exec( 'PRAGMA foreign_keys = ON;' );
+      $juapitoken = $_POST['userjenkinsapi'];
+      $_SESSION['sessionjuapitoken'] = $juapitoken;
+      $sql = "SELECT *
+              FROM UsersExtAPILinks
+              WHERE UserId=$uid AND JenkinsUserAPIToken='$juapitoken'";
+      $results = $db->query($sql);
+      while ($row = $results->fetchArray()) {
+        echo "<pre>";
+        echo "<h4>JenkinsURL:</h4>";
+        echo "<tr><td>" . $row['JenkinsURL']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "<h4>JenkinsAPITokenUserId:</h4>";
+        echo "<tr><td>" . $row['JenkinsAPITokenUserId']. "</td></tr>";
+        echo "</pre>";
+        echo "<pre>";
+        echo "<h4>JenkinsUserAPIToken:</h4>";
+        echo "<tr><td>" . $row['JenkinsUserAPIToken']. "</td></tr>";
+        echo "</pre>";
+      }
+      include 'edit_user_jenkins_api.php';
+    }
+  }
+?>

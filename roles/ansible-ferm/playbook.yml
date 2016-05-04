@@ -1,0 +1,8 @@
+---
+- name: configures ferm firewall services
+  hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-ferm
+  tasks:

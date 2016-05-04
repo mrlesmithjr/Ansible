@@ -1,0 +1,7 @@
+[auth]
+{% for item in gerrit_db_info %}
+{%   if item.type == "mysql" %}
+[database]
+        password = {{ item.pass }}
+{%   endif %}
+{% endfor %}

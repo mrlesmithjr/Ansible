@@ -1,0 +1,6 @@
+---
+- name: python_modules | installing/uninstalling additional python modules
+  pip:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: gocd_python_modules

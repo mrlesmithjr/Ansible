@@ -1,0 +1,18 @@
+---
+# tasks file for ansible-plex
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos.yml
+  when: ansible_os_family == "RedHat"
+
+- include: mountsmb.yml
+  tags:
+    - mount_smb
+  when: plex_mount_smb is defined
+
+# Open firewall ports
+- include: ferm.yml
+  tags:
+    - ferm
+  when: enable_firewall

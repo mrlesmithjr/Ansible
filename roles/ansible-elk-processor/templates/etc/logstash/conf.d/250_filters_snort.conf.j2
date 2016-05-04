@@ -1,0 +1,86 @@
+# Snort parsing
+filter {
+  if "snort" in [tags] {
+    if "PFSense" in [tags] {
+      grok {
+        match => [
+          "orig_message", "snort\[%{INT:snort_pid}\]\:.*\[%{INT:ids_gid}\:%{INT:ids_sid}\:%{INT:ids_rev}\].%{GREEDYDATA:ids_alert}.\[Classification\: %{DATA:ids_classification}\].*\[Priority\: %{INT:ids_priority}].*%{WORD:ids_proto}.*%{IP:src_ip}:%{INT:src_port} \-\>.*%{IP:dst_ip}:%{INT:dst_port}",
+          "orig_message", "snort\[%{INT:snort_pid}\]\:.*\[%{INT:ids_gid}\:%{INT:ids_sid}\:%{INT:ids_rev}\].%{GREEDYDATA:ids_alert}.\[Classification\: %{DATA:ids_classification}\].*\[Priority\: %{INT:ids_priority}].*\PROTO:%{WORD:ids_proto}.*%{IP:src_ip} \-\>.*%{IP:dst_ip}"
+        ]
+      }
+      grok {
+        match => [
+          "orig_message", "snort\[%{INT}\]\:.\[%{DATA:ids_signature}:%{INT}].%{GREEDYDATA}"
+        ]
+      }
+    }
+    if "PFsense" not in [tags] and [type] == "snort" {
+      grok {
+        match => [
+          "message", "%{DATESTAMP:timestamp}.*\[%{INT:ids_gid}\:%{INT:ids_sid}\:%{INT:ids_rev}\].%{GREEDYDATA:ids_alert}.\[Classification\: %{DATA:ids_classification}\].*\[Priority\: %{INT:ids_priority}].*%{WORD:ids_proto}.*%{IP:src_ip}:%{INT:src_port} \-\>.*%{IP:dst_ip}:%{INT:dst_port}",
+          "message", "%{DATESTAMP:timestamp}.*\[%{INT:ids_gid}\:%{INT:ids_sid}\:%{INT:ids_rev}\].%{GREEDYDATA:ids_alert}.\[Classification\: %{DATA:ids_classification}\].*\[Priority\: %{INT:ids_priority}].*\{DATA:%{WORD:ids_proto}.*%{IP:src_ip} \-\>.*%{IP:dst_ip}"
+        ]
+      }
+      grok {
+        match => [
+          "message", "%{DATESTAMP}.*\[%{DATA:ids_signature}:%{INT}].%{GREEDYDATA}"
+        ]
+      }
+    }
+    translate {
+      field => "ids_priority"
+      destination => "ids_priority_full"
+      dictionary => [
+        "1", "High",
+        "2", "Medium",
+        "3", "Low"
+      ]
+    }
+    geoip {
+      source => "src_ip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+      convert => [ "[geoip][coordinates]", "float" ]
+    }
+    if [ids_signature] {
+      if [ids_alert] =~ /^GPL/ {
+        mutate {
+          add_tag => [ "Snort-ET-sig" ]
+          add_field => [ "ids_rule_type", "Emerging Threats" ]
+        }
+      }
+      if [ids_alert] =~ /^ET/ {
+        mutate {
+          add_tag => [ "Snort-ET-sig" ]
+          add_field => [ "ids_rule_type", "Emerging Threats" ]
+        }
+      }
+      if "Snort-ET-sig" not in [tags] {
+        mutate {
+          add_tag => [ "Snort-sig" ]
+          add_field => [ "ids_rule_type", "Snort" ]
+        }
+      }
+    }
+    if "Snort-sig" in [tags] {
+      if [ids_gid] == "1" {
+        mutate {
+          add_field => [ "Signature_Info", "http://rootedyour.com/snortsid?sid=%{ids_sid}" ]
+        }
+      }
+      if [ids_gid] != "1" {
+        mutate {
+          add_field => [ "Signature_Info", "http://rootedyour.com/snortsid?sid=%{ids_gid}-%{ids_sid}" ]
+        }
+      }
+    }
+    if "Snort-ET-sig" in [tags] {
+      mutate {
+        add_field => [ "Signature_Info", "http://doc.emergingthreats.net/bin/view/Main/%{ids_sid}" ]
+      }
+    }
+  }
+}

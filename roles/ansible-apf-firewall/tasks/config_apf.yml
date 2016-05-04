@@ -1,0 +1,24 @@
+---
+- name: config_apf | configuring apf firewall
+  template:
+    src: "etc/apf-firewall/conf.apf.j2"
+    dest: "{{ apf_firewall_install_path }}/conf.apf"
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart apf-firewall
+    - reload apf-firewall rules
+  when: ansible_os_family != "RedHat"
+
+- name: config_apf | configuring apf firewall
+  template:
+    src: "etc/apf-firewall/conf.apf.j2"
+    dest: "{{ apf_firewall_redhat_install_path }}/conf.apf"
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart apf
+    - reload apf rules
+  when: ansible_os_family == "RedHat"

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+    <meta name="description" content="{{ cmdb_web_description }}" />
+    <meta name="keywords" content="{{ cmdb_web_keywords }}" />
+    <meta name="author" content="{{ cmdb_web_author }}" />
+    <title>{{ cmdb_web_title }}</title>
+		<style>
+			a:link {
+				color:orange;
+			}
+			a:visited {
+				color:lime;
+			}
+			html {
+				background: url(background.jpg) no-repeat center center fixed;
+				background-size: cover;
+			}
+			body {
+				color: orange;
+			}
+		</style>
+	</head>
+  	<body>
+			<?php
+				session_start();
+				$gid = $_SESSION['sessiongid'];
+			  echo "<html>";
+			    echo "<body>";
+			    $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+			    $db->exec( 'PRAGMA foreign_keys = ON;' );
+			    $sql = "SELECT * FROM Groups WHERE GroupId=$gid";
+			    $results = $db->query($sql);
+			    while ($row = $results->fetchArray()) {
+			      echo "<pre>";
+			      echo "GroupId: ";
+			      echo "<tr><td>" . $row['GroupId']. "</td></tr>";
+			      echo "</pre>";
+			      echo "<pre>";
+			      echo "GroupName: ";
+			      echo "<tr><td>" . $row['GroupName']. "</td></tr><br>";
+			      echo "</pre>";
+			      echo "<pre>";
+			      echo "GroupDescription: ";
+			      echo "<tr><td>" . $row['GroupDescription']. "</td></tr><br>";
+			      echo "</pre>";
+			      echo "<pre>";
+			      echo "GroupDTAP: ";
+			      echo "<tr><td>" . $row['GroupDTAP']. "</td></tr><br>";
+			      echo "</pre>";
+			      echo "<pre>";
+			      echo "LastUpdateTime: ";
+			      echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+			      echo "</pre>";
+			    }
+					echo "</body>";
+				echo "</html><br><br>";
+			?>
+  	  <h4>(** - Denotes required field)</h4>
+			<form action="edit_group.php" method="post">
+				Group name: (**)<br><input type="text" name="GroupName"><br>
+				Group description:<br><input type="text" name="GroupDescription"><br>
+				Group DTAP: (**)<br><select name="GroupDTAP">
+					<option value="D">Development</option>
+					<option value="T">Test</option>
+					<option value="A">Acceptance</option>
+					<option value="P">Production</option>
+				</select><br>
+				<input type="submit" value="Update Group">
+				<input type="reset" value="Reset">
+      </form>
+    </body>
+  </head>
+</html>

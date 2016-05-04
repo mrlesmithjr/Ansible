@@ -1,0 +1,9 @@
+---
+- hosts: all
+  sudo: true
+  vars:
+    - kibana_docker_elasticsearch_container_name: elasticsearch  #defines the Docker container name to link to for elasticsearch
+    - kibana_docker_install: true
+  roles:
+    - role: ansible-elk-kibana
+  tasks:

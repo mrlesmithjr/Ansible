@@ -1,0 +1,67 @@
+<?php
+  // Add common configurations across all pages
+  require("common_base.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<!DOCTYPE html>
+<html>
+  <body>
+    <?php
+      echo "<html>";
+        echo "<body>";
+          session_start();
+          $cid = $_POST['contactid'];
+          $gid = $_SESSION['sessiongid'];
+          $db = new SQLite3('{{ cmdb_sqlite_db_file }}');
+          $db->exec( 'PRAGMA foreign_keys = ON;' );
+          $sql = "SELECT * FROM GroupContact WHERE ContactId=$cid";
+          $results = $db->query($sql);
+          while ($row = $results->fetchArray()) {
+            echo "<br><br><br><br>";
+            echo "<pre>";
+            echo "ContactId: ";
+            echo "<tr><td>" . $row['ContactId']. "</td></tr>";
+            echo "</pre>";
+            echo "<pre>";
+            echo "ContactName: ";
+            echo "<tr><td>" . $row['ContactName']. "</td></tr><br>";
+            echo "</pre>";
+            echo "<pre>";
+            echo "ContactEmail: ";
+            echo "<tr><td>" . $row['ContactEmail']. "</td></tr><br>";
+            echo "</pre>";
+            echo "<pre>";
+            echo "ContactPhone: ";
+            echo "<tr><td>" . $row['ContactPhone']. "</td></tr><br>";
+            echo "</pre>";
+            echo "<pre>";
+            echo "ContactCreatedOn: ";
+            echo "<tr><td>" . $row['ContactCreatedOn']. "</td></tr><br>";
+            echo "</pre>";
+            echo "<pre>";
+            echo "LastUpdateTime: ";
+            echo "<tr><td>" . $row['LastUpdateTime']. "</td></tr><br>";
+            echo "</pre><br><br>";
+          }
+          echo "<form action=\"group_actions.php\" method=\"post\">";
+            echo "Contact Actions:<br><select name=\"GroupAction\">";
+              echo "<option selected>Choose Contact Action:</option>";
+              echo "<option value=\"DeleteGroupContact\">Delete Group Contact</option>";
+              echo "<option value=\"EditGroupContact\">Edit Group Contact</option>";
+              echo "<option value=\"ViewGroupContactInfo\">View Group Contact Info</option>";
+            echo "</select>";
+            echo "<input type=\"submit\">";
+            echo "<input type=\"reset\" value=\"Reset\">";
+          echo "</form>";
+        echo "</body>";
+      echo "</html>";
+    ?>
+    <?php
+      session_start();
+      $_SESSION['sessioncid'] = $cid;
+      $_SESSION['sessiongid'] = $gid;
+    ?>
+  </body>
+</html>

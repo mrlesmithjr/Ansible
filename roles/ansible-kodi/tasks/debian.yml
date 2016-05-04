@@ -1,0 +1,26 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'software-properties-common'
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | adding Ubuntu repo
+  apt_repository:
+    repo: "{{ kodi_ubuntu_repo }}"
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | adding Debian repo
+  apt_repository:
+    repo: "{{ kodi_debian_repo }}"
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: debian | installing Kodi
+  apt:
+    name: "kodi"
+    state: present
+    

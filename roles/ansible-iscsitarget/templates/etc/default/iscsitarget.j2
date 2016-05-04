@@ -1,0 +1,11 @@
+ISCSITARGET_ENABLE={{ iscsitarget_enable|lower }}
+ISCSITARGET_MAX_SLEEP={{ iscsitarget_max_sleep }}
+
+
+# ietd options
+# See ietd(8) for details
+{% if iscsitarget_options is defined %}
+ISCSITARGET_OPTIONS="{{ iscsitarget_options }}"
+{% elif iscsitarget_options is not defined %}
+ISCSITARGET_OPTIONS=""
+{% endif %}

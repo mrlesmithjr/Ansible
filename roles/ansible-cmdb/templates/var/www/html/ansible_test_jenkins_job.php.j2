@@ -1,0 +1,18 @@
+<?php
+  // Add common configurations across all pages
+  require("common.php");
+  session_start();
+  $username = $_SESSION['UserName'];
+  $uid = $_SESSION['UserId'];
+?>
+<?php
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, "http://{{ jenkins_server_fqdn }}:8080/job/test/build?token={{ jenkins_api_token }}");
+  curl_setopt($ch, CURLOPT_HEADER, false);
+  curl_exec($ch);
+  curl_close($ch);
+  echo "<br><br><br><br>";
+  echo "Job executed on Jenkins server.";
+  echo "<br>";
+  echo "Check <a href=\"http://{{ jenkins_server_fqdn }}:8080/job/test\">Jenkins</a> for status.";
+?>

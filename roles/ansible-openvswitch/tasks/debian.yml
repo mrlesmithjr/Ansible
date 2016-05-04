@@ -1,0 +1,62 @@
+---
+- name: adding apt repo(s)
+  apt_repository: repo={{ item }} state=present
+  with_items: apt_repos
+  when: add_repos is defined and add_repos
+
+- name: installing ovs packages
+  apt: name={{ item }} state=present
+  with_items:
+    - openvswitch-switch
+    - openvswitch-controller
+  when: (uninstall is defined and not uninstall) or uninstall is not defined
+
+- name: creating ovs bridges
+  openvswitch_bridge: bridge={{ item.name }} state={{ item.state }}
+  with_items: ovs_bridges
+  when: (uninstall is defined and not uninstall) or uninstall is not defined
+
+- name: adding ports to ovs bridges
+  openvswitch_port: bridge={{ item.0.name }} port={{ item.1 }} state={{ item.0.state }}
+  with_subelements:
+    - ovs_bridges
+    - interfaces
+  when: (item[0].add_interfaces is defined and item[0].add_interfaces) and (item[1] is defined and item[0].state != "absent") and (uninstall is defined and not uninstall)
+
+- name: checking for ovs installed
+  stat: path=/usr/bin/ovs-vsctl
+  register: ovs_installed_check
+  when: uninstall is defined and uninstall
+
+- name: removing ovs bridges
+  openvswitch_bridge: bridge={{ item.name }} state=absent
+  with_items: ovs_bridges
+  when: (uninstall is defined and uninstall) and ovs_installed_check.stat.exists
+
+- name: removing ovs packages
+  apt: name={{ item }} state=absent purge=yes
+  with_items:
+    - openvswitch-common
+    - openvswitch-controller
+    - openvswitch-switch
+  when: uninstall is defined and uninstall
+
+- name: configuring network interfaces (/etc/network/interfaces)
+  template: src=etc/network/interfaces.j2 dest=/etc/network/interfaces owner=root group=root mode=0644
+  register: interfaces_configured
+  tags:
+    - config_interfaces
+
+- name: bringing up interfaces
+  shell: "ifdown {{ item.name }} && ifup {{ item.name }}"
+  tags:
+    - config_interfaces
+  with_items: interfaces
+  when: interfaces_configured.changed and (item.configure is defined and item.configure)
+
+- name: bringing up OVS interfaces
+  shell: "ifdown {{ item.name }} && ifup {{ item.name }}"
+  tags:
+    - config_interfaces
+  with_items: ovs_bridges
+  when: interfaces_configured.changed and item.state == "present"

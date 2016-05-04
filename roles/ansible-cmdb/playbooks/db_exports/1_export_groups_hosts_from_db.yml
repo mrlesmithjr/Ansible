@@ -1,0 +1,37 @@
+---
+#### Exports Groups and Hosts from DB and dumps to an inventory file for use with Ansible..
+#### Associcates the hosts with their proper groups.
+- hosts: localhost
+  sudo: true
+  remote_user: remote
+  vars:
+    - apache2_root: /var/www/html
+    - cmdb_sqlite_db_file: '{{ cmdb_sqlite_db_path }}/cmdb.db'
+    - cmdb_sqlite_db_path: '{{ apache2_root }}/../db'
+    - create_inventory_file: ./hosts
+    - db_groups_export_file: ./groups.yml
+  tasks:
+    - name: exporting groups from db
+      shell: "sqlite3 {{ cmdb_sqlite_db_file }} \"SELECT GroupName FROM HostGroups GROUP BY GroupName;\""
+      register: db_groups
+      delegate_to: cmdb
+
+    - name: query hosts per group
+      shell: "sqlite3 {{ cmdb_sqlite_db_file }} \"SELECT HostName FROM HostGroups WHERE GroupName='{{ item }}';\""
+      delegate_to: cmdb
+      register: db_hosts
+      with_items: db_groups.stdout_lines
+
+    - name: checking for existing inventory file
+      stat: path="{{ create_inventory_file }}"
+      register: inv_file_check
+
+    - name: creating inventory file when missing
+      file: path="{{ create_inventory_file }}" state=touch
+      sudo: false
+      when: not inv_file_check.stat.exists
+
+    - name: creating usable Ansible inventory
+      sudo: false
+      lineinfile: dest="{{ create_inventory_file }}" line="[{{ item.item }}]{{ '\n' }}{{ item.stdout }}{{ '\n' }}"
+      with_items: db_hosts.results

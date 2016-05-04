@@ -1,0 +1,34 @@
+---
+- name: templates | ensuring templates directory exists
+  file:
+    path: "{{ cacti_site_dir }}/templates"
+    state: directory
+    owner: "{{ cacti_web_owner }}"
+    group: "{{ cacti_web_group }}"
+    mode: 0755
+
+- name: templates | copying additional cacti snmp queries
+  template:
+    src: "resource/snmp_queries/{{ item }}.j2"
+    dest: "{{ cacti_site_dir }}/resource/snmp_queries/{{ item }}"
+    owner: "{{ cacti_web_owner }}"
+    group: "{{ cacti_web_group }}"
+    mode: 0644
+  with_items: '{{ cacti_snmp_queries }}'
+
+- name: templates | copying snmp informant templates
+  template:
+    src: "templates/{{ item }}.j2"
+    dest: "{{ cacti_site_dir }}/templates/{{ item }}"
+    owner: "{{ cacti_web_owner }}"
+    group: "{{ cacti_web_group }}"
+    mode: 0644
+  register: templates_updated
+  with_items: '{{ cacti_snmp_templates }}'
+
+- name: templates | importing snmp informant templates
+  command: php {{ cacti_cli }}/import_template.php --filename={{ cacti_site_dir }}/templates/{{ item }} --with-template-rras
+  with_items:
+    - cacti_host_template_f5_big-ip.xml
+    - cacti_host_template_snmp_informant_windows.xml
+  when: templates_updated.changed

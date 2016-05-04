@@ -1,0 +1,21 @@
+---
+- name: config_marathon | ensuring marathon config directory exists
+  file:
+    path: "/etc/marathon/conf"
+    state: directory
+    owner: root
+    group: root
+
+- name: config_marathon | configuring marathon
+  template:
+    src: "etc/marathon/conf/{{ item }}.j2"
+    dest: "/etc/marathon/conf/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart marathon
+  with_items:
+    - 'hostname'
+    - 'master'
+    - 'zk'
