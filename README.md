@@ -18,8 +18,15 @@ Requirements
 The majority of variables are configurable in group_vars/all  
 The goal of this is to keep a consistent single place to update site-wide variables.
 
+To ensure all roles are current and up to date you can run the following in the root of this repo..  
+````
+ansible-galaxy install -r requirements.yml -f -p ./roles --ignore-errors
+````
+
 ##### Playbooks
+````
 bootstrap.yml  
+````
 Used as phase one of deployments... bootstraps hosts
 ````
 site.yml
@@ -34,9 +41,8 @@ elkstack_prod.yml
 ````
 Builds ELKStack Highly Available, Scalable environment
 
-Requirements
-------------
 ELKStack - Requirements
+-----------------------
 
 Build out the following hosts and modify hosts to reflect name changes...lines with [] define a group name to be added to hosts.  
 Lines that contain [1:x] are regex values to define multiple hosts.
