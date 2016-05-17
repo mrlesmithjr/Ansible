@@ -1,0 +1,77 @@
+---
+- name: manage | flush rules
+  command: "iptables -F"
+  when: iptables_flush_rules
+
+- name: manage | flush chains
+  command: "iptables -X"
+  when: iptables_flush_chains
+
+- name: manage | collecting iptables custom chains
+  shell: "iptables -L -n|grep references|cut -d\" \" -f2"
+  register: iptables_chains_check
+  changed_when: false
+
+- name: manage | managing iptables custom chains
+  command: "iptables -N {{ item.name }}"
+  with_items: '{{ iptables_custom_chains }}'
+  when: >
+        item.state == "present" and
+        item.name not in iptables_chains_check.stdout_lines
+
+- name: manage | managing iptables custom chains
+  command: "iptables -X {{ item.name }}"
+  with_items: '{{ iptables_custom_chains }}'
+  when: >
+        item.state == "absent" and
+        item.name in iptables_chains_check.stdout_lines
+
+- name: manage | managing iptables rules
+  iptables:
+    chain: "{{ item.0.name }}"
+    comment: "{{ item.1.comment|default (omit) }}"
+    ctstate: "{{ item.1.ctstate|default (omit) }}"
+    destination_port: "{{ item.1.destination_port|default (omit) }}"
+    goto: "{{ item.1.goto|default (omit) }}"
+    in_interface: "{{ item.1.in_interface|default (omit) }}"
+    jump: "{{ item.1.jump|default (omit) }}"
+    limit: "{{ item.1.limit|default (omit) }}"
+    protocol: "{{ item.1.protocol|default (omit) }}"
+    state: "{{ item.1.state|default (omit) }}"
+    table: "{{ item.1.table|default (omit) }}"
+    to_ports: "{{ item.1.to_ports|default (omit) }}"
+  register: rules
+  with_subelements:
+    - '{{ iptables_chains }}'
+    - rules
+
+- name: manage | saving persistent rules (if enabled)
+  shell: "iptables-save -c > {{ iptables_save_file }}"
+  when: >
+        ansible_os_family == "Debian" and
+        iptables_persistent and
+        (rules.changed or
+        iptables_persistent_enabled.changed)
+
+- name: manage | saving persistent rules (if enabled)
+  command: "service {{ item }} save"
+  with_items:
+    - 'iptables'
+    - 'ip6tables'
+  when: >
+        ansible_os_family == "RedHat" and
+        iptables_persistent and
+        (rules.changed or
+        iptables_persistent_enabled.changed)
+
+- name: manage | capturing default policies
+  shell: "iptables -L -v -n | grep \"Chain {{ item.name }}\" | cut -d \" \" -f4 | grep \"{{ item.policy }}\""
+  register: policies
+  failed_when: policies.rc > 1
+  changed_when: false
+  with_items: '{{ iptables_default_policies }}'
+
+- name: manage | setting default policies
+  command: "iptables -P {{ item.item.name }} {{ item.item.policy }}"
+  with_items: '{{ policies.results }}'
+  when: item.rc == 1

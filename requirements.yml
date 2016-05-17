@@ -46,6 +46,7 @@
 - src: https://github.com/mrlesmithjr/ansible-haproxy
 - src: https://github.com/mrlesmithjr/ansible-hashicorp-toolbox
 - src: https://github.com/mrlesmithjr/ansible-iperf
+- src: https://github.com/mrlesmithjr/ansible-iptables
 - src: https://github.com/mrlesmithjr/ansible-isc-dhcp
 - src: https://github.com/mrlesmithjr/ansible-iscsitarget
 - src: https://github.com/mrlesmithjr/ansible-jekyll

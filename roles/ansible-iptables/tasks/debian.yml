@@ -1,0 +1,42 @@
+---
+- name: debian | installing iptables-persistent package (if enabled)
+  apt:
+    name: "iptables-persistent"
+    state: present
+  register: iptables_persistent_enabled
+  when: iptables_persistent
+
+- name: debian | un-installing iptables-persistent package (if not enabled)
+  apt:
+    name: "iptables-persistent"
+    state: absent
+    purge: yes
+  when: not iptables_persistent
+
+- name: debian | enabling iptables restore on boot (if enabled)
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    regexp: "^pre-up iptables-restore < {{ iptables_save_file }}"
+    line: "pre-up iptables-restore < {{ iptables_save_file }}"
+  when: iptables_persistent
+
+- name: debian | disabling iptables restore on boot (if not enabled)
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    regexp: "^pre-up iptables-restore < {{ iptables_save_file }}"
+    line: ""
+  when: not iptables_persistent
+
+- name: debian | enabling iptables save on shutdown (if enabled)
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    regexp: "^post-down iptables-save -c > {{ iptables_save_file }}"
+    line: "post-down iptables-save -c > {{ iptables_save_file }}"
+  when: iptables_persistent
+
+- name: debian | disabling iptables save on shutdown (if not enabled)
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    regexp: "^post-down iptables-save -c > {{ iptables_save_file }}"
+    line: ""
+  when: not iptables_persistent
