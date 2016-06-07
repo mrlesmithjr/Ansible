@@ -2,7 +2,7 @@
 - name: users | creating rundeck ssh folder
   file:
     path: "{{ rundeck_framework_ssh_keypath}}"
-    state: directory
+    state: "directory"
     owner: "{{ rundeck_framework_ssh_user}}"
     group: "{{ rundeck_framework_ssh_user }}"
     mode: 0700

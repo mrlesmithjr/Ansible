@@ -25,8 +25,8 @@ Role Variables
 ````
 ---
 # defaults file for ansible-es-filebeat
-es_filebeat_debian_dl: 'https://download.elastic.co/beats/filebeat/{{ es_filebeat_debian_package }}'
 es_filebeat_debian_package: 'filebeat_{{ es_filebeat_version }}_amd64.deb'
+es_filebeat_dl_url: 'https://download.elastic.co/beats/filebeat'
 es_filebeat_elasticsearch_host: 'es.{{ pri_domain_name }}:9200'
 es_filebeat_idle_timeout: '5s'
 es_filebeat_outputs:
@@ -43,11 +43,11 @@ es_filebeat_prospectors:  #define the paths (directories) to watch
     document_type: 'syslog'  #The event type to use for published lines read by harvesters. For Elasticsearch output, the value that you specify here is used to set the type field in the output document. The default value is log.
 #  - paths:
 #      - '/opt/myapp/var/*.log'
-#    document_type: 'my_app_log'    
-es_filebeat_redhat_dl: 'https://download.elastic.co/beats/filebeat/filebeat-{{ es_filebeat_version }}-x86_64.rpm'
+#    document_type: 'my_app_log'
+es_filebeat_redhat_package: 'filebeat-{{ es_filebeat_version }}-x86_64.rpm'
 es_filebeat_registry_file: '/var/lib/filebeat/registry'
 es_filebeat_spool_size: 2048  #Event count spool threshold - forces network flush if exceeded
-es_filebeat_version: '1.1.1'
+es_filebeat_version: '1.2.2'
 pri_domain_name: 'example.org'
 ````
 

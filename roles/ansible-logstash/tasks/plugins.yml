@@ -2,6 +2,7 @@
 - name: plugins | collecting installed plugins
   shell: /opt/logstash/bin/plugin list
   register: logstash_plugins_installed
+  changed_when: false
   always_run: true  #allows checks and diffs to pass
 
 - name: plugins | installing logstash plugins

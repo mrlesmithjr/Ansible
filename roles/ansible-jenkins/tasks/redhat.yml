@@ -1,0 +1,27 @@
+---
+- name: redhat | Adding Jenkins Repo Key
+  rpm_key:
+    key: "{{ jenkins_repo_key }}"
+    state: "present"
+
+- name: redhat | Adding Jenkins Repo
+  template:
+    src: "etc/yum.repos.d/jenkins.repo.j2"
+    dest: "/etc/yum.repos.d/jenkins.repo"
+
+- name: redhat | Installing Jenkins Pre-Reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ jenkins_redhat_pre_req_packages }}'
+
+- name: redhat | Installing Jenkins
+  yum:
+    name: "jenkins"
+    state: "latest"
+
+- name: redhat | Ensuring Jenkins is Enabled and Started
+  service:
+    name: "jenkins"
+    state: "started"
+    enabled: yes

@@ -1,0 +1,10 @@
+---
+- name: redhat | adding Docker repo
+  template:
+    src: "etc/yum.repos.d/docker.repo.j2"
+    dest: "/etc/yum.repos.d/docker.repo"
+
+- name: redhat | installing Docker
+  yum:
+    name: "docker-engine"
+    state: present

@@ -5,7 +5,10 @@
 - include: openstack_haproxy_config.yml
   tags:
     - config_haproxy
-  when: (openstack_haproxy_config is defined and openstack_haproxy_config) and inventory_hostname in groups['openstack-haproxy-nodes']
+  when: >
+        (openstack_haproxy_config is defined and
+        openstack_haproxy_config) and
+        inventory_hostname in groups['openstack-haproxy-nodes']
 
 - include: openstack_rabbitmq_config.yml
   when: inventory_hostname in groups['openstack-controller-nodes']
@@ -57,75 +60,119 @@
 - include: openstack_neutron_controller_nodes.yml
   tags:
     - neutron
-  when: openstack_networking  == "neutron" and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        openstack_networking  == "neutron" and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_neutron_network_nodes.yml
   tags:
     - neutron
-  when: openstack_networking  == "neutron" and inventory_hostname in groups['openstack-network-nodes']
+  when: >
+        openstack_networking  == "neutron" and
+        inventory_hostname in groups['openstack-network-nodes']
 
 - include: openstack_neutron_compute_nodes.yml
   tags:
     - neutron
     - nova
-  when: openstack_networking  == "neutron" and inventory_hostname in groups['openstack-compute-nodes']
+  when: >
+        openstack_networking  == "neutron" and
+        inventory_hostname in groups['openstack-compute-nodes']
 
 - include: openstack_neutron_manage_external_networks.yml
   tags:
     - create_neutron_external_networks
     - neutron_networks
-  when: (config_openstack_neutron_networks is defined and config_openstack_neutron_networks) and openstack_networking  == "neutron" and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (config_openstack_neutron_networks is defined and
+        config_openstack_neutron_networks) and
+        openstack_networking  == "neutron" and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_neutron_manage_tenant_networks.yml
   tags:
     - create_neutron_tenant_networks
     - neutron_networks
-  when: (config_openstack_neutron_networks is defined and config_openstack_neutron_networks) and openstack_networking  == "neutron" and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (config_openstack_neutron_networks is defined and
+        config_openstack_neutron_networks) and
+        openstack_networking  == "neutron" and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_horizon.yml
   tags:
     - horizon
-  when: (openstack_horizon_install is defined and openstack_horizon_install) and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (openstack_horizon_install is defined and
+        openstack_horizon_install) and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_cinder_controller_nodes.yml
   tags:
     - cinder
-  when: (openstack_cinder_install is defined and openstack_cinder_install) and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (openstack_cinder_install is defined and
+        openstack_cinder_install) and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_cinder_storage_nodes.yml
   tags:
     - cinder
-  when: (openstack_cinder_install is defined and openstack_cinder_install) and inventory_hostname in groups['openstack-storage-nodes']
+  when: >
+        (openstack_cinder_install is defined and
+        openstack_cinder_install) and
+        inventory_hostname in groups['openstack-storage-nodes']
 
 - include: openstack_cinder_compute_nodes.yml
   tags:
     - cinder
-  when: (openstack_cinder_install is defined and openstack_cinder_install) and inventory_hostname in groups['openstack-compute-nodes']
+  when: >
+        (openstack_cinder_install is defined and
+        openstack_cinder_install) and
+        inventory_hostname in groups['openstack-compute-nodes']
 
 - include: openstack_heat.yml
   tags:
     - heat
-  when: (openstack_heat_install is defined and openstack_heat_install) and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (openstack_heat_install is defined and
+        openstack_heat_install) and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_telemetry_controller_nodes.yml
   tags:
     - telemetry
-  when: (openstack_telementry_install is defined and openstack_telementry_install) and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (openstack_telementry_install is defined and
+        openstack_telementry_install) and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_telemetry_compute_nodes.yml
   tags:
     - telemetry
-  when: (openstack_telementry_install is defined and openstack_telementry_install) and inventory_hostname in groups['openstack-compute-nodes']
+  when: >
+        (openstack_telementry_install is defined and
+        openstack_telementry_install) and
+        inventory_hostname in groups['openstack-compute-nodes']
 
 - include: openstack_telemetry_storage_nodes.yml
   tags:
     - telemetry
-  when: (openstack_telementry_install is defined and openstack_telementry_install) and inventory_hostname in groups['openstack-storage-nodes']
+  when: >
+        (openstack_telementry_install is defined and
+        openstack_telementry_install) and
+        inventory_hostname in groups['openstack-storage-nodes']
 
 - include: openstack_group_based_policy.yml
   tags:
     - group_based_policy
-  when: (openstack_group_based_policy_install is defined and openstack_group_based_policy_install) and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (openstack_group_based_policy_install is defined and
+        openstack_group_based_policy_install) and
+        inventory_hostname in groups['openstack-controller-nodes']
 
 - include: openstack_manage_glance_images.yml
-  when: (openstack_glance_manage_images is defined and openstack_glance_manage_images) and inventory_hostname in groups['openstack-controller-nodes']
+  when: >
+        (openstack_glance_manage_images is defined and
+        openstack_glance_manage_images) and
+        inventory_hostname in groups['openstack-controller-nodes']

@@ -45,6 +45,7 @@
 - src: https://github.com/mrlesmithjr/ansible-hadoop
 - src: https://github.com/mrlesmithjr/ansible-haproxy
 - src: https://github.com/mrlesmithjr/ansible-hashicorp-toolbox
+- src: https://github.com/mrlesmithjr/ansible-inventory
 - src: https://github.com/mrlesmithjr/ansible-iperf
 - src: https://github.com/mrlesmithjr/ansible-iptables
 - src: https://github.com/mrlesmithjr/ansible-isc-dhcp
@@ -52,6 +53,7 @@
 - src: https://github.com/mrlesmithjr/ansible-jekyll
 - src: https://github.com/mrlesmithjr/ansible-jenkins
 - src: https://github.com/mrlesmithjr/ansible-juju
+- src: https://github.com/mrlesmithjr/ansible-kea-dhcp
 - src: https://github.com/mrlesmithjr/ansible-keepalived
 - src: https://github.com/mrlesmithjr/ansible-kodi
 - src: https://github.com/mrlesmithjr/ansible-kvm
@@ -76,6 +78,7 @@
 - src: https://github.com/mrlesmithjr/ansible-nodejs
 - src: https://github.com/mrlesmithjr/ansible-ntop
 - src: https://github.com/mrlesmithjr/ansible-ntp
+- src: https://github.com/mrlesmithjr/ansible-observium
 - src: https://github.com/mrlesmithjr/ansible-open-iscsi
 - src: https://github.com/mrlesmithjr/ansible-openldap
 - src: https://github.com/mrlesmithjr/ansible-opennms

@@ -239,5 +239,5 @@ snort_send_stats: true  #true/false
 snort_src_dir: '/opt/snort_src'  #defines where to download source packages to compile
 snort_startup: boot
 snort_stats_threshold: 1
-snort_version: 2.9.8.0
+snort_version: 2.9.8.2
 snort_whitelist_path: '/etc/snort/rules'

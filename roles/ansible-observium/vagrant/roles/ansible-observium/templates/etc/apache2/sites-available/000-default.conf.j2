@@ -1,0 +1,21 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot {{ observium_base_dir }}/html
+    <FilesMatch \.php$>
+      SetHandler application/x-httpd-php
+    </FilesMatch>
+    <Directory />
+            Options FollowSymLinks
+            AllowOverride None
+    </Directory>
+    <Directory {{ observium_base_dir }}/html/>
+            DirectoryIndex index.php
+            Options Indexes FollowSymLinks MultiViews
+            AllowOverride All
+            Require all granted
+    </Directory>
+    ErrorLog  ${APACHE_LOG_DIR}/error.log
+    LogLevel warn
+    CustomLog  ${APACHE_LOG_DIR}/access.log combined
+    ServerSignature On
+</VirtualHost>

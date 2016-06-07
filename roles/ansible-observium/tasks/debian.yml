@@ -1,0 +1,12 @@
+---
+- name: debian | Installing Debian Pre-Req Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ observium_debian_pre_reqs }}'
+
+- name: debian | Installing LibVirt Packages to monitor (If Desired)
+  apt:
+    name: "{{ libvirt-bin }}"
+    state: "present"
+  when: observium_monitor_libvirt_vms

@@ -1,0 +1,16 @@
+---
+- name: finalize | Checking If Initial Admin Password Exists
+  stat:
+    path: "{{ jenkins_home_dir }}/secrets/initialAdminPassword"
+  register: "jenkins_initial_password_check"
+
+- name: finalize | Capturing Initial Admin Password
+  command: "cat {{ jenkins_home_dir }}/secrets/initialAdminPassword"
+  register: "jenkins_initialAdminPassword"
+  changed_when: false
+  when:  jenkins_initial_password_check.stat.exists
+
+- name: finalize | Displaying Initial Admin Password
+  debug:
+    msg: "Login to Jenkins with the initial password {{ jenkins_initialAdminPassword.stdout }}"
+  when:  jenkins_initial_password_check.stat.exists

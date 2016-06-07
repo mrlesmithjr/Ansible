@@ -1,0 +1,4 @@
+{% if docker_opts is defined %}
+DOCKER_OPTS="{% for item in docker_opts %}{{ item }}{% if not loop.last %} {% endif %}{% endfor %}{% if ansible_docker0 is defined %} --bip={{ ansible_docker0.ipv4.address }}/16{% endif %}"
+
+{% endif %}

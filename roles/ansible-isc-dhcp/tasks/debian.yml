@@ -1,7 +1,5 @@
 ---
-- name: debian | installing packages
-  apt: name=isc-dhcp-server state=present
-
-- name: debian | configuring dhcp service
-  template: src=etc/dhcp/dhcpd.conf.j2 dest=/etc/dhcp/dhcpd.conf owner=root group=root mode=0644
-  notify: restart_isc_dhcp_server
+- name: debian | Installing DHCP Packages
+  apt:
+    name: "isc-dhcp-server"
+    state: "present"

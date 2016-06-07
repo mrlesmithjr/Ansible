@@ -26,7 +26,9 @@
   with_items:
     - "{{ pdns_fwd_zones }}"
     - "{{ pdns_rev_zones }}"
-  when: pdns_fwd_zones is defined or pdns_rev_zones is defined
+  when: >
+        pdns_fwd_zones is defined or
+        pdns_rev_zones is defined
 
 - name: pdns_zones | creating pdns forward/reverse zones in zone folders
   template:
@@ -39,7 +41,9 @@
   with_items:
     - "{{ pdns_fwd_zones }}"
     - "{{ pdns_rev_zones }}"
-  when: pdns_fwd_zones is defined or pdns_rev_zones is defined
+  when: >
+        pdns_fwd_zones is defined or
+        pdns_rev_zones is defined
 
 - name: pdns_zones | creating pdns zones script
   template:
@@ -48,7 +52,10 @@
     owner: root
     group: root
     mode: 0770
-  when: pdns_zones_created.changed and (pdns_fwd_zones is defined or pdns_rev_zones is defined)
+  when: >
+        pdns_zones_created.changed and
+        (pdns_fwd_zones is defined or
+        pdns_rev_zones is defined)
 
 - name: pdns_zones | creating pdns zones script
   template:
@@ -57,7 +64,11 @@
     owner: root
     group: root
     mode: 0770
-  when: (force is defined and force) and (pdns_fwd_zones is defined or pdns_rev_zones is defined)
+  when: >
+        (force is defined and
+        force) and
+        (pdns_fwd_zones is defined or
+        pdns_rev_zones is defined)
 
 - name: pdns_zones | creating pdns zones
   shell: /tmp/pdns_zones.sh
@@ -67,7 +78,9 @@
 - name: pdns_zones | creating pdns zones
   shell: /tmp/pdns_zones.sh
   run_once: true
-  when: force is defined and force
+  when: >
+        force is defined and
+        force
 
 - name: pdns_zones | cleaning up pdns zones script
   file:

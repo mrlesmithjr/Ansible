@@ -1,0 +1,10 @@
+---
+- name: debian | updating apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: debian | installing apache2 package
+  apt:
+    name: "apache2"
+    state: present

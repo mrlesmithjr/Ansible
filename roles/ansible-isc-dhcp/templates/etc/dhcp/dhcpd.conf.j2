@@ -1,109 +1,95 @@
-# {{ ansible_managed }}
-#
-# Sample configuration file for ISC dhcpd for Debian
-#
-# Attention: If /etc/ltsp/dhcpd.conf exists, that will be used as
-# configuration file instead of this file.
-#
-#
-
-# The ddns-updates-style parameter controls whether or not the server will
-# attempt to do a DNS update when a lease is confirmed. We default to the
-# behavior of the version 2 packages ('none', since DHCP v2 didn't
-# have support for DDNS.)
-{% if ddns_updates is defined and ddns_updates %}
+{% if isc_dhcp_ddns_updates %}
 ddns-updates on;
-ddns-update-style {{ ddns_update_style|lower }};
+ddns-update-style {{ isc_dhcp_ddns_update_style|lower }};
 update-static-leases on;
 allow unknown-clients;
 use-host-decl-names on;
-{% endif %}
-{% if (ddns_updates is defined and not ddns_updates) or ddns_updates is not defined %}
+{% elif not isc_dhcp_ddns_updates %}
 ddns-update-style none;
 {% endif %}
 
-# option definitions common to all supported networks...
-option domain-name "{{ dhcp_domain_name }}";
-option domain-name-servers {{ dhcp_name_servers }};
-{% if ntp_servers is defined %}
-option ntp-servers {% for server in ntp_servers %}{{ server }}{% if not loop.last %}, {% endif %}{% endfor %};
-{% endif %}
+{% for item in isc_dhcp_options %}
+option {{ item.name }} {{ item.value }};
+{% endfor %}
 
 default-lease-time 600;
 max-lease-time 7200;
 
-# If this DHCP server is the official DHCP server for the local
-# network, the authoritative directive should be uncommented.
-
-{% if authoritative == true %}
+{% if isc_dhcp_authoritative %}
 authoritative;
 {% endif %}
 
-# Use this to send dhcp log messages to a different log file (you also
-# have to hack syslog.conf to complete the redirection).
 log-facility local7;
 
 {% if enable_dhcp_failover %}
-# Setup failover
-{%   if failover_role  == "primary" %}
+{%   if inventory_hostname == isc_dhcp_failover_info.primary %}
 failover peer "failover" {
-	{{ failover_role }};
-	address {{ failover_address }};
-	port 519;
-	peer address {{ failover_peer_address }};
-	peer port 520;
-	mclt 3600;
-	split 128;
-	load balance max seconds 3;
+  primary;
+  address {{ isc_dhcp_failover_info.failover_address }};
+  port 519;
+{%     for host in groups[isc_dhcp_failover_info.failover_group] %}
+{%       if inventory_hostname != host %}
+  peer address {{ host }};
+{%       endif %}
+{%     endfor %}
+  peer port 520;
+  mclt 3600;
+  split 128;
+  load balance max seconds 3;
 }
 {%   endif %}
 
-{%   if failover_role == "secondary" %}
+{%   if inventory_hostname == isc_dhcp_failover_info.secondary %}
 failover peer "failover" {
-  {{ failover_role }};
-  address {{ failover_address }};
+  secondary;
+  address {{ isc_dhcp_failover_info.failover_address }};
   port 520;
-  peer address {{ failover_peer_address }};
+{%     for host in groups[isc_dhcp_failover_info.failover_group] %}
+{%       if inventory_hostname != host %}
+  peer address {{ host }};
+{%       endif %}
+{%     endfor %}
   peer port 519;
   load balance max seconds 3;
 }
 {%   endif %}
 {% endif %}
-{% for item in dhcp_scopes %}
-subnet {{ item.dhcp_subnet }} netmask {{ item.dhcp_netmask }} {
-	pool {
-{%   if enable_dhcp_failover %}
-	    failover peer "failover";
-{%   endif %}
-	    range {{ item.dhcp_range }};
+
+{% if isc_dhcp_scopes is defined %}
+{%   for item in isc_dhcp_scopes %}
+subnet {{ item.subnet }} netmask {{ item.netmask }} {
+  pool {
+{%     if enable_dhcp_failover %}
+    failover peer "failover";
+{%     endif %}
+    range {{ item.range }};
 	}
-	option routers			{{ item.dhcp_routers }};
-	option subnet-mask		{{ item.dhcp_subnet_mask }};
-	option broadcast-address	{{ item.dhcp_broadcast_address }};
-	option domain-name-servers	{{ item.dhcp_domain_name_servers }};
+{%     for option in item.options %}
+    option {{ option.name }} {{ option.value }};
+{%     endfor %}
+{%     if enable_pxe_boot %}
+    option bootfile-name "{{ isc_dhcp_pxe_boot_file }}";
+    next-server {{ pxe_boot_server }};
+{%     endif %}
 
-{% if enable_pxe_boot %}
-	option bootfile-name "{{ pxe_boot_file }}";
-	next-server {{ pxe_boot_server }};
-{% endif %}
-
-	default-lease-time {{ item.dhcp_default_lease_time }};
-	max-lease-time {{ item.dhcp_max_lease_time }};
-}
-{% endfor %}
-
-{% if dhcp_dns_fwd_zones is defined %}
-{%   for item in dhcp_dns_fwd_zones %}
-zone {{ item.dhcp_dns_fwd_zone }}. {
-  primary 127.0.0.1;
+    default-lease-time {{ item.default_lease_time }};
+    max-lease-time {{ item.max_lease_time }};
 }
 {%   endfor %}
 {% endif %}
 
-{% if dhcp_dns_rev_zones is defined %}
-{%   for item in dhcp_dns_rev_zones %}
-zone {{ item.dhcp_dns_rev_zone }}.in-addr.arpa. {
-  primary 127.0.0.1;
+{% if isc_dhcp_dns_fwd_zones is defined %}
+{%   for item in isc_dhcp_dns_fwd_zones %}
+zone {{ item.zone }}. {
+  primary {{ item.primary }};
+}
+{%   endfor %}
+{% endif %}
+
+{% if isc_dhcp_dns_rev_zones is defined %}
+{%   for item in isc_dhcp_dns_rev_zones %}
+zone {{ item.zone }}.in-addr.arpa. {
+  primary {{ item.primary }};
 }
 {%   endfor %}
 {% endif %}

@@ -1,9 +1,14 @@
 ---
 # tasks file for ansible-phpipam
+- include: set_facts.yml
+
+- include: upgrade.yml
+  when: phpipam_upgrade
+
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
-- include: centos.yml
+- include: redhat.yml
   when: ansible_os_family == "RedHat"
 
 - include: cron.yml
@@ -13,7 +18,9 @@
 - include: config_apache2.yml
   tags:
     - config_apache2
-  when: phpipam_url_rewrite is defined and phpipam_url_rewrite
+  when: >
+        phpipam_prettify_links is defined and
+        phpipam_prettify_links
 
 - include: config_phpipam.yml
   tags:
@@ -22,4 +29,6 @@
 - include: backups.yml
   tags:
     - phpipam_db_backups
-  when: enable_phpipam_db_backups is defined and enable_phpipam_db_backups
+  when: >
+        enable_phpipam_db_backups is defined and
+        enable_phpipam_db_backups

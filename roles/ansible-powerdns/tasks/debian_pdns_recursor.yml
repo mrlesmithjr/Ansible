@@ -1,39 +1,10 @@
 ---
-- name: debian_pdns_recursor | creating pdns group
-  group:
-    name: pdns
-    state: present
-
-- name: debian_pdns_recursor | creating pdns user
-  user:
-    name: pdns
-    group: pdns
-    system: yes
-    home: /var/spool/powerdns
-    shell: /bin/false
-    state: present
-
 - name: debian_pdns_recursor | downloading powerdns recursor
   get_url:
-    url: "{{ pdns_download_url }}/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
+    url: "{{ pdns_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
     dest: "/opt/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
 
 - name: debian_pdns_recursor | installing powerdns recursor
   apt:
     deb: "/opt/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
-  notify: restart_pdns_recursor
-
-- name: debian_pdns_recursor | configuring powerdns recursor
-  template:
-    src: etc/powerdns/recursor.conf.j2
-    dest: /etc/powerdns/recursor.conf
-    owner: root
-    group: root
-  notify: restart_pdns_recursor
-  register: pdns_recursor_configured
-
-- name: debian_pdns_recursor | restarting powerdns recursor
-  service:
-    name: pdns-recursor
-    state: restarted
-  when: pdns_recursor_configured.changed
+  notify: restart pdns recursor

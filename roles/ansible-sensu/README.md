@@ -22,7 +22,7 @@ vagrant up
 Role Variables
 --------------
 
-````
+```yaml
 ---
 # defaults file for ansible-sensu
 email_notifications: 'notifications@{{ pri_domain_name }}'
@@ -43,7 +43,7 @@ sensu_check_plugins:
   - check-procs.rb
   - check-redis-ping.rb
   - es-cluster-metrics.rb
-sensu_client: false  #defines if host is a sensu client
+sensu_client: true  #defines if host is a sensu client/server
 sensu_client_debian_packages:
   - erlang-nox
   - build-essential
@@ -230,8 +230,8 @@ sensu_server_debian_packages:
   - erlang-nox
   - mailutils
   - make
-  - ruby
-  - ruby-dev
+  - ruby2.0
+  - ruby2.0-dev
   - sensu
   - uchiwa
 sensu_server_services:
@@ -242,7 +242,7 @@ sensu_server_services:
 smtp_domain_name: '{{ pri_domain_name }}'
 smtp_server: 'smtp.{{ pri_domain_name }}'
 smtp_server_port: 25
-````
+```
 
 Dependencies
 ------------
@@ -255,7 +255,7 @@ Example Playbook
 ----------------
 
 #### GitHub
-````
+```yaml
 ---
 - hosts: all
   become: true
@@ -268,9 +268,12 @@ Example Playbook
     - role: ansible-redis
     - role: ansible-sensu
   tasks:
-````
+```
+
+
 #### Galaxy
-````
+
+```yaml
 ---
 - hosts: all
   become: true
@@ -283,7 +286,7 @@ Example Playbook
     - role: mrlesmithjr.redis
     - role: mrlesmithjr.sensu
   tasks:
-````
+```
 
 License
 -------

@@ -1,9 +1,12 @@
 ---
 # tasks file for ansible-rundeck
+- include: db.yml
+  when: rundeck_mysql_backend
+
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
-- include: centos.yml
+- include: redhat.yml
   when: ansible_os_family == "RedHat"
 
 - include: users.yml
@@ -13,9 +16,13 @@
 - include: config_rundeck.yml
   tags:
     - config_rundeck
-  when: config_rundeck is defined and config_rundeck
+  when: >
+        config_rundeck is defined and
+        config_rundeck
 
 - include: plugins.yml
   tags:
     - config_rundeck_plugins
-  when: enable_rundeck_plugins is defined and enable_rundeck_plugins
+  when: >
+        enable_rundeck_plugins is defined and
+        enable_rundeck_plugins

@@ -1,0 +1,80 @@
+---
+- name: config | Creating Observium DB
+  mysql_db:
+    name: "{{ observium_db_info.db }}"
+    state: "present"
+
+- name: config | Creating Observium DB Permissions
+  mysql_user:
+    name: "{{ observium_db_info.user }}"
+    password: "{{ observium_db_info.password }}"
+    priv: "observium.*:ALL"
+
+- name: config | Configuring Observium
+  template:
+    src: "config.php.j2"
+    dest: "{{ observium_base_dir }}/config.php"
+
+- name: config | Creating Logs and Graph Directories
+  file:
+    path: "{{ item }}"
+    state: "directory"
+  with_items:
+    - '{{ observium_base_dir }}/logs'
+    - '{{ observium_base_dir }}/rrd'
+
+- name: config | Setting Permissions on Graph Directory
+  file:
+    path: "{{ observium_base_dir }}/rrd"
+    state: "directory"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+    recurse: yes
+
+- name: config | Checking if Observium DB Has Been Populated
+  stat:
+    path: "/root/.observium_db_populated"
+  register: "observium_db_populated_check"
+
+- name: config | Populating Observium DB
+  command: "{{ observium_base_dir }}/discovery.php -u"
+  register: "observium_db_populated"
+  when: not observium_db_populated_check.stat.exists
+
+- name: config | Marking Observium DB as Populated
+  file:
+    path: "/root/.observium_db_populated"
+    state: "touch"
+  when: observium_db_populated.changed
+
+- name: config | Configuring Apache Site
+  template:
+    src: "etc/apache2/sites-available/000-default.conf.j2"
+    dest: "/etc/apache2/sites-available/000-default.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+    backup: yes
+  notify:
+    - 'restart {{ webserver_handler }}'
+  when: ansible_os_family == "Debian"
+
+- name: config | Checking Enabled PHP Mods
+  command: "php -m"
+  register: php_mods_enabled
+  changed_when: false
+
+- name: config | Ensuring PHP Mods are Enabled
+  command: "php5enmod {{ item }}"
+  with_items:
+    - 'mcrypt'
+  when: item not in php_mods_enabled.stdout_lines
+
+- name: config | Ensuring Apache Mods are Enabled
+  apache2_module:
+    name: "{{ item }}"
+    state: "present"
+  notify:
+    - 'restart {{ webserver_handler }}'
+  with_items:
+    - 'rewrite'

@@ -1,13 +1,23 @@
 ---
 # tasks file for ansible-jenkins
+- include: set_facts.yml
+
 - include: debian.yml
-  when: install_jenkins is defined and install_jenkins
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: python_modules.yml
 
 - include: users.yml
   tags:
     - configure_jenkins_user
 
 - include: plugins.yml
+  when: jenkins_manage_plugins
 
 - include: config_jenkins.yml
-  when: config_jenkins is defined and config_jenkins
+  when: config_jenkins
+
+- include: finalize.yml

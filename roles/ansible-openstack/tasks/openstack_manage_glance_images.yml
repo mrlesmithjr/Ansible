@@ -10,7 +10,9 @@
     state: present
     copy_from: "{{ item.image_url }}"
   with_items: openstack_glance_images
-  when: openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
 
 - name: manage_glance_images | uploading glance images  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
   glance_image:
@@ -23,7 +25,9 @@
     state: present
     copy_from: "{{ item.image_url }}"
   with_items: openstack_glance_images
-  when: openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)
 
 - name: manage_glance_images | removing glance images
   glance_image:
@@ -33,7 +37,9 @@
     name: "{{ item.name }}"
     state: absent
   with_items: openstack_glance_images
-  when: openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
 
 - name: manage_glance_images | removing glance images  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
   glance_image:
@@ -43,4 +49,6 @@
     name: "{{ item.name }}"
     state: absent
   with_items: openstack_glance_images
-  when: openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)

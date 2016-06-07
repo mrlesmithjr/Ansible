@@ -1,14 +1,17 @@
 Role Name
 =========
 
-Installs PowerDNS https://www.powerdns.com/ (MySQL cluster ready)
+An Ansible role that installs/configures PowerDNS https://www.powerdns.com/ (MySQL cluster ready)
 
 [![Build Status](https://travis-ci.org/mrlesmithjr/ansible-powerdns.svg)](https://travis-ci.org/mrlesmithjr/ansible-powerdns)
 
 Requirements
 ------------
 
-None
+Install required Ansible roles..  
+````
+sudo ansible-galaxy install -r requirements.yml
+````
 
 Role Variables
 --------------
@@ -41,7 +44,7 @@ pdns_db_pass: powerdns  #define here or globally in group_vars/all/accounts
 pdns_db_user: powerdns  #define here or globally in group_vars/all/accounts
 pdns_default_soa_mail: "hostmaster.{{ pri_domain_name }}" #define here or globally in group_vars/group
 pdns_default_soa_name: "{{ ansible_hostname }}.{{ pri_domain_name }}" #define here or globally in group_vars/group
-pdns_download_url: https://downloads.powerdns.com/releases/deb
+pdns_download_url: https://downloads.powerdns.com/releases
 pdns_json_interface: true
 pdns_ns1: "ns1.{{ pri_domain_name }}"  #define primary nameserver to use when creating zones...IP/Hostname..ns1.example.org
 pdns_ns2: "ns2.{{ pri_domain_name }}"  #define secondary nameserver to use when creating zones...IP/Hostname..ns2.example.org
@@ -130,21 +133,18 @@ web_root: /var/www/html
 Dependencies
 ------------
 
-````
-mrlesmithjr.mariadb-galera-cluster  #if clustering
-mrlesmithjr.mariadb-mysql  #if not clustering
-mrlesmithjr.apache2
-mrlesmithjr.logstash  #if using logstash
-````
+Reference requirements section above...
 
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.mariadb-mysql}
-         - { role: mrlesmithjr.apache2 }
-         - { role: mrlesmithjr.powerdns }
+````
+- hosts: all
+  roles:
+    - role: ansible-apache2
+    - role: ansible-mariadb-mysql
+    - role: ansible-powerdns
+````
 
 License
 -------

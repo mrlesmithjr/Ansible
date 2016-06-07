@@ -1,0 +1,19 @@
+---
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'libpcap'
+    - 'unzip'
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | downloading packetbeat
+  get_url:
+    url: "{{ es_packetbeat_dl_url }}/{{ es_packetbeat_redhat_package }}"
+    dest: "/opt/{{ es_packetbeat_redhat_package }}"
+
+- name: redhat | installing packetbeat
+  yum:
+    name: "/opt/{{ es_packetbeat_redhat_package }}"
+    state: "present"

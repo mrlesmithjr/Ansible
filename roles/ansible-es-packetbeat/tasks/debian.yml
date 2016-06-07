@@ -2,17 +2,17 @@
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - libpcap0.8
-    - unzip
+    - 'libpcap0.8'
+    - 'unzip'
 
 - name: debian | downloading packetbeat
   get_url:
-    url: "{{ es_packetbeat_debian_dl }}"
+    url: "{{ es_packetbeat_dl_url }}/{{ es_packetbeat_debian_package }}"
     dest: "/opt/{{ es_packetbeat_debian_package }}"
 
 - name: debian | installing packetbeat
   apt:
     deb: "/opt/{{ es_packetbeat_debian_package }}"
-    state: present
+    state: "present"

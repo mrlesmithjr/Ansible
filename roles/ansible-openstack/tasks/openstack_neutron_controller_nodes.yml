@@ -73,7 +73,9 @@
 - name: openstack_neutron_controller_nodes | populating neutron
   command: su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
   register: neutron_populated
-  when: not neutron_is_populated.stat.exists and mysql_master
+  when: >
+        not neutron_is_populated.stat.exists and
+        mysql_master
 
 - name: openstack_neutron_controller_nodes | marking neutron as populated
   file:

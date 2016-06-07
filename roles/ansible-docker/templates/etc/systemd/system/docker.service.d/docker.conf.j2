@@ -1,0 +1,7 @@
+[Service]
+EnvironmentFile=-/etc/sysconfig/docker
+#EnvironmentFile=-/etc/sysconfig/docker-storage
+#EnvironmentFile=-/etc/sysconfig/docker-network
+TimeoutSec=300
+ExecStart=
+ExecStart=/usr/bin/docker daemon -H fd:// $DOCKER_OPTS

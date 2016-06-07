@@ -1,0 +1,72 @@
+---
+# defaults file for ansible-kea-dhcp
+kea_dhcp_debian_packages:
+  - 'kea-dhcp-ddns-server'
+  - 'kea-dhcp4-server'
+#  - 'kea-dhcp6-server'
+kea_dhcp_debian_services:
+  - name: 'kea-dhcp-ddns-server'
+    enabled: true
+  - name: 'kea-dhcp4-server'
+    enabled: true
+  - name: 'kea-dhcp6-server'
+    enabled: false
+kea_dhcp_configs:
+  - name: 'Dhcp4'
+    backend: 'memfile'
+    ddns:
+      qualifying_suffix: '{{ pri_domain_name }}'
+    enable_ddns: true
+    expired_leases_processing:
+      reclaim_timer_wait_time: 10
+      flush_reclaimed_timer_wait_time: 25
+      hold_reclaimed_time: 3600
+      max_reclaim_leases: 100
+      max_reclaim_time: 250
+      unwarned_reclaim_cycles: 5
+    listen_interfaces:
+      - '*'
+#      - 'eth0'
+#      - 'eth1'
+    options:
+      - name: 'domain-name-servers'
+        code: 6
+        csv_format: true
+        data:
+          - '8.8.8.8'
+          - '8.8.4.4'
+      - name: 'domain-name'
+        code: 15
+        csv_format: true
+        data: '{{ pri_domain_name }}'
+      - name: 'tftp-server-name'
+        code: 66
+        csv_format: true
+        data: 'tftp.{{ pri_domain_name }}'
+      - name: 'boot-file-name'
+        code: 67
+        csv_format: true
+        data: 'pxelinux.0'
+    socket_type: 'raw'
+    subnets:
+      - name: 'subnet4'
+        pools:
+          - range: '192.0.2.1 - 192.0.2.200'
+            subnet: '192.0.2.0/24'
+            reservations:
+              - hw_address: '1a:1b:1c:1d:1e:1f'
+                ip_address: '192.0.2.202'
+          - range: '192.0.3.1 - 192.0.3.200'
+            subnet: '192.0.3.0/24'
+          - range: '192.0.4.1 - 192.0.4.200'
+            subnet: '192.0.4.0/24'
+    valid_lifetime: 4000
+kea_dhcp_ddns_configs:
+kea_dhcp_redhat_services:  #Defines services to enable
+  - name: 'kea-dhcp-ddns'
+    enabled: true
+  - name: 'kea-dhcp4'
+    enabled: true
+  - name: 'kea-dhcp6'
+    enabled: false
+pri_domain_name: 'vagrant.local'

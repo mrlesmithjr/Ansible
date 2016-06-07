@@ -1,0 +1,80 @@
+---
+- name: poweradmin | installing poweradmin pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - gettext
+    - libapache2-mod-php5
+    - php-pear
+    - php5
+    - php5-common
+    - php5-curl
+    - php5-dev
+    - php5-gd
+    - php5-imap
+    - php5-mcrypt
+    - php5-mhash
+    - php5-ming
+    - php5-mysql
+    - php5-sqlite
+    - php5-xmlrpc
+    - wget
+  when: ansible_os_family == "Debian"
+
+- name: poweradmin | installing pear modules
+  command: pear install {{ item }}
+  ignore_errors: yes
+  with_items:
+    - 'DB'
+    - 'pear/MDB2#mysql'
+
+- name: poweradmin | enabling php mcrypt module
+  command: php5enmod mcrypt
+  args:
+    creates: /etc/php5/cli/conf.d/20-mcrypt.ini
+  notify: restart apache2
+  when: ansible_os_family == "Debian"
+
+- name: poweradmin | downloading poweradmin
+  get_url:
+    url: "http://sourceforge.net/projects/poweradmin/files/{{ poweradmin_ver }}.tgz"
+    dest: /tmp/poweradmin.tgz
+
+- name: poweradmin | extracting poweradmin package to web_root
+  unarchive:
+    src: /tmp/poweradmin.tgz
+    dest: "{{ web_root }}"
+    copy: no
+    owner: www-data
+    group: www-data
+    creates: "{{ web_root }}/poweradmin/index.php"
+
+- name: poweradmin | checking for existing poweradmin
+  stat:
+    path: "{{ web_root }}/poweradmin"
+  register: poweradmin_moved
+
+- name: poweradmin | moving poweradmin
+  command: "mv {{ web_root }}/{{ poweradmin_ver }} {{ web_root }}/poweradmin"
+  when: >
+        not poweradmin_moved.stat.exists
+
+- name: poweradmin | creating poweradmin user
+  mysql_user:
+    name: "{{ poweradmin_user }}"
+    password: "{{ poweradmin_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    state: present
+
+- name: poweradmin | configuring poweradmin
+  template:
+    src: config.inc.php.j2
+    dest: "{{ web_root }}/poweradmin/inc/config.inc.php"
+    owner: www-data
+    group: www-data
+
+- name: poweradmin | removing poweradmin install directory
+  file:
+    path: "{{ web_root }}/poweradmin/install"
+    state: absent

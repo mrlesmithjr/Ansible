@@ -1,0 +1,12 @@
+---
+- name: install | Downloading Observium to {{ observium_dl_dir }}
+  get_url:
+    url: "{{ observium_dl_url }}/{{ observium_dl_package }}"
+    dest: "{{ observium_dl_dir }}/{{ observium_dl_package }}"
+
+- name: install | Extracting Observium Package to {{ observium_dl_dir }}
+  unarchive:
+    src: "{{ observium_dl_dir }}/{{ observium_dl_package }}"
+    dest: "{{ observium_dl_dir }}"
+    creates: "{{ observium_base_dir }}/poller.php"
+    copy: no

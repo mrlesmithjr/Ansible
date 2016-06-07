@@ -22,4 +22,8 @@
     value: 1
     state: present
     reload: yes
-  when: (openstack_haproxy_config is defined and openstack_haproxy_config) and (inventory_hostname in groups['openstack-controller-nodes'] or inventory_hostname in groups['openstack-haproxy-nodes'])
+  when: >
+        (openstack_haproxy_config is defined and
+        openstack_haproxy_config) and
+        (inventory_hostname in groups['openstack-controller-nodes'] or
+        inventory_hostname in groups['openstack-haproxy-nodes'])

@@ -4,12 +4,6 @@
     update_cache: yes
     cache_valid_time: 86400
 
-- name: uninstall python-pip (If installed) - Debian
-  apt:
-    name: python-pip
-    state: absent
-  when: ansible_distribution == "Debian"
-
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"
@@ -46,21 +40,6 @@
   apt:
     name: docker-engine
     state: present
-  register: docker_installed
-
-- name: debian | ensuring docker is started
-  service:
-    name: docker
-    state: started
-  when: docker_installed.changed
-
-- name: debian | adding docker users (for use without sudo)
-  user:
-    name: "{{ item }}"
-    append: yes
-    groups: docker
-  with_items: docker_users
-  when: config_docker_users is defined and config_docker_users
 
 - name: debian | setting grub memory limit (if set)
   lineinfile:
@@ -68,45 +47,13 @@
     regexp: "^GRUB_CMDLINE_LINUX_DEFAULT"
     line: 'GRUB_CMDLINE_LINUX_DEFAULT="cgroup_enable=memory swapaccount=1"'
   register: grub_updated
-  when: docker_set_grub_memory_limit is defined and docker_set_grub_memory_limit
+  when: >
+        docker_set_grub_memory_limit is defined and
+        docker_set_grub_memory_limit
 
 - name: debian | updating grub (if updated)
   command: update-grub
   when: grub_updated.changed
-
-- name: debian | configuring docker service
-  template:
-    src: etc/default/docker.j2
-    dest: /etc/default/docker
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart docker
-  when: config_docker_service is defined and config_docker_service
-
-- name: debian | installing python packages
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - python-pip
-  when: ansible_distribution == "Ubuntu"
-
-- name: debian | installing python packages
-  easy_install:
-    name: "{{ item }}"
-#    state: present
-  with_items:
-    - pip
-  when: ansible_distribution == "Debian"
-
-- name: debian | installing python modules
-  pip:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - docker-compose
-    - docker-py
 
 - name: debian | installing additonal packages
   apt:

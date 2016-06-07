@@ -16,11 +16,16 @@ stackstorm_debian_repo_info:
   repos:
     - 'deb https://packagecloud.io/StackStorm/staging-stable/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
     - 'deb-src https://packagecloud.io/StackStorm/staging-stable/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
+stackstorm_install_packs: true  #defines if packs defined should be installed
 stackstorm_packs:
   - name: ansible
-    state: present
+    installed: true
+  - name: docker
+    installed: true
+  - name: jenkins
+    installed: true
   - name: sensu
-    state: present
+    installed: true
 stackstorm_ssh_info:
   user: 'stanley'
 stackstorm_ssl_info:

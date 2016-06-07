@@ -74,7 +74,9 @@
 - name: openstack_compute_services | populating nova
   command: su -s /bin/sh -c "nova-manage db sync" nova
   register: nova_populated
-  when: not nova_is_populated.stat.exists and mysql_master
+  when: >
+        not nova_is_populated.stat.exists and
+        mysql_master
 
 - name: openstack_compute_services | marking nova as populated
   file:

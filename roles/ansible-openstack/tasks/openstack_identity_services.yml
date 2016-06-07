@@ -75,7 +75,9 @@
   get_url:
     url: https://git.openstack.org/cgit/openstack/openstack-resource-agents/plain/ocf/keystone
     dest: /usr/lib/ocf/resource.d/openstack/keystone
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_identity_services | setting permissions on keystone pacemaker file
   file:
@@ -84,7 +86,9 @@
     group: root
     mode: 0755
     recurse: yes
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_identity_services | configuring keystone
   template:
@@ -120,7 +124,9 @@
 - name: openstack_identity_services | populating keystone
   command: su -s /bin/sh -c "keystone-manage db_sync" keystone
   register: keystone_populated
-  when: not keystone_is_populated.stat.exists and mysql_master
+  when: >
+        not keystone_is_populated.stat.exists and
+        mysql_master
 
 - name: openstack_identity_services | marking keystone as populated
   file:

@@ -26,6 +26,7 @@ stackstorm_debian_packages:
   - 'apache2-utils'
   - 'python-passlib'
   - 'st2'
+  - 'st2chatops'
   - 'st2mistral'
   - 'st2web'
 stackstorm_debian_repo_info:
@@ -33,6 +34,16 @@ stackstorm_debian_repo_info:
   repos:
     - 'deb https://packagecloud.io/StackStorm/staging-stable/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
     - 'deb-src https://packagecloud.io/StackStorm/staging-stable/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
+stackstorm_install_packs: true  #defines if packs defined should be installed
+stackstorm_packs:
+  - name: ansible
+    installed: true
+  - name: docker
+    installed: true
+  - name: jenkins
+    installed: true
+  - name: sensu
+    installed: true
 stackstorm_ssh_info:
   user: 'stanley'
 stackstorm_ssl_info:

@@ -37,7 +37,9 @@
     password: "{{ openstack_ceilometer_dbpass }}"
     roles: "readWrite,dbAdmin"
     state: present
-  when: openstack_mongodb_master is defined and openstack_mongodb_master
+  when: >
+        openstack_mongodb_master is defined and
+        openstack_mongodb_master
 
 - name: openstack_telemetry_controller_nodes | checking if mongodb-keyfile exists
   stat:
@@ -46,14 +48,20 @@
 
 - name: openstack_telemetry_controller_nodes | generating mongodb-keyfile
   shell: openssl rand -base64 741 > {{ openstack_mongodb_keyfile }}
-  when: not mongodb_keyfile.stat.exists and (openstack_mongodb_master is defined and openstack_mongodb_master)
+  when: >
+        not mongodb_keyfile.stat.exists and
+        (openstack_mongodb_master is defined and
+        openstack_mongodb_master)
 
 - name: openstack_telemetry_controller_nodes | copying mongodb-keyfile local
   fetch:
     dest: "/tmp{{ openstack_mongodb_keyfile }}"
     flat: yes
     src: "{{ openstack_mongodb_keyfile }}"
-  when: not mongodb_keyfile.stat.exists and (openstack_mongodb_master is defined and openstack_mongodb_master)
+  when: >
+        not mongodb_keyfile.stat.exists and
+        (openstack_mongodb_master is defined and
+        openstack_mongodb_master)
 
 - name: openstack_telemetry_controller_nodes | copying mongodb-keyfile
   copy:

@@ -8,7 +8,9 @@
     token: "{{ openstack_keystone_temp_admin_token }}"
     state: present
   with_items: openstack_keystone_users
-  when: openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
 
 - name: openstack_keystone_users | creating users  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
   keystone_user:
@@ -19,4 +21,6 @@
     token: "{{ openstack_keystone_temp_admin_token }}"
     state: present
   with_items: openstack_keystone_users
-  when: openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)

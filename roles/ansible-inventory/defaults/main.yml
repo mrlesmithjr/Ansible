@@ -1,0 +1,49 @@
+---
+# defaults file for ansible-inventory
+inventory_db_name: 'ansible_inventory'  #Defines the Inventory DB Name
+inventory_db_host: 'node0'  #Defines the inventory_hostname in which the Inventory DB is to reside
+inventory_db_host_access:  #Defines the Host Access to the DB User
+  - '127.0.0.1'
+  - 'localhost'
+  - '::1'
+  - '{{ ansible_hostname }}'
+  - '%'
+inventory_db_user: 'ansible'  #Defines the Inventory DB User Name
+inventory_db_password: 'ansible'  #Defines the Inventory DB User Password
+inventory_group_vars:  #Define specific Ansible group vars to add
+  - group: 'all'
+    vars:
+      - name: 'pri_domain_name'
+        value: 'vagrant.local'
+      - name: 'email_notifications'
+        value: 'mrlesmithjr@gmail.com'
+      - name: 'pri_dns'
+        value: '8.8.8.8'
+      - name: 'sec_dns'
+        value: '8.8.4.4'
+  - group: 'db-nodes'
+    vars:
+      - name: 'mysql_allow_remote_connections'
+        value: 'true'
+      - name: 'mysql_root_password'
+        value: 'root'
+inventory_groups:  #Define specific Ansible groups to define...All groups are discovered and added during scans as well
+  - 'db-nodes'
+  - 'elk-nodes'
+  - 'openstack-nodes'
+inventory_host_vars:  #Define any specific hostvars to add
+  - host: 'node0'
+    vars:
+      - name: 'ansiblevar'
+        value: 'ansibleval'
+      - name: 'es_packetbeat_interface'
+        value: 'eth0'
+  - host: 'node2'
+    vars:
+      - name: 'es_packetbeat_interface'
+        value: 'any'
+inventory_hosts:  #Define hosts to be added to the inventory (ip is optional-if DNS works)
+  - name: 'test-node-01'
+    ip: '192.168.202.201'
+  - name: 'test-node-02'
+    ip: '192.168.202.202'

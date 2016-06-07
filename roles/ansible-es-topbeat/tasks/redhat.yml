@@ -1,0 +1,19 @@
+---
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'unzip'
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | downloading topbeat
+  get_url:
+    url: "{{ es_topbeat_dl_url }}/{{ es_topbeat_redhat_package }}"
+    dest: "/opt/{{ es_topbeat_redhat_package }}"
+
+- name: redhat | installing topbeat
+  yum:
+    name: "/opt/{{ es_topbeat_redhat_package }}"
+    state: "present"
+  when: ansible_distribution != "Fedora"

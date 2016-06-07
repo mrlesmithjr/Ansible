@@ -1,4 +1,8 @@
 ---
+- name: debian_server | adding brightbox ruby repository
+  apt_repository:
+    repo: 'ppa:brightbox/ruby-ng'
+
 - name: debian_server | adding sensu repo key
   apt_key:
     url: "{{ sensu_debian_repo_key }}"

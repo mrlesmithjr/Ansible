@@ -15,7 +15,9 @@
     dest: /usr/lib/ocf/resource.d/heartbeat/haproxy
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_haproxy_config | setting permissions on haproxy pacemaker file
   file:
@@ -25,7 +27,9 @@
     mode: 0755
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_haproxy_config | configuring VIP on pacemaker
   pacemaker: >
@@ -38,7 +42,9 @@
     - pacemaker
   notify:
     - pacemaker commit
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_haproxy_config | configuring stickiness on pacemaker
   pacemaker: >
@@ -47,7 +53,9 @@
     - pacemaker
   notify:
     - pacemaker commit
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_haproxy_config | configuring HAProxy monitoring on pacemaker
   pacemaker: >
@@ -58,14 +66,18 @@
     - pacemaker
   notify:
     - pacemaker commit
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_haproxy_config | configuring colocation for HAProxy VIP on pacemaker
   shell: "crm configure colocation haproxy-with-public-IPS INFINITY: haproxyLB failover-ip"
   ignore_errors: yes  #added this to get around having to set this setting using shell...it works the first time and then fails the next becuase it is already set...will investigate..
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 #- name: openstack_haproxy_config | configuring order for HAProxy VIP on pacemaker
 #  pacemaker: >

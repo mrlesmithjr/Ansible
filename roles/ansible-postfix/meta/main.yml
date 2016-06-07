@@ -28,8 +28,8 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  #- name: Fedora
-  #  versions:
+  - name: Fedora
+    versions:
   #  - all
   #  - 16
   #  - 17
@@ -37,7 +37,8 @@ galaxy_info:
   #  - 19
   #  - 20
   #  - 21
-  #  - 22
+    - 22
+    - 23
   #- name: Windows
   #  versions:
   #  - all
@@ -102,11 +103,11 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  #- name: Debian
-  #  versions:
+  - name: Debian
+    versions:
   #  - all
   #  - etch
-  #  - jessie
+    - jessie
   #  - lenny
   #  - squeeze
   #  - wheezy

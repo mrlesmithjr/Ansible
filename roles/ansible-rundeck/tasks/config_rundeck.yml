@@ -3,8 +3,10 @@
   template:
     src: "etc/rundeck/{{ item }}.j2"
     dest: "{{ rundeck_root_dir }}/{{ item }}"
-    owner: rundeck
-    group: rundeck
+    owner: "rundeck"
+    group: "rundeck"
   notify: restart rundeck
-  with_items: rundeck_configs
-  when: config_rundeck is defined and config_rundeck
+  with_items: '{{ rundeck_configs }}'
+  when: >
+        config_rundeck is defined and
+        config_rundeck

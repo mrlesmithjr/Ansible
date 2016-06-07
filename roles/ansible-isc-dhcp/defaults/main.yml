@@ -1,50 +1,58 @@
 ---
 # defaults file for ansible-isc-dhcp
-authoritative: false  #defines if DHCP server should be authoritative for subnet...define here or in group_vars/group
-ddns_update_style: none   #defines ddns update style...options are ad-hoc, interim, standard or none...define here or in group_vars/group...read more on this here... https://deepthought.isc.org/article/AA-01091/0/ISC-DHCP-support-for-Standard-DDNS.html
-ddns_updates: false  #defines if ddns updates should be enabled between dhcp and dns...define here or in group_vars/group
-default_lease_time: 86400
-dhcp_dns_fwd_zones: [] #isc-dhcp
-#  - dhcp_dns_fwd_zone: '{{ dhcp_domain_name }}'
-#    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
-dhcp_dns_rev_zones: [] #isc-dhcp
-#  - dhcp_dns_rev_zone: 0.0.10
-#    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
-#  - dhcp_dns_rev_zone: 101.0.10
-#    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
-#  - dhcp_dns_rev_zone: 125.0.10
-#    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
-dhcp_domain_name: '{{ pri_domain_name }}'  #defines domain name to assign to dhcp clients...define here or in group_vars/group
-dhcp_name_servers: '{{ pri_dns }}, {{ sec_dns }}'  #defines dns servers to assign to dhcp clients...define here or in group_vars/group
-dhcp_scopes: [] #defines dhcp scopes to create...define here or in group_vars/group
-#  - dhcp_range: '10.0.0.128 10.0.0.224'
-#    dhcp_subnet: 10.0.0.0
-#    dhcp_netmask: 255.255.255.0
-#    dhcp_routers: 10.0.0.1
-#    dhcp_subnet_mask: 255.255.255.0
-#    dhcp_broadcast_address: 10.0.0.255
-#    dhcp_domain_name_servers: '{{ dhcp_name_servers }}'
-#    dhcp_default_lease_time: '{{ default_lease_time }}'
-#    dhcp_max_lease_time: '{{ max_lease_time }}'
-#  - dhcp_range: '10.0.101.128 10.0.101.224'
-#    dhcp_subnet: 10.0.101.0
-#    dhcp_netmask: 255.255.255.0
-#    dhcp_routers: 10.0.101.1
-#    dhcp_subnet_mask: 255.255.255.0
-#    dhcp_broadcast_address: 10.0.101.255
-#    dhcp_domain_name_servers: '{{ dhcp_name_servers }}'
-#    dhcp_default_lease_time: '{{ default_lease_time }}'
-#    dhcp_max_lease_time: '{{ max_lease_time }}'
-enable_dhcp: true  #defines if dhcp should be enabled or not...define here or in group_vars/group
-enable_dhcp_failover: false  #defines if dhcp load balancing and failover should be configured between dhcp servers...define here or in group_vars/group
-enable_pxe_boot: false  #defines if TFTP/PXE boot options should be enabled...define here or in group_vars/group
-failover_address: '{{ ansible_default_ipv4.address }}'  #defines failover address for dhcp failover setup
-max_lease_time: 86400  #defines max lease time for clients
-#ntp_servers:  #defines internal ntp servers for clients to poll...define here or globally in group_vars/all
+config_dhcp: true  #defines if dhcp should be configured
+enable_dhcp: true  #defines if dhcp should be enabled or not
+enable_dhcp_failover: false  #defines if dhcp load balancing and failover should be configured between dhcp servers
+enable_pxe_boot: false  #defines if TFTP/PXE boot options should be enabled
+isc_dhcp_authoritative: false  #defines if DHCP server should be authoritative for subnet
+isc_dhcp_ddns_updates: false  #defines if ddns updates should be enabled between dhcp and dns
+isc_dhcp_ddns_update_style: 'none'  #defines ddns update style...options are ad-hoc, interim, standard or none...read more on this here... https://deepthought.isc.org/article/AA-01091/0/ISC-DHCP-support-for-Standard-DDNS.html
+isc_dhcp_default_lease_time: 86400
+isc_dhcp_dns_fwd_zones:  #define forward zones to forward to
+  - zone: '{{ isc_dhcp_domain_name }}'  #define forward zone name
+    primary: '127.0.0.1'  #define forward zone primary dns server to forward to
+isc_dhcp_dns_rev_zones:
+  - zone: '202.168.192'  #define reverse zone
+    primary: '127.0.0.1'  #define reverse zone primary dns server to forward to
+isc_dhcp_domain_name: '{{ pri_domain_name }}'  #defines domain name to assign to dhcp clients
+isc_dhcp_failover_info:
+  failover_address: '{{ ansible_eth1.ipv4.address }}' #ansible_default_ipv4.address|ansible_enp0s8.ipv4.address #defines failover address for dhcp failover setup
+  failover_group: 'dhcp-nodes'  #define Ansible inventory group that nodes belong to
+  primary: 'node0'  #define the node in which should be considered the primary
+  secondary: 'node1'  #define the node in which should be considered the secondary
+isc_dhcp_max_lease_time: 86400  #defines max lease time for clients
+isc_dhcp_name_servers:  #defines dns servers to assign to dhcp clients
+  - '{{ pri_dns }}'
+  - '{{ sec_dns }}'
+isc_dhcp_options:  #define global options to configure
+  - name: 'domain-name'
+    value: '"{{ isc_dhcp_domain_name }}"'
+  - name: 'domain-name-servers'
+    value: '{{ isc_dhcp_name_servers|join (", ") }}'
+  - name: 'ntp-servers'
+    value: '{{ ntp_servers|join (", ") }}'
+isc_dhcp_pxe_boot_file: 'pxelinux.0'  #defines boot file used for pxe boot
+isc_dhcp_pxe_boot_server: 'tftp.{{ pri_domain_name }}'  #defines tftp server to PXE/TFTP from
+isc_dhcp_scopes:  #defines dhcp scopes to create
+  - subnet: '192.168.202.0'
+    default_lease_time: '{{ isc_dhcp_default_lease_time }}'
+    max_lease_time: '{{ isc_dhcp_max_lease_time }}'
+    netmask: '255.255.255.0'
+    options:  #define scope specific options to configure
+      - name: 'routers'
+        value: '192.168.202.1'
+      - name: 'subnet-mask'
+        value: '255.255.255.0'
+      - name: 'broadcast-address'
+        value: '192.168.202.255'
+      - name: 'domain-name-servers'
+        value: '{{ isc_dhcp_name_servers|join (", ") }}'
+    range: '192.168.202.128 192.168.202.224'
+ntp_servers:  #defines ntp servers for clients to poll
 #  - 'ntp1.{{ pri_domain_name }}'
 #  - 'ntp2.{{ pri_domain_name }}'
-pri_domain_name: example.org  #defines primary domain name for environment...define here or in group_vars/all
-pri_dns: []  #define primary dns server for environment...define here or in group_vars/all
-pxe_boot_file: pxelinux.0  #defines boot file used for pxe boot
-pxe_boot_server: []  #defines tftp server to PXE/TFTP from......define here or in group_vars/group
-sec_dns: []  #define secondary dns server for environment...define here or in group_vars/all
+  - '0.ubuntu.pool.ntp.org'
+  - '1.ubuntu.pool.ntp.org'
+pri_domain_name: 'example.org'  #defines primary domain name for environment
+pri_dns: '8.8.8.8'  #define primary dns server for environment
+sec_dns: '8.8.4.4'  #define secondary dns server for environment

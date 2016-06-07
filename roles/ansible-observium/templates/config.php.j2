@@ -1,0 +1,29 @@
+<?php
+
+## Check http://www.observium.org/docs/config_options/ for documentation of possible settings
+
+// Database config ---  This MUST be configured
+$config['db_extension'] = 'mysqli';
+$config['db_host']      = '{{ observium_db_info.host }}';
+$config['db_user']      = '{{ observium_db_info.user }}';
+$config['db_pass']      = '{{ observium_db_info.password }}';
+$config['db_name']      = '{{ observium_db_info.db }}';
+
+// Base directory
+#$config['install_dir'] = "{{ observium_base_dir }}";
+
+// Default community list to use when adding/discovering
+$config['snmp']['community'] = array("public");
+
+// Authentication Model
+$config['auth_mechanism'] = "mysql";    // default, other options: ldap, http-auth, please see documentation for config help
+
+// Enable alerter (not available in CE)
+// $config['poller-wrapper']['alerter'] = TRUE;
+
+// Set up a default alerter (email to a single address)
+$config['email']['default']        = "user@your-domain";
+$config['email']['from']           = "Observium <observium@your-domain>";
+$config['email']['default_only']   = TRUE;
+
+// End config.php

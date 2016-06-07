@@ -24,10 +24,15 @@ ansible-playbook -i hosts openstack.yml --user vagrant
 
 Log into Horizon Dashboard  
 http://127.0.0.1:8080/horizon  
-user: administrator  
+user: admin  
 password: 29b1416692cb38014ea0  
 
 or ...
 
 user: demo  
 password: 54a27efd264beeb7843d  
+
+When you are done and ready to tear down the environment.  
+````
+./cleanup.sh
+````

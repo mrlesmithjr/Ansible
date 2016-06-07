@@ -8,6 +8,7 @@
     - libapache2-mod-php5
     - python-mysqldb
     - php5
+    - php5-cli
     - php5-gmp
     - php-pear
 #    - php5-mysql

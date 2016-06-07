@@ -1,0 +1,52 @@
+---
+- name: manage_python_modules | uninstall python-pip (If installed) - Debian
+  apt:
+    name: "python-pip"
+    state: absent
+  when: ansible_distribution == "Debian"
+
+- name: manage_python_modules | uninstall python-pip (If installed) - RedHat
+  yum:
+    name: "python-pip"
+    state: absent
+  when: ansible_distribution == "RedHat"
+
+- name: manage_python_modules | installing python pre-req packages (Debian)
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libffi-dev
+    - libssl-dev
+    - python-dev
+    - python-setuptools
+  when: ansible_os_family == "Debian"
+
+- name: manage_python_modules | installing python pre-req packages (RedHat)
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libffi-devel
+    - openssl-devel
+    - python-crypto
+    - python-devel
+    - python-setuptools
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+- name: manage_python_modules | installing python packages
+  easy_install:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'pip'
+
+- name: debian | installing python modules
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'docker-compose'
+    - 'docker-py'

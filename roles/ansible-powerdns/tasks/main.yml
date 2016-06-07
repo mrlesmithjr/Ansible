@@ -1,15 +1,31 @@
 ---
 # tasks file for ansible-powerdns
-- include: debian.yml
-  when: ansible_os_family == "Debian"
+- include: set_facts.yml
 
-- include: centos.yml
-  when: ansible_os_family == "RedHat"
+- include: pdns_accounts.yml
+
+- include: pdns_server.yml
+  when: >
+        install_pdns_server is defined and
+        install_pdns_server
+
+- include: pdns_recursor.yml
+  when: >
+        install_pdns_recursor is defined and
+        install_pdns_recursor
+
+- include: poweradmin.yml
+  when: >
+        install_poweradmin is defined and
+        install_poweradmin
+
+- include: nsedit.yml
 
 - include: remove_logstash.yml
-  tags:
-    - remove_logstash
-  when: (install_logstash is defined and not install_logstash) or install_logstash is not defined
+  when: >
+        (install_logstash is defined and
+        not install_logstash) or
+        install_logstash is not defined
 
 #- include: cron.yml
 #  tags:
@@ -19,9 +35,14 @@
 - include: pdns_zones.yml
   tags:
     - create_pdns_zones
-  when: create_pdns_zones is defined and create_pdns_zones
+  when: >
+        create_pdns_zones is defined and
+        create_pdns_zones
 
 - include: pdns_records.yml
   tags:
     - create_pdns_records
-  when: (create_pdns_records is defined and create_pdns_records) and pdns_records is defined
+  when: >
+        (create_pdns_records is defined and
+        create_pdns_records) and
+        pdns_records is defined

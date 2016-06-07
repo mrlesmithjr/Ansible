@@ -1,0 +1,18 @@
+- hosts: db-nodes
+  become: true
+  vars:
+    - mysql_allow_remote_connections: true
+    - mysql_root_password: root
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-apache2
+    - role: ansible-mariadb-mysql
+  tasks:
+
+- hosts: all
+  become: true
+  vars:
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-inventory
+  tasks:

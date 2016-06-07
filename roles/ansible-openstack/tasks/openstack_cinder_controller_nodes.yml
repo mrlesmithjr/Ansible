@@ -64,7 +64,9 @@
 - name: openstack_cinder | populating cinder
   command: su -s /bin/sh -c "cinder-manage db sync" cinder
   register: cinder_populated
-  when: not cinder_is_populated.stat.exists and mysql_master
+  when: >
+        not cinder_is_populated.stat.exists and
+        mysql_master
 
 - name: openstack_cinder | marking cinder as populated
   file:
@@ -83,7 +85,9 @@
     dest: /usr/lib/ocf/resource.d/openstack/cinder-api
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_cinder | setting permissions on cinder-api pacemaker file
   file:
@@ -93,7 +97,9 @@
     mode: 0755
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 #- name: openstack_cinder | configuring glance-api monitoring on pacemaker
 #  pacemaker: >

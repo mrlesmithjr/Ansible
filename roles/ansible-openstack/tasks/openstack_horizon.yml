@@ -23,7 +23,9 @@
     state: absent
   tags:
     - uninstall_ubuntu_horizon_dashboard
-  when: openstack_horizon_remove_ubuntu_theme is defined and openstack_horizon_remove_ubuntu_theme
+  when: >
+        openstack_horizon_remove_ubuntu_theme is defined and
+        openstack_horizon_remove_ubuntu_theme
 
 - name: openstack_horizon | installing Ubuntu Horizon theme
   apt:
@@ -31,4 +33,7 @@
     state: present
   tags:
     - install_ubuntu_horizon_dashboard
-  when: (openstack_horizon_remove_ubuntu_theme is defined and not openstack_horizon_remove_ubuntu_theme) or openstack_horizon_remove_ubuntu_theme is not defined
+  when: >
+        (openstack_horizon_remove_ubuntu_theme is defined and
+        not openstack_horizon_remove_ubuntu_theme) or
+        openstack_horizon_remove_ubuntu_theme is not defined

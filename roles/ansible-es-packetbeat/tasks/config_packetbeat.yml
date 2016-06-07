@@ -3,14 +3,27 @@
   template:
     src: "etc/packetbeat/packetbeat.yml.j2"
     dest: "/etc/packetbeat/packetbeat.yml"
-    owner: root
-    group: root
+    owner: "root"
+    group: "root"
     mode: 0644
   notify:
-    - restart packetbeat
+    - 'restart packetbeat'
+
+- name: config_packetbeat | checking status of packetbeat ES Index Template import
+  stat:
+    path: "/etc/packetbeat/.packetbeat_es_index_template_imported"
+  register: "packetbeat_es_index_template_imported_check"
 
 - name: config_packetbeat | loading packetbeat ES Index Template
   command: "curl -XPUT 'http://{{ es_packetbeat_elasticsearch_host }}/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json"
+  register: "packetbeat_es_index_template_imported"
+  when: not packetbeat_es_index_template_imported_check.stat.exists
+
+- name: config_packetbeat | marking packetbeat ES Index Template as imported
+  file:
+    path: "/etc/packetbeat/.packetbeat_es_index_template_imported"
+    state: "touch"
+  when: packetbeat_es_index_template_imported.changed
 
 - name: config_packetbeat | downloading packetbeat dashboards
   get_url:
@@ -23,8 +36,10 @@
     dest: "/opt"
     copy: no
     creates: "{{ es_packetbeat_dashboard_dir }}/load.sh"
+  register: "extract_packetbeat_dashboards"
 
 - name: config_packetbeat | loading packetbeat dashboards
   shell: "./load.sh -url http://{{ es_packetbeat_elasticsearch_host }}"
   args:
-    chdir: "/opt/{{ es_packetbeat_dashboard_dir }}"
+    chdir: "{{ es_packetbeat_dashboard_dir }}"
+  when: extract_packetbeat_dashboards.changed

@@ -1,4 +1,9 @@
 ---
+- name: debian | updating apt-cache
+  apt:
+    update_cache: "yes"
+    cache_valid_time: 86400
+
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"

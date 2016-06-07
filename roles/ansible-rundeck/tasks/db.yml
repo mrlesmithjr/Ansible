@@ -1,0 +1,12 @@
+---
+- name: db | creating rundeck db
+  mysql_db:
+    name: "{{ rundeck_db_name }}"
+    state: "present"
+
+- name: db | creating rundeck db user
+  mysql_user:
+    name: "{{ rundeck_db_user }}"
+    password: "{{ rundeck_db_pass }}"
+    priv: "{{ rundeck_db_name }}:ALL"
+    state: "present"

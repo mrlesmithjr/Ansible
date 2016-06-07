@@ -72,7 +72,9 @@
 - name: openstack_image_services | populating glance
   command: su -s /bin/sh -c "glance-manage db_sync" glance
   register: glance_populated
-  when: not glance_is_populated.stat.exists and mysql_master
+  when: >
+        not glance_is_populated.stat.exists and
+        mysql_master
 
 - name: openstack_image_services | marking glance as populated
   file:
@@ -91,7 +93,9 @@
     dest: /usr/lib/ocf/resource.d/openstack/glance-api
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 - name: openstack_image_services | setting permissions on glance-api pacemaker file
   file:
@@ -101,7 +105,9 @@
     mode: 0755
   tags:
     - pacemaker
-  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
 
 #- name: openstack_image_services | configuring glance-api monitoring on pacemaker
 #  pacemaker: >

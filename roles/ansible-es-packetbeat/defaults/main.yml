@@ -1,10 +1,10 @@
 ---
 # defaults file for ansible-es-packetbeat
-es_packetbeat_dashboard_dir: 'beats-dashboards-{{ es_packetbeat_version }}'
+es_packetbeat_dashboard_dir: '/opt/beats-dashboards-{{ es_packetbeat_version }}'
 es_packetbeat_dashboard_dl: 'http://download.elastic.co/beats/dashboards/{{ es_packetbeat_dashboard_package }}'
 es_packetbeat_dashboard_package: 'beats-dashboards-{{ es_packetbeat_version }}.zip'
-es_packetbeat_debian_dl: 'https://download.elastic.co/beats/packetbeat/{{ es_packetbeat_debian_package }}'
 es_packetbeat_debian_package: 'packetbeat_{{ es_packetbeat_version }}_amd64.deb'
+es_packetbeat_dl_url: 'https://download.elastic.co/beats/packetbeat'
 es_packetbeat_elasticsearch_host: 'es.{{ pri_domain_name }}:9200'
 es_packetbeat_interface: 'any'  #defines interface to sniff on... (any, eth0, eth1, etc.)
 es_packetbeat_outputs:
@@ -35,6 +35,6 @@ es_packetbeat_protocols:
   - name: redis
     ports:
       - 6379
-es_packetbeat_redhat_dl: 'https://download.elastic.co/beats/packetbeat/packetbeat-{{ es_packetbeat_version }}-x86_64.rpm'
-es_packetbeat_version: '1.1.1'
+es_packetbeat_redhat_package: 'packetbeat-{{ es_packetbeat_version }}-x86_64.rpm'
+es_packetbeat_version: '1.2.3'
 pri_domain_name: 'example.org'

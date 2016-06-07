@@ -26,6 +26,7 @@ sensu_client_debian_packages:
   - sensu
   - ruby2.0
   - ruby2.0-dev
+sensu_client_address: "{{ ansible_fqdn }}"
 sensu_client_services:
   - sensu-client
 sensu_config_dir: '{{ sensu_root_dir }}/conf.d'
@@ -205,8 +206,8 @@ sensu_server_debian_packages:
   - erlang-nox
   - mailutils
   - make
-  - ruby
-  - ruby-dev
+  - ruby2.0
+  - ruby2.0-dev
   - sensu
   - uchiwa
 sensu_server_services:

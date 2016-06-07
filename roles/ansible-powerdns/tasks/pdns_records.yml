@@ -2,16 +2,16 @@
 - name: pdns_records | checking that pdns_zones_dir exists
   stat:
     path: "{{ pdns_zones_dir }}"
-  register: pdns_zones_dir_check
-  delegate_to: localhost
+  register: "pdns_zones_dir_check"
+  delegate_to: "localhost"
   run_once: true
   sudo: false
 
 - name: pdns_records | creating pdns_zones_dir if it does not exist
   file:
     path: "{{ pdns_zones_dir }}"
-    state: directory
-  delegate_to: localhost
+    state: "directory"
+  delegate_to: "localhost"
   run_once: true
   sudo: false
   when: not pdns_zones_dir_check.stat.exists
@@ -19,8 +19,8 @@
 - name: pdns_records | creating pdns zones folders
   file:
     path: "{{ pdns_zones_dir }}/{{ item.zone }}"
-    state: directory
-  delegate_to: localhost
+    state: "directory"
+  delegate_to: "localhost"
   run_once: true
   sudo: false
   with_items: pdns_records
@@ -29,22 +29,22 @@
   template:
     src: pdns_records.j2
     dest: "{{ pdns_zones_dir }}/{{ item.zone }}/{{ item.name }}_{{ item.type }}"
-  delegate_to: localhost
+  delegate_to: "localhost"
   run_once: true
   sudo: false
-  register: pdns_records_created
-  with_items: pdns_records
+  register: "pdns_records_created"
+  with_items: '{{ pdns_records }}'
   when: item.type != "SRV"
 
 - name: pdns_records | creating pdns SRV records in zones folders
   template:
-    src: pdns_records.j2
+    src: "pdns_records.j2"
     dest: "{{ pdns_zones_dir }}/{{ item.zone }}/{{ item.dc_name }}{{ item.name }}_{{ item.type }}"
-  delegate_to: localhost
+  delegate_to: "localhost"
   run_once: true
   sudo: false
-  register: pdns_srv_records_created
-  with_items: pdns_records
+  register: "pdns_srv_records_created"
+  with_items: '{{ pdns_records }}'
   when: item.type == "SRV"
 
 #- name: pdns_records | adding pdns records
@@ -70,7 +70,9 @@
     owner: root
     group: root
     mode: 0770
-  when: (pdns_records_created.changed or pdns_srv_records_created.changed)
+  when: >
+        pdns_records_created.changed or
+        pdns_srv_records_created.changed
 
 - name: pdns_records | creating pdns records script
   template:
@@ -79,17 +81,23 @@
     owner: root
     group: root
     mode: 0770
-  when: force is defined and force
+  when: >
+        force is defined and
+        force
 
 - name: pdns_records | creating pdns records
   shell: /tmp/pdns_records.sh
   run_once: true
-  when: (pdns_records_created.changed or pdns_srv_records_created.changed)
+  when: >
+        pdns_records_created.changed or
+        pdns_srv_records_created.changed
 
 - name: pdns_records | creating pdns records
   shell: /tmp/pdns_records.sh
   run_once: true
-  when: force is defined and force
+  when: >
+        force is defined and
+        force
 
 - name: pdns_records | cleaning up pdns records script
   file:

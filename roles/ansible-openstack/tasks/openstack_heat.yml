@@ -76,7 +76,9 @@
 
 - name: openstack_heat | creating heat domain
   shell: ". /root/admin-openrc.sh heat-keystone-setup-domain --stack-user-domain-name heat_user_domain --stack-domain-admin heat_domain_admin --stack-domain-admin-password {{ openstack_heat_domain_pass }}"
-  when: not heat_domain_created.stat.exists and mysql_master
+  when: >
+        not heat_domain_created.stat.exists and
+        mysql_master
 
 #- name: openstack_heat | creating heat domain
 #  keystone:
@@ -102,7 +104,9 @@
 #  heat_manage:
 #    action: dbsync
   register: heat_populated
-  when: not heat_is_populated.stat.exists and mysql_master
+  when: >
+        not heat_is_populated.stat.exists and
+        mysql_master
 
 - name: openstack_heat | marking heat as populated
   file:

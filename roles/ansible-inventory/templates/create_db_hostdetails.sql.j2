@@ -1,0 +1,91 @@
+{% for item in groups.all %}
+INSERT IGNORE INTO Hosts(`inventory_hostname`) VALUES ('{{ hostvars[item].inventory_hostname }}');
+{% endfor %}
+
+{% for item in groups.all %}
+{%   for grp in hostvars[item].group_names %}
+INSERT IGNORE INTO Groups(`group_names`) VALUES ('all');
+INSERT IGNORE INTO Groups(`group_names`) VALUES ('{{ grp }}');
+{%   endfor %}
+{% endfor %}
+
+{% for item in groups.all %}
+REPLACE INTO HostDetails(`HostId`,`ansible_ssh_host`,`ansible_architecture`,`ansible_bios_date`,`ansible_bios_version`,`ansible_distribution`, \
+`ansible_distribution_release`,`ansible_distribution_version`,`ansible_fqdn`,`ansible_hostname`,`ansible_kernel`,`ansible_system_vendor`,`ansible_date_time.tz`,`ansible_virtualization_type`, \
+`ansible_default_ipv4.interface`,`ansible_default_ipv4.gateway`,`ansible_default_ipv4.macaddress`,`ansible_default_ipv4.netmask`,`ansible_default_ipv4.address`,`ansible_processor`, \
+`ansible_processor_cores`,`ansible_processor_count`,`ansible_memfree_mb`,`ansible_memtotal_mb`,`ansible_nodename`,`ansible_os_family`,`ansible_product_name`,`ansible_swapfree_mb`,`ansible_swaptotal_mb`) \
+VALUES( (SELECT HostId FROM Hosts WHERE inventory_hostname='{{ hostvars[item].inventory_hostname }}'), \
+'{{ hostvars[item].ansible_ssh_host }}','{{ hostvars[item].ansible_architecture }}','{{ hostvars[item].ansible_bios_date }}', \
+'{{ hostvars[item].ansible_bios_version }}','{{ hostvars[item].ansible_distribution }}', \
+'{{ hostvars[item].ansible_distribution_release }}','{{ hostvars[item].ansible_distribution_version }}', \
+'{{ hostvars[item].ansible_fqdn }}','{{ hostvars[item].ansible_hostname }}','{{ hostvars[item].ansible_kernel }}','{{ hostvars[item].ansible_system_vendor }}', \
+'{{ hostvars[item].ansible_date_time.tz }}','{{ hostvars[item].ansible_virtualization_type }}', \
+'{{ hostvars[item].ansible_default_ipv4.interface }}','{{ hostvars[item].ansible_default_ipv4.gateway }}', \
+'{{ hostvars[item].ansible_default_ipv4.macaddress }}','{{ hostvars[item].ansible_default_ipv4.netmask }}', \
+'{{ hostvars[item].ansible_default_ipv4.address }}','{{ hostvars[item].ansible_processor|join }}', \
+'{{ hostvars[item].ansible_processor_cores }}','{{ hostvars[item].ansible_processor_count }}','{{ hostvars[item].ansible_memfree_mb }}', \
+'{{ hostvars[item].ansible_memtotal_mb }}','{{ hostvars[item].ansible_nodename }}','{{ hostvars[item].ansible_os_family }}','{{ hostvars[item].ansible_product_name }}', \
+'{{ hostvars[item].ansible_swapfree_mb }}','{{ hostvars[item].ansible_swaptotal_mb }}');
+{% endfor %}
+
+{% for item in groups.all %}
+INSERT IGNORE INTO HostGroups(`GroupId`,`group_names`,`HostId`,`inventory_hostname`) \
+VALUES ( (SELECT GroupId FROM Groups WHERE group_names='all'), \
+(SELECT group_names FROM Groups WHERE group_names='all'), \
+(SELECT HostId FROM Hosts Where inventory_hostname='{{ hostvars[item].inventory_hostname }}'), \
+(SELECT inventory_hostname FROM Hosts Where inventory_hostname='{{ hostvars[item].inventory_hostname }}') );
+{% endfor %}
+
+{% for item in groups.all %}
+{%   for grp in hostvars[item].group_names %}
+INSERT IGNORE INTO HostGroups(`GroupId`,`group_names`,`HostId`,`inventory_hostname`) \
+VALUES ( (SELECT GroupId FROM Groups WHERE group_names='{{ grp }}'), \
+(SELECT group_names FROM Groups WHERE group_names='{{ grp }}'), \
+(SELECT HostId FROM Hosts Where inventory_hostname='{{ hostvars[item].inventory_hostname }}'), \
+(SELECT inventory_hostname FROM Hosts Where inventory_hostname='{{ hostvars[item].inventory_hostname }}') );
+{%   endfor %}
+{% endfor %}
+
+{% if inventory_groups is defined %}
+{%   for item in inventory_groups %}
+INSERT IGNORE INTO Groups(`group_names`) VALUES ('{{ item }}');
+{%   endfor %}
+{% endif %}
+
+{% if inventory_group_vars is defined %}
+{%   for item in inventory_group_vars %}
+{%     for var in item.vars %}
+REPLACE INTO GroupVars(`GroupId`,`VarName`,`VarValue`) \
+VALUES ((SELECT GroupId FROM Groups WHERE group_names='{{ item.group }}'),'{{ var.name }}','{{ var.value }}');
+{%     endfor %}
+{%    endfor %}
+{% endif %}
+
+{% if inventory_hosts is defined %}
+{%   for item in inventory_hosts %}
+INSERT IGNORE INTO Hosts(`inventory_hostname`) VALUES ('{{ item.name }}');
+INSERT IGNORE INTO HostGroups(`GroupId`,`group_names`,`HostId`,`inventory_hostname`) \
+VALUES ( (SELECT GroupId FROM Groups WHERE group_names='all'), \
+(SELECT group_names FROM Groups WHERE group_names='all'), \
+(SELECT HostId FROM Hosts Where inventory_hostname='{{ item.name }}'), \
+(SELECT inventory_hostname FROM Hosts Where inventory_hostname='{{ item.name }}') );
+{%     if item.ip is defined %}
+REPLACE INTO HostDetails(`HostId`,`ansible_ssh_host`) \
+VALUES( (SELECT HostId FROM Hosts WHERE inventory_hostname='{{ item.name }}'), '{{ item.ip }}');
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+{%   for item in groups.all %}
+REPLACE INTO HostVars(`HostId`,`VarName`,`VarValue` )
+VALUES ((SELECT HostId FROM Hosts where inventory_hostname='{{ hostvars[item].inventory_hostname }}'),'ansible_ssh_host','{{ hostvars[item].ansible_ssh_host }}');
+{%   endfor %}
+
+{% if inventory_host_vars is defined %}
+{%   for item in inventory_host_vars %}
+{%     for var in item.vars %}
+REPLACE INTO HostVars(`HostId`,`VarName`,`VarValue` )
+VALUES ((SELECT HostId FROM Hosts where inventory_hostname='{{ item.host }}'),'{{ var.name }}','{{ var.value }}');
+{%     endfor %}
+{%   endfor %}
+{% endif %}

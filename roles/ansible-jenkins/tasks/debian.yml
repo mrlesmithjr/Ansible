@@ -1,35 +1,29 @@
 ---
-- name: debian | installing pre-reqs for Ubuntu Precise
+- name: debian | Installing Pre-Reqs for Ubuntu Precise and Older
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - python-software-properties
-  when: ansible_distribution_version|int < 14.04
+    - 'python-software-properties'
+  when: ansible_distribution_version|int < 14
 
-- name: debian | adding jenkins repo key
+- name: debian | Adding Jenkins Repo Key
   apt_key:
-    url: "{{ jenkins_apt_key }}"
-    state: present
+    url: "{{ jenkins_repo_key }}"
+    state: "present"
 
-- name: debian | adding jenkins repo
+- name: debian | Adding Jenkins Repo
   apt_repository:
     repo: "{{ jenkins_apt_repo }}"
-    state: present
+    state: "present"
 
-- name: debian | installing packages
+- name: debian | Installing Jenkins Pre-Reqs
   apt:
     name: "{{ item }}"
-    state: latest
-  with_items:
-   - default-jdk
-   - default-jre-headless
-   - jenkins
-   - python-pip
+    state: "latest"
+  with_items: '{{ jenkins_debian_pre_req_packages }}'
 
-- name: debian | installing tower-cli
-  pip:
-    name: ansible-tower-cli
-    state: present
-  ignore_errors: true
-  when: install_tower_cli is defined and install_tower_cli
+- name: debian | Installing Jenkins
+  apt:
+    name: "jenkins"
+    state: "present"

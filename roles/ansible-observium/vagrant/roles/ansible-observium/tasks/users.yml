@@ -1,0 +1,16 @@
+---
+- name: users | Checking if Observium Admin Account Has Been Created
+  stat:
+    path: "/root/.observium_admin_account_created"
+  register: "observium_admin_account_created_check"
+
+- name: users | Creating Observium Admin Account
+  command: "{{ observium_base_dir }}/adduser.php {{ observium_admin_account_info.username }} {{ observium_admin_account_info.password }} {{ observium_admin_account_info.level }} {{ observium_admin_account_info.email }}"
+  register: "observium_admin_account_created"
+  when: not observium_admin_account_created_check.stat.exists
+
+- name: users | Marking Observium Admin Account as Created
+  file:
+    path: "/root/.observium_admin_account_created"
+    state: "touch"
+  when: observium_admin_account_created.changed

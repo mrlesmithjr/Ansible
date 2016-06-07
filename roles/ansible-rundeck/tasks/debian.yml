@@ -7,12 +7,12 @@
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - python-pip
-    - python-dev
-    - default-jre-headless
-    - software-properties-common
+    - 'python-pip'
+    - 'python-dev'
+    - 'default-jre-headless'
+    - 'software-properties-common'
 
 - name: debian | downloading rundeck
   get_url:
@@ -20,25 +20,11 @@
     dest: "/opt/{{ rundeck_dl_pkg }}"
     mode: 0770
 
-- name: debian | creating rundeck db
-  mysql_db:
-    name: "{{ rundeck_db_name }}"
-    state: present
-  when: rundeck_mysql_backend
-
-- name: debian | creating rundeck db user
-  mysql_user:
-    name: "{{ rundeck_db_user }}"
-    password: "{{ rundeck_db_pass }}"
-    priv: "{{ rundeck_db_name }}:ALL"
-    state: present
-  when: rundeck_mysql_backend
-
 - name: debian | installing rundeck
   apt:
     deb: "/opt/{{ rundeck_dl_pkg }}"
 
 - name: debian | installing ansible
   pip:
-    name: ansible
-    state: present
+    name: "ansible"
+    state: "present"

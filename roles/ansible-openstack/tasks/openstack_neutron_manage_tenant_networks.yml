@@ -13,7 +13,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - networks
-  when: (openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant network(s)
   neutron_network:
@@ -28,7 +33,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - networks
-  when: (openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant subnet(s)
   neutron_subnet:
@@ -49,7 +59,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - subnets
-  when: (openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant subnet(s)
   neutron_subnet:
@@ -70,7 +85,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - subnets
-  when: (openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant router(s)
   neutron_router:
@@ -84,7 +104,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - routers
-  when: (openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant router(s)
   neutron_router:
@@ -98,7 +123,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - routers
-  when: (openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant router(s) interface(s)
   neutron_router_interface:
@@ -112,7 +142,12 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - router_interfaces
-  when: (openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
 
 - name: openstack_neutron_manage_tenant_networks | creating tenant router(s) interface(s)
   neutron_router_interface:
@@ -126,4 +161,9 @@
   with_subelements:
     - openstack_neutron_tenant_networks
     - router_interfaces
-  when: (openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)) and (item.0 is defined and item.1 is defined and item.1.state == "present")
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")

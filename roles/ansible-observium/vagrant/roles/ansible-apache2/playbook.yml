@@ -1,0 +1,7 @@
+---
+- hosts: all
+  sudo: true
+  vars:
+  roles:
+    - role: ansible-apache2
+  tasks:

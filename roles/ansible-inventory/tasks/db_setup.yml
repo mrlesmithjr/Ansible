@@ -1,0 +1,43 @@
+---
+# tasks file for ansible-inventory
+- name: db_setup | Creating Inventory DB {{ inventory_db_name }}
+  mysql_db:
+    name: "{{ inventory_db_name }}"
+    state: "present"
+
+- name: db_setup | Checking Status of Inventory DB Schema Import
+  stat:
+    path: "/root/.inventory_db_schema_imported"
+  register: "inventory_db_schema_import_check"
+
+- name: db_setup | Copying Inventory DB Schema
+  template:
+    src: "ansible-inventory.schema.sql.j2"
+    dest: "/root/ansible-inventory.schema.sql"
+  when: >
+        not inventory_db_schema_import_check.stat.exists
+
+- name: db_setup | Importing Inventory DB Schema
+  mysql_db:
+    name: "{{ inventory_db_name }}"
+    state: "import"
+    target: "/root/ansible-inventory.schema.sql"
+  register: "inventory_db_schema_imported"
+  when: >
+        not inventory_db_schema_import_check.stat.exists
+
+- name: db_setup | Marking Inventory DB Schema as Imported
+  file:
+    path: "/root/.inventory_db_schema_imported"
+    state: "touch"
+  when: >
+        inventory_db_schema_imported.changed
+
+- name: db_setup | Adding Inventory DB User
+  mysql_user:
+    host: "{{ item }}"
+    name: "{{ inventory_db_user }}"
+    password: "{{ inventory_db_password }}"
+    priv: "{{ inventory_db_name }}.*:ALL,GRANT"
+    state: "present"
+  with_items: '{{ inventory_db_host_access }}'

@@ -1,0 +1,14 @@
+---
+- name: redhat | enabling EPEL repo
+  yum:
+    name: "epel-release"
+    state: "present"
+  when: >
+        ansible_distribution != "Fedora"
+
+- name: redhat | installing kea dhcp
+  yum:
+    name: "kea"
+    state: "present"
+  when: >
+        ansible_distribution != "Fedora"  

@@ -1,4 +1,5 @@
 ---
+config_openstack_neutron_networks: true
 mysql_allow_remote_connections: true  #defines if mysql should listen on loopback (default) or allow remove connections
 ntp_servers:  #defines internal ntp servers for clients to poll
   - 'oscontroller.{{ pri_domain_name }}'

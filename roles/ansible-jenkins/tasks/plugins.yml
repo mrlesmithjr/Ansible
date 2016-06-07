@@ -1,54 +1,56 @@
 ---
-- name: plugins | ensuring jenkins is running
+- name: plugins | Ensuring Jenkins Is Running
   service:
     name: "jenkins"
-    state: started
+    state: "started"
 
-- name: plugins | waiting for jenkins to start
+- name: plugins | Waiting For Jenkins To Start
   wait_for:
     port: 8080
     delay: 20
 
-- name: plugins | downloading jenkins-cli
+- name: plugins | Downloading jenkins-cli
   get_url:
     url: "http://localhost:8080/jnlpJars/jenkins-cli.jar"
     dest: "{{ jenkins_home_dir }}/jenkins-cli.jar"
-    owner: jenkins
-    group: jenkins
+    owner: "jenkins"
+    group: "jenkins"
 
-- name: config_jenkins | checking if secure setup
+- name: config_jenkins | Checking If Secure Setup
   stat:
     path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
   register: jenkins_secure_setup
-  when: jenkins_config_info.use_security is defined and jenkins_config_info.use_security
+  when: >
+        jenkins_config_info.use_security is defined and
+        jenkins_config_info.use_security
 
-- name: plugins | gathering plugins with updates available
+- name: plugins | Gathering Plugins With Updates Available
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 list-plugins | grep -e ')$' | awk '{ print $1 }'"
-  register: jenkins_plugin_updates
+  register: "jenkins_plugin_updates"
   changed_when: false
   when: >
         not jenkins_secure_setup.stat.exists
 
-- name: plugins | upgrading installed plugins
+- name: plugins | Upgrading Installed Plugins
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 install-plugin {{ item }}"
   notify:
-    - restart jenkins
-  with_items: jenkins_plugin_updates.stdout_lines
+    - 'restart jenkins'
+  with_items: '{{ jenkins_plugin_updates.stdout_lines }}'
   when: >
         not jenkins_secure_setup.stat.exists
 
-- name: plugins | gathering installed plugins
+- name: plugins | Gathering Installed Plugins
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 list-plugins | cut -f 1 -d ' '"
-  register: jenkins_installed_plugins
+  register: "jenkins_installed_plugins"
   changed_when: false
   when: >
         not jenkins_secure_setup.stat.exists
 
-- name: plugins | installing plugins
+- name: plugins | Installing Plugins
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 install-plugin {{ item }}"
   notify:
-    - restart jenkins
-  with_items: jenkins_plugins
+    - 'restart jenkins'
+  with_items: '{{ jenkins_plugins }}'
   when: >
         not jenkins_secure_setup.stat.exists and
         item not in jenkins_installed_plugins.stdout_lines

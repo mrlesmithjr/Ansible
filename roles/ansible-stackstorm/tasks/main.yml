@@ -10,3 +10,6 @@
 - include: config_stackstorm.yml
 
 - include: config_webui.yml
+
+- include: packs.yml
+  when: stackstorm_install_packs

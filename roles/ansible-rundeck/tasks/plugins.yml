@@ -3,7 +3,9 @@
   template:
     src: "var/lib/rundeck/libext/LogstashPlugin.groovy.j2"
     dest: "{{ rundeck_base }}/libext/LogstashPlugin.groovy"
-    owner: rundeck
-    group: rundeck
+    owner: "rundeck"
+    group: "rundeck"
   notify: restart rundeck
-  when: rundeck_enable_logstash_plugin is defined and rundeck_enable_logstash_plugin
+  when: >
+        rundeck_enable_logstash_plugin is defined and
+        rundeck_enable_logstash_plugin

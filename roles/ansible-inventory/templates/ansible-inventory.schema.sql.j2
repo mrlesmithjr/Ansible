@@ -1,0 +1,194 @@
+--
+-- Table structure for table `Groups`
+--
+
+DROP TABLE IF EXISTS `Groups`;
+CREATE TABLE `Groups` (
+  `GroupId` int(11) NOT NULL AUTO_INCREMENT,
+  `group_names` varchar(255) NOT NULL,
+  `GroupDescription` varchar(255) DEFAULT NULL,
+  `GroupDTAP` char(1) DEFAULT '',
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`GroupId`),
+  UNIQUE KEY `group_names` (`group_names`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `Hosts`
+--
+
+DROP TABLE IF EXISTS `Hosts`;
+CREATE TABLE `Hosts` (
+  `HostId` int(11) NOT NULL AUTO_INCREMENT,
+  `inventory_hostname` varchar(255) NOT NULL,
+  `HostDescription` varchar(255) DEFAULT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`HostId`),
+  UNIQUE KEY `inventory_hostname` (`inventory_hostname`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `AnsiblePlaybooks`
+--
+
+DROP TABLE IF EXISTS `AnsiblePlaybooks`;
+CREATE TABLE `AnsiblePlaybooks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) NOT NULL,
+  `Description` varchar(255) DEFAULT NULL,
+  `Path` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Name` (`Name`),
+  UNIQUE KEY `Path` (`Path`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `GroupContact`
+--
+
+DROP TABLE IF EXISTS `GroupContact`;
+CREATE TABLE `GroupContact` (
+  `ContactId` int(11) NOT NULL AUTO_INCREMENT,
+  `ContactName` varchar(255) NOT NULL,
+  `ContactEmail` varchar(255) NOT NULL,
+  `ContactPhone` varchar(255) NOT NULL,
+  `GroupId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ContactId`),
+  UNIQUE KEY `ContactName` (`ContactName`),
+  UNIQUE KEY `ContactEmail` (`ContactEmail`),
+  KEY `GroupId` (`GroupId`),
+  CONSTRAINT `GroupContact_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `GroupVars`
+--
+
+DROP TABLE IF EXISTS `GroupVars`;
+CREATE TABLE `GroupVars` (
+  `VarsId` int(11) NOT NULL AUTO_INCREMENT,
+  `VarName` varchar(255) NOT NULL,
+  `VarDescription` varchar(255) DEFAULT '',
+  `VarReference` varchar(255) DEFAULT '',
+  `VarSet` varchar(255) DEFAULT '',
+  `VarValue` varchar(255) NOT NULL,
+  `GroupId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`VarsId`),
+  UNIQUE KEY `GroupId_2` (`GroupId`,`VarName`),
+  KEY `GroupId` (`GroupId`),
+  CONSTRAINT `GroupVars_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `HostVars`
+--
+
+DROP TABLE IF EXISTS `HostVars`;
+CREATE TABLE `HostVars` (
+  `VarsId` int(11) NOT NULL AUTO_INCREMENT,
+  `VarName` varchar(255) NOT NULL,
+  `VarDescription` varchar(255) DEFAULT '',
+  `VarReference` varchar(255) DEFAULT '',
+  `VarSet` varchar(255) DEFAULT '',
+  `VarValue` varchar(255) NOT NULL,
+  `HostId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`VarsId`),
+  UNIQUE KEY `HostId_2` (`HostId`,`VarName`,`VarValue`),
+  KEY `HostId` (`HostId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `ChildHostVars`
+--
+
+DROP TABLE IF EXISTS `ChildHostVars`;
+CREATE TABLE `ChildHostVars` (
+  `VarsId` int(11) NOT NULL AUTO_INCREMENT,
+  `VarName` varchar(255) NOT NULL,
+  `VarDescription` varchar(255) DEFAULT '',
+  `VarReference` varchar(255) DEFAULT '',
+  `VarSet` varchar(255) DEFAULT '',
+  `VarValue` varchar(255) NOT NULL,
+  `ParentVarsId` int(11) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`VarsId`),
+  UNIQUE KEY `ParentVarsId_2` (`ParentVarsId`,`VarName`,`VarValue`),
+  KEY `ParentVarsId` (`ParentVarsId`),
+  CONSTRAINT `ChildHostVars_ibfk_1` FOREIGN KEY (`ParentVarsId`) REFERENCES `HostVars` (`VarsId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `HostDetails`
+--
+
+DROP TABLE IF EXISTS `HostDetails`;
+CREATE TABLE `HostDetails` (
+  `HostDetailsId` int(11) NOT NULL AUTO_INCREMENT,
+  `ansible_architecture` varchar(255) DEFAULT NULL,
+  `ansible_bios_date` varchar(255) DEFAULT NULL,
+  `ansible_bios_version` varchar(255) DEFAULT NULL,
+  `ansible_date_time.tz` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.address` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.gateway` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.interface` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.macaddress` varchar(255) DEFAULT NULL,
+  `ansible_default_ipv4.netmask` varchar(255) DEFAULT NULL,
+  `ansible_distribution` varchar(255) DEFAULT NULL,
+  `ansible_distribution_release` varchar(255) DEFAULT NULL,
+  `ansible_distribution_version` varchar(255) DEFAULT NULL,
+  `ansible_fqdn` varchar(255) DEFAULT NULL,
+  `ansible_kernel` varchar(255) DEFAULT NULL,
+  `ansible_hostname` varchar(255) DEFAULT NULL,
+  `ansible_memfree_mb` int(11) DEFAULT NULL,
+  `ansible_memtotal_mb` int(11) DEFAULT NULL,
+  `ansible_nodename` varchar(255) DEFAULT NULL,
+  `ansible_os_family` varchar(255) DEFAULT NULL,
+  `ansible_processor` varchar(255) DEFAULT NULL,
+  `ansible_processor_cores` int(11) DEFAULT NULL,
+  `ansible_processor_count` int(11) DEFAULT NULL,
+  `ansible_product_name` varchar(255) DEFAULT NULL,
+  `ansible_ssh_host` varchar(255) DEFAULT NULL,
+  `ansible_swapfree_mb` int(11) DEFAULT NULL,
+  `ansible_swaptotal_mb` int(11) DEFAULT NULL,
+  `ansible_system_vendor` varchar(255) DEFAULT NULL,
+  `ansible_virtualization_type` varchar(255) DEFAULT NULL,
+  `HostId` int(11) DEFAULT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`HostDetailsId`),
+  UNIQUE KEY `ansible_fqdn` (`ansible_fqdn`),
+  UNIQUE KEY `HostId` (`HostId`),
+  CONSTRAINT `HostDetails_ibfk_1` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `HostGroups`
+--
+
+DROP TABLE IF EXISTS `HostGroups`;
+CREATE TABLE `HostGroups` (
+  `HostGroupId` int(11) NOT NULL AUTO_INCREMENT,
+  `GroupId` int(11) NOT NULL,
+  `group_names` varchar(255) NOT NULL,
+  `HostId` int(11) NOT NULL,
+  `inventory_hostname` varchar(255) NOT NULL,
+  `LastUpdateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`HostGroupId`),
+  UNIQUE KEY `HostId` (`HostId`,`GroupId`),
+  KEY `GroupId` (`GroupId`),
+  CONSTRAINT `HostGroups_ibfk_1` FOREIGN KEY (`GroupId`) REFERENCES `Groups` (`GroupId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `HostGroups_ibfk_2` FOREIGN KEY (`HostId`) REFERENCES `Hosts` (`HostId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE OR REPLACE VIEW `inventory`
+AS SELECT
+   `h`.`inventory_hostname` AS `inventory_hostname`,
+   `hd`.`ansible_ssh_host` AS `ansible_ssh_host`,
+   `hg`.`group_names` AS `group_names`,
+   `hd`.`ansible_distribution` AS `ansible_distribution`,
+   `hd`.`ansible_distribution_release` AS `ansible_distribution_release`,
+   `hd`.`ansible_distribution_version` AS `ansible_distribution_version`,
+   `hd`.`LastUpdateTime` AS `LastUpdateTime`
+FROM ((`Hosts` `h` join `HostDetails` `hd` on((`h`.`HostId` = `hd`.`HostId`))) join `HostGroups` `hg` on((`hd`.`HostId` = `hg`.`HostId`))) order by `h`.`inventory_hostname`;

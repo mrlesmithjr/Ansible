@@ -1,0 +1,27 @@
+# This is a configuration file for keactrl script which controls
+# the startup, shutdown, reconfiguration and gathering the status
+# of the Kea's processes.
+
+# prefix holds the location where the Kea is installed.
+prefix=/usr
+
+# Location of Kea configuration file.
+kea_config_file=/etc/kea/kea.conf
+
+# Location of Kea binaries.
+exec_prefix=/usr
+dhcp4_srv=/usr/sbin/kea-dhcp4
+dhcp6_srv=/usr/sbin/kea-dhcp6
+dhcp_ddns_srv=/usr/sbin/kea-dhcp-ddns
+
+# Start DHCPv4 server?
+dhcp4=yes
+
+# Start DHCPv6 server?
+dhcp6=yes
+
+# Start DHCP DDNS server?
+dhcp_ddns=no
+
+# Be verbose?
+kea_verbose=no

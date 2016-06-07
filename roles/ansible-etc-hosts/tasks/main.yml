@@ -1,15 +1,14 @@
 ---
 # tasks file for ansible-etc-hosts
-- name: pre-reqs (Not Fedora)
+- name: pre-reqs (RedHat)
   yum:
     name: "{{ item }}"
     state: present
   with_items:
-    - dnf
-    - python-dnf
+    - libselinux-python
   when: >
-        (ansible_os_family == "RedHat" and
-        ansible_distribution != "Fedora")
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
 
 - name: pre-reqs (RedHat)
   dnf:
@@ -17,7 +16,9 @@
     state: present
   with_items:
     - libselinux-python
-  when: ansible_os_family == "RedHat"
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
 
 - name: main | updating /etc/hosts (localhost)
   template:

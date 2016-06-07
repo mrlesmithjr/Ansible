@@ -1,0 +1,9 @@
+---
+- name: config | Configuring DHCP Service
+  template:
+    src: "etc/dhcp/dhcpd.conf.j2"
+    dest: "/etc/dhcp/dhcpd.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: 'restart {{ ansible_os_family|lower }} DHCP Server'

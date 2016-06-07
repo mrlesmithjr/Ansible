@@ -1,0 +1,52 @@
+---
+- name: config_docker | ensuring Docker service is enabled and started
+  service:
+    name: "docker"
+    state: started
+    enabled: yes
+
+- name: config_docker | configuring docker service (Debian)
+  template:
+    src: etc/default/docker.j2
+    dest: /etc/default/docker
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart docker
+  when: >
+        ansible_os_family == "Debian" and
+        (config_docker_service is defined and
+        config_docker_service)
+
+- name: config_docker | ensuring /etc/systemd/system/docker.service.d directory exists
+  file:
+    path: "/etc/systemd/system/docker.service.d"
+    state: directory
+  when: ansible_os_family == "RedHat"
+
+- name: config_docker | creating Docker systemd override
+  template:
+    src: "etc/systemd/system/docker.service.d/docker.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/docker.conf"
+    owner: root
+    group: root
+    mode: 0644
+  register: docker_systemd_override
+  when: ansible_os_family == "RedHat"
+
+- name: config_docker | configuring Docker service options
+  template:
+    src: "etc/sysconfig/docker.j2"
+    dest: "/etc/sysconfig/docker"
+    owner: root
+    group: root
+    mode: 0644
+  register: docker_service_config
+  notify: restart docker
+  when: ansible_os_family == "RedHat"
+
+- name: docker | restarting systemd manager (when Docker systemd override is created)
+  shell: "systemctl daemon-reload"
+  when: >
+        docker_systemd_override.changed or
+        docker_service_config.changed

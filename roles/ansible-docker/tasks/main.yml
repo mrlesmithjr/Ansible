@@ -3,5 +3,17 @@
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_docker.yml
+
+- include: users.yml
+  when: >
+        config_docker_users is defined and
+        config_docker_users
+
+- include: manage_python_modules.yml
+
 - include: images.yml
   when: docker_images is defined

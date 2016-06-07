@@ -6,24 +6,23 @@
     owner: root
     group: root
     mode: 0644
+    backup: yes
   notify: restart apache2
+  when: ansible_os_family == "Debian"
 
-- name: config_apache2 | creating phpipam web configuration
+- name: config_apache2 | reconfiguring default website
   template:
-    src: "etc/apache2/sites-available/phpipam.conf.j2"
-    dest: "/etc/apache2/sites-available/phpipam.conf"
+    src: "etc/httpd/conf/httpd.conf.j2"
+    dest: "/etc/httpd/conf/httpd.conf"
     owner: root
     group: root
     mode: 0644
-  register: phpipam_apache2_configured
+    backup: yes
+  notify: restart httpd
+  when: ansible_os_family == "RedHat"
 
-- name: config_apache2 | enabling phpipam
-  command: a2ensite phpipam.conf
-  creates: "/etc/apache2/sites-enabled/phpipam.conf"
-  notify: restart apache2
-  when: phpipam_apache2_configured.changed
-
-- name: config_apache2 | enabling php mod extenstions
+- name: config_apache2 | enabling php mod extensions
   command: "php5enmod {{ item }}"
   with_items:
     - json
+  when: ansible_os_family == "Debian"

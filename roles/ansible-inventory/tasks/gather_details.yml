@@ -1,0 +1,15 @@
+---
+- name: gather_details | creating HostDetails
+  template:
+    src: "create_db_hostdetails.sql.j2"
+    dest: "/tmp/db_hostdetails.sql"
+  delegate_to: "{{ inventory_db_host }}"
+  run_once: true
+
+- name: gather_details | importing HostDetails
+  mysql_db:
+    name: "{{ inventory_db_name }}"
+    state: "import"
+    target: "/tmp/db_hostdetails.sql"
+  delegate_to: "{{ inventory_db_host }}"
+  run_once: true

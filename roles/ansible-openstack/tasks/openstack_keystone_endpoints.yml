@@ -9,7 +9,9 @@
     token: "{{ openstack_keystone_temp_admin_token }}"
     state: present
   with_items: openstack_keystone_endpoints
-  when: openstack_keystone_api_master is defined and (inventory_hostname == openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
 
 - name: openstack_keystone_endpoints | creating keystone endpoints  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
   keystone_endpoint:
@@ -21,4 +23,6 @@
     token: "{{ openstack_keystone_temp_admin_token }}"
     state: present
   with_items: openstack_keystone_endpoints
-  when: openstack_keystone_api_master is defined and (inventory_hostname != openstack_keystone_api_master)
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)

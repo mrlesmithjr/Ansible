@@ -1,0 +1,26 @@
+---
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: "present"
+  tags:
+    - cacti_monitoring
+  run_once: true
+  when: >
+        cacti_server is defined
+
+- name: debian | adding cacti db user for monitoring
+  mysql_user:
+    name: "{{ cacti_db_user }}"
+    password: "{{ cacti_db_password }}"
+    host: "{{ cacti_server_fqdn }}"
+    priv: "*.*:SUPER,PROCESS"
+    state: "present"
+  tags:
+    - cacti_monitoring
+  run_once: true
+  when: >
+        cacti_server_fqdn is defined

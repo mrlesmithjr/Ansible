@@ -3,30 +3,30 @@
 config_rundeck: true
 enable_rundeck: true
 enable_rundeck_plugins: true
-pri_domain_name: example.org
-rundeck_base: /var/lib/rundeck
+pri_domain_name: 'example.org'
+rundeck_base: '/var/lib/rundeck'
 rundeck_configs:
-  - framework.properties
-  - rundeck-config.properties
-rundeck_db_name: rundeck
-rundeck_db_pass: rundeck
-rundeck_db_user: rundeck
+  - 'framework.properties'
+  - 'rundeck-config.properties'
+rundeck_db_name: 'rundeck'
+rundeck_db_pass: 'rundeck'
+rundeck_db_user: 'rundeck'
 rundeck_dl_pkg: 'rundeck-{{ rundeck_version }}-GA.deb'
-rundeck_dl_url: http://dl.bintray.com/rundeck/rundeck-deb/
+rundeck_dl_url: 'http://dl.bintray.com/rundeck/rundeck-deb/'
 rundeck_enable_logstash_plugin: false
-rundeck_framework_server_hostname: localhost
-rundeck_framework_server_name: localhost
-rundeck_framework_server_password: admin
+rundeck_framework_server_hostname: 'localhost'
+rundeck_framework_server_name: 'localhost'
+rundeck_framework_server_password: 'admin'
 rundeck_framework_server_port: 4440
 rundeck_framework_server_url: 'http://{{ rundeck_framework_server_hostname }}'
-rundeck_framework_server_username: admin
+rundeck_framework_server_username: 'admin'
 rundeck_framework_ssh_keypath_file: '{{ rundeck_framework_ssh_keypath }}/id_rsa'
-rundeck_framework_ssh_keypath: /var/lib/rundeck/.ssh
-rundeck_framework_ssh_user: rundeck
+rundeck_framework_ssh_keypath: '/var/lib/rundeck/.ssh'
+rundeck_framework_ssh_user: 'rundeck'
 rundeck_install_ansible: true
 rundeck_logstash_host: []  #defines logstash server if used
 rundeck_logstash_port: 9700
 rundeck_mysql_backend: false
-rundeck_root_dir: /etc/rundeck
+rundeck_root_dir: '/etc/rundeck'
 rundeck_vagrant_install: false  #defines if installing under Vagrant
-rundeck_version: 2.6.2-1
+rundeck_version: '2.6.7-1'

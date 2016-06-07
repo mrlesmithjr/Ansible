@@ -1,0 +1,11 @@
+---
+- name: redhat | Installing DHCP Packages
+  yum:
+    name: "dhcp"
+    state: "present"
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Ensuring DHCP Service is Enabled
+  service:
+    name: "dhcpd"
+    enabled: yes
