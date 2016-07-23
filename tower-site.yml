@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-base
+    - role: ansible-rsyslog
+    - role: ansible-snmpd
+    - role: ansible-timezone
+  tasks:
