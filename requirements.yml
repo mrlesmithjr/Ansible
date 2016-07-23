@@ -10,6 +10,7 @@
 - src: https://github.com/mrlesmithjr/ansible-bootstrap
 - src: https://github.com/mrlesmithjr/ansible-cacti
 - src: https://github.com/mrlesmithjr/ansible-change-hostname
+- src: https://github.com/mrlesmithjr/ansible-cis-debian
 - src: https://github.com/mrlesmithjr/ansible-clone-git-repos
 - src: https://github.com/mrlesmithjr/ansible-cmdb
 - src: https://github.com/mrlesmithjr/ansible-collectd
@@ -29,6 +30,7 @@
 - src: https://github.com/mrlesmithjr/ansible-elk-kibana
 - src: https://github.com/mrlesmithjr/ansible-elk-pre-processor
 - src: https://github.com/mrlesmithjr/ansible-elk-processor
+- src: https://github.com/mrlesmithjr/ansible-elk-processors
 - src: https://github.com/mrlesmithjr/ansible-elkstack
 - src: https://github.com/mrlesmithjr/ansible-es-filebeat
 - src: https://github.com/mrlesmithjr/ansible-es-packetbeat
@@ -74,6 +76,7 @@
 - src: https://github.com/mrlesmithjr/ansible-mysql
 - src: https://github.com/mrlesmithjr/ansible-nagios
 - src: https://github.com/mrlesmithjr/ansible-network-tweaks
+- src: https://github.com/mrlesmithjr/ansible-nipap
 - src: https://github.com/mrlesmithjr/ansible-nginx
 - src: https://github.com/mrlesmithjr/ansible-nodejs
 - src: https://github.com/mrlesmithjr/ansible-ntop
@@ -110,6 +113,7 @@
 - src: https://github.com/mrlesmithjr/ansible-squid
 - src: https://github.com/mrlesmithjr/ansible-stackstorm
 - src: https://github.com/mrlesmithjr/ansible-suricata
+- src: https://github.com/mrlesmithjr/ansible-tcpwrappers
 - src: https://github.com/mrlesmithjr/ansible-tftpd-hpa
 - src: https://github.com/mrlesmithjr/ansible-tftpserver
 - src: https://github.com/mrlesmithjr/ansible-timezone
