@@ -1,0 +1,7 @@
+---
+- hosts: web-servers
+  become: true
+  vars:
+  roles:
+    - role: ansible-nginx
+  tasks:
