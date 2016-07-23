@@ -266,6 +266,17 @@ suricata_rules:
   - dns-events.rules     # available in suricata sources under rules dir
   - tls-events.rules     # available in suricata sources under rules dir
 suricata_run_initd: 'yes'  #set to yes to start the server in the init.d script
+suricata_suppress_list:  #Defines a list of alerts to suppress
+  - gen_id: 1
+    sig_id: 2210020
+#    track: by_src  #options are: by_src|by_dst
+#    ip_addresses:  #define IP addressORsubnet if setting up track by
+#      - 172.16.0.0/16
+#      - 192.168.1.0/24
+  - gen_id: 1
+    sig_id: 2210021
+  - gen_id: 1
+    sig_id: 2210029
 suricata_ubuntu_ppa: ppa:oisf/suricata-stable  #Options are ppa:oisf/suricata-stable, ppa:oisf/suricata-beta or ppa:oisf/suricata-daily
 suricata_unix_command:
   enabled: "no"

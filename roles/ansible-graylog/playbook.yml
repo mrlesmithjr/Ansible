@@ -3,6 +3,7 @@
   hosts: all
   sudo: true
   vars:
+    - graylog_server_rest_listen_uri: 'http://192.168.202.201:12900/'
   roles:
     - role: ansible-snmpd
     - role: ansible-timezone

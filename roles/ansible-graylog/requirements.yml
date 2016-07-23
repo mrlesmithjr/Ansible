@@ -4,8 +4,3 @@
 - src: https://github.com/mrlesmithjr/ansible-elasticsearch
 - src: https://github.com/mrlesmithjr/ansible-mongodb
 - src: https://github.com/mrlesmithjr/ansible-graylog
-- src: mrlesmithjr.snmpd
-- src: mrlesmithjr.timezone
-- src: mrlesmithjr.elasticsearch
-- src: mrlesmithjr.mongodb
-- src: mrlesmithjr.graylog

@@ -11,5 +11,5 @@
 - include: config_graylog_server.yml
   when: enable_graylog_server
 
-- include: config_graylog_web.yml
-  when: enable_graylog_web
+#- include: config_graylog_web.yml
+#  when: enable_graylog_web

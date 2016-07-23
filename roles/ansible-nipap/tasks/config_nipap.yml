@@ -1,0 +1,10 @@
+---
+- name: config_nipap | configuring nipap
+  template:
+    src: "etc/nipap/nipap.conf.j2"
+    dest: "/etc/nipap/nipap.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify:
+    - 'restart nipapd'

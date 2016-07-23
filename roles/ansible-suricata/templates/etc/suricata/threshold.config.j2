@@ -1,0 +1,4 @@
+{% for item in suricata_suppress_list %}
+suppress gen_id {{ item.gen_id }}, sig_id {{ item.sig_id }}{% if item.track is defined %}, track {{ item.track }}, ip [{{ item.ip_addresses|join (',') }}]{% endif %}
+
+{% endfor %}

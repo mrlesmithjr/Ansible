@@ -1,0 +1,13 @@
+---
+# defaults file for ansible-nipap
+nipap_db_info:
+  db_host: 'localhost'
+  db_name: 'nipap'
+  db_pass: 'nipap'
+  db_port: '5432'
+  db_user: 'nipap'
+nipap_debian_packages:
+  - 'nipapd'
+  - 'nipap-www'
+nipap_debian_repo: 'deb http://spritelink.github.io/NIPAP/repos/apt stable main extra'
+nipap_debian_repo_key: 'https://spritelink.github.io/NIPAP/nipap.gpg.key'

@@ -1,0 +1,108 @@
+# Setting up VMware ESX(i) log parsing
+filter {
+  if "ESXi" in [tags] {
+    if "Section for VMware ESX" in [message] {
+      drop {}
+    }
+    multiline {
+      pattern => "-->"
+      what => "previous"
+    }
+    multiline {
+      pattern => "(^[a-zA-Z.]+(?:Error|Exception): .+)|(^\s+at .+)|(^\s+... \d+ more)|(^\s*Caused by:.+)"
+      what => "previous"
+    }
+    grok {
+      break_on_match => true
+      match => [
+        "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{SYSLOGPROG:syslog_program}: (?<message_body>(?<message_system_info>(?:\[%{DATA:message_thread_id} %{DATA:syslog_level} \'%{DATA:message_service}\'\ ?%{DATA:message_opID}])) \[%{DATA:message_service_info}]\ (?<syslog_message>(%{GREEDYDATA})))",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{SYSLOGPROG:syslog_program}: (?<message_body>(?<message_system_info>(?:\[%{DATA:message_thread_id} %{DATA:syslog_level} \'%{DATA:message_service}\'\ ?%{DATA:message_opID}])) \[%{DATA:message_service_info}]\ (?<syslog_message>(%{GREEDYDATA})))",
+        "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{SYSLOGPROG:syslog_program}: (?<message_body>(?<message_system_info>(?:\[%{DATA:message_thread_id} %{DATA:syslog_level} \'%{DATA:message_service}\'\ ?%{DATA:message_opID}])) (?<syslog_message>(%{GREEDYDATA})))",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{SYSLOGPROG:syslog_program}: (?<message_body>(?<message_system_info>(?:\[%{DATA:message_thread_id} %{DATA:syslog_level} \'%{DATA:message_service}\'\ ?%{DATA:message_opID}])) (?<syslog_message>(%{GREEDYDATA})))",
+        "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{SYSLOGPROG:syslog_program}: %{GREEDYDATA:syslog_message}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{SYSLOGPROG:syslog_program}: %{GREEDYDATA:syslog_message}",
+        "message", "<%{POSINT:syslog_pri}>%{TIMESTAMP_ISO8601:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:syslog_message}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:syslog_message}"
+      ]
+    }
+    syslog_pri {}
+    date {
+      match => [ "syslog_timestamp", "YYYY-MM-ddHH:mm:ss,SSS", "YYYY-MM-dd HH:mm:ss,SSS", "ISO8601", "MMM d HH:mm:ss", "MMM dd HH:mm:ss", "MMM  d HH:mm:ss" ]
+      timezone => "UTC"
+    }
+    if "_grokparsefailure" not in [tags] {
+      mutate {
+        replace => [ "host", "%{syslog_hostname}" ]
+      }
+    }
+    if "Device naa" in [message] {
+      grok {
+        break_on_match => false
+        match => [
+          "message", "Device naa.%{WORD:device_naa} performance has %{WORD:device_status}%{GREEDYDATA} of %{INT:datastore_latency_from}%{GREEDYDATA} to %{INT:datastore_latency_to}",
+          "message", "Device naa.%{WORD:device_naa} performance has %{WORD:device_status}%{GREEDYDATA} from %{INT:datastore_latency_from}%{GREEDYDATA} to %{INT:datastore_latency_to}"
+        ]
+      }
+    }
+    if "connectivity issues" in [message] {
+      grok {
+        match => [
+          "message", "Hostd: %{GREEDYDATA} : %{DATA:device_access} to volume %{DATA:device_id} %{DATA:datastore} (following|due to)"
+        ]
+      }
+    }
+    if "WARNING" in [message] {
+      grok {
+        match => [
+          "message", "WARNING: %{GREEDYDATA:ESXi_warning_msg}"
+        ]
+      }
+    }
+    mutate {
+      add_tag => [ "pre-processed" ]
+    }
+  }
+}
+filter {
+  if "ESXi" in [tags] and [syslog_program] == "prnxd" {
+    multiline {
+      pattern => "\|"
+      what => "previous"
+    }
+  }
+}
+filter {
+  if "ESXi" in [tags] and [syslog_program] == "dfwpktlogs" {
+    if "match" in [message] {
+      grok {
+        match => [
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{WORD:rule_reason}.%{WORD:rule_action}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.%{INT:length}.%{WORD:protocol}.%{IP:src_ip}/%{INT:src_port}.*%{IP:dst_ip}/%{INT:dst_port}.*%{WORD:flag}",
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{WORD:rule_reason}.%{WORD:rule_action}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.%{INT:length}.%{WORD:protocol}.%{IP:src_ip}/%{INT:src_port}.*%{IP:dst_ip}/%{INT:dst_port}",
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.%{WORD:protocol}.%{IP:src_ip}/%{INT:src_port}.*%{IP:dst_ip}/%{INT:dst_port}.%{GREEDYDATA}",
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{WORD:rule_reason}.%{WORD:rule_action}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.%{INT:length}.*PROTO.*%{INT}.%{IP:src_ip}.*%{IP:dst_ip}",
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{NOTSPACE:rule_action}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.*PROTO.*%{INT}.%{IP:src_ip}.*%{IP:dst_ip}"
+        ]
+      }
+    }
+    if "match" not in [message] {
+      grok {
+        match => [
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{NOTSPACE:rule_action}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.%{WORD:protocol}.%{IP:src_ip}/%{INT:src_port}.*%{IP:dst_ip}/%{INT:dst_port}.%{NOTSPACE:rule}.%{NOTSPACE}",
+          "message", "dfwpktlogs:.%{WORD:af_value}.%{NOTSPACE:rule_action}.%{DATA:ruleset_name}/%{INT:rule_id}.%{WORD:rule_direction}.*PROTO.*%{INT}.%{IP:src_ip}.*%{IP:dst_ip}.%{NOTSPACE:rule}.%{NOTSPACE}"
+        ]
+      }
+    }
+    mutate {
+      add_tag => [ "NSX-DFW" ]
+    }
+  }
+}
+filter {
+  if "_grokparsefailure" not in [tags] {
+    if "ESXi" in [tags] and "multiline" not in [tags] {
+      mutate {
+        replace => [ "message", "%{syslog_message}" ]
+      }
+    }
+  }
+}

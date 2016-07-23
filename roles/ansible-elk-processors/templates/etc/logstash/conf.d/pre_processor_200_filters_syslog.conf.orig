@@ -1,0 +1,59 @@
+filter {
+  if "syslog" in [tags] {
+    grok {
+      match => [
+        "message", "<%{POSINT}>%{TIMESTAMP_ISO8601} %{SYSLOGHOST:syslog_host_id} %{DATA:pre_syslog_program}(?:\[%{POSINT:pre_syslog_pid}\])?: %{GREEDYDATA}",
+        "message", "<%{POSINT}>%{SYSLOGTIMESTAMP} %{SYSLOGHOST:syslog_host_id} %{DATA:pre_syslog_program}(?:\[%{POSINT:pre_syslog_pid}\])?: %{GREEDYDATA}",
+        "message", "<%{POSINT}>%{SYSLOGTIMESTAMP} %{DATA:pre_syslog_program}(?:\[%{POSINT:pre_syslog_pid}\])?: %{GREEDYDATA}"
+      ]
+    }
+    mutate {
+      add_field => [ "pre-msg", "%{message}" ]
+    }
+{% if esxinaming is defined %}
+{%   for item in esxinaming %}
+    if "{{ item }}" in [syslog_host_id] {
+      mutate {
+        add_tag => [ "ESXi" ]
+      }
+    }
+{%   endfor %}
+{% endif %}
+{% if hadoopnaming is defined and hadoopnaming != None %}
+{%   for item in hadoopnaming %}
+    if "{{ item }}" in [syslog_host_id] {
+      mutate {
+        add_tag => [ "Hadoop" ]
+      }
+    }
+{%   endfor %}
+{% endif %}
+{% if netscalernaming is defined %}
+{%   for item in netscalernaming %}
+    if "{{ item }}" in [syslog_host_id] {
+      mutate {
+        add_tag => [ "Netscaler" ]
+      }
+    }
+{%   endfor %}
+{% endif %}
+{% if nsxnaming is defined %}
+{%   for item in nsxnaming %}
+    if "{{ item }}" in [syslog_host_id] {
+      mutate {
+        add_tag => [ "NSX", "pre-processed" ]
+      }
+    }
+{%   endfor %}
+{% endif %}
+{% if pfsensenaming is defined %}
+{%   for item in pfsensenaming %}
+    if "{{ item }}" in [syslog_host_id] {
+      mutate {
+        add_tag => [ "PFSense" ]
+      }
+    }
+{%   endfor %}
+{% endif %}
+  }
+}

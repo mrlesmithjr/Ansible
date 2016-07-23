@@ -1,0 +1,20 @@
+# Windows Eventlogs....Use NXLOG for client side logging
+filter {
+  if [type] == "eventlog" {
+    grok {
+      match => { "EventReceivedTime"  => "\d+"}
+    }
+    mutate {
+      lowercase => [ "EventType", "FileName", "Hostname", "Severity" ]
+    }
+    mutate {
+      rename => [ "Hostname", "host" ]
+    }
+    date {
+      match => [ "EventReceivedTime", "UNIX" ]
+    }
+    mutate {
+      rename => [ "Message", "message" ]
+    }
+  }
+}

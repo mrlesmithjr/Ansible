@@ -1,18 +1,50 @@
 ---
 # defaults file for ansible-mysql
-cacti_db_password: cactiuser  #defines cacti db password for monitoring
-cacti_db_user: cactiuser  #defines cacti db user for monitoring
+cacti_db_password: 'cactiuser'  #defines cacti db password for monitoring
+cacti_db_user: 'cactiuser'  #defines cacti db user for monitoring
 cacti_server_fqdn: 'cacti.{{ pri_domain_name }}'  #defines fqdn of cacti server for monitoring
-cacti_server: cacti  #defines hostname of cacti server for monitoring
+cacti_server: 'cacti'  #defines hostname of cacti server for monitoring
+config_mysql_replication: false  #defines if replication should be configured
 config_mysqlchk: false  #defines if mysqlchk scripts should be configured for load balancer monitoring
-deb_db_password: "{{ mysql_root_password }}"  #defines debian db password...generate using echo password | mkpasswd -s -m sha-512
+deb_db_password: '{{ mysql_root_password }}'  #defines debian db password...generate using echo password | mkpasswd -s -m sha-512
 enable_cacti_monitoring: false  #defines if cacti monitoring should be configured
 mysql_allow_remote_connections: false  #defines if mysql should listen on loopback (default) or allow remove connections
+mysql_allow_root_access_from_hosts:  #defines hosts where root can login from
+  - '{{ ansible_hostname }}'
+  - '127.0.0.1'
+  - '::1'
+  - 'localhost'
+#  - '%'
 mysql_docker_install: false  #defines if mysql is being installed in Docker
-mysql_port: 3306  #defines the port for mysql to listen on
-mysql_root_password: root #defines mysql root password...generate using echo password | mkpasswd -s -m sha-512
+mysql_mem_multiplier: .25  #defines the percentage of memory to use for memory calculations.
+mysql_port: '3306'  #defines the port for mysql to listen on
+mysql_replication_account_info:
+  user: replicator
+  password: mysqlreplication
+mysql_replication_dbs:
+  - 'test1'
+  - 'test2'
+mysql_replication_master_node: node0
+mysql_replication_nodes:
+  - name: node0
+    role: master
+    server_id: 1
+  - name: node1
+    role: slave
+    server_id: 2
+mysql_root_password: 'root' #defines mysql root password...generate using echo password | mkpasswd -s -m sha-512
+mysql_settings:
+  expire_logs_days: '10'
+  key_buffer_size: '{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M'  #Default is 16M
+  max_allowed_packet: '16M'
+  max_binlog_size: '100M'
+  max_connections: '150'
+  query_cache_limit: '1M'
+  query_cache_size: '16M'
+  thread_cache_size: '8'
+  thread_stack: '192K'
 mysqlchk_host: '127.0.0.1'  #defines the host to run mysqlchk against...usually localhost
 mysqlchk_opts: '-N -q -A'  #defines mysqlchk options to pass
 mysqlchk_user: 'cmon'  #defines mysqlchk user
 mysqlchk_pass: 'cmon'  #defines mysqlchk user password
-pri_domain_name: example.org
+pri_domain_name: 'example.org'

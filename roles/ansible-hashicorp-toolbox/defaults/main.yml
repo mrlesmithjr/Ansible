@@ -3,27 +3,27 @@
 hashicorp_install_dir: /usr/local/bin/
 hashicorp_tools:
   - name: consul
-    version: 0.6.3
+    version: 0.6.4
     state: present
   - name: nomad
-    version: 0.3.0
+    version: 0.4.0
     state: present
   - name: otto
     version: 0.2.0
     state: present
   - name: packer
-    version: 0.9.0
+    version: 0.10.1
     state: present
   - name: serf
     version: 0.7.0
     state: present
   - name: terraform
-    version: 0.6.12
+    version: 0.6.16
     state: present
   - name: vagrant  #Debian package
-    version: 1.8.1
+    version: 1.8.4
     state: present
   - name: vault
-    version: 0.5.1
+    version: 0.6.0
     state: present
 hashicorp_url: https://releases.hashicorp.com

@@ -1,0 +1,73 @@
+---
+- name: setup_replication | configuring replication account
+  mysql_user:
+    name: "{{ mysql_replication_account_info.user }}"
+    password: "{{ mysql_replication_account_info.password }}"
+    host: "%"
+    priv: "*.*:REPLICATION SLAVE"
+    state: "present"
+  with_items: '{{ mysql_replication_nodes }}'
+  when: >
+        item.role == "master" and
+        inventory_hostname == item.name
+
+- name: setup_replication | ensuring replicated dbs exist
+  mysql_db:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ mysql_replication_dbs }}'
+
+- name: setup_replication | restarting mysql if reconfigured
+  service:
+    name: "mysql"
+    state: "restarted"
+  register: "mysql_restarted"
+  when: >
+        ansible_os_family == "Debian" and
+        (mysql_reconfigured_14_04.changed or
+        mysql_reconfigured_16_04.changed)
+
+- name: setup_replication | restarting mysql if reconfigured
+  service:
+    name: "mariadb"
+    state: "restarted"
+  register: "mariadb_restarted"
+  when: >
+        ansible_os_family == "RedHat" and
+        mariadb_reconfigured_redhat.changed
+
+- name: setup_replication | waiting for MySQL service
+  wait_for:
+    port: "{{ mysql_port }}"
+    delay: 10
+  when: >
+        mysql_restarted.changed or
+        mariadb_reconfigured_redhat.changed
+
+- name: setup_replication | checking master status
+  mysql_replication:
+    mode: "getmaster"
+  register: "mysql_master_status"
+  when: inventory_hostname == mysql_replication_master_node
+
+- name: setup_replication | changing master
+  mysql_replication:
+    mode: "changemaster"
+    master_host: "{{ mysql_replication_master_node }}"
+    master_log_file: "{{ hostvars[mysql_replication_master_node].mysql_master_status.File }}"
+    master_log_pos: "{{ hostvars[mysql_replication_master_node].mysql_master_status.Position }}"
+    master_password: "{{ mysql_replication_account_info.password }}"
+    master_user: "{{ mysql_replication_account_info.user }}"
+  ignore_errors: true  #setting this for now to get around the initial setup
+  with_items: '{{ mysql_replication_nodes }}'
+  when: >
+        item.role == "slave" and
+        inventory_hostname == item.name
+
+- name: setup_replication | start slave
+  mysql_replication:
+    mode: "startslave"
+  with_items: '{{ mysql_replication_nodes }}'
+  when: >
+        item.role == "slave" and
+        inventory_hostname == item.name

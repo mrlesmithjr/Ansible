@@ -37,14 +37,15 @@ userlist STATSUSERS
     group admin users admin
     user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
 
-listen admin_page 0.0.0.0:{{ haproxy_admin_port }}
+listen stats
+    bind *:{{ haproxy_admin_port }}
     mode http
     stats enable
     stats refresh 60s
     stats uri /
     acl AuthOkay_ReadOnly http_auth(STATSUSERS)
     acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
-    stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+    stats http-request auth realm stats unless AuthOkay_ReadOnly
 {% endif %}
 
 {% if haproxy_configs is defined and haproxy_configs != 'None' %}

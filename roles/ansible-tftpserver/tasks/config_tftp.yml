@@ -131,10 +131,7 @@
     owner: root
     group: root
     mode: 0644
-  with_items:
-    - preseed
-    - ubuntu_12.04_preseed
-    - ubuntu_14.04_preseed
+  with_items: '{{ tftp_preseed_files }}'
   when: >
         (sync_tftp is defined and not sync_tftp) or
         sync_tftp is not defined
@@ -147,10 +144,7 @@
     group: root
     mode: 0644
   run_once: true
-  with_items:
-    - preseed
-    - ubuntu_12.04_preseed
-    - ubuntu_14.04_preseed
+  with_items: '{{ tftp_preseed_files }}'
   when: sync_tftp is defined and sync_tftp
 
 - name: config_tftp | reconfiguring txt.cfg

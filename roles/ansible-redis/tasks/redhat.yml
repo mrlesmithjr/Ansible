@@ -2,13 +2,13 @@
 - name: redhat | installing epel repo (RedHat)
   yum:
     name: "epel-release"
-    state: present
+    state: "present"
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing dependencies
   yum:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
     - 'python-devel'
     - 'python-pip'
@@ -17,7 +17,7 @@
 - name: redhat | installing dependencies
   dnf:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
     - 'python-devel'
     - 'python-pip'
@@ -26,23 +26,23 @@
 - name: redhat | installing redis
   yum:
     name: "redis"
-    state: present
+    state: "present"
   notify:
-    - start redis
+    - 'start redis'
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing redis
   dnf:
     name: "redis"
-    state: present
+    state: "present"
   notify:
-    - start redis
+    - 'start redis'
   when: ansible_distribution == "Fedora"
 
 - name: redhat | ensuring redis is enabled and started
   service:
     name: "redis"
-    state: started
+    state: "started"
     enabled: yes
 
 - name: redhat | configuring redis-server to listen on all interfaces
@@ -50,15 +50,7 @@
     dest: "/etc/redis.conf"
     regexp: "^bind 127.0.0.1"
     replace: "#bind 127.0.0.1"
-  notify: restart redis
+  notify: 'restart redis'
   when: >
         redis_allow_remote_connections is defined and
         redis_allow_remote_connections
-
-- name: redhat | tweaking redis memory
-  sysctl:
-    name: "vm.overcommit_memory"
-    value: 1
-    state: present
-    reload: yes
-  notify: restart redis

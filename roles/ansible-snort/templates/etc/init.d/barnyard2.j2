@@ -3,7 +3,7 @@
 case $1 in
     start)
         echo "Starting Barnyard2"
-        sudo bash -c "barnyard2 -c /etc/snort/barnyard2.conf -d {{ snort_barnyard2_logdir }} -f snort.log -w {{ snort_barnyard2_waldo_file }}"
+        sudo bash -c "barnyard2 -c /etc/snort/barnyard2.conf -d {{ snort_barnyard2_logdir }} -f snort.log -w {{ snort_barnyard2_waldo_file }} -g snort -u snort"
         echo 'Barnyard2 started.'
     ;;
     stop)

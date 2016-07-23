@@ -1,0 +1,43 @@
+# This is where alerts and specific notification outputs will be defined
+#
+filter {
+  if "Hadoop" in [tags] and [syslog_facility] == "kernel" {
+    if "critical target error" in [message] {
+      grok {
+        match => [
+          "message", ".*critical target error*. dev %{WORD:failed_drive_device}.*"
+        ]
+      }
+      mutate {
+        add_tag => [ "Hadoop-Alert", "HardDrive-Failure" ]
+      }
+    }
+  }
+}
+{%   if alert_throttles is defined %}
+filter {
+{%     for item in alert_throttles %}
+  if "{{ item.tag }}" in [tags] {
+    throttle {
+{%       for setting in item.settings %}
+      {{ setting.name }} => "{{ setting.value }}"
+{%       endfor %}
+      add_tag => "throttled"
+    }
+  }
+{%     endfor %}
+}
+{%   endif %}
+output {
+  if "HardDrive-Failure" in [tags] and "throttled" not in [tags] {
+    email {
+      address => "{{ smtp_server }}"
+      domain => "{{ logstash_alerts_domain }}"
+      from => "{{ logstash_alerts_email }}"
+      subject => "HardDrive Failure Detected on Hadoop node %{host} (%{failed_drive_device})"
+      to => "{{ email_notifications }}"
+      via => "smtp"
+      body => "Triggered in %{message}"
+    }
+  }
+}

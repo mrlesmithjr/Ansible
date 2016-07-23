@@ -1,0 +1,64 @@
+# Cisco ASA
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if "%ASA-" in [message] {
+      mutate {
+        add_tag => [ "pre-processed", "Firewall", "ASA" ]
+      }
+      grok {
+        match => [
+          "message", "<%{POSINT:syslog_pri}>%{CISCOTIMESTAMP:timestamp} %{SYSLOGHOST:sysloghost} %%{CISCOTAG:cisco_tag}: %{GREEDYDATA:cisco_message}"
+        ]
+      }
+      syslog_pri { }
+      grok {
+        match => [
+          "cisco_message", "%{CISCOFW106001}",
+          "cisco_message", "%{CISCOFW106006_106007_106010}",
+          "cisco_message", "%{CISCOFW106014}",
+          "cisco_message", "%{CISCOFW106015}",
+          "cisco_message", "%{CISCOFW106021}",
+          "cisco_message", "%{CISCOFW106023}",
+          "cisco_message", "%{CISCOFW106100}",
+          "cisco_message", "%{CISCOFW110002}",
+          "cisco_message", "%{CISCOFW302010}",
+          "cisco_message", "%{CISCOFW302013_302014_302015_302016}",
+          "cisco_message", "%{CISCOFW302020_302021}",
+          "cisco_message", "%{CISCOFW305011}",
+          "cisco_message", "%{CISCOFW313001_313004_313008}",
+          "cisco_message", "%{CISCOFW313005}",
+          "cisco_message", "%{CISCOFW402117}",
+          "cisco_message", "%{CISCOFW402119}",
+          "cisco_message", "%{CISCOFW419001}",
+          "cisco_message", "%{CISCOFW419002}",
+          "cisco_message", "%{CISCOFW500004}",
+          "cisco_message", "%{CISCOFW602303_602304}",
+          "cisco_message", "%{CISCOFW710001_710002_710003_710005_710006}",
+          "cisco_message", "%{CISCOFW713172}",
+          "cisco_message", "%{CISCOFW733100}",
+          "cisco_message", "%{WORD:action} %{WORD:protocol} %{CISCO_REASON:reason} from %{DATA:src_interface}:%{IP:src_ip}/%{INT:src_port} to %{DATA:dst_interface}:%{IP:dst_ip}/%{INT:dst_port}; %{GREEDYDATA:dnssec_validation}",
+          "cisco_message", "%{CISCO_ACTION:action} %{WORD:protocol} %{CISCO_REASON:reason}.*(%{IP:src_ip}).*%{IP:dst_ip} on interface %{GREEDYDATA:interface}",
+          "cisco_message", "Connection limit exceeded %{INT:inuse_connections}/%{INT:connection_limit} for input packet from %{IP:src_ip}/%{INT:src_port} to %{IP:dst_ip}/%{INT:dst_port} on interface %{GREEDYDATA:interface}",
+          "cisco_message", "TCP Intercept %{DATA:threat_detection} to %{IP:ext_nat_ip}/%{INT:ext_nat_port}.*(%{IP:int_nat_ip}/%{INT:int_nat_port}).*Average rate of %{INT:syn_avg_rate} SYNs/sec exceeded the threshold of %{INT:syn_threshold}.#%{INT}",
+          "cisco_message", "Embryonic connection limit exceeded %{INT:econns}/%{INT:limit} for %{WORD:direction} packet from %{IP:src_ip}/%{INT:src_port} to %{IP:dst_ip}/%{INT:dst_port} on interface %{GREEDYDATA:interface}"
+        ]
+      }
+      geoip {
+        source => "src_ip"
+        target => "geoip"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+      }
+      mutate {
+        convert => [ "[geoip][coordinates]", "float" ]
+      }
+      date {
+        match => [ "timestamp", "MMM dd HH:mm:ss", "MMM d HH:mm:ss", "MMM dd yyyy HH:mm:ss", "MMM d yyyy HH:mm:ss", "MMM  d HH:mm:ss" ]
+        timezone => "America/New_York"
+      }
+      mutate {
+        replace => [ "host", "%{sysloghost}" ]
+      }
+    }
+  }
+}

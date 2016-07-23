@@ -1,0 +1,10 @@
+# setup rundeck filtering
+filter {
+  if [type] == "rundeck" {
+    if [event.node] {
+      mutate {
+        replace => [ "host", "%{event.node}" ]
+      }
+    }
+  }
+}

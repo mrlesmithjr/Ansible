@@ -5,3 +5,6 @@
 
 - include: config_bind.yml
   when: config_bind
+
+- include: manage_zones.yml
+  when: manage_bind_zones

@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-elk-processors.git
+- src: https://github.com/mrlesmithjr/ansible-logstash.git
+- src: https://github.com/mrlesmithjr/ansible-redis.git

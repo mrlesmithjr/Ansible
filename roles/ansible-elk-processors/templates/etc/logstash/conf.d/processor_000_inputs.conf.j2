@@ -1,0 +1,30 @@
+#
+{% if logstash_processor_inputs is defined %}
+{%   for item in logstash_processor_inputs %}
+{%     if item.type == "redis" %}
+input {
+  redis {
+    host => "{{ item.host }}"
+    data_type => "list"
+{%         if item.batch_count is defined %}
+    batch_count => "{{ item.batch_count }}"
+{%         endif %}
+    key => "logstash"
+{%         if item.threads is defined %}
+    threads => "{{ item.threads }}"
+{%         endif %}
+  }
+}
+{%     endif %}
+{%     if item.type == "rabbitmq" %}
+input {
+  rabbitmq {
+    host => "{{ item.host }}"
+{%       if item.exchange is defined %}
+    exchange => "{{ item.exchange }}"
+{%       endif %}
+  }
+}
+{%     endif %}
+{%   endfor %}
+{% endif %}

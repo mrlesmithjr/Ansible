@@ -1,6 +1,8 @@
 ---
 - name: config_db | granting db permissions for user {{ stackstorm_db_info.user }}
   become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
   postgresql_user:
     name: "{{ stackstorm_db_info.user }}"
     password: "{{ stackstorm_db_info.password }}"
@@ -10,6 +12,8 @@
 
 - name: config_db | creating db {{ stackstorm_db_info.db }}
   become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
   postgresql_db:
     name: "{{ stackstorm_db_info.db }}"
     owner: "{{ stackstorm_db_info.user }}"

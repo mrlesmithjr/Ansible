@@ -30,3 +30,4 @@ squid_servers: []  #defines squid servers to configure haproxy if used
 #  - squid-1
 #  - squid-2
 squid_transparent_proxy: false  #defines if squid should function in transparent mode...define here or in group_vars/group
+squid_transparent_proxy_ferm: false  #defines if squid transparent should configure ferm firewall for masquerading

@@ -9,13 +9,13 @@
 #		       S T A R T U P   E N A B L E D
 ###############################################################################
 
-STARTUP_ENABLED=Yes
+STARTUP_ENABLED={{ shorewall_config_options.startup_enabled }}
 
 ###############################################################################
 #		              V E R B O S I T Y
 ###############################################################################
 
-VERBOSITY=1
+VERBOSITY={{ shorewall_config_options.verbosity }}
 
 ###############################################################################
 #		                L O G G I N G
@@ -25,17 +25,17 @@ BLACKLIST_LOG_LEVEL=
 
 INVALID_LOG_LEVEL=
 
-LOG_MARTIANS=Yes
+LOG_MARTIANS={{ shorewall_config_options.log_martians }}
 
-LOG_VERBOSITY=2
+LOG_VERBOSITY={{ shorewall_config_options.log_verbosity }}
 
 LOGALLNEW=
 
-LOGFILE=/var/log/messages
+LOGFILE={{ shorewall_config_options.logfile }}
 
-LOGFORMAT="Shorewall:%s:%s:"
+LOGFORMAT="{{ shorewall_config_options.logformat }}"
 
-LOGTAGONLY=No
+LOGTAGONLY={{ shorewall_config_options.logtagonly }}
 
 LOGLIMIT=
 
@@ -49,7 +49,7 @@ SFILTER_LOG_LEVEL=info
 
 SMURF_LOG_LEVEL=info
 
-STARTUP_LOG=/var/log/shorewall-init.log
+STARTUP_LOG={{ shorewall_config_options.startup_log }}
 
 TCP_FLAGS_LOG_LEVEL=info
 
@@ -110,7 +110,7 @@ RSH_COMMAND='ssh ${root}@${system} ${command}'
 #			F I R E W A L L	  O P T I O N S
 ###############################################################################
 
-ACCOUNTING=Yes
+ACCOUNTING={{ shorewall_config_options.accounting }}
 
 ACCOUNTING_TABLE=filter
 
@@ -164,7 +164,7 @@ IMPLICIT_CONTINUE=No
 
 IPSET_WARNINGS=Yes
 
-IP_FORWARDING=Keep
+IP_FORWARDING={{ shorewall_config_options.ip_forwarding }}
 
 KEEP_RT_TABLES=No
 
@@ -184,7 +184,7 @@ MARK_IN_FORWARD_CHAIN=No
 
 MODULE_SUFFIX=ko
 
-MULTICAST=No
+MULTICAST={{ shorewall_config_options.multicast }}
 
 MUTEX_TIMEOUT=60
 

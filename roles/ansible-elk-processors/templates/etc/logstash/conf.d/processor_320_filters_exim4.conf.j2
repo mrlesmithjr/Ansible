@@ -1,0 +1,65 @@
+# Setup EXIM4 Log parsing
+filter {
+  if [type] == "exim-log" {
+    grok {
+      match => [
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} <= %{NOTSPACE:from_addr} H=%{IPORHOST:incoming_hostname} \[%{IP:incoming_ip}\] P=%{WORD:protocol} S=%{INT:msg_size} id=%{NOTSPACE:incoming_msg_id}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} <= %{NOTSPACE:from_addr} H=%{IPORHOST:incoming_hostname} %{NOTSPACE} \[%{IP:incoming_ip}\] P=%{WORD:protocol} S=%{INT:msg_size}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} <= %{NOTSPACE:from_addr} H=%{IPORHOST:incoming_hostname} \[%{IP:incoming_ip}\] P=%{WORD:protocol} S=%{INT:msg_size}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} => %{NOTSPACE:to_addr} R=%{WORD:router_name} T=%{NOTSPACE:transport_name} H=%{IPORHOST:outgoing_hostname} \[%{IP:outgoing_ip}\] C=%{QS:smtp_confirmation}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} \**\ %{NOTSPACE:to_addr} R=%{WORD:router_name} T=%{NOTSPACE:transport_name}: %{GREEDYDATA:msg_alert} SIZE=%{INT:msg_size}: host %{IPORHOST:outgoing_hostname} \[%{IP:outgoing_ip}]: %{GREEDYDATA:msg_alert_reason}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} \**\ %{NOTSPACE:from_addr} R=%{WORD:router_name} T=%{NOTSPACE:transport_name}: %{GREEDYDATA:msg_alert}: host %{IPORHOST:outgoing_hostname} \[%{IP:outgoing_ip}]: %{GREEDYDATA:msg_alert_reason}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{WORD} queue run: pid=%{INT:pid}",
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE:msgid} %{GREEDYDATA}"
+      ]
+    }
+    if "=>" in [message] {
+      mutate {
+        add_field => [ "delivery", "outgoing" ]
+      }
+    }
+    if "<=" in [message] {
+      mutate {
+        add_field => [ "delivery", "incoming" ]
+      }
+    }
+    if ">>" in [message] {
+      mutate {
+        add_field => [ "delivery", "cutthrough" ]
+      }
+    }
+    if "*>" in [message] {
+      mutate {
+        add_field => [ "delivery", "suppressed" ]
+      }
+    }
+    if "**" in [message] {
+      mutate {
+        add_field => [ "delivery", "bounced" ]
+      }
+    }
+    if "==" in [message] {
+      mutate {
+        add_field => [ "delivery", "deferred" ]
+      }
+    }
+    if "Completed" in [message] {
+      mutate {
+        add_field => [ "msg_status", "completed" ]
+      }
+    }
+    if "frozen" in [message] {
+      mutate {
+        add_field => [ "msg_status", "frozen" ]
+      }
+    }
+    grok {
+      match => [
+        "message", "%{TIMESTAMP_ISO8601:syslog_timestamp} %{GREEDYDATA:message_body}"
+      ]
+    }
+    mutate {
+      replace => [ "message", "%{message_body}" ]
+    }
+  }
+}

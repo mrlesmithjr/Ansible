@@ -14,6 +14,7 @@ snorby_db_info_setup:  #defines Snorby DB Info for initial setup
   host: localhost
   user: root
   pass: '{{ mysql_root_password }}'
+snorby_db_type: mysql  #defines what db type is used...options mysql or mariadb
 snorby_mail_sender: 'snorby@{{ pri_domain_name }}'
 snorby_reconfigure_gemfile: true  #defines if Gemfile pulled down should be overwritten due to https://github.com/Snorby/snorby/pull/388
 snorby_root_dir: '{{ apache_root_dir }}/snorby'

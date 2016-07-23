@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs redis
+  description: Installs Redis Server
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)

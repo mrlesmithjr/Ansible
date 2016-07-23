@@ -2,6 +2,7 @@
 allow_ddns_updates: false  #define here or globally in group_vars/group
 allow_ddns_updates_from: 0.0.0.0/0  #defines subnet to allow DDNS updates from if allowed...define here or globally in group_vars/group
 config_logstash: false  #defines if logstash should be configured if installed...define here or globally in group_vars/group
+config_soa_edit_api: false  #set to true if setting up Master/Slave...Otherwise Master zones will not update their SOA in order to transfer
 create_pdns_records: false   #defines if dns records should be created/updated
 create_pdns_zones: false  #defines if dns zones should be created...pdns_fwd_zones and pdns_fwd_zones
 dns_hostmaster: "hostmaster.{{ pri_domain_name }}"  #define here or globally in group_vars/group
@@ -27,8 +28,13 @@ pdns_default_soa_mail: "hostmaster.{{ pri_domain_name }}" #define here or global
 pdns_default_soa_name: "{{ ansible_hostname }}.{{ pri_domain_name }}" #define here or globally in group_vars/group
 pdns_download_url: https://downloads.powerdns.com/releases
 pdns_json_interface: true
-pdns_ns1: "ns1.{{ pri_domain_name }}"  #define primary nameserver to use when creating zones...IP/Hostname..ns1.example.org
-pdns_ns2: "ns2.{{ pri_domain_name }}"  #define secondary nameserver to use when creating zones...IP/Hostname..ns2.example.org
+pdns_listen_all_interfaces: true  #defines if PDSN will listen on all interfaces
+pdns_master: false  #Defines if node should perform as PDNS Master
+pdns_nameservers:  #define nameservers to use when creating zones..
+  - 'ns1.{{ pri_domain_name }}'
+  - 'ns2.{{ pri_domain_name }}'
+#pdns_ns1: "ns1.{{ pri_domain_name }}"  #define primary nameserver to use when creating zones...IP/Hostname..ns1.example.org
+#pdns_ns2: "ns2.{{ pri_domain_name }}"  #define secondary nameserver to use when creating zones...IP/Hostname..ns2.example.org
 pdns_fwd_zones:  #defines the DNS forward zones to create if create_pdns_zones is true
   - "_msdcs.{{ pri_domain_name }}"
   - "_sites.{{ pri_domain_name }}"
@@ -95,6 +101,10 @@ pdns_rev_zones:  #defines the DNS reverse zones to create if create_pdns_zones i
   - 70.168.192.in-addr.arpa
   - 200.168.192.in-addr.arpa
 pdns_server_version: 3.4.6-1
+pdns_slave: false  #Defines if node should perform as PDNS Slave
+pdns_slaves:
+  - '172.28.128.4/32'
+  - '172.28.128.6/32'
 pdns_webserver_address: 0.0.0.0
 pdns_webserver_allow: "0.0.0.0/0,::/0"
 pdns_webserver_password: []  #define here or globally in group_vars/all/accounts
@@ -108,4 +118,5 @@ poweradmin_ver: poweradmin-2.1.7
 pri_dns: []  #defines primary dns server on network...define here or globally in group_vars/all
 pri_domain_name: example.org  #define here or globally in group_vars/all
 sec_dns: []  #defines secondary dns server on network...define here or globally in group_vars/all
+soa_edit_api: 'INCEPTION-INCREMENT'
 web_root: /var/www/html

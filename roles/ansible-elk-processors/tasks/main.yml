@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-elk-processors
+- include: debian_rsyslog.yml
+  when: ansible_os_family == "Debian"
+
+- include: centos_rsyslog.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_logstash.yml
+
+- include: config_blacklists.yml
+  when: enable_dns_blacklist_filtering

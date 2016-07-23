@@ -1,0 +1,38 @@
+---
+- name: section_07_level1 | Modifying Network Parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: "present"
+    reload: yes
+  with_items: '{{ cis_debian_section_07_level1_network_params }}'
+
+- name: section_07_level1 | Ensuring TCP Wrappers is installed (Scored)
+  apt:
+    name: "tcpd"
+    state: "present"
+
+- name: section_07_level1 | Ensuring /etc/hosts.allow permissions are correct (Scored)
+  file:
+    path: "/etc/hosts.allow"
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: section_07_level1 | Ensuring /etc/hosts.deny permissions are correct (Scored)
+  file:
+    path: "/etc/hosts.deny"
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: section_07_level1 | Configuring firewall
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  with_items: '{{ cis_debian_section_07_level1_firewall_conf }}'
+
+- name: section_07_level1 | Ensuring firewall is active (Scored)
+  ufw:
+    state: "enabled"

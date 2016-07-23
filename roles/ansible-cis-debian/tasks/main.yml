@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-cis-debian
+- include: section_02_level1.yml
+
+- include: section_02_level2.yml
+
+- include: section_07_level1.yml
+
+- include: section_08_level2.yml

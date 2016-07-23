@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs mysql role (Configurable and Cacti Monitoring options)
+  description: An Ansible role to install/configure MySQL https://www.mysql.com/
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -85,6 +85,7 @@ galaxy_info:
     - trusty
   #  - utopic
   #  - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

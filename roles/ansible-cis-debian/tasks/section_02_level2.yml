@@ -1,0 +1,8 @@
+---
+- name: section_02_level2 | Configuring /etc/modprobe.d/CIS.conf
+  template:
+    src: "etc/modprobe.d/CIS.conf.j2"
+    dest: "/etc/modprobe.d/CIS.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644

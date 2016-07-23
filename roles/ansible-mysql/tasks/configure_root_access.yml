@@ -1,8 +1,8 @@
 ---
 - name: configure_root_access | ensuring MySQL service is running (Non Docker install)
   service:
-    name: mysql
-    state: started
+    name: "mysql"
+    state: "started"
     enabled: yes
   when: >
         mariadb_server_installed is not defined and
@@ -12,8 +12,8 @@
 
 - name: configure_root_access | ensuring MySQL service is running (Non Docker install)
   service:
-    name: mariadb
-    state: started
+    name: "mariadb"
+    state: "started"
     enabled: yes
   when: >
         mariadb_server_installed is defined and
@@ -34,19 +34,25 @@
 
 - name: configure_root | configuring root my.cnf
   template:
-    src: root/my.cnf.j2
-    dest: /root/.my.cnf
-    owner: root
-    group: root
+    src: "root/my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: "root"
+    group: "root"
     mode: 0600
+  when: ansible_os_family == "Debian"
 
 - name: configure_root_access | updating root passwords
   mysql_user:
-    name: root
+    name: "root"
     host: "{{ item }}"
     password: "{{ mysql_root_password }}"
-  with_items:
-    - '{{ ansible_hostname }}'
-    - '127.0.0.1'
-    - '::1'
-    - localhost
+  with_items: '{{ mysql_allow_root_access_from_hosts }}'
+
+- name: configure_root | configuring root my.cnf
+  template:
+    src: "root/my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: "root"
+    group: "root"
+    mode: 0600
+  when: ansible_os_family != "Debian"

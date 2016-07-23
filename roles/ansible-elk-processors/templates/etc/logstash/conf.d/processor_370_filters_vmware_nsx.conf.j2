@@ -1,0 +1,70 @@
+# NSX Initial Parsing
+filter {
+  if "NSX" in [tags] {
+    grok {
+      match => [
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}"
+      ]
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    syslog_pri { }
+    date {
+      match => [ "syslog_timestamp", "MMM d HH:mm:ss", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss", "ISO8601" ]
+      timezone => "UTC"
+    }
+    if !("_grokparsefailure" in [tags]) {
+      mutate {
+        replace => [ "host", "%{syslog_hostname}" ]
+      }
+    }
+  }
+}
+# NSX Firewall Rule parsing
+filter {
+  if "NSX" in [tags] and [syslog_program] == "firewall[]" {
+    grok {
+      break_on_match => false
+      match => [
+        "message", ": \[%{DATA:nsx_tenant}]\: (%{DATA:nsx_fw_action}_%{INT:nsx_fw_ruletag}IN=%{DATA:in_int}) OUT=%{DATA:out_int}?.*MAC=(%{COMMONMAC:dst_mac}):(%{COMMONMAC:src_mac}).*SRC=%{IP:src_ip}.*DST=%{IP:dst_ip}.*PROTO=(%{WORD:protocol}).?*SPT=(%{INT:src_port}?.*DPT=%{INT:dst_port}?.*)",
+        "message", ": \[%{DATA:nsx_tenant}]\: (%{DATA:nsx_fw_action}_%{INT:nsx_fw_ruletag}IN=%{DATA:in_int}).*SRC=%{IP:src_ip}.*DST=%{IP:dst_ip}.*PROTO=(%{WORD:protocol}).?*SPT=(%{INT:src_port}?.*DPT=%{INT:dst_port}?.*)",
+        "message", ": \[%{DATA:nsx_tenant}]\: (%{DATA:nsx_fw_action}_%{INT:nsx_fw_ruletag}IN=%{DATA:in_int}).*SRC=%{IP:src_ip}.*DST=%{IP:dst_ip}.*PROTO=%{WORD:protocol} TYPE=%{INT:proto_type} %{GREEDYDATA}",
+        "message", ": \[%{DATA:nsx_tenant}]\: (%{DATA:nsx_fw_action}_%{INT:nsx_fw_ruletag}IN=%{DATA:in_int}) OUT=%{DATA:out_int}?.*MAC=(%{COMMONMAC:dst_mac}):(%{COMMONMAC:src_mac}).*SRC=%{IP:src_ip}.*DST=%{IP:dst_ip}.*PROTO=(%{WORD:protocol})"
+      ]
+    }
+    geoip {
+      source => "src_ip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+      convert => [ "[geoip][coordinates]", "float" ]
+    }
+    mutate {
+      add_tag => [ "NSX-FW" ]
+    }
+  }
+}
+# NSX NAT Rule parsing
+filter {
+  if "NSX" in [tags] and [syslog_program] == "nat[]" {
+    grok {
+      match => [
+        "message", ":.*\[%{DATA:nsx_tenant}]\:.*SNAT_IN=%{WORD:in_int}?.*\OUT=%{WORD:out_int}.*SRC=%{IP:src_ip}.*DST=%{IP:dst_ip}.*PROTO=%{WORD:protocol}.*SPT=%{INT:src_port}.*DPT=%{INT:dst_port}"
+      ]
+    }
+    geoip {
+      source => "dst_ip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+      convert => [ "[geoip][coordinates]", "float" ]
+    }
+    mutate {
+      add_tag => [ "NSX-NAT" ]
+    }
+  }
+}

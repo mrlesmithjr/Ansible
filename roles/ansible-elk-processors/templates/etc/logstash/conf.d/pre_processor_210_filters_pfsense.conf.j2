@@ -1,0 +1,184 @@
+# Setting up PFsense Firewall parsing
+filter {
+  if "PFSense" in [tags] {
+    mutate {
+      add_tag => [ "firewall" ]
+    }
+    grok {
+      match => [
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGBASE} %{NOTSPACE} %{GREEDYDATA:pfsense_message}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGBASE} %{GREEDYDATA:pfsense_message}"
+      ]
+    }
+    mutate {
+      add_field => [ "orig_message", "%{message}" ]
+    }
+    syslog_pri {}
+    date {
+      match => [ "timestamp", "MMM d HH:mm:ss", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss", "MMM d HH:mm:ss,SSS", "MMM dd HH:mm:ss,SSS", "ISO8601" ]
+      timezone => "America/New_York"
+    }
+# New parsing for PFSense 2.2
+    if [program] == "filterlog" {
+      grok {
+        match => [
+          "message", "filterlog: %{INT:pf_ruleset},%{INT:pf_sub_ruleset},%{WORD:pf_anchor},%{INT:pf_tracker},%{WORD:pf_real_int},%{WORD:pf_reason},%{WORD:pf_action},%{WORD:pf_direction},%{INT:pf_ip_version},%{GREEDYDATA:pf_ip_spec_data}",
+          "message", "filterlog: %{DATA}:*.\[ %{INT:pf_ruleset},%{INT:pf_sub_ruleset},,%{INT:pf_tracker},%{WORD:pf_real_int},%{WORD:pf_reason},%{WORD:pf_action},%{WORD:pf_direction},%{INT:pf_ip_version},%{GREEDYDATA:pf_ip_spec_data}]",
+          "message", "filterlog: %{INT:pf_ruleset},%{INT:pf_sub_ruleset},,%{INT:pf_tracker},%{WORD:pf_real_int},%{WORD:pf_reason},%{WORD:pf_action},%{WORD:pf_direction},%{INT:pf_ip_version},%{GREEDYDATA:pf_ip_spec_data}"
+        ]
+      }
+      if [pf_ip_version] == "4" {
+        grok {
+          match => [
+            "pf_ip_spec_data", "%{WORD:pf_ip_tos},%{WORD:pf_ip_ecn},%{INT:pf_ip_ttl},%{INT:pf_ip_pkt_id},%{INT:pf_ip_frag_offset},%{WORD:pf_ip_flags},%{INT:pf_ip_proto_id},%{WORD:pf_ip_proto},%{INT:pf_ip_pkt_len},%{IP:pf_src_addr},%{IP:pf_dst_addr},%{GREEDYDATA:pf_proto_spec_data}",
+            "pf_ip_spec_data", "%{WORD:pf_ip_tos},,%{INT:pf_ip_ttl},%{INT:pf_ip_pkt_id},%{INT:pf_ip_frag_offset},%{WORD:pf_ip_flags},%{INT:pf_ip_proto_id},%{WORD:pf_ip_proto},%{INT:pf_ip_pkt_len},%{IP:pf_src_addr},%{IP:pf_dst_addr},%{GREEDYDATA:pf_proto_spec_data}"
+          ]
+        }
+        if [pf_ip_proto] == "icmp" {
+          if [pf_proto_spec_data] =~ /^request/ or [pf_proto_spec_data] =~ /^reply/ {
+            grok {
+              match => [
+                "pf_proto_spec_data", "%{DATA:pf_icmp_echo_type},%{INT:pf_icmp_echo_id},%{INT:pf_icmp_echo_seq}"
+              ]
+            }
+          }
+          else if [pf_proto_spec_data] =~ /^unreach/ or [pf_proto_spec_data] =~ /^timexceed/ or [pf_proto_spec_data] =~ /^paramprob/ or [pf_proto_spec_data] =~ /^redirect/ or [pf_proto_spec_data] =~ /^maskreply/ {
+            grok {
+              match => [
+                "pf_proto_spec_data", "%{DATA:pf_icmp_other_unreachable},%{GREEDYDATA:pf_icmp_desc}"
+              ]
+            }
+          }
+          else {
+            grok {
+              match => [
+                "pf_proto_spec_data", "%{GREEDYDATA:pf_icmp_message}"
+              ]
+            }
+          }
+        }
+        if [pf_ip_proto] == "tcp" {
+          grok {
+            match => [
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num}:%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num}:%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options};",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num}:%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},,%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},,%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,"
+            ]
+          }
+        }
+        if [pf_ip_proto] == "udp" {
+          grok {
+            match => [
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len}"
+            ]
+          }
+        }
+      }
+      if [pf_ip_version] == "6" {
+        grok {
+          match => [
+            "pf_ip_spec_data", "%{WORD:pf_ipv6_class},%{WORD:pf_ipv6_flow_label},%{INT:pf_ipv6_hop_limit},%{WORD:pf_ipv6_proto},%{INT:pf_ipv6_proto_id},%{INT:pf_ipv6_pkt_len},%{DATA:pf_ipv6_src_addr},%{DATA:pf_ipv6_dest_addr},%{GREEDYDATA:pf_proto_spec_data}"
+          ]
+        }
+        if [pf_ipv6_proto] == "TCP" {
+          grok {
+            match => [
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}"
+            ]
+          }
+        }
+        if [pf_ipv6_proto] == "UDP" {
+          grok {
+            match => [
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len}"
+            ]
+          }
+        }
+      }
+      mutate {
+        rename => [ "pf_real_int", "iface" ]
+        rename => [ "pf_action", "action" ]
+        rename => [ "pf_dst_addr", "dst_ip" ]
+        rename => [ "pf_dst_port", "dst_port" ]
+        rename => [ "pf_ip_proto", "proto" ]
+        rename => [ "pf_reason", "reason" ]
+        rename => [ "pf_src_addr", "src_ip" ]
+        rename => [ "pf_src_port", "src_port" ]
+      }
+      if [src_ip]  {
+        geoip {
+          source => "src_ip"
+          target => "geoip"
+          add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+          add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+        }
+        mutate {
+          convert => [ "[geoip][coordinates]", "float" ]
+        }
+      }
+    }
+# End PFSense 2.2
+#    mutate {
+#      replace => [ "message", "%{pfsense_message}" ]
+#    }
+    if [program] =~ /^pf$/ {
+      mutate {
+        add_tag => [ "packetfilter" ]
+      }
+      multiline {
+        pattern => "^\s+|^\t\s+"
+        what => "previous"
+      }
+      mutate {
+        gsub => ['message', "\n", " "]
+      }
+      grok {
+        match => [
+          "message", "rule %{NOTSPACE:rule}\(.*\): %{WORD:action} .* on %{NOTSPACE:iface}: .* proto %{WORD:proto}%{GREEDYDATA}%{IP:src_ip}\.%{INT:src_port} [<|>] %{IP:dst_ip}\.%{INT:dst_port}: %{GREEDYDATA}",
+          "message", "%{GREEDYDATA}"
+        ]
+      }
+      mutate {
+        remove_field => [ "pfsense_message" ]
+      }
+    }
+    if [program] =~ /^dhcpd$/ {
+      if [message] =~ /^DHCPACK|^DHCPREQUEST|^DHCPOFFER/ {
+        grok {
+          match => [ "message", "(?<action>.*) (on|for|to) (?<src_ip>[0-2]?[0-9]?[0-9]\.[0-2]?[0-9]?[0-9]\.[0-2]?[0-9]?[0-9]\.[0-2]?[0-9]?[0-9]) .*(?<mac_address>[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]).* via (?<iface>.*)" ]
+        }
+      }
+      if [message] =~ /^DHCPDISCOVER/ {
+        grok {
+          match => [ "message", "(?<action>.*) from (?<mac_address>[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]).* via (?<iface>.*)" ]
+        }
+      }
+      if [message] =~ /^DHCPINFORM/ {
+        grok {
+          match => [ "message", "(?<action>.*) from (?<src_ip>.*).* via (?<iface>.*)" ]
+        }
+      }
+    }
+    if [program] == "suricata" {
+      mutate {
+        add_tag => [ "suricata" ]
+      }
+    }
+    if [program] == "snort" {
+      mutate {
+        add_tag => [ "snort" ]
+      }
+    }
+    mutate {
+      replace => [ "host", "%{logsource}" ]
+      add_tag => [ "pre-processed" ]
+      remove_field => [ "logsource", "pfsense_message", "syslog_host_id" ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+filter {
+  if [type] == "syslog" {
+    dns {
+      reverse => [ "host" ]
+      action => "replace"
+    }
+    mutate {
+      add_tag => [ "syslog" ]
+    }
+  }
+  if [type] == "ESXi" {
+    mutate {
+      add_tag => [ "ESXi" ]
+    }
+  }
+  if [type] == "vCenter" {
+    mutate {
+      add_tag => [ "vCenter" ]
+    }
+  }
+}

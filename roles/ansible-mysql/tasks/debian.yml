@@ -4,32 +4,52 @@
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - automysqlbackup
-    - software-properties-common
-    - python-mysqldb
-    - rsync
+    - 'automysqlbackup'
+    - 'software-properties-common'
+    - 'python-mysqldb'
+    - 'rsync'
 
 - name: debian | installing mysql
   apt:
-    name: mysql-server
-    state: present
+    name: "mysql-server"
+    state: "present"
 
 - name: debian | configuring mysql
   template:
-    src: etc/mysql/my.cnf.j2
-    dest: /etc/mysql/my.cnf
-  notify: restart mysql
+    src: "etc/mysql/my.cnf.j2"
+    dest: "/etc/mysql/my.cnf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  register: "mysql_reconfigured_14_04"
+  notify: "restart mysql"
+  when: >
+        ansible_distribution_version <= '14.04'
+
+- name: debian | configuring mysql
+  template:
+    src: "etc/mysql/mysql.conf.d/mysqld.cnf.j2"
+    dest: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  register: "mysql_reconfigured_16_04"
+  notify: "restart mysql"
+  when: >
+        ansible_distribution_version >= '16.04'
 
 - name: debian | configuring client configuration
   template:
-    src: etc/mysql/conf.d/client.cnf.j2
-    dest: /etc/mysql/conf.d/client.cnf
-    owner: root
-    group: root
+    src: "etc/mysql/conf.d/client.cnf.j2"
+    dest: "/etc/mysql/conf.d/client.cnf"
+    owner: "root"
+    group: "root"
     mode: 0644
-  notify: reload mysql
+  notify: "reload mysql"
+  when: >
+        ansible_distribution_version <= '14.04'
 
 - name: debian | adding cacti db user for monitoring
   mysql_user:
@@ -37,10 +57,12 @@
     password: "{{ cacti_db_password }}"
     host: "{{ cacti_server }}"
     priv: "*.*:SUPER,PROCESS"
-    state: present
+    state: "present"
   tags:
     - cacti_monitoring
-  when: enable_cacti_monitoring and cacti_server is defined
+  when: >
+        enable_cacti_monitoring and
+        cacti_server is defined
 
 - name: debian | adding cacti db user for monitoring
   mysql_user:
@@ -48,7 +70,9 @@
     password: "{{ cacti_db_password }}"
     host: "{{ cacti_server_fqdn }}"
     priv: "*.*:SUPER,PROCESS"
-    state: present
+    state: "present"
   tags:
     - cacti_monitoring
-  when: enable_cacti_monitoring and cacti_server_fqdn is defined
+  when: >
+        enable_cacti_monitoring and
+        cacti_server_fqdn is defined

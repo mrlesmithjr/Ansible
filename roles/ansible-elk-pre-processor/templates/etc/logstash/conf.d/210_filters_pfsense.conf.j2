@@ -1,5 +1,3 @@
-# {{ ansible_managed }}
-#
 # Setting up PFsense Firewall parsing
 filter {
   if "PFSense" in [tags] {
@@ -25,12 +23,14 @@ filter {
       grok {
         match => [
           "message", "filterlog: %{INT:pf_ruleset},%{INT:pf_sub_ruleset},%{WORD:pf_anchor},%{INT:pf_tracker},%{WORD:pf_real_int},%{WORD:pf_reason},%{WORD:pf_action},%{WORD:pf_direction},%{INT:pf_ip_version},%{GREEDYDATA:pf_ip_spec_data}",
+          "message", "filterlog: %{DATA}:*.\[ %{INT:pf_ruleset},%{INT:pf_sub_ruleset},,%{INT:pf_tracker},%{WORD:pf_real_int},%{WORD:pf_reason},%{WORD:pf_action},%{WORD:pf_direction},%{INT:pf_ip_version},%{GREEDYDATA:pf_ip_spec_data}]",
           "message", "filterlog: %{INT:pf_ruleset},%{INT:pf_sub_ruleset},,%{INT:pf_tracker},%{WORD:pf_real_int},%{WORD:pf_reason},%{WORD:pf_action},%{WORD:pf_direction},%{INT:pf_ip_version},%{GREEDYDATA:pf_ip_spec_data}"
         ]
       }
       if [pf_ip_version] == "4" {
         grok {
           match => [
+            "pf_ip_spec_data", "%{WORD:pf_ip_tos},%{WORD:pf_ip_ecn},%{INT:pf_ip_ttl},%{INT:pf_ip_pkt_id},%{INT:pf_ip_frag_offset},%{WORD:pf_ip_flags},%{INT:pf_ip_proto_id},%{WORD:pf_ip_proto},%{INT:pf_ip_pkt_len},%{IP:pf_src_addr},%{IP:pf_dst_addr},%{GREEDYDATA:pf_proto_spec_data}",
             "pf_ip_spec_data", "%{WORD:pf_ip_tos},,%{INT:pf_ip_ttl},%{INT:pf_ip_pkt_id},%{INT:pf_ip_frag_offset},%{WORD:pf_ip_flags},%{INT:pf_ip_proto_id},%{WORD:pf_ip_proto},%{INT:pf_ip_pkt_len},%{IP:pf_src_addr},%{IP:pf_dst_addr},%{GREEDYDATA:pf_proto_spec_data}"
           ]
         }
@@ -61,7 +61,14 @@ filter {
           grok {
             match => [
               "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num}:%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
-              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}"
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num}:%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options};",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num}:%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},,%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,%{NOTSPACE:pf_tcp_options}",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},,%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},%{INT:pf_tcp_ack_num},%{INT:pf_tcp_window},,",
+              "pf_proto_spec_data", "%{INT:pf_src_port},%{INT:pf_dst_port},%{INT:pf_data_len},%{WORD:pf_tcp_flags},%{INT:pf_tcp_seq_num},,%{INT:pf_tcp_window},,"
             ]
           }
         }
@@ -103,6 +110,17 @@ filter {
         rename => [ "pf_reason", "reason" ]
         rename => [ "pf_src_addr", "src_ip" ]
         rename => [ "pf_src_port", "src_port" ]
+      }
+      if [src_ip]  {
+        geoip {
+          source => "src_ip"
+          target => "geoip"
+          add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+          add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+        }
+        mutate {
+          convert => [ "[geoip][coordinates]", "float" ]
+        }
       }
     }
 # End PFSense 2.2

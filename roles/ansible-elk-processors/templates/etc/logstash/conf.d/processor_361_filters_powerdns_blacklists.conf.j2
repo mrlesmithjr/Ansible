@@ -1,0 +1,22 @@
+{%   if powerdns_blacklists is defined %}
+{%     for item in powerdns_blacklists %}
+filter{
+  if "PowerDNS" in [tags] and "pre-processed" not in [tags] {
+    translate {
+      add_tag => [ "DNS_Blacklist", "Blacklist_{{ item }}" ]
+      destination => "dns_blacklist"
+      dictionary_path => "{{ logstash_blacklists_dir }}/{{ item }}.yml"
+      field => "pdns_record_lookup"
+    }
+  }
+}
+{%     endfor %}
+{%   endif %}
+
+filter {
+  if "DNS_Blacklist" in [tags] {
+    mutate {
+      add_field => [ "blacklist_host", "%{pdns_request_from}" ]
+    }
+  }
+}

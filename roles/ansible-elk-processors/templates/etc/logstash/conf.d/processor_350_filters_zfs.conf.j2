@@ -1,0 +1,15 @@
+# ZFS ArcStats
+#filter {
+#  if [type] == "ZFS_ArcStats"
+#}
+
+# ZFS ZPOOL IO
+filter {
+  if [type] == "ZFS_ZPOOL_IO" {
+    grok {
+      match => [
+        "path", "/var/log/logstash/%{DATA:zpool_name}_zpool.io"
+      ]
+    }
+  }
+}

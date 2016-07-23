@@ -1,0 +1,58 @@
+# Setting up VMware vCenter parsing
+filter {
+  if "vCenter" in [tags] {
+    multiline {
+      pattern => "-->"
+      what => "previous"
+    }
+    multiline {
+      pattern => "StackTrace:"
+      what => "previous"
+    }
+    multiline {
+      pattern => "(^[a-zA-Z.]+(?:Error|Exception): .+)|(^\s+at .+)|(^\s+... \d+ more)|(^\s*Caused by:.+)"
+      what => "previous"
+    }
+    grok {
+      break_on_match => true
+      match => [
+        "message", "<%{INT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{IPORHOST:syslog_hostname} %{TIMESTAMP_ISO8601:syslog_timestamp} (?<message_body>(?<message_system_info>(?:\[%{DATA:message_thread_id} %{DATA:syslog_level} \'%{DATA:message_service}\'\ ?%{DATA:message_opID}])) \[%{DATA:message_service_info}]\ (?<syslog_message>(%{GREEDYDATA})))",
+        "message", "<%{INT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{IPORHOST:syslog_hostname} %{TIMESTAMP_ISO8601:syslog_timestamp} (?<message_body>(?<message_system_info>(?:\[%{DATA:message_thread_id} %{DATA:syslog_level} \'%{DATA:message_service}\'\ ?%{DATA:message_opID}])) (?<syslog_message>(%{GREEDYDATA})))",
+        "message", "<%{INT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{IPORHOST:syslog_hostname} (?:\[%{TIMESTAMP_ISO8601:syslog_timestamp} %{NOTSPACE} %{DATA:syslog_level} %{NOTSPACE:message_service}]) %{GREEDYDATA:syslog_message}",
+        "message", "<%{INT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{IPORHOST:syslog_hostname} %{TIMESTAMP_ISO8601:syslog_timestamp} %{GREEDYDATA:syslog_message}",
+        "message", "<%{INT:syslog_pri}>%{SYSLOGTIMESTAMP:timestamp} %{IPORHOST:syslog_hostname} %{GREEDYDATA:syslog_message}",
+        "message", "%{SYSLOG5424BASE}.?.%{GREEDYDATA:syslog_message}"
+      ]
+    }
+    syslog_pri { }
+    date {
+      #match => [ "syslog_timestamp", "YYYY-MM-ddHH:mm:ss,SSS", "YYYY-MM-dd HH:mm:ss,SSS", "ISO8601" ] #For vCenter Appliance 5.x
+      match => [ "syslog5424_ts", "YYYY-MM-ddHH:mm:ss,SSS", "YYYY-MM-dd HH:mm:ss,SSS", "ISO8601" ] #For vCenter Appliance 6.x
+      #match => [ "timestamp", "MMM d HH:mm:ss", "MMM dd HH:mm:ss" ]
+      timezone => "UTC" #For vCenter Appliance
+      #timezone => "America/New_York"
+    }
+    if "_grokparsefailure" not in [tags] {
+      mutate {
+        replace => [ "host", "%{syslog_hostname}" ]
+      }
+    }
+
+{% if vcenter_version is defined and vcenter_version == "vcsa_6" %}
+#### Not needed at this time for vcsa 6
+#    if "syslog5424_host" {
+#      mutate {
+#        replace => [ "host", "%{syslog5424_host}" ]
+#      }
+#    }
+#    if "syslog5424_app" {
+#      mutate {
+#        add_field => [ "syslog_program", "%{syslog5424_app}" ]
+#      }
+#    }
+{% endif %}
+    mutate {
+      add_tag => [ "pre-processed" ]
+    }
+  }
+}

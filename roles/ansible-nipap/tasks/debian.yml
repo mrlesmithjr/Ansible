@@ -1,0 +1,24 @@
+---
+- name: debian | adding debian nipap repo key
+  apt_key:
+    url: "{{ nipap_debian_repo_key }}"
+    state: "present"
+
+- name: debian | adding debian nipap repo
+  apt_repository:
+    repo: "{{ nipap_debian_repo }}"
+    state: "present"
+
+- name: debian | installing debian nipap packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ nipap_debian_packages }}'
+
+- name: debian | enabling nipap service
+  lineinfile:
+    dest: "/etc/default/nipapd"
+    regexp: "^RUN="
+    line: "RUN=yes"
+  notify:
+    - 'restart nipapd'

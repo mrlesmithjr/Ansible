@@ -1,4 +1,15 @@
 ---
+- name: nsedit | installing Apache pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  notify:
+    - 'restart apache2'
+  with_items:
+    - 'php5-curl'
+    - 'php5-sqlite'
+  when: ansible_os_family == "Debian"
+
 - name: nsedit | installing nsedit
   git:
     repo: "https://github.com/tuxis-ie/nsedit"

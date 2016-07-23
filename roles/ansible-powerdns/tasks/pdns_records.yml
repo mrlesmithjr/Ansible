@@ -89,15 +89,31 @@
   shell: /tmp/pdns_records.sh
   run_once: true
   when: >
-        pdns_records_created.changed or
-        pdns_srv_records_created.changed
+        pdns_db_cluster and
+        (pdns_records_created.changed or
+        pdns_srv_records_created.changed)
+
+- name: pdns_records | creating pdns records
+  shell: /tmp/pdns_records.sh
+  when: >
+        not pdns_db_cluster and
+        (pdns_records_created.changed or
+        pdns_srv_records_created.changed)
 
 - name: pdns_records | creating pdns records
   shell: /tmp/pdns_records.sh
   run_once: true
   when: >
-        force is defined and
-        force
+        pdns_db_cluster and
+        (force is defined and
+        force)
+
+- name: pdns_records | creating pdns records
+  shell: /tmp/pdns_records.sh
+  when: >
+        not pdns_db_cluster and
+        (force is defined and
+        force)
 
 - name: pdns_records | cleaning up pdns records script
   file:

@@ -17,6 +17,15 @@
     mode: 0644
   notify: restart suricata
 
+- name: configure_suricata | configuring suricata suppression list
+  template:
+    src: "etc/suricata/threshold.config.j2"
+    dest: "/etc/suricata/threshold.config"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: restart suricata
+
 - name: configure_suricata | configuring oinkmaster
   template:
     src: "etc/oinkmaster.conf.j2"

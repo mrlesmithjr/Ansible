@@ -217,6 +217,9 @@ pre_seed_expert_recipe_partitions:  #define the partitions to create during pre-
     min_size: 5000
     priority: 10000
     use_filesystem: true
+pre_seed_packages:  #define packages to install during pre-seed installation(s)
+  - openssh-server
+  - open-vm-tools
 pre_seed_partition_disk: /dev/sda  #defines disk to install to during pre-seed TFTP/PXE install
 pre_seed_partitioning_method: lvm   #defines partitioning method....lvm, regular or crypto
 pri_domain_name: example.org  #define here or globally in group_vars/all
@@ -227,6 +230,7 @@ sync_tftp: false  #defines if setting up multiple servers are to be configured f
 # To generate passwords use (replace P@55w0rd with new password).... echo "P@55w0rd" | mkpasswd -s -m sha-512
 root_password: [] #define root password for hosts....define here or in group_vars/all
 tftpboot_backup_dir: ''  #define if using GlusterFS
+tftpboot_home: ''  #define if using GlusterFS
 tftpboot_mnt: ''  #define if using GlusterFS
 tftp_bind_address: '{{ ansible_default_ipv4.address }}'
 tftp_boot_menu:  #menu_default has been disabled to allow boot from local HD by default
@@ -258,22 +262,22 @@ tftp_boot_menu:  #menu_default has been disabled to allow boot from local HD by 
 #    menu_label: 'Install Ubuntu 12.04.5 (Manual)'
 #    menu_default: false
 #    kernel: images/Ubuntu/12.04/install/netboot/ubuntu-installer/amd64/linux
-#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/12.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto'
+#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/12.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto live-installer/net-image=http://{{ tftp_bind_address }}/images/Ubuntu/12.04/install/filesystem.squashfs'
 #  - label: 'Ubuntu 12.04.5 (Pre-Seed)'
 #    menu_label: 'Install Ubuntu 12.04.5 (Pre-Seed)'
 #    menu_default: false
 #    kernel: images/Ubuntu/12.04/install/netboot/ubuntu-installer/amd64/linux
-#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/12.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto url=tftp://{{ tftp_bind_address }}/preseed.cfg'
+#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/12.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto url=tftp://{{ tftp_bind_address }}/ubuntu_12.04_preseed.cfg live-installer/net-image=http://{{ tftp_bind_address }}/images/Ubuntu/12.04/install/filesystem.squashfs'
 #  - label: 'Ubuntu 14.04.2 (Manual)'
 #    menu_label: 'Install Ubuntu 14.04.2 (Manual)'
 #    menu_default: false
 #    kernel: images/Ubuntu/14.04/install/netboot/ubuntu-installer/amd64/linux
-#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/14.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto'
+#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/14.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto live-installer/net-image=http://{{ tftp_bind_address }}/images/Ubuntu/14.04/install/filesystem.squashfs'
 #  - label: 'Ubuntu 14.04.2 (Pre-Seed)'
 #    menu_label: 'Install Ubuntu 14.04.2 (Pre-Seed)'
 #    menu_default: false
 #    kernel: images/Ubuntu/14.04/install/netboot/ubuntu-installer/amd64/linux
-#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/14.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto url=tftp://{{ tftp_bind_address }}/preseed.cfg'
+#    append: 'auto=true priority=critical vga=788 initrd=tftp://{{ tftp_bind_address }}/images/Ubuntu/14.04/install/netboot/ubuntu-installer/amd64/initrd.gz locale=en_US.UTF-8 kbd-chooser/method=us netcfg/choose_interface=auto url=tftp://{{ tftp_bind_address }}/ubuntu_14.04_preseed.cfg live-installer/net-image=http://{{ tftp_bind_address }}/images/Ubuntu/14.04/install/filesystem.squashfs'
 tftp_build_images: false  #defines if images folder(s) and isos should be added
 tftp_images_folders:
   - CentOS/7
@@ -304,6 +308,11 @@ tftp_iso_images: []
 #  - file: VMware-VMvisor-Installer-6.0.0.update01-3029758.x86_64.iso
 #    folder: ESXi/6.0U1
 tftp_preseed_create_users: false  #defines if Users should be created as part of preseed....define these in create_users
+tftp_preseed_files:
+  - preseed
+  - ubuntu_12.04_preseed
+  - ubuntu_14.04_preseed
+  - ubuntu_16.04_preseed
 tftp_preseed_users_encrypted_pw: true  #defines if users accounts are encrypted....this should be yes..but ensure that password under create_users is MD5 hash.
 ````
 

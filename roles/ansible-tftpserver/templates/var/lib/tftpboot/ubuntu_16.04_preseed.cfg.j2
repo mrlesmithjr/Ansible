@@ -1,0 +1,201 @@
+#### Contents of the preconfiguration file (for squeeze)
+### Localization
+d-i debian-installer/locale string en_US
+
+# The values can also be preseeded individually for greater flexibility.
+
+# Keyboard selection.
+# Disable automatic (interactive) keymap detection.
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/layoutcode string us
+
+### Network configuration
+# Disable network configuration entirely. This is useful for cdrom
+# installations on non-networked devices where the network questions,
+# warning and long timeouts are a nuisance.
+
+d-i netcfg/choose_interface select auto
+d-i netcfg/get_hostname string unassigned-hostname
+d-i netcfg/get_domain string {{ domain_name }}
+d-i netcfg/wireless_wep string
+
+### Mirror settings
+# If you select ftp, the mirror/country string does not need to be set.
+{% if enable_apt_mirror is defined and enable_apt_mirror %}
+d-i mirror/country string manual
+d-i mirror/http/hostname string {{ apt_mirror_server }}
+d-i mirror/http/directory string {{ apt_mirror_dir }}
+d-i mirror/http/mirror select {{ apt_mirror_server }}
+{% elif (enable_apt_mirror is defined and not enable_apt_mirror) or enable_apt_mirror is not defined %}
+d-i mirror/country string manual
+d-i mirror/http/hostname string {{ tftp_bind_address }}
+d-i mirror/http/directory string /images/Ubuntu/16.04
+d-i mirror/http/mirror select {{ tftp_bind_address }}
+{% endif %}
+
+{% if (enable_apt_caching is defined and enable_apt_caching) and apt_cacher_server is defined %}
+{%   if pri_domain_name is defined %}
+d-i mirror/http/proxy string http://{{ apt_cacher_server }}.{{ pri_domain_name }}:{{ apt_cacher_ng_port|default(3142) }}
+{%   elif pri_domain_name is not defined %}
+d-i mirror/http/proxy string http://{{ apt_cacher_server }}:{{ apt_cacher_ng_port|default(3142) }}
+{%   endif %}
+{% endif %}
+{% if (enable_apt_caching is defined and not enable_apt_caching) or enable_apt_caching is not defined %}
+{% endif %}
+
+d-i mirror/http/proxy string
+
+### Clock and time zone setup
+# Controls whether or not the hardware clock is set to UTC.
+d-i clock-setup/utc boolean true
+
+# You may set this to any valid setting for $TZ; see the contents of
+# /usr/share/zoneinfo/ for valid values.
+d-i time/zone string US/Eastern
+
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean {{ tftp_preseed_ntp_sync|lower }}
+
+### Partitioning
+d-i partman-auto/disk string {{ pre_seed_partition_disk }}
+d-i partman-auto/method string {{ pre_seed_partitioning_method }}
+
+{% if pre_seed_partitioning_method == "lvm" %}
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-lvm/confirm boolean false
+d-i partman-lvm/confirm_nooverwrite boolean true
+
+# For LVM partitioning, you can select how much of the volume group to use
+# for logical volumes.
+d-i partman-auto-lvm/guided_size string max
+{% endif %}
+
+# You can choose one of the three predefined partitioning recipes:
+# - atomic: all files in one partition
+# - home:   separate /home partition
+# - multi:  separate /home, /usr, /var, and /tmp partitions
+d-i partman-auto/choose_recipe select atomic
+
+{% if pre_seed_expert_recipe_partitioning is defined and pre_seed_expert_recipe_partitioning %}
+d-i partman-auto/expert_recipe string                         \
+      boot-root ::                                            \
+{%   for item in pre_seed_expert_recipe_partitions %}
+              {{ item.min_size }} {{ item.priority }} {{ item.max_size }} {{ item.filesystem }}                                  \
+{%     if item.bootable is defined and item.bootable %}
+                      $primary{ } $bootable{ }                \
+{%     endif %}
+{%     if pre_seed_partitioning_method == "lvm" and item.lv_name is defined %}
+                      lv_name{ {{ item.lv_name }} }           \
+                      $lvmok{ }                               \
+{%     endif %}
+{%     if item.method is defined %}
+                      method{ {{ item.method }} } format{ }              \
+{%     endif %}
+{%     if item.use_filesystem is defined and item.use_filesystem %}
+                      use_filesystem{ } filesystem{ {{ item.filesystem }} }    \
+{%     endif %}
+{%     if item.mountpoint is defined and item.mountpoint != None %}
+                      mountpoint{ {{ item.mountpoint }} }                     \
+{%     endif %}
+{%     if not loop.last %}
+              .                                               \
+{%     endif %}
+{%   endfor %}
+              .
+{% endif %}
+
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i partman-md/confirm boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm_nooverwrite boolean true
+
+### Account setup
+d-i passwd/root-login boolean false
+{% if (tftp_preseed_create_users is defined and not tftp_preseed_create_users) or tftp_preseed_create_users is not defined %}
+d-i passwd/make-user boolean false
+{% endif %}
+{% if (tftp_preseed_create_users is defined and tftp_preseed_create_users) %}
+{%   if create_users is defined %}
+#d-i passwd/make-user boolean false
+{%     for item in create_users %}
+{%       if item.preseed_user is defined and item.preseed_user %}
+{%         if item.comment is defined %}
+d-i passwd/user-fullname string {{ item.comment }}
+{%         endif %}
+{%         if item.comment is not defined %}
+d-i passwd/user-fullname string {{ item.user }}
+{%         endif %}
+d-i passwd/username string {{ item.user }}
+{%         if tftp_preseed_users_encrypted_pw is defined and not tftp_preseed_users_encrypted_pw %}
+d-i passwd/user-password password {{ item.pass }}
+d-i passwd/user-password-again password {{ item.pass }}
+{%         endif %}
+{%         if tftp_preseed_users_encrypted_pw is defined and tftp_preseed_users_encrypted_pw %}
+d-i passwd/user-password-crypted password {{ item.pass }}
+{%         endif %}
+{%       endif %}
+{%     endfor %}
+d-i user-setup/allow-password-weak boolean true
+{%   endif %}
+{% endif %}
+
+# Root password, either in clear text or encrypted...encrypted is default
+#d-i passwd/root-password-crypted password {{ root_password }}
+
+# Set to true if you want to encrypt the first user's home directory.
+d-i user-setup/encrypt-home boolean false
+
+### Apt setup
+#d-i apt-setup/local0/repository string http://mirrors.kernel.org/ubuntu trusty main
+
+### Package selection
+tasksel tasksel/first mulitselect standard
+
+# Individual additional packages to install
+d-i pkgsel/include string {% for item in pre_seed_packages %}{{ item }}{% if not loop.last %} {% endif %}{% endfor %}
+
+### Boot loader installation
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/with_other_os boolean true
+
+### Finishing up the installation
+d-i finish-install/reboot_in_progress note
+
+# This is how to make the installer shutdown when finished, but not
+# reboot into the installed system.
+#d-i debian-installer/exit/halt boolean true
+# This will power off the machine instead of just halting it.
+{% if tftp_poweroff_after_install is defined and tftp_poweroff_after_install %}
+d-i debian-installer/exit/poweroff boolean true
+{% elif (tftp_poweroff_after_install is defined and not tftp_poweroff_after_install) or tftp_poweroff_after_install is not defined %}
+#d-i debian-installer/exit/poweroff boolean true
+{% endif %}
+
+### X configuration
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/config/monitor/selection-method \
+       select medium
+xserver-xorg xserver-xorg/config/monitor/mode-list \
+       select 1024x768 @ 60 Hz
+
+### Preseeding other packages
+
+#### Advanced options
+d-i preseed/late_command string \
+{% if (tftp_preseed_create_users is defined and tftp_preseed_create_users) %}
+{%   if create_users is defined %}
+{%     for item in create_users %}
+{%       if item.preseed_user is defined and item.preseed_user %}
+{%         if item.sudo is defined and item.sudo %}
+    echo "{{ item.user }}	ALL=(ALL) NOPASSWD:ALL">>/target/etc/sudoers;
+{%         endif %}
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+#    in-target sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/g' /etc/ssh/sshd_config;

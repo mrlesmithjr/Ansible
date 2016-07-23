@@ -2,34 +2,26 @@
 - name: debian | installing pre-requisites
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - python-pip
+    - 'python-pip'
 
 - name: debian | installing redis-server
   apt:
-    name: redis-server
-    state: present
+    name: "redis-server"
+    state: "present"
 
-- name: debian | install | installing redis python module
+- name: debian | installing redis python module
   pip:
-    name: redis
-    state: present
+    name: "redis"
+    state: "present"
 
 - name: debian | configuring redis-server to listen on all interfaces
   replace:
     dest: "/etc/redis/redis.conf"
     regexp: "^bind 127.0.0.1"
     replace: "#bind 127.0.0.1"
-  notify: restart redis-server
+  notify: 'restart redis-server'
   when: >
         redis_allow_remote_connections is defined and
         redis_allow_remote_connections
-
-- name: debian | tweaking redis memory
-  sysctl:
-    name: "vm.overcommit_memory"
-    value: 1
-    state: present
-    reload: yes
-  notify: restart redis-server

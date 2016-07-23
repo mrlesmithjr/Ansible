@@ -1,0 +1,9 @@
+{% if not tcpwrappers_allow_all_connections %}
+{%   if tcpwrappers_deny_all_connections %}
+ALL: ALL
+{% elif not tcpwrappers_deny_all_connections %}
+{%     for item in tcpwrappers_deny %}
+{{ item.daemon }}: {{ item.clients| join (' ')}}
+{%     endfor %}
+{%   endif %}
+{% endif %}

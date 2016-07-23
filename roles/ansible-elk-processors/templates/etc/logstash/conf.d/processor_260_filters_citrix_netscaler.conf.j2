@@ -1,0 +1,28 @@
+# Setting up Citrix Netscaler parsing
+filter {
+  if "Netscaler" in [tags] {
+    grok {
+      break_on_match => true
+      match => [
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP} %{IPORHOST} %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{DATA:netscaler_packet_engine} : %{DATA:netscaler_message} :.* Source %{IP:netscaler_source_ip}:%{INT:netscaler_source_port}.* Vserver %{IP:netscaler_vserver_ip}:%{INT:netscaler_vserver_port}.*NatIP %{IP:netscaler_nat_ip}:%{INT:netscaler_nat_port}.*Destination %{IP:netscaler_destination_ip}:%{INT:netscaler_destination_port}.*%{DATE_US:netscaler_delink_date}:%{TIME:netscaler_delink_time}.*Total_bytes_send %{INT:netscaler_total_bytes_send}.*Total_bytes_recv %{INT:netscaler_total_bytes_recv}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP} %{IPORHOST} %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{DATA:netscaler_packet_engine} : %{DATA:netscaler_message} :.* Source %{IP:netscaler_source_ip}:%{INT:netscaler_source_port}.*Destination %{IP:netscaler_destination_ip}:%{INT:netscaler_destination_port}.*%{DATE_US:netscaler_start_date}:%{TIME:netscaler_start_time}.*%{DATE_US:netscaler_end_date}:%{TIME:netscaler_end_time}.*Total_bytes_send %{INT:netscaler_total_bytes_send}.*Total_bytes_recv %{INT:netscaler_total_bytes_recv}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP} %{IPORHOST} %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{DATA:netscaler_packet_engine} : %{DATA:netscaler_message} : SPCBId %{INT:netscaler_spcbid}.*ClientIP %{IP:netscaler_client_ip}.*ClientPort %{INT:netscaler_client_port}.*VserverServiceIP %{IP:netscaler_vserver_ip}.*VserverServicePort %{INT:netscaler_vserver_port}.*ClientVersion %{NOTSPACE:netscaler_client_version}.*CipherSuite %{QS:netscaler_cipher_suite}.*Session %{WORD:netscaler_session_type}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP} %{IPORHOST} %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{DATA:netscaler_packet_engine} : %{DATA:netscaler_message} : User %{WORD:netscaler_user}.*Remote_ip %{IP:netscaler_remote_ip}.*Command %{QS:netscaler_command}.*Status %{QS:netscaler_command_status}",
+        "message", "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP} %{IPORHOST} %{DATE_US}:%{TIME} GMT %{SYSLOGHOST:syslog_hostname} %{DATA:netscaler_packet_engine} : %{GREEDYDATA:netscaler_message}"
+      ]
+    }
+    syslog_pri { }
+    geoip {
+      source => "netscaler_client_ip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+      add_field => [ "src_ip", "%{netscaler_client_ip}" ]
+      convert => [ "[geoip][coordinates]", "float" ]
+      replace => [ "@source_host", "%{host}" ]
+      replace => [ "@message", "%{netscaler_message}" ]
+    }
+  }
+}

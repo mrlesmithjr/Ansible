@@ -1,24 +1,14 @@
 ---
-- name: redhat | installing pre-reqs (yum)
+- name: redhat | installing pre-reqs
   yum:
     name: "{{ item }}"
     state: present
   with_items:
-    - dnf
     - epel-release
-    - python-dnf
-  when: >
-        ansible_distribution != "Fedora"
-
-- name: redhat | installing pre-reqs (dnf)
-  dnf:
-    name: "{{ item }}"
-    state: present
-  with_items:
     - wget
 
 - name: redhat | installing erlang
-  dnf:
+  yum:
     name: "erlang"
     state: present
 
@@ -33,7 +23,7 @@
     dest: "/opt/{{ rabbitmq_redhat_package }}"
 
 - name: redhat | installing RabbitMQ
-  dnf:
+  yum:
     name: "/opt/{{ rabbitmq_redhat_package }}"
     state: present
 

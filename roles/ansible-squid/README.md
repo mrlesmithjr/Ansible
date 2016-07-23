@@ -25,6 +25,8 @@ Role Variables
 --------------
 
 ````
+---
+# defaults file for ansible-squid
 enable_haproxy: false  #defines if haproxy should be installed...define here or in group_vars/group
 enable_keepalived: false  #defines if keepalived should be installed...define here or in group_vars/group
 haproxy_squid_http_port: 8080  #define load balanced port for clients to connect to if haproxy is used
@@ -42,7 +44,7 @@ squid_cache_peer: [] #defines squid peers to sync with...define here or in group
 #    icp_port: '{{ squid_icp_port }}'
 #    options: default
 #  - host: squid-2  #do not enter FQDN...hostname only
-#    domain: '{{ pri_domain_name }}'  #enter domain name for hostname abov
+#    domain: '{{ pri_domain_name }}'  #enter domain name for hostname above
 #    type: sibling
 #    proxy_port: '{{ squid_http_port }}'
 #    icp_port: '{{ squid_icp_port }}'
@@ -55,6 +57,7 @@ squid_servers: []  #defines squid servers to configure haproxy if used
 #  - squid-1
 #  - squid-2
 squid_transparent_proxy: false  #defines if squid should function in transparent mode...define here or in group_vars/group
+squid_transparent_proxy_ferm: false  #defines if squid transparent should configure ferm firewall for masquerading
 ````
 
 Dependencies

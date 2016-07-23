@@ -1,0 +1,187 @@
+# -------------------------
+# NIPAP configuration file
+# -------------------------
+#
+# This configuration file contains information regarding both the NIPAPd
+# backend daemon as well as the web front-end, ie it is a shared configuration
+# file.
+#
+# This file consists mostly of lines of the form:
+#
+#   name = value
+#
+# Where name is the name of an option and value is its value. Value may be
+# empty. Options are further grouped into sections, which start with:
+#
+#   [section]
+#
+# There is no explicit marker for the end of a section. All options following a
+# section header is interpreted as belonging to that section. Please be aware
+# of which section you edit.
+#
+# Lines starting with "#" or ";" are interpreted as a comments. It may not
+# contain leading whitespace! Comments may also appear on lines holding values
+# or section names but must be prefaced with whitespace followed by ";". Lines
+# starting with whitespace is interpreted as a continuation of the value on the
+# previous option-value line.
+#
+# The commented-out settings shown represent the default values in most cases.
+#
+# This file is read on server startup and in case of NIPAPd when the NIPAPd
+# process receives a SIGHUP signal - do note however that certain changes
+# requires a server restart and not just a configuration file reload.
+#
+
+#
+# Options regarding the NIPAP daemon
+# ----------------------------------
+#
+[nipapd]
+
+# Run nipapd as a different user, ie drop privileges from root to the specified
+# user and group. If no user is specified, nipapd will run as the user who
+# started it (typically root). If only user but no group is specified, the
+# value for user will be used for group as well.
+#user = nipap
+#group = nipap
+
+
+listen = 127.0.0.1              ; IP address to listen on.
+# The default is to listen to 127.0.0.1. Use 0.0.0.0 to listen on all addresses
+# (change requires restart).
+port = 1337                     ; XML-RPC listen port (change requires restart)
+
+foreground = false              ; run in foreground, won't work with init script
+debug = false                   ; enable debug logging
+
+fork = 0                        ; number of forks
+# fork processes, mutually exclusive with foreground. 0 = automatically
+# determine number of forks (same as number of CPUs). -1 = no forking, >0 =
+# number of forks
+
+syslog = true                   ; log to syslog
+
+pid_file = /var/run/nipap/nipapd.pid
+
+#
+# - Database Connection -
+#
+# the following parameters control how NIPAPd connects to the PostgreSQL
+# backend database
+#
+
+db_host = {{ nipap_db_info.db_host }}            ; database hostname
+# The default is to connect via IP to localhost. This is preferred over
+# connecting over a UNIX socket as it supports MD5 authentication.
+# "" (ie, empty string without quotes), is a special case which means to
+# connect over a UNIX socket but be aware that authentication needs to be done
+# using "ident" support so the user nipapd is run as needs to match with the
+# database username.
+
+db_port = {{ nipap_db_info.db_port }}                  ; port that PostgreSQL listens to, defaults to
+# 5432, only applicable if connection is not over a UNIX socket
+
+db_name = {{ nipap_db_info.db_name }}                 ; database name
+db_user = {{ nipap_db_info.db_user }}                 ; database username
+db_pass = {{ nipap_db_info.db_pass }}                 ; database password
+
+db_sslmode = require            ; database SSL mode
+# please see the PostgreSQL database documentation for further details
+
+
+
+#
+# Options regarding the authentication backend
+# --------------------------------------------
+#
+[auth]
+default_backend = local                ; which backend to use by default
+auth_cache_timeout = 3600              ; seconds cached auth entries are stored
+
+# example backend with SQLite
+[auth.backends.local]
+type = SqliteAuth
+
+db_path = /etc/nipap/local_auth.db     ; path to SQLite database used
+
+# example backend for LDAP
+#[auth.backends.ldap1]
+#type = LdapAuth
+#
+#basedn = ou=Users,dc=example,dc=com       ; base DN
+#uri = ldaps://ldap.example.com            ; LDAP server URI
+#tls = False                            ; initiate TLS, use ldap://
+#
+# LDAP style
+#binddn_fmt = uid={},ou=Users,dc=example,dc=com
+#search = uid={}                        ; LDAP search filter
+#
+# Active Directory (UPN) style
+#binddn_fmt = {}@example.com
+#search = sAMAccountName={}
+#
+# {} in binddn_fmt is replaced by the username of the authenticating user.
+#
+## Secondary LDAP connection
+# Normally a bind to the LDAP server is performed using the credentials of the
+# user that is trying to login. A successful bind means that the user has the
+# correct credentials. This LDAP connection is then used to perform a search
+# query fetching the full name ("cn") and potentially the group membership of
+# the user ("memberOf").
+#
+# Depending on the access control configuration of the LDAP server, users may
+# or may not have privileges to perform this search. The following two options,
+# search_binddn and search_password, can be used to create a second LDAP
+# connection that is used to fetch the full name and group memberships in case
+# the user doesn't have sufficient privileges. A second user needs to be
+# created in LDAP for NIPAP that has sufficient privileges to read the "cn" and
+# "memberOf" attribute.
+#search_binddn = uid=foo,ou=Users,dc=example,dc=com
+#search_password = secret
+#
+## Group permissions
+# Group permissions enables granting read-write or read-only privileges based
+# on a users group membership in LDAP.
+#
+# Non-empty values for rw_group/ro_group requires the memberOf attribute to be
+# present in LDAP. For OpenLDAP this requires a "memberof" overlay.
+#
+# Note how certain LDAP servers are case-sensitive on DN-specification, e.g.
+# "DC=example,DC=com" works while "dc=example,dc=com" does not or vice versa.
+#
+# Examples:
+#
+# Everyone with an account can login and gets read/write access:
+#rw_group =
+#ro_group =
+#
+# Users specified by rw_group, i.e. 'tech', gets read/write access, everyone
+# else gets read only access:
+#rw_group = cn=tech,dc=example,dc=com      ; Users in this group get rw access
+#ro_group =
+#
+# Users specified by rw_group, i.e. 'tech', gets read/write access, users
+# specified by ro_group, i.e. 'staff', get read only access. You need to be in
+# either group to authenticate at all:
+#rw_group = cn=tech,dc=example,dc=com      ; Users in this group get rw access
+#ro_group = cn=staff,dc=example,dc=com     ; Users in this group get ro access
+#
+# Users get read/write access by default, users specified by ro_group, i.e.
+# 'untrusted', gets read only access:
+#rw_group =
+#ro_group = cn=untrusted,dc=example,dc=com ; Users in this group get ro access
+
+#
+# Options for the WWW UI
+# ----------------------
+#
+[www]
+xmlrpc_uri = http://@:@127.0.0.1:1337
+#connection uri to the backend
+#example using local authentication with username 'user' and password 'pass'
+#xmlrpc_uri = http://user@local:pass@127.0.0.1:1337
+
+# welcome_message allows the display of a custom message on the login page of
+# the web interface, it might contain hints about what credentials to use or
+# just greet the user.
+#welcome_message = Welcome to NIPAP at COMPANY. Please login using your XYZ credentials.

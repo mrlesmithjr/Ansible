@@ -1,0 +1,6 @@
+---
+- name: section_02_level1 | removing services (Scored)
+  apt:
+    name: "{{ item }}"
+    state: absent
+  with_items: '{{ cis_debian_section_02_level1_services }}'

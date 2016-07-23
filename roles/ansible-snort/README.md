@@ -26,6 +26,7 @@ snort_barnyard2_db_info:
   name: snort  #db name
   pass: snort  #db password
   user: snort  #db user
+snort_barnyard2_db_type: mysql  #defines the DB type...options are mysql or mariadb
 snort_barnyard2_enable: false  #defines if barnyard2 should be installed and configured
 snort_barnyard2_logdir: '/var/log/snort'
 snort_barnyard2_waldo_file: '{{ snort_barnyard2_logdir }}/barnyard2.waldo'
@@ -192,6 +193,7 @@ snort_oinkmaster_dl_package: 'oinkmaster-2.0.tar.gz'
 snort_oinkmaster_dl_url: 'http://prdownloads.sourceforge.net/oinkmaster'
 snort_oinkmaster_rules_url: 'http://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz'
 snort_options: ''  #define additional snort options to pass to startup
+snort_output_syslog: false  #defines if alerts should be sent to syslog
 snort_preproc_rule_path: '/etc/snort/preproc_rules'
 snort_preproc_rules: []
   #- preprocessor.rules
@@ -260,7 +262,7 @@ snort_send_stats: true  #true/false
 snort_src_dir: '/opt/snort_src'  #defines where to download source packages to compile
 snort_startup: boot
 snort_stats_threshold: 1
-snort_version: 2.9.8.0
+snort_version: 2.9.8.2
 snort_whitelist_path: '/etc/snort/rules'
 ````
 

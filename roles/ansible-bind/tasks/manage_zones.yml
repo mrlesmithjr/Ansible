@@ -1,0 +1,45 @@
+---
+- name: manage_zones | create serial timestamp
+  command: "date +%y%m%d%H%M"
+  register: "bind_timestamp"
+  changed_when: false
+
+- name: manage_zones | configuring bind zones
+  template:
+    src: "etc/bind/named.conf.local.j2"
+    dest: "/etc/bind/named.conf.local"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify:
+    - "reload bind"
+
+- name: manage_zones | ensuring {{ bind_zones_dir }} exists
+  file:
+    path: "{{ bind_zones_dir }}"
+    state: "directory"
+  when: inventory_hostname in groups[bind_masters_group]
+
+- name: manage_zones | creating forward zones
+  template:
+    src: "etc/bind/zones/forward_zone.j2"
+    dest: "{{ bind_zones_dir }}/db.{{ item.zone }}"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify:
+    - "reload bind"
+  with_items: '{{ bind_forward_zones }}'
+  when: inventory_hostname in groups[bind_masters_group]
+
+- name: manage_zones | creating reverse zones
+  template:
+    src: "etc/bind/zones/reverse_zone.j2"
+    dest: "{{ bind_zones_dir }}/db.{{ item.zone }}"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify:
+    - "reload bind"
+  with_items: '{{ bind_reverse_zones }}'
+  when: inventory_hostname in groups[bind_masters_group]

@@ -17,7 +17,6 @@
     - git
     - imagemagick
     - libmagickwand-dev
-    - libmysqlclient-dev
     - libreadline-gplv2-dev
     - libssl-dev
     - libxml2-dev
@@ -28,3 +27,15 @@
     - ruby1.9.3
     - wkhtmltopdf
     - zlib1g-dev
+
+- name: debian | installing add'l pre-reqs
+  apt:
+    name: "libmariadbclient-dev"
+    state: "present"
+  when: snorby_db_type == "mariadb"
+
+- name: debian | installing add'l pre-reqs
+  apt:
+    name: "libmysqlclient-dev"
+    state: "present"
+  when: snorby_db_type == "mysql"

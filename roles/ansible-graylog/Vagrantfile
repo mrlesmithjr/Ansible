@@ -7,7 +7,7 @@
 # you're doing.
 Vagrant.configure(2) do |config|
   config.vm.define "graylog" do |graylog|
-    graylog.vm.box = "mrlesmithjr/trusty64"
+    graylog.vm.box = "mrlesmithjr/xenial64"
     graylog.vm.hostname = "graylog"
 
     graylog.vm.network :private_network, ip: "192.168.202.201"

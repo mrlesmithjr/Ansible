@@ -1,0 +1,28 @@
+---
+- name: config_blacklists | removing old blacklists
+  file:
+    name: "/etc/logstash/{{ item }}.yml"
+    state: absent
+  with_items:
+    - blacklist
+    - malware
+    - social_networking
+    - spyware
+
+- name: config_blacklists | creating blacklists folder
+  file:
+    path: "{{ logstash_blacklists_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: config_blacklists | configuring dns blacklist filtering
+  copy:
+    src: "etc/logstash/blacklists/{{ item }}.yml"
+    dest: "{{ logstash_blacklists_dir }}/{{ item }}.yml"
+    owner: logstash
+    group: logstash
+    mode: 0775
+  notify: restart logstash
+  with_items: powerdns_blacklists

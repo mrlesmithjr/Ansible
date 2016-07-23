@@ -8,6 +8,12 @@
   apt_repository:
     repo: "{{ rabbitmq_debian_repo }}"
     state: present
+  register: "rabbitmq_repo_added"
+
+- name: debian | updating apt cache
+  apt:
+    update_cache: yes
+  when: rabbitmq_repo_added.changed
 
 - name: debian | installing RabbitMQ server
   apt:

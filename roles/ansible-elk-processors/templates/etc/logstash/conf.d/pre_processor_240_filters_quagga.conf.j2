@@ -1,0 +1,64 @@
+# Setting up Quaaga parsing
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if [pre_syslog_program] == "ospfd" {
+      multiline {
+        pattern => "ip_"
+        what => "next"
+      }
+      multiline {
+        pattern => "src \["
+        what => "previous"
+      }
+      multiline {
+        pattern => "dst \["
+        what => "previous"
+      }
+      multiline {
+        pattern => "\[Hello:RECV]:"
+        what => "previous"
+      }
+      multiline {
+        pattern => "make_hello:"
+        what => "previous"
+      }
+      multiline {
+        pattern => "Hello sent to"
+        what => "previous"
+      }
+      mutate {
+        add_tag => [ "Quagga", "pre-processed" ]
+      }
+      mutate {
+        rename => [ "pre_syslog_program", "syslog_program" ]
+        rename => [ "pre_syslog_pid", "syslog_pid" ]
+      }
+    }
+  }
+}
+# Additional Quagga parsing
+filter {
+  if "Quagga" in [tags] {
+    if "ip_src" in [message] {
+      grok {
+        match => [
+          "message", "ip_src %{IP:src_ip}"
+        ]
+      }
+    }
+    if "ip_dst" in [message] {
+      grok {
+        match => [
+          "message", "ip_dst %{IP:dst_ip}"
+        ]
+      }
+    }
+    if "Hello received from" in [message] {
+      grok {
+        match => [
+          "message", "Hello received from \[%{IP:remote_router_id}] via \[%{WORD:local_router_int}:%{IP:local_router_int_ip}]"
+        ]
+      }
+    }
+  }
+}

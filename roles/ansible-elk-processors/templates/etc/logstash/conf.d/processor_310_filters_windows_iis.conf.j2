@@ -1,0 +1,58 @@
+# Microsoft IIS logging....Use NXLOG for client side logging
+filter {
+  if [type] == "iis" {
+    if [message] =~ "^#" {
+      drop {}
+    }
+    grok {
+      match => [
+        "message", "%{TIMESTAMP_ISO8601:logtime} %{IPORHOST:hostname} %{URIPROTO:cs_method} %{URIPATH:cs_stem} (?:%{NOTSPACE:cs_query}|-) %{NUMBER:src_port} %{NOTSPACE:cs_username} %{IP:clientip} %{NOTSPACE:cs_useragent} %{NUMBER:sc_status} %{NUMBER:sc_subresponse} %{NUMBER:sc_win32_status} %{NUMBER:timetaken}",
+        "message", "%{TIMESTAMP_ISO8601:logtime} %{IPORHOST:hostname} %{URIPROTO:cs_method} %{URIPATH:cs_stem} (?:%{NOTSPACE:cs_query}|-) %{NUMBER:src_port} %{NOTSPACE:cs_username} %{IP:clientip} %{NOTSPACE:cs_useragent} %{NOTSPACE:cs_referrer} %{NUMBER:sc_status} %{NUMBER:sc_subresponse} %{NUMBER:sc_win32_status} %{NUMBER:timetaken}"
+      ]
+    }
+    grok {
+      match => [
+        "message", "%{TIMESTAMP_ISO8601} %{IPORHOST} %{GREEDYDATA:syslog_message}"
+      ]
+    }
+    date {
+      match => [ "logtime", "YYYY-MM-dd HH:mm:ss" ]
+      timezone => "UTC"
+    }
+    geoip {
+      source => "clientip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    dns {
+      reverse => [ "hostname" ]
+      action => "replace"
+    }
+    useragent {
+      add_tag => [ "UA" ]
+      source => "cs_useragent"
+    }
+    if "UA" in [tags] {
+      mutate {
+        rename => [ "name", "browser_name" ]
+      }
+    }
+    mutate {
+      add_field => [ "src_ip", "%{clientip}" ]
+      convert => [ "[geoip][coordinates]", "float" ]
+      rename => [ "cs_method", "method" ]
+      rename => [ "cs_stem", "request" ]
+      rename => [ "cs_useragent", "agent" ]
+      rename => [ "cs_username", "username" ]
+      rename => [ "sc_status", "response" ]
+      rename => [ "timetaken", "time_request" ]
+    }
+    if "_grokparsefailure" not in [tags] {
+      mutate {
+        replace => [ "host", "%{hostname}" ]
+        replace => [ "message", "%{syslog_message}" ]
+      }
+    }
+  }
+}

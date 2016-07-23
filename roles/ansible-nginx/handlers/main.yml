@@ -1,11 +1,11 @@
 ---
 # handlers file for ansible-nginx
-- name: restart nginx
+- name: "restart nginx"
   service:
     name: "nginx"
-    state: restarted
+    state: "restarted"
 
-- name: restart php5-fpm
+- name: "restart php{{ nginx_php_ver }}-fpm"
   service:
-    name: "php5-fpm"
-    state: restarted
+    name: "php{{ nginx_php_ver }}-fpm"
+    state: "restarted"

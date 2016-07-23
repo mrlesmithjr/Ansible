@@ -1,0 +1,84 @@
+# 8.1.4 Record Events That Modify Date and Time Information (Scored)
+{% if ansible_architecture == "x86_64" %}
+-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change
+-a always,exit -F arch=b64 -S clock_settime -k time-change
+-w /etc/localtime -p wa -k time-change
+{% elif ansible_architecture == "i386" %}
+-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change
+-a always,exit -F arch=b32 -S clock_settime -k time-change
+-w /etc/localtime -p wa -k time-change
+{% endif %}
+
+# 8.1.5 Record Events That Modify User/Group Information (Scored)
+-w /etc/group -p wa -k identity
+-w /etc/passwd -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/security/opasswd -p wa -k identity
+
+# 8.1.6 Record Events That Modify the System's Network Environment (Scored)
+{% if ansible_architecture == "x86_64" %}
+-a exit,always -F arch=b64 -S sethostname -S setdomainname -k system-locale
+-w /etc/issue -p wa -k system-locale
+-w /etc/issue.net -p wa -k system-locale
+-w /etc/hosts -p wa -k system-locale
+-w /etc/network -p wa -k system-locale
+{% elif ansible_architecture == "i386" %}
+-a exit,always -F arch=b32 -S sethostname -S setdomainname -k system-locale
+-w /etc/issue -p wa -k system-locale
+-w /etc/issue.net -p wa -k system-locale
+-w /etc/hosts -p wa -k system-locale
+-w /etc/network -p wa -k system-locale
+{% endif %}
+
+# 8.1.7 Record Events That Modify the System's Mandatory Access Controls (Scored)
+-w /etc/selinux/ -p wa -k MAC-policy
+
+# 8.1.8 Collect Login and Logout Events (Scored)
+-w /var/log/faillog -p wa -k logins
+-w /var/log/lastlog -p wa -k logins
+-w /var/log/tallylog -p wa -k logins
+
+# 8.1.9 Collect Session Initiation Information (Scored)
+-w /var/run/utmp -p wa -k session
+-w /var/log/wtmp -p wa -k session
+-w /var/log/btmp -p wa -k session
+
+# 8.1.10 Collect Discretionary Access Control Permission Modification Events (Scored)
+{% if ansible_architecture == "x86_64" %}
+-a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=500 \
+-F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=500 \
+-F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S \
+lremovexattr -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod
+{% elif ansible_architecture == "i386" %}
+-a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=500 \
+-F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b32 -S chown -S fchown -S fchownat -S lchown -F auid>=500 \
+-F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b32 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S \
+lremovexattr -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod
+{% endif %}
+
+# 8.1.11 Collect Unsuccessful Unauthorized Access Attempts to Files (Scored)
+{% if ansible_architecture == "x86_64" %}
+-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate \
+-F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate \
+-F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access
+{% elif ansible_architecture == "i386" %}
+-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate \
+-F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate \
+-F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access
+{% endif %}
+
+# 8.1.12 Collect Use of Privileged Commands (Scored)
+
+# 8.1.13 Collect Successful File System Mounts (Scored)
+{% if ansible_architecture == "x86_64" %}
+-a always,exit -F arch=b64 -S mount -F auid>=500 -F auid!=4294967295 -k mounts
+{% elif ansible_architecture == "i386" %}
+-a always,exit -F arch=b32 -S mount -F auid>=500 -F auid!=4294967295 -k mounts
+{% endif %}

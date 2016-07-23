@@ -1,0 +1,121 @@
+---
+- name: config_logstash | clearing existing logstash config
+  file:
+    path: "{{ logstash_config_dir }}"
+    state: "absent"
+  when: >
+        clear_logstash_config is defined and
+        clear_logstash_config
+
+- name: config_logstash | recreating logstash config directory if previously cleared
+  file:
+    path: "{{ logstash_config_dir }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: 0775
+  when: >
+        clear_logstash_config is defined and
+        clear_logstash_config
+
+- name: config_logstash | removing original logstash config if it exists
+  file:
+    path: "{{ logstash_config_dir }}/logstash.conf"
+    state: "absent"
+  notify:
+    - "restart logstash"
+
+- name: config_logstash | configuring logstash
+  template:
+    src: "etc/logstash/conf.d/{{ item }}.conf.j2"
+    dest: "{{ logstash_config_dir }}/{{ item }}.conf"
+    owner: "logstash"
+    group: "logstash"
+    mode: 0644
+    validate: "/opt/logstash/bin/logstash -tf %s"
+  notify:
+    - "restart logstash"
+  with_items: '{{ logstash_configs }}'
+  when: >
+        skip_validation is not defined or
+        (skip_validation is defined and
+        not skip_validation)
+
+- name: config_logstash | configuring logstash
+  template:
+    src: "etc/logstash/conf.d/{{ item }}.conf.j2"
+    dest: "{{ logstash_config_dir }}/{{ item }}.conf"
+    owner: "logstash"
+    group: "logstash"
+    mode: 0644
+  notify:
+    - "restart logstash"
+  with_items: '{{ logstash_configs }}'
+  when: >
+        skip_validation is defined and
+        skip_validation
+
+- name: config_logstash | removing logstash configs that are defined in logstash_configs_remove
+  file:
+    path: "{{ logstash_config_dir }}/{{ item }}.conf"
+    state: "absent"
+  notify:
+    - "restart logstash"
+  with_items: '{{ logstash_configs_remove }}'
+
+- name: config_logstash | checking to ensure /opt/logstash/lib/logstash/outputs/elasticsearch folder exists
+  stat:
+    path: "/opt/logstash/lib/logstash/outputs/elasticsearch"
+  register: "ls_es_output_dir"
+  when: >
+        logstash_custom_template is defined and
+        logstash_custom_template
+
+- name: config_logstash | creating /opt/logstash/lib/logstash/outputs/elasticsearch folder if it is missing
+  file:
+    path: "/opt/logstash/lib/logstash/outputs/elasticsearch"
+    state: "directory"
+    owner: "logstash"
+    group: "logstash"
+    mode: 0644
+  when: >
+        not ls_es_output_dir.stat.exists and
+        (logstash_custom_template is defined and
+        logstash_custom_template)
+
+- name: config_logstash | copying elasticsearch-template.json
+  template:
+    src: "opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json.j2"
+    dest: "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
+    owner: "logstash"
+    group: "logstash"
+  notify:
+    - "restart logstash"
+  when: >
+        logstash_custom_template is defined and
+        logstash_custom_template
+
+- name: config_logstash | checking to ensure /opt/logstash/patterns folder exists
+  stat:
+    path: "/opt/logstash/patterns"
+  register: "ls_es_patterns_dir"
+
+- name: config_logstash | creating /opt/logstash/patterns folder if it is missing
+  file:
+    path: "/opt/logstash/patterns"
+    state: "directory"
+    owner: "logstash"
+    group: "logstash"
+    mode: 0775
+  when: >
+        not ls_es_patterns_dir.stat.exists
+
+- name: config_logstash | copying GROK patterns
+  template:
+    src: "opt/logstash/patterns/{{ item }}.j2"
+    dest: "/opt/logstash/patterns/{{ item }}"
+    owner: "logstash"
+    group: "logstash"
+  notify:
+    - "restart logstash"
+  with_items: '{{ logstash_grok_patterns }}'

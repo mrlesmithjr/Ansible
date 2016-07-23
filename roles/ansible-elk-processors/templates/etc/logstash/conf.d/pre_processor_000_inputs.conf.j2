@@ -1,0 +1,27 @@
+{% if logstash_file_inputs is defined %}
+{%   for item in logstash_file_inputs %}
+input {
+  file {
+    path => "{{ item.path }}"
+    type => "{{ item.type }}"
+    sincedb_path => "/dev/null"
+  }
+}
+{%   endfor %}
+{% endif %}
+{% if logstash_pre_processor_inputs is defined %}
+{%   for item in logstash_pre_processor_inputs %}
+input {
+  {{ item.prot }} {
+    type => "{{ item.type }}"
+    port => "{{ item.port }}"
+{%     if item.format is defined %}
+    format => "{{ item.format }}"
+{%     endif %}
+{%     if item.codec is defined %}
+    codec => "{{ item.codec }}"
+{%     endif %}
+  }
+}
+{%   endfor %}
+{% endif %}

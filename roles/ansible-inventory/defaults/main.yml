@@ -10,6 +10,7 @@ inventory_db_host_access:  #Defines the Host Access to the DB User
   - '%'
 inventory_db_user: 'ansible'  #Defines the Inventory DB User Name
 inventory_db_password: 'ansible'  #Defines the Inventory DB User Password
+inventory_gather_details: false   #Defines if gather details task should run
 inventory_group_vars:  #Define specific Ansible group vars to add
   - group: 'all'
     vars:

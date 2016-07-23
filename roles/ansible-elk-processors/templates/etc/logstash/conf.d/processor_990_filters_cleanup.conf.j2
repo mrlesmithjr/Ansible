@@ -1,0 +1,126 @@
+# The below filter section will be used to remove unnecessary fields to keep ES memory cache from filling up with useless data and cleaning up a bit
+# The below filter section will be where you would want to comment certain types or tags out if trying to isolate a logging issue
+filter {
+  if [type] == "apache" {
+    if [agent] == "-" {
+      mutate {
+        remove => [ "agent" ]
+      }
+    }
+    if [referrer] == "-" {
+      mutate {
+        remove => [ "referrer" ]
+      }
+    }
+    if [bytes] == "0" {
+      mutate {
+        remove => [ "bytes" ]
+      }
+    }
+    mutate {
+      remove => [ "clientip", "resolve_hostname", "timestamp" ]
+    }
+  }
+  if [type] == "elasticsearch-curator" {
+    mutate {
+      remove => [ "@source_host", "@source_host_ip", "resolve_hostname" ]
+    }
+  }
+  if [type] == "eventlog" {
+    mutate {
+      remove => [ "EventReceivedTime", "EventTime", "Keywords", "RecordNumber", "resolve_hostname" ]
+    }
+  }
+  if [type] == "exim-log" {
+    mutate {
+      remove => [ "message_body", "resolve_hostname", "syslog_timestamp", "timestamp" ]
+    }
+  }
+  if "HAProxy" in [tags] {
+    mutate {
+      remove => [ "haproxy_hour", "haproxy_milliseconds", "haproxy_minute", "haproxy_month", "haproxy_monthday", "haproxy_second", "haproxy_year", "pid", "program", "syslog_server" ]
+    }
+  }
+  if [type] == "iis" {
+    mutate {
+      remove => [ "clientip", "hostname", "logtime", "resolve_hostname", "syslog_message" ]
+    }
+  }
+  if [type] =~ "nginx" {
+    if [agent] == "-" {
+      mutate {
+        remove => [ "agent" ]
+      }
+    }
+    if [referrer] == "-" {
+      mutate {
+        remove => [ "referrer" ]
+      }
+    }
+    if [bytes] == "0" {
+      mutate {
+        remove => [ "bytes" ]
+      }
+    }
+    mutate {
+      remove => [ "apache_vhost", "clientip", "resolve_hostname", "timestamp" ]
+    }
+  }
+  if "Netscaler" in [tags] {
+    mutate {
+      remove_field => [ "clientip" ]
+    }
+  }
+  if "PFSense" in [tags] {
+    mutate {
+      remove_field => [ "orig_message", "pf_ip_spec_data", "pf_proto_spec_data" ]
+    }
+  }
+  if [type] == "postfix-log" {
+    mutate {
+      remove_field => [ "logsource", "message_body", "postfix_message", "resolve_hostname", "timestamp" ]
+    }
+  }
+  if [type] == "redis-server" {
+    mutate {
+      remove_field => [ "message_body", "resolve_hostname" ]
+    }
+  }
+  if [type] == "syslog" {
+    mutate {
+      remove => [ "accept_date", "pre-msg", "pre_syslog_pid", "pre_syslog_program", "received_at", "received_from", "resolve_hostname", "syslog_host_id", "syslog_hostname", "syslog_message", "syslog_timestamp" ]
+    }
+  }
+  if "UA" in [tags] {
+    if [device] == "Other" {
+      mutate {
+        remove => [ "device" ]
+      }
+    }
+    if [browser_name] == "Other" {
+      mutate {
+        remove => [ "browser_name" ]
+      }
+    }
+    if [os] == "Other" {
+      mutate {
+        remove => [ "os" ]
+      }
+    }
+    if [os_name] == "Other" {
+      mutate {
+        remove => [ "os_name" ]
+      }
+    }
+  }
+  if [type] == "ESXi" {
+    mutate {
+      remove => [ "message_body", "program", "resolve_hostname", "syslog_hostname", "syslog_message", "syslog_timestamp" ]
+    }
+  }
+  if [type] == "vCenter" {
+    mutate {
+      remove => [ "message_body", "program", "resolve_hostname", "syslog_hostname", "syslog_message", "syslog_timestamp", "timestamp" ]
+    }
+  }
+}

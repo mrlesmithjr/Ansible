@@ -2,7 +2,7 @@
 - name: mysql_check | installing pre-reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
     - 'xinetd'
   when: >
@@ -24,14 +24,14 @@
 
 - name: mysql_check | finding mysql command path
   command: 'which mysql'
-  register: mysql_path
+  register: "mysql_path"
 
 - name: mysql_check | configuring mysqlchk.sh
   template:
     src: "usr/local/bin/mysqlchk.sh.j2"
     dest: "/usr/local/bin/mysqlchk.sh"
-    owner: root
-    group: root
+    owner: "root"
+    group: "root"
     mode: 0775
 
 - name: mysql_check | configuring mysqlchk_user permissions for MySQL
@@ -39,4 +39,4 @@
     name: "{{ mysqlchk_user }}"
     password: "{{ mysqlchk_pass }}"
     priv: "*.*:SELECT"
-    state: present
+    state: "present"

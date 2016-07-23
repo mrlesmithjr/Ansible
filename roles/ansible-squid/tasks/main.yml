@@ -10,4 +10,6 @@
   when: enable_haproxy
 
 - include: config_squid_transparent_proxy.yml
-  when: squid_transparent_proxy is defined and squid_transparent_proxy
+  when: >
+        squid_transparent_proxy and
+        squid_transparent_proxy_ferm

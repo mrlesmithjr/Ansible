@@ -8,3 +8,6 @@
 
 - include: opensuse.yml
   when: ansible_os_family == "openSUSE Leap"
+
+- include: tweaks.yml
+  when: redis_enable_tweaks

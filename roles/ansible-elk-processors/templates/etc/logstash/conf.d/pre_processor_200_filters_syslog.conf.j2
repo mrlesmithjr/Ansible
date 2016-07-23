@@ -1,0 +1,25 @@
+filter {
+  if "syslog" in [tags] {
+    grok {
+      match => [
+        "message", "<%{POSINT}>%{TIMESTAMP_ISO8601} %{SYSLOGHOST:syslog_host_id} %{DATA:pre_syslog_program}(?:\[%{POSINT:pre_syslog_pid}\])?: %{GREEDYDATA}",
+        "message", "<%{POSINT}>%{SYSLOGTIMESTAMP} %{SYSLOGHOST:syslog_host_id} %{DATA:pre_syslog_program}(?:\[%{POSINT:pre_syslog_pid}\])?: %{GREEDYDATA}",
+        "message", "<%{POSINT}>%{SYSLOGTIMESTAMP} %{DATA:pre_syslog_program}(?:\[%{POSINT:pre_syslog_pid}\])?: %{GREEDYDATA}"
+      ]
+    }
+    mutate {
+      add_field => [ "pre-msg", "%{message}" ]
+    }
+{% if logstash_custom_tagging is defined %}
+{%   for item in logstash_custom_tagging %}
+{%     for name in item.naming %}
+    if "{{ name }}" in [syslog_host_id] {
+      mutate {
+        add_tag => [ "{{ item.tag }}"]
+      }
+    }
+{%     endfor %}
+{%   endfor %}
+{% endif %}
+  }
+}

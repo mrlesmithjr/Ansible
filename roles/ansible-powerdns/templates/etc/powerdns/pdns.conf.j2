@@ -3,6 +3,9 @@
 # allow-axfr-ips	Allow zonetransfers only to these subnets
 #
 # allow-axfr-ips=127.0.0.0/8,::1
+{% if pdns_master %}
+allow-axfr-ips={{ pdns_slaves| join (',') }}
+{% endif %}
 
 #################################
 # allow-dnsupdate-from	A global setting to allow DNS updates from these IP ranges.
@@ -127,6 +130,11 @@ default-soa-name={{ pdns_default_soa_name }}
 # disable-axfr	Disable zonetransfers but do allow TCP queries
 #
 # disable-axfr=no
+{% if pdns_master or not pdns_slave %}
+disable-axfr=no
+{% elif pdns_slave %}
+disable-axfr=yes
+{% endif %}
 
 #################################
 # disable-axfr-rectify	Disable the rectify step during an outgoing AXFR. Only required for regression testing.
@@ -206,6 +214,9 @@ experimental-json-interface=yes
 # guardian	Run within a guardian process
 #
 # guardian=no
+{% if pdns_master or pdns_slave %}
+guardian=yes
+{% endif %}
 
 #################################
 # include-dir	Include *.conf files from this directory
@@ -230,7 +241,11 @@ experimental-json-interface=yes
 local-address=127.0.0.1,{{ pri_dns }},{{ sec_dns }},{{ ansible_default_ipv4.address }}
 {% endif %}
 {% if (enable_pdns_anycast is defined and not enable_pdns_anycast) or enable_pdns_anycast is not defined %}
+{%   if pdns_listen_all_interfaces %}
+local-address=0.0.0.0
+{%   elif not pdns_listen_all_interfaces %}
 local-address=127.0.0.1,{{ ansible_default_ipv4.address }}
+{%   endif %}
 {% endif %}
 
 #################################
@@ -288,6 +303,11 @@ loglevel=5
 # master	Act as a master
 #
 # master=no
+{% if pdns_master %}
+master=yes
+{% elif not pdns_master %}
+master=no
+{% endif %}
 
 #################################
 # max-cache-entries	Maximum number of cache entries
@@ -446,6 +466,11 @@ recursor={{ pdns_recursor_host }}:{{ pdns_recursor_port }}
 # slave	Act as a slave
 #
 # slave=no
+{% if pdns_slave %}
+slave=yes
+{% elif not pdns_slave %}
+slave=no
+{% endif %}
 
 #################################
 # slave-cycle-interval	Schedule slave freshness checks once every .. seconds

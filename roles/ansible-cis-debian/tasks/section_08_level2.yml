@@ -1,0 +1,40 @@
+---
+- name: section_08_level2 | Ensuring Auditd is installed (Scored)
+  apt:
+    name: "auditd"
+    state: "present"
+
+- name: section_08_level2 | Ensuring Auditd is started and enabled (Scored)
+  service:
+    name: "auditd"
+    state: "started"
+    enabled: yes
+
+- name: section_08_level2 | Configuring Auditd (Scored)
+  lineinfile:
+    dest: "/etc/audit/auditd.conf"
+    regexp: "^{{ item.name }} = {{ item.value }}"
+    line: "{{ item.name }} = {{ item.value }}"
+    state: "present"
+  with_items: '{{ cis_debian_section_08_level2_auditd_conf }}'
+
+- name: section_08_level2 | Configuring Grub auditing
+  lineinfile:
+    dest: "/etc/default/grub"
+    regexp: "^GRUB_CMDLINE_LINUX="
+    line: "GRUB_CMDLINE_LINUX=\"{{ cis_debian_section_08_level2_grub_conf }}\""
+    state: "present"
+  register: "grub_configured"
+
+- name: section_08_level2 | Updating Grub
+  command: "update-grub"
+  when: grub_configured.changed
+
+- name: section_08_level2 | Configuring audit rules
+  template:
+    src: "etc/audit/audit.rules.j2"
+    dest: "/etc/audit/audit.rules"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: "restart auditd"

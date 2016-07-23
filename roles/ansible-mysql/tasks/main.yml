@@ -10,3 +10,6 @@
 
 - include: mysql_check.yml
   when: config_mysqlchk
+
+- include: setup_replication.yml
+  when: config_mysql_replication

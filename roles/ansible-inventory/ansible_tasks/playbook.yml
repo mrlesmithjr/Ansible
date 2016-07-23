@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  become: true
+  vars:
+    - inventory_db_host: localhost
+    - inventory_gather_details: false
+    - mysql_allow_remote_connections: true
+    - mysql_docker_install: true
+  roles:
+    - role: ansible-mysql
+    - role: ansible-inventory
+  tasks:

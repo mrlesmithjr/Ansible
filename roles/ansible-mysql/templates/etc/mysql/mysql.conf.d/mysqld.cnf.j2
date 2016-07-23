@@ -1,0 +1,49 @@
+#
+# The MySQL database server configuration file.
+#
+[mysqld_safe]
+socket = /var/run/mysqld/mysqld.sock
+nice = 0
+
+[mysqld]
+basedir = /usr
+{% if mysql_allow_remote_connections is not defined %}
+bind-address = 127.0.0.1
+{% endif %}
+{% if mysql_allow_remote_connections is defined and not mysql_allow_remote_connections %}
+bind-address = 127.0.0.1
+{% endif %}
+{% if mysql_allow_remote_connections is defined and mysql_allow_remote_connections %}
+#bind-address = 127.0.0.1
+{% endif %}
+datadir = /var/lib/mysql
+expire_logs_days = {{ mysql_settings.expire_logs_days }}
+key_buffer_size = {{ mysql_settings.key_buffer_size }}
+lc-messages-dir	= /usr/share/mysql
+log_error = /var/log/mysql/error.log
+max_allowed_packet = {{ mysql_settings.max_allowed_packet }}
+max_binlog_size = {{ mysql_settings.max_binlog_size }}
+max_connections = {{ mysql_settings.max_connections }}
+myisam-recover-options  = BACKUP
+pid-file = /var/run/mysqld/mysqld.pid
+port = {{ mysql_port }}
+query_cache_limit	= {{ mysql_settings.query_cache_limit }}
+query_cache_size = {{ mysql_settings.query_cache_size }}
+skip-external-locking
+socket = /var/run/mysqld/mysqld.sock
+thread_cache_size = {{ mysql_settings.thread_cache_size }}
+thread_stack = {{ mysql_settings.thread_stack }}
+tmpdir = /tmp
+user = mysql
+{% if config_mysql_replication %}
+# Replication
+{%   for item in mysql_replication_nodes %}
+{%     if inventory_hostname == item.name %}
+server-id = {{ item.server_id }}
+{%     endif %}
+{%   endfor %}
+{%   for item in mysql_replication_dbs %}
+binlog_do_db = {{ item }}
+{%   endfor %}
+log_bin = /var/log/mysql/mysql-bin.log
+{% endif %}

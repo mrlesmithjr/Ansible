@@ -1,0 +1,17 @@
+;
+; BIND data file for {{ item.zone }}
+;
+$TTL	{{ item.ttl }}
+@	IN	SOA	{{ item.soa }}. {{ item.hostmaster }}. (
+			{{ bind_timestamp.stdout }}		; Serial
+			{{ item.refresh }}		; Refresh
+			{{ item.retry}}		; Retry
+			{{ item.expire }}		; Expire
+			{{ item.neg_cache_ttl }} )	; Negative Cache TTL
+;
+{% for ns in item.nameservers %}
+@  IN  NS  {{ ns }}.
+{% endfor %}
+{% for record in item.records %}
+{{ record.address }}  IN  PTR  {{ record.name }}
+{% endfor %}

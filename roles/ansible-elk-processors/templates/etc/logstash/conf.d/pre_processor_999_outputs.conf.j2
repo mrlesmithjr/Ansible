@@ -1,0 +1,28 @@
+output {
+  if "metric" in [tags] {
+    stdout {
+      codec => line {
+        format => "1m rate: %{documents.rate_1m} ( %{documents.count} )"
+      }
+    }
+  }
+}
+{% if logstash_pre_processor_outputs is defined %}
+{%   for item in logstash_pre_processor_outputs %}
+output {
+  {{ item.output }} {
+{%     if item.host is defined %}
+    host => "{{ item.host }}"
+{%     endif %}
+{%     if item.output == "redis" %}
+    data_type => "list"
+    key => "logstash"
+{%     endif %}
+{%     if item.output == "rabbitmq" %}
+    exchange => "{{ item.exchange }}"
+    exchange_type => "{{ item.exchange_type }}"
+{%     endif %}
+  }
+}
+{%   endfor %}
+{% endif %}

@@ -73,14 +73,30 @@
 - name: pdns_zones | creating pdns zones
   shell: /tmp/pdns_zones.sh
   run_once: true
-  when: pdns_zones_created.changed
+  when: >
+        pdns_db_cluster and
+        pdns_zones_created.changed
+
+- name: pdns_zones | creating pdns zones
+  shell: /tmp/pdns_zones.sh
+  when: >
+        not pdns_db_cluster and
+        pdns_zones_created.changed
 
 - name: pdns_zones | creating pdns zones
   shell: /tmp/pdns_zones.sh
   run_once: true
   when: >
-        force is defined and
-        force
+        pdns_db_cluster and
+        (force is defined and
+        force)
+
+- name: pdns_zones | creating pdns zones
+  shell: /tmp/pdns_zones.sh
+  when: >
+        not pdns_db_cluster and
+        (force is defined and
+        force)
 
 - name: pdns_zones | cleaning up pdns zones script
   file:

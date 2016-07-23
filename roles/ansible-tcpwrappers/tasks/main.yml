@@ -1,0 +1,3 @@
+---
+# tasks file for ansible-tcpwrappers
+- include: config.yml

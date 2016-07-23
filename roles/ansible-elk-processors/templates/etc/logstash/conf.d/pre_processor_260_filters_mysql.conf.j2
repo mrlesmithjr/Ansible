@@ -1,0 +1,24 @@
+# Setting up MySQL parsing
+filter {
+  if "syslog" in [tags] and "pre-processed" not in [tags] {
+    if [pre_syslog_program] == "mysqld" {
+      multiline {
+        pattern => "^memb {"
+        what => "next"
+      }
+      multiline {
+        pattern => "^%{NUMBER} *%{NUMBER}"
+        what => "previous"
+      }
+      if "multiline" in [tags] {
+        mutate {
+          add_tag => [ "MySQL", "MySQL-Replication", "pre-processed" ]
+        }
+      }
+      mutate {
+        rename => [ "pre_syslog_program", "syslog_program" ]
+        rename => [ "pre_syslog_pid", "syslog_pid" ]
+      }
+    }
+  }
+}

@@ -117,6 +117,24 @@ Example Playbook
     - role: ansible-inventory
   tasks:
 ````
+
+Docker
+------
+You can run the Ansible Inventory system within a Docker container by...
+````
+docker run -d -p 3306:3306 --name ansible-inventory mrlesmithjr/ansible-inventory
+````
+To run the examples below within the Docker container you can replace the commands  
+as such...  
+Adding a new host...
+````
+docker exec -it ansible-inventory /etc/ansible/roles/ansible-inventory/library/ansible_inventory.py --dbuser ansible --dbpassword ansible addhost --host smtp --group smtp-servers --sshhost="10.0.102.128"
+````
+Ansible playbook executions...
+````
+docker exec -it ansible-inventory ansible-playbook -i /etc/ansible/roles/ansible-inventory/library/ansible_play.py playbook.yml --list-hosts
+````
+
 Example Ansible playbook execution
 ----------------------------------
 Using the included python script (library/ansible_play.py) you can  

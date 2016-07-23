@@ -129,7 +129,8 @@
   connection: local
   become: false
   vars:
-    - openstack_keystone_url: 'openstack.{{ pri_domain_name }}'
+    - openstack_keystone_url: 'http://{{ openstack_services_vip_fqdn }}'
+    - openstack_services_vip_fqdn: 'openstack.{{ pri_domain_name }}'
   tasks:
     - name: creating client script(s)  #creating this to source in order to create heat domain
       template:

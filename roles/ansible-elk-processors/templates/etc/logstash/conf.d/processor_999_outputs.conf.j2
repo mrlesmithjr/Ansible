@@ -1,0 +1,59 @@
+output {
+  if "metric" in [tags] {
+    stdout {
+      codec => line {
+        format => "1m rate: %{documents.rate_1m} ( %{documents.count} )"
+      }
+    }
+  }
+}
+{% for item in logstash_processor_outputs %}
+output {
+  if "drop" not in [tags] {
+    {{ item.output }} {
+{%   if item.host is defined %}
+      host => "{{ item.host }}"
+{%   endif %}
+{%   if item.hosts is defined %}
+      hosts => ["{{ item.hosts }}"]
+{%   endif %}
+{%   if item.output == "elasticsearch" %}
+{%     if item.flush_size is defined %}
+      flush_size => {{ item.flush_size }}
+{%     endif %}
+{%     if logstash_custom_template is defined and logstash_custom_template %}
+      manage_template => true
+      template => "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
+      template_overwrite => true
+{%     endif %}
+{%     if item.workers is defined %}
+      workers => {{ item.workers }}
+{%     endif %}
+{%   endif %}
+{%   if item.output == "redis" %}
+      data_type => "list"
+      key => "logstash"
+{%   endif %}
+{%   if item.output == "rabbitmq" %}
+      exchange => "{{ item.exchange }}"
+      exchange_type => "{{ item.exchange_type }}"
+{%   endif %}
+    }
+  }
+}
+{% endfor %}
+{% if enable_logstash_slack_output is defined and enable_logstash_slack_output %}
+{%   if logstash_slack_output_tags is defined and logstash_slack_output_tags != None %}
+# Slack outputs based on tags.
+{%     for item in logstash_slack_output_tags %}
+output {
+  if "{{ item }}" in [tags] {
+    slack {
+      url => "{{ logstash_slack_api_webhook_url }}"
+      channel => "{{ logstash_slack_channel }}"
+    }
+  }
+}
+{%     endfor %}
+{%   endif %}
+{% endif %}

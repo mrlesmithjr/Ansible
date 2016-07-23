@@ -3,7 +3,7 @@
 config_nginx: false
 nginx_access_log: '/var/log/nginx/access.log'
 nginx_enable_ipv6: false
-nginx_enable_php5: true
+nginx_enable_php: true
 nginx_error_log: '/var/log/nginx/error.log'
 nginx_events_block:
 #  - 'multi_accept on'

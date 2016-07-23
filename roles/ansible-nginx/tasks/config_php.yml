@@ -1,25 +1,27 @@
 ---
-- name: config_php | installing php5
+- name: config_php | installing PHP-{{ nginx_php_ver }}
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - php5
-    - php5-cli
-    - php5-fpm
-  when: ansible_os_family == "Debian"
+    - 'php{{ nginx_php_ver }}'
+    - 'php{{ nginx_php_ver }}-cli'
+    - 'php{{ nginx_php_ver }}-fpm'
+  when: >
+        ansible_os_family == "Debian"
 
 - name: config_php | configuring php.ini
   template:
-    src: "etc/php5/{{ item }}.j2"
-    dest: "/etc/php5/{{ item }}"
-    owner: root
-    group: root
+    src: "{{ nginx_php_path }}/{{ item }}.j2"
+    dest: "/{{ nginx_php_path }}/{{ item }}"
+    owner: "root"
+    group: "root"
     mode: 0644
   notify:
-    - restart nginx
-    - restart php5-fpm
+    - "restart nginx"
+    - "restart php{{ nginx_php_ver }}-fpm"
   with_items:
-    - fpm/php.ini
-    - cli/php.ini
-  when: ansible_os_family == "Debian"
+    - 'fpm/php.ini'
+    - 'cli/php.ini'
+  when: >
+        ansible_os_family == "Debian"

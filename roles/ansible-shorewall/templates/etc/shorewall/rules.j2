@@ -15,7 +15,9 @@
 #							PORT	PORT(S)		DEST		LIMIT		GROUP
 {% for item in shorewall_rules %}
 SECTION {{ item.section }}
-{%   for rule in item.rules %}
+{%   if item.rules is defined %}
+{%     for rule in item.rules %}
 {{ rule.action }}   {{ rule.source }}   {{ rule.dest }}   {{ rule.proto }}   {{ rule.dest_ports|join (',') }}
-{%   endfor %}
+{%     endfor %}
+{% endif %}
 {% endfor %}

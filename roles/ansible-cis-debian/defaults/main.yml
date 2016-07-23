@@ -1,0 +1,90 @@
+---
+# defaults file for ansible-cis-debian
+cis_debian_section_02_level1_services:
+  - 'telnet-server'
+  - 'telnet'
+  - 'rsh-server'
+  - 'rsh'
+  - 'ypbind'
+  - 'ypserv'
+  - 'tftp'
+  - 'tftp-server'
+  - 'talk'
+  - 'talk-server'
+  - 'xinetd'
+cis_debian_section_02_level2_CIS_conf:
+  - 'cramfs'
+  - 'freevxfs'
+  - 'jffs2'
+  - 'hfs'
+  - 'hfsplus'
+  - 'squashfs'
+  - 'udf'
+cis_debian_section_07_level1_CIS_conf:
+  - 'dccp'
+  - 'sctp'
+  - 'rds'
+  - 'tipc'
+cis_debian_section_07_level1_firewall_conf:  #Configure allowed services (Not specifically in CIS document)
+  - rule: 'allow'
+    port: 'ssh'
+    proto: 'tcp'
+cis_debian_section_07_level1_network_params:
+  - name: 'net.ipv4.ip_forward'
+    value: 0
+  - name: 'net.ipv4.conf.all.send_redirects'
+    value: 0
+  - name: 'net.ipv4.conf.default.send_redirects'
+    value: 0
+  - name: 'net.ipv4.conf.all.accept_source_route'
+    value: 0
+  - name: 'net.ipv4.conf.default.accept_source_route'
+    value: 0
+  - name: 'net.ipv4.conf.all.accept_redirects'
+    value: 0
+  - name: 'net.ipv4.conf.default.accept_redirects'
+    value: 0
+  - name: 'net.ipv4.conf.all.secure_redirects'
+    value: 0
+  - name: 'net.ipv4.conf.default.secure_redirects'
+    value: 0
+  - name: 'net.ipv4.conf.all.log_martians'
+    value: 1
+  - name: 'net.ipv4.conf.default.log_martians'
+    value: 1
+  - name: 'net.ipv4.icmp_echo_ignore_broadcasts'
+    value: 1
+  - name: 'net.ipv4.icmp_ignore_bogus_error_responses'
+    value: 1
+  - name: 'net.ipv4.conf.all.rp_filter'
+    value: 1
+  - name: 'net.ipv4.conf.default.rp_filter'
+    value: 1
+  - name: 'net.ipv4.tcp_syncookies'
+    value: 1
+  - name: 'net.ipv6.conf.all.accept_ra'
+    value: 0
+  - name: 'net.ipv6.conf.default.accept_ra'
+    value: 0
+  - name: 'net.ipv6.conf.all.accept_redirects'
+    value: 0
+  - name: 'net.ipv6.conf.default.accept_redirects'
+    value: 0
+  - name: 'net.ipv6.conf.all.disable_ipv6'
+    value: 1
+  - name: 'net.ipv6.conf.default.disable_ipv6'
+    value: 1
+  - name: 'net.ipv6.conf.lo.disable_ipv6'
+    value: 1
+cis_debian_section_08_level2_auditd_conf:
+  - name: 'max_log_file'
+    value: '6'
+  - name: 'space_left_action'
+    value: 'email'
+  - name: 'action_mail_acct'
+    value: 'root'
+  - name: 'admin_space_left_action'
+    value: 'halt'
+  - name: 'max_log_file_action'
+    value: 'keep_logs'
+cis_debian_section_08_level2_grub_conf: 'AUDIT=1 debian-installer=en_US'

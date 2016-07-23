@@ -1,11 +1,16 @@
 ---
 # handlers file for ansible-mysql
-- name: restart mysql
+- name: "restart mariadb"
   service:
-    name: mysql
-    state: restarted
+    name: "mariadb"
+    state: "restarted"
 
-- name: reload mysql
+- name: "restart mysql"
   service:
-    name: mysql
-    state: reloaded
+    name: "mysql"
+    state: "restarted"
+
+- name: "reload mysql"
+  service:
+    name: "mysql"
+    state: "reloaded"

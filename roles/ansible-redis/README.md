@@ -1,33 +1,40 @@
 Role Name
 =========
 
-Installs redis http://redis.io/
+Installs Redis http://redis.io/
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
 
 ````
+---
+# defaults file for ansible-redis
 redis_allow_remote_connections: false  #defines if redis should allow connections on all interfaces
+redis_enable_tweaks: false  #Defines if redis related tweaks should be enabled
 ````
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.redis }
+````
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - ansible-redis
+  tasks:
+````
 
 License
 -------

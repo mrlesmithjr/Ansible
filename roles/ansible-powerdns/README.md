@@ -46,6 +46,7 @@ pdns_default_soa_mail: "hostmaster.{{ pri_domain_name }}" #define here or global
 pdns_default_soa_name: "{{ ansible_hostname }}.{{ pri_domain_name }}" #define here or globally in group_vars/group
 pdns_download_url: https://downloads.powerdns.com/releases
 pdns_json_interface: true
+pdns_listen_all_interfaces: true  #defines if PDSN will listen on all interfaces
 pdns_ns1: "ns1.{{ pri_domain_name }}"  #define primary nameserver to use when creating zones...IP/Hostname..ns1.example.org
 pdns_ns2: "ns2.{{ pri_domain_name }}"  #define secondary nameserver to use when creating zones...IP/Hostname..ns2.example.org
 pdns_fwd_zones:  #defines the DNS forward zones to create if create_pdns_zones is true

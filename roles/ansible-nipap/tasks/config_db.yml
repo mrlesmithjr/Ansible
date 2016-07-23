@@ -1,0 +1,25 @@
+---
+- name: config_db | adding nipap db
+  become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
+  postgresql_db:
+    name: "{{ nipap_db_info.db_name }}"
+    state: "present"
+
+- name: config_db | enabling postgres extensions
+  become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
+  postgresql_ext:
+    name: "hstore"
+    db: "{{ nipap_db_info.db_name }}"
+
+- name: config_db | adding nipap db permissions
+  become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
+  postgresql_user:
+    db: "{{ nipap_db_info.db_name }}"
+    name: "{{ nipap_db_info.db_user }}"
+    password: "{{ nipap_db_info.db_pass }}"

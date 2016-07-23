@@ -17,6 +17,7 @@ graylog_server_syslog_input_port: 10514 #set to port to be defined in graylog in
 graylog_server_syslog_input_protocol: udp #udp or tcp
 graylog_version: 2.0
 graylog_web_application_secret: X4S0oYP9DcGjgpX6uAGOfHS3NbB5OpSHWVKwQP94mJxaDCM3WPP0QP5zd8uqZs2tDBPiKET6r81IJEumQkqAk6WOnqKwvCu1  #define in group_vars/all/accounts or generate new pw using...pwgen -N 1 -s 96
+graylog_web_listen_uri: 'http://0.0.0.0:9000'
 graylog_web_server_uri: '{{ graylog_server_rest_listen_uri }}' #set to same as graylog_server_rest_listen_uri unless not installing both server and web on same host
 port_redirects:  #define ports to port forward from system to graylog_server - only required for ports below 1024
   - syslog_dport: 514

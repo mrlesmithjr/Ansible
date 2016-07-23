@@ -1,0 +1,59 @@
+# Setting up Nginx web server parsing
+filter {
+  if [type] =~ "nginx" {
+    grok {
+      pattern => "%{COMBINEDAPACHELOG}"
+    }
+    geoip {
+      source => "clientip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    date {
+      match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ]
+    }
+    mutate {
+      add_field => [ "src_ip", "%{clientip}" ]
+      convert => [ "[geoip][coordinates]", "float" ]
+      rename => [ "verb" , "method" ]
+    }
+    grok {
+      match => [
+        "message", "%{DATA:apache_vhost} "
+      ]
+    }
+    useragent {
+      add_tag => [ "UA" ]
+      source => "agent"
+    }
+    if "UA" in [tags] {
+      mutate {
+        rename => [ "name", "browser_name" ]
+      }
+    }
+  }
+}
+# Setting up Nginx errors parsing
+filter {
+  if [type] == "nginx-error" {
+    grok {
+      match => { "message" => "%{NGINXERROR" }
+      patterns_dir => [ "/opt/logstash/patterns" ]
+    }
+    geoip {
+      source => "clientip"
+      target => "geoip"
+      add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+      add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    date {
+      match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ]
+    }
+    mutate {
+      add_field => [ "src_ip", "%{clientip}" ]
+      convert => [ "[geoip][coordinates]", "float" ]
+      rename => [ "verb" , "method" ]
+    }
+  }
+}

@@ -3,8 +3,11 @@
   when: ansible_os_family == "Debian"
 
 - include: redhat.yml
-  when: ansible_os_family == "RedHat"
-  
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+
+- include: fedora.yml
+  when: ansible_distribution == "Fedora"
+
 - name: checking to see if already clustered
   stat: path=/etc/rabbitmq/clustered
   register: clustered
