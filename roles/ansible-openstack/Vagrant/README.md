@@ -2,12 +2,12 @@ Vagrant Environment
 ===================
 
 The Vagrant environment consists of the following nodes:  
-client - run code from  
-logstash
-oscompute  
-oscontroller  
-oshaproxy  
 
+`client` - run code from  
+`logstash`  
+`oscompute`  
+`oscontroller`  
+`oshaproxy`  
 
 
 Spin up environment
@@ -22,17 +22,18 @@ cd /vagrant
 ansible-playbook -i hosts openstack.yml --user vagrant
 ````
 
-Log into Horizon Dashboard  
-http://127.0.0.1:8080/horizon  
-user: admin  
-password: 29b1416692cb38014ea0  
+Log into [Horizon] Dashboard
+
+user: `admin`  
+password: `29b1416692cb38014ea0`  
 
 or ...
 
-user: demo  
-password: 54a27efd264beeb7843d  
+user: `demo`  
+password: `54a27efd264beeb7843d`  
 
 When you are done and ready to tear down the environment.  
 ````
 ./cleanup.sh
 ````
+[Horizon]: <http://127.0.0.1:8080/horizon>
