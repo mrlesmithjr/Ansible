@@ -29,19 +29,20 @@ defaults
   timeout  server 1m
   timeout  check 10s
 
-{% if enable_haproxy_admin_page is defined and enable_haproxy_admin_page %}
+{% if enable_haproxy_admin_page %}
 userlist STATSUSERS
-  group admin users admin
-  user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
+    group admin users admin
+    user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
 
-listen admin_page 0.0.0.0:{{ haproxy_admin_port }}
-  mode http
-  stats enable
-  stats refresh 60s
-  stats uri /
-  acl AuthOkay_ReadOnly http_auth(STATSUSERS)
-  acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
-  stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+listen stats
+    bind *:{{ haproxy_admin_port }}
+    mode http
+    stats enable
+    stats refresh 60s
+    stats uri /
+    acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+    acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+    stats http-request auth realm stats unless AuthOkay_ReadOnly
 {% endif %}
 
 listen ceilometer_api_cluster
