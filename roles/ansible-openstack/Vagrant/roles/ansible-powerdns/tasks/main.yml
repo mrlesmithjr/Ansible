@@ -1,0 +1,48 @@
+---
+# tasks file for ansible-powerdns
+- include: set_facts.yml
+
+- include: pdns_accounts.yml
+
+- include: pdns_server.yml
+  when: >
+        install_pdns_server is defined and
+        install_pdns_server
+
+- include: pdns_recursor.yml
+  when: >
+        install_pdns_recursor is defined and
+        install_pdns_recursor
+
+- include: poweradmin.yml
+  when: >
+        install_poweradmin is defined and
+        install_poweradmin
+
+- include: nsedit.yml
+
+- include: remove_logstash.yml
+  when: >
+        (install_logstash is defined and
+        not install_logstash) or
+        install_logstash is not defined
+
+#- include: cron.yml
+#  tags:
+#    - cron
+#  when: enable_pdns_anycast is defined and enable_pdns_anycast
+
+- include: pdns_zones.yml
+  tags:
+    - create_pdns_zones
+  when: >
+        create_pdns_zones is defined and
+        create_pdns_zones
+
+- include: pdns_records.yml
+  tags:
+    - create_pdns_records
+  when: >
+        (create_pdns_records is defined and
+        create_pdns_records) and
+        pdns_records is defined

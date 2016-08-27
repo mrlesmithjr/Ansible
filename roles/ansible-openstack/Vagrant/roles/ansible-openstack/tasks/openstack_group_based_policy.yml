@@ -1,0 +1,68 @@
+---
+- name: openstack_group_based_policy | adding GBP repos
+  apt_repository:
+    repo: "deb http://ppa.launchpad.net/group-based-policy-drivers/ppa/ubuntu utopic main"
+    validate_certs: no
+    state: present
+
+- name: openstack_group_based_policy | installing GBP packages
+  apt:
+    name: "{{ item }}"
+    force: yes
+    state: present
+  with_items:
+    - group-based-policy
+    - group-based-policy-automation
+    - group-based-policy-ui
+    - python-group-based-policy-client
+
+- name: openstack_group_based_policy | configuring Neutron
+  template:
+    src: etc/neutron/neutron.conf.j2
+    dest: /etc/neutron/neutron.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-server
+    - restart heat-api
+    - restart heat-api-cfn
+    - restart heat-engine
+    - restart apache2
+
+- name: openstack_group_based_policy | Updating GBP automation package name to work correctly with pbr
+  template:
+    src: usr/lib/python2.7/dist-packages/gbpautomation/__init__.py.j2
+    dest: /usr/lib/python2.7/dist-packages/gbpautomation/__init__.py
+    owner: root
+    group: root
+    mode: 0644
+
+- name: openstack_group_based_policy | Enabling GBP UI on horizon dashboard
+#  shell: ln -s /usr/lib/python2.7/dist-packages/gbpui/_*project*.py /usr/share/openstack-dashboard/openstack_dashboard/enabled
+  file:
+    src: /usr/lib/python2.7/dist-packages/gbpui/{{ item }}
+    dest: /usr/share/openstack-dashboard/openstack_dashboard/enabled/{{ item }}
+    state: link
+  with_items:
+    - _50_gbp_project_add_panel_group.py
+    - _60_gbp_project_add_panel.py
+    - _61_gbp_project_add_panel.py
+    - _62_gbp_project_add_panel.py
+    - _63_gbp_project_add_panel.py
+
+- name: openstack_group_based_policy | checking if GBP tables have been imported
+  stat:
+    path: /etc/neutron/gbp_tables_imported
+  register: gbp_tables_imported
+  always_run: yes
+
+- name: openstack_group_based_policy | importing GBP tables
+  shell: "gbp-db-manage --config-file /etc/neutron/neutron.conf upgrade head"
+  when: not gbp_tables_imported.stat.exists
+
+- name: openstack_group_based_policy | marking GBP tables as imported
+  file:
+    dest: /etc/neutron/gbp_tables_imported
+    state: touch
+  when: not gbp_tables_imported.stat.exists

@@ -8,17 +8,19 @@
   command: "zpool create -f {{ item.name }} {{ item.devices|join (' ') }}"
   with_items: '{{ zfs_pools }}'
   when: >
-        item.type == "basic" and
+        create_zfs_pools and
+        (item.type == "basic" and
         item.name not in zpools.stdout and
-        item.state == "present"
+        item.state == "present")
 
 - name: manage_zfs | creating mirror/zraid zpool(s)
   command: "zpool create -f {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
   with_items: '{{ zfs_pools }}'
   when: >
-        item.type != "basic" and
+        create_zfs_pools and
+        (item.type != "basic" and
         item.name not in zpools.stdout and
-        item.state == "present"
+        item.state == "present")
 
 - name: manage_zfs | managing pools
   zfs:
@@ -33,6 +35,7 @@
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
   with_items: '{{ zfs_pools }}'
+  when: create_zfs_pools
 
 - name: manage_zfs | managing filesystems
   zfs:
@@ -40,14 +43,16 @@
     atime: "{{ item.atime|default(omit) }}"
     compression: "{{ item.compression|default(omit) }}"
     dedup: "{{ item.dedup|default(omit) }}"
-    quota: "{{ item.quota|default(omit) }}"
+    logbias: "{{ item.logbias|default(omit) }}"
+    mountpoint: "{{ item.mountpoint|default(omit) }}"
     primarycache: "{{ item.primarycache|default(omit) }}"
+    quota: "{{ item.quota|default(omit) }}"
     recordsize: "{{ item.recordsize|default(omit) }}"
     sharenfs: "{{ item.sharenfs|default(omit) }}"
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
-    logbias: "{{ item.logbias|default(omit) }}"
   with_items: '{{ zfs_filesystems }}'
+  when: create_zfs_filesystems
 
 - name: manage_zfs | managing volumes
   zfs:
@@ -65,6 +70,7 @@
   notify:
     - restart iscsitarget
   with_items: '{{ zfs_volumes }}'
+  when: create_zfs_volumes
 
 - name: manage_zfs | configuring iscsi devices
   template:

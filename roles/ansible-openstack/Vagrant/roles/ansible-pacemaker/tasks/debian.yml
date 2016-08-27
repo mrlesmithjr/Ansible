@@ -1,0 +1,106 @@
+---
+- name: debian | installing pacemaker
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - cluster-glue
+    - corosync
+    - crmsh
+    - pacemaker
+    - resource-agents
+
+- name: debian | checking if corosync authkey exists
+  stat:
+    path: /etc/corosync/authkey
+  register: corosync_authkey
+
+- name: debian | installing haveged on pacemaker_primary_server
+  apt:
+    name: haveged
+    state: present
+  when: not corosync_authkey.stat.exists and (pacemaker_primary_server is defined and pacemaker_primary_server)
+
+- name: debian | generating corosync authkey
+  command: corosync-keygen
+  register: corosync_auth_key_generated
+  when: not corosync_authkey.stat.exists and (pacemaker_primary_server is defined and pacemaker_primary_server)
+
+- name: debian | uninstalling haveged
+  apt:
+    name: haveged
+    purge: yes
+    state: absent
+  when: corosync_auth_key_generated.changed and (pacemaker_primary_server is defined and pacemaker_primary_server)
+
+- name: debian | copying corosync authkey local
+  fetch:
+    dest: /tmp/corosync_authkey
+    flat: yes
+    src: /etc/corosync/authkey
+  when: corosync_auth_key_generated.changed and (pacemaker_primary_server is defined and pacemaker_primary_server)
+
+- name: debian | copying corosync authkey to other hosts
+  copy:
+    src: /tmp/corosync_authkey
+    dest: /etc/corosync/authkey
+    owner: root
+    group: root
+    mode: 0400
+  when: not corosync_authkey.stat.exists and (pacemaker_primary_server is defined and not pacemaker_primary_server)
+
+- name: debian | configuring corosync
+  template:
+    src: etc/corosync/corosync.conf.j2
+    dest: /etc/corosync/corosync.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart corosync
+    - restart pacemaker
+  register: corosync_reconfigured
+
+- name: debian | configuring corosync service to start
+  template:
+    src: etc/default/corosync.j2
+    dest: /etc/default/corosync
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart corosync
+    - restart pacemaker
+
+- name: debian | ensuring corosync and pacemaker are running in order to configure cluster properties
+  service:
+    name: "{{ item }}"
+    state: restarted
+    sleep: 10
+  with_items:
+    - corosync
+    - pacemaker
+  when: corosync_reconfigured.changed
+
+- name: debian | ensuring corosync and pacemaker start on boot
+  service:
+    name: "{{ item }}"
+    enabled: yes
+  with_items:
+    - corosync
+    - pacemaker
+
+- name: debian | configuring pacemaker cluster properties
+  pacemaker: >
+    property "{{ item.property }}"="{{ item.value }}"
+  with_items: pacemaker_cluster_settings
+  notify:
+    - pacemaker commit
+  when: pacemaker_cluster_settings is defined
+
+- name: debian | disabling pacemaker STONITH
+  pacemaker: >
+    property stonith-enabled=false
+  notify:
+    - pacemaker commit
+  when: pacemaker_disable_stonith is defined and pacemaker_disable_stonith

@@ -1,0 +1,120 @@
+---
+- name: openstack_heat | creating Heat DB
+  mysql_db:
+    name: heat
+    state: present
+  when: mysql_master
+
+- name: openstack_heat | creating Heat DB
+  mysql_db:
+    name: heat
+    state: present
+  when: not mysql_master
+
+- name: openstack_heat | granting permissions to Heat DB
+  mysql_user:
+    name: heat
+    password: "{{ openstack_heat_dbpass }}"
+    priv: "heat.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: mysql_master
+
+- name: openstack_heat | granting permissions to Heat DB
+  mysql_user:
+    name: heat
+    password: "{{ openstack_heat_dbpass }}"
+    priv: "heat.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: not mysql_master
+
+- name: openstack_heat | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - heat-api
+    - heat-api-cfn
+    - heat-engine
+    - python-heatclient
+
+- name: openstack_heat | configuring heat
+  template:
+    src: etc/heat/heat.conf.j2
+    dest: /etc/heat/heat.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart heat-api
+    - restart heat-api-cfn
+    - restart heat-engine
+
+- name: openstack_heat | creating client script(s)  #creating this to source in order to create heat domain
+  template:
+    src: "{{ item }}-openrc.sh.j2"
+    dest: "/root/{{ item }}-openrc.sh"
+    mode: 0700
+  tags:
+    - create-openstack-client-scripts
+  with_items:
+    - admin
+    - demo
+
+- name: openstack_heat | checking if heat domain has been created
+  stat:
+    path: /etc/heat/heat_domain_created
+  register: heat_domain_created
+  always_run: yes
+
+- name: openstack_heat | creating heat domain
+  shell: ". /root/admin-openrc.sh heat-keystone-setup-domain --stack-user-domain-name heat_user_domain --stack-domain-admin heat_domain_admin --stack-domain-admin-password {{ openstack_heat_domain_pass }}"
+  when: >
+        not heat_domain_created.stat.exists and
+        mysql_master
+
+#- name: openstack_heat | creating heat domain
+#  keystone:
+#    command: ensure_domain
+#    domain_name: heat
+#    endpoint: "{{ openstack_keystone_url }}:35357/v2.0"
+#    token: "{{ openstack_keystone_temp_admin_token}}"
+
+- name: openstack_heat | marking heat domain as created
+  file:
+    path: /etc/heat/heat_domain_created
+    state: touch
+  when: not heat_domain_created.stat.exists
+
+- name: openstack_heat | checking if heat has been populated
+  stat:
+    path: /etc/heat/heat_populated
+  register: heat_is_populated
+  always_run: yes
+
+- name: openstack_heat | populating heat
+  command: su -s /bin/sh -c "heat-manage db_sync" heat
+#  heat_manage:
+#    action: dbsync
+  register: heat_populated
+  when: >
+        not heat_is_populated.stat.exists and
+        mysql_master
+
+- name: openstack_heat | marking heat as populated
+  file:
+    path: /etc/heat/heat_populated
+    state: touch
+  when: heat_populated.changed
+
+- name: openstack_heat | deleting heat sqlite db
+  file:
+    path: /var/lib/heat/heat.sqlite
+    state: absent

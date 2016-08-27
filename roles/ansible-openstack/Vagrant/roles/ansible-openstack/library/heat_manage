@@ -1,0 +1,105 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+DOCUMENTATION = '''
+---
+module: heat_manage
+short_description: Initialize Orchestration (heat) database
+description: Create the tables for the database backend used by heat
+options:
+  action:
+    description:
+      - action to perform. Currently only dbysnc is supported
+    required: true
+  conf:
+    description:
+      - path to keystone config file.
+    required: false
+    default: /etc/heat/heat.conf
+requirements: [ python-heatclient ]
+author: Gauvain Pocentek
+'''
+
+EXAMPLES = '''
+heat_manage: action=dbsync
+'''
+
+import subprocess
+
+try:
+    import heat
+    from heat.db.sqlalchemy import migration
+    from migrate.versioning import api as versioning_api
+    from heat.db import api
+    from oslo.config import cfg
+except ImportError:
+    heat_found = False
+else:
+    heat_found = True
+
+
+def will_db_change(conf):
+    """ Check if the database version will change after the sync.
+
+    conf is the path to the heat config file
+
+    """
+    # Load the config file options
+    cfg.CONF(project='heat', default_config_files=[conf])
+    try:
+        current_version = migration.db_version()
+    except TypeError:  # juno
+        current_version = api.db_version(api.get_engine())
+
+    repo_path = os.path.join(os.path.dirname(heat.__file__),
+                             'db', 'sqlalchemy', 'migrate_repo')
+    repo_version = versioning_api.repository.Repository(repo_path).latest
+    return current_version != repo_version
+
+
+def do_dbsync():
+    """Do the dbsync. Returns (returncode, stdout, stderr)"""
+    # We call heat-manage db_sync on the shell rather than trying to
+    # do this in Python since we have no guarantees about changes to the
+    # internals.
+    args = ['heat-manage', 'db_sync']
+
+    call = subprocess.Popen(args, shell=False,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = call.communicate()
+    return (call.returncode, out, err)
+
+
+def main():
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            action=dict(required=True),
+            conf=dict(required=False, default="/etc/heat/heat.conf")
+        ),
+        supports_check_mode=True
+    )
+
+    if not heat_found:
+        module.fail_json(msg="python-heatclient could not be found")
+
+    action = module.params['action']
+    conf = module.params['conf']
+    if action not in ['dbsync', 'db_sync']:
+        module.fail_json(msg="Only supported action is 'dbsync'")
+
+    changed = will_db_change(conf)
+    if module.check_mode:
+        module.exit_json(changed=changed)
+
+    (res, stdout, stderr) = do_dbsync()
+
+    if res == 0:
+        module.exit_json(changed=changed, stdout=stdout, stderr=stderr)
+    else:
+        module.fail_json(msg="heat-manage returned non-zero value: %d" % res,
+                         stdout=stdout, stderr=stderr)
+
+
+from ansible.module_utils.basic import *
+main()

@@ -40,6 +40,7 @@ gerrit_account_info:
   group: gerrit  #defines usernames groupname
 gerrit_allow_remote_admin: false  #defines if gerrit should allow remote admin capabilities
 gerrit_auth_type: OPENID  #defines authorization type...OPENID, LDAP, LDAP_BIND...
+gerrit_canonical_web_url: http://{{ ansible_hostname }}.{{ pri_domain_name }}:{{ gerrit_http_listen_port }}/
 gerrit_db_info:
   - host: localhost
     type: h2
@@ -90,17 +91,22 @@ gerrit_plugins:
     name: reviewnotes.jar
   - url: https://storage.cloud.google.com/gerritcodereview-plugins/plugins/master/singleusergroup
     name: singleusergroup.jar
+gerrit_replication_enabled: false  #defines if replication should be enabled or not
 gerrit_replication_info:
-  enabled: false  #defines if replication should be enabled or not
+  authgroup: 'Gitlab Replication'  #define the gerrit group to execute replication as..This group needs to be created in gerrit as well. and perms defined as below.
   name: 'gitlab'  #define name to assign to replication definition
   owner: 'infra'  #define username or groupname...if collaborating use groupname
-  url: 'git@gitlab.{{ pri_domain_name }}:{{ gerrit_replication_info.owner }}/${name}.git'  #define remote url
-  timeout: '30'  #define the replication timeout
+  ssh_config_info:  #defines configuration of ~/.ssh/config....THIS WILL OVERWRITE WHAT IS THERE
+    - host: 'gitlab.{{ pri_domain_name }}'
+      user: '{{ gerrit_account_info.name }}'
+      identityfile: '{{ gerrit_site_dir }}/.ssh/id_rsa'
+      stricthostkeychecking: false
   threads: '3'  #defines the number of threads to allocate to replication
-  authgroup: 'Gitlab Replication'  #define the gerrit group to execute replication as..This group needs to be created in gerrit as well. and perms defined as below.
-     ##Group Name: Gitlab Replication
-     ##Gitlab Replication denied read to refs/* in all projects
-     ##Gitlab Replication allowed read to refs/* in in Project nameofproject (ex. test-replication)
+  timeout: '30'  #define the replication timeout
+  url: 'git@gitlab.{{ pri_domain_name }}'  #define remote url
+       ##Gitlab Replication allowed read to refs/* in in Project nameofproject (ex. test-replication)
+       ##Gitlab Replication denied read to refs/* in all projects
+       ##Group Name: Gitlab Replication
 gerrit_service_name: gerrit
 gerrit_site_dir: /var/gerrit
 gerrit_smtp_server: 'smtp.{{ pri_domain_name }}'

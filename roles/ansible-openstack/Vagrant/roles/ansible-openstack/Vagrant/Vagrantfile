@@ -1,0 +1,85 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  config.vm.define "client" do |client|
+    client.vm.box = "mrlesmithjr/trusty64"
+    client.vm.hostname = "client"
+
+    client.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+    end
+    client.vm.provision :shell, path: "provision.sh", keep_color: "true"
+  end
+  config.vm.define "logstash" do |logstash|
+    logstash.vm.box = "mrlesmithjr/trusty64"
+    logstash.vm.hostname = "logstash"
+
+    logstash.vm.network :private_network, ip: "192.168.202.200"
+
+    logstash.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+    end
+  end
+  config.vm.define "oshaproxy" do |oshaproxy|
+    oshaproxy.vm.box = "mrlesmithjr/trusty64"
+    oshaproxy.vm.hostname = "oshaproxy"
+
+    oshaproxy.vm.network :private_network, ip: "192.168.202.201"
+    oshaproxy.vm.network :forwarded_port, guest: 80, host: 8081
+    oshaproxy.vm.network :forwarded_port, guest: 9090, host: 9090
+
+    oshaproxy.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+    end
+  end
+  config.vm.define "oscontroller" do |oscontroller|
+    oscontroller.vm.box = "mrlesmithjr/trusty64"
+    oscontroller.vm.hostname = "oscontroller"
+
+    oscontroller.vm.network :private_network, ip: "192.168.202.202"
+    oscontroller.vm.network :forwarded_port, guest: 80, host: 8080
+
+    oscontroller.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+    end
+  end
+  config.vm.define "oscompute" do |oscompute|
+    oscompute.vm.box = "mrlesmithjr/trusty64"
+    oscompute.vm.hostname = "oscompute"
+
+    oscompute.vm.network :private_network, ip: "192.168.202.203"
+    oscompute.vm.network :private_network, ip: "192.168.100.203"
+
+    oscompute.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+    end
+  end
+  config.vm.define "osnetwork" do |osnetwork|
+    osnetwork.vm.box = "mrlesmithjr/trusty64"
+    osnetwork.vm.hostname = "osnetwork"
+
+    osnetwork.vm.network :private_network, ip: "192.168.202.204"
+    osnetwork.vm.network :private_network, ip: "192.168.100.204"
+    osnetwork.vm.network :private_network, ip: "172.24.4.225", :netmask => "255.255.255.0", :auto_config => false
+
+    osnetwork.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+    end
+  end
+  config.vm.define "ddi" do |ddi|
+    ddi.vm.box = "mrlesmithjr/trusty64"
+    ddi.vm.hostname = "ddi"
+
+    ddi.vm.network :private_network, ip: "192.168.202.205"
+
+    ddi.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+    end
+  end
+end

@@ -1,0 +1,9 @@
+---
+- name: manage_ssh_keys | managing ssh user keys
+  authorized_key:
+    user: "{{ item.0.remote_user }}"
+    key: "{{ lookup('file', item.1) }}"
+    state: "{{ item.0.state }}"
+  with_subelements:
+    - '{{ manage_ssh_keys }}'
+    - keys

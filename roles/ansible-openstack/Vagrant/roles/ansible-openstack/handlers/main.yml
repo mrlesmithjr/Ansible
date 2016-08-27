@@ -1,0 +1,174 @@
+---
+# handlers file for ansible-openstack
+#- name: pacemaker commit  ###commented out for now...broken in ansible 2.0
+#  pacemaker: commit
+
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted
+
+- name: restart ceilometer-agent-central
+  service:
+    name: ceilometer-agent-central
+    state: restarted
+
+- name: restart ceilometer-agent-compute
+  service:
+    name: ceilometer-agent-compute
+    state: restarted
+
+- name: restart ceilometer-agent-notification
+  service:
+    name: ceilometer-agent-notification
+    state: restarted
+
+- name: restart ceilometer-api
+  service:
+    name: ceilometer-api
+    state: restarted
+
+- name: restart ceilometer-collector
+  service:
+    name: ceilometer-collector
+    state: restarted
+
+- name: restart ceilometer-alarm-evaluator
+  service:
+    name: ceilometer-alarm-evaluator
+    state: restarted
+
+- name: restart ceilometer-alarm-notifier
+  service:
+    name: ceilometer-alarm-notifier
+    state: restarted
+
+- name: restart cinder-api
+  service:
+    name: cinder-api
+    state: restarted
+
+- name: restart cinder-scheduler
+  service:
+    name: cinder-scheduler
+    state: restarted
+
+- name: restart cinder-volume
+  service:
+    name: cinder-volume
+    state: restarted
+
+- name: restart glance-api
+  service:
+    name: glance-api
+    state: restarted
+
+- name: restart glance-registry
+  service:
+    name: glance-registry
+    state: restarted
+
+- name: restart haproxy
+  service:
+    name: haproxy
+    state: restarted
+
+- name: restart heat-api
+  service:
+    name: heat-api
+    state: restarted
+
+- name: restart heat-api-cfn
+  service:
+    name: heat-api-cfn
+    state: restarted
+
+- name: restart heat-engine
+  service:
+    name: heat-engine
+    state: restarted
+
+- name: restart keystone
+  service:
+    name: keystone
+    state: restarted
+
+- name: restart memcached
+  service:
+    name: memcached
+    state: restarted
+
+- name: restart mongodb
+  service:
+    name: mongodb
+    state: restarted
+
+- name: restart neutron-dhcp-agent
+  service:
+    name: neutron-dhcp-agent
+    state: restarted
+
+- name: restart neutron-l3-agent
+  service:
+    name: neutron-l3-agent
+    state: restarted
+
+- name: restart neutron-metadata-agent
+  service:
+    name: neutron-metadata-agent
+    state: restarted
+
+- name: restart neutron-plugin-openvswitch-agent
+  service:
+    name: neutron-plugin-openvswitch-agent
+    state: restarted
+
+- name: restart neutron-server
+  service:
+    name: neutron-server
+    state: restarted
+
+- name: restart nova-api
+  service:
+    name: nova-api
+    state: restarted
+
+- name: restart nova-cert
+  service:
+    name: nova-cert
+    state: restarted
+
+- name: restart nova-compute
+  service:
+    name: nova-compute
+    state: restarted
+
+- name: restart nova-conductor
+  service:
+    name: nova-conductor
+    state: restarted
+
+- name: restart nova-consoleauth
+  service:
+    name: nova-consoleauth
+    state: restarted
+
+- name: restart nova-scheduler
+  service:
+    name: nova-scheduler
+    state: restarted
+
+- name: restart nova-novncproxy
+  service:
+    name: nova-novncproxy
+    state: restarted
+
+- name: restart openvswitch-switch
+  service:
+    name: openvswitch-switch
+    state: restarted
+
+- name: restart tgt
+  service:
+    name: tgt
+    state: restarted

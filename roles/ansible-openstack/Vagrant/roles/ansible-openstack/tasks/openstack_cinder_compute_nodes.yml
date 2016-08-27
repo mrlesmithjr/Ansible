@@ -1,0 +1,13 @@
+---
+- name: openstack_cinder_compute_nodes | ensuring LVM is installed
+  apt:
+    name: lvm2
+    state: present
+
+- name: openstack_cinder_compute_nodes | configuring LVM
+  template:
+    src: etc/lvm/lvm.conf.j2
+    dest: /etc/lvm/lvm.conf
+    owner: root
+    group: root
+    mode: 0644

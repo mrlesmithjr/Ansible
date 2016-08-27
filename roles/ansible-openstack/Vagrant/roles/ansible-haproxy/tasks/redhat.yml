@@ -1,0 +1,25 @@
+---
+- name: redhat | installing haproxy and socat
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - haproxy
+    - hatop
+    - socat
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing haproxy and socat
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - haproxy
+    - hatop
+    - socat
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | ensuring haproxy is enabled
+  service:
+    name: haproxy
+    enabled: yes

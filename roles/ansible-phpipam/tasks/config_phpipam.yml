@@ -3,6 +3,7 @@
   get_url:
     url: "{{ phpipam_download }}"
     dest: "/opt/{{ phpipam_download_file }}"
+  when: not phpipam_install_from_git
 
 - name: config_phpipam | extracting phpipam package to {{ web_root }}
   unarchive:
@@ -12,6 +13,13 @@
     owner: "{{ web_owner }}"
     group: "{{ web_group }}"
     creates: "{{ phpipam_root }}/config.php"
+  when: not phpipam_install_from_git
+
+- name: config_phpipam | installing phpIPAM from git
+  git:
+    repo: "https://github.com/phpipam/phpipam.git"
+    dest: "{{ phpipam_root }}"
+  when: phpipam_install_from_git
 
 - name: config_phpipam | creating phpipam web config
   template:
@@ -71,17 +79,18 @@
   register: phpipam_db_imported
   when: phpipam_pre_load_db
 
-- name: config_phpipam | copying db schema
-  template:
-    src: "phpipam_schema-{{ phpipam_version }}.sql.j2"
-    dest: "/tmp/phpipam_schema.sql"
-  when: phpipam_pre_load_db
+# - name: config_phpipam | copying db schema
+#   template:
+#     src: "phpipam_schema-{{ phpipam_version }}.sql.j2"
+#     dest: "/tmp/phpipam_schema.sql"
+#   when: phpipam_pre_load_db
 
 - name: config_phpipam | importing phpipam database
   mysql_db:
     name: "{{ phpipam_db_name }}"
     state: import
-    target: "/tmp/phpipam_schema.sql"
+    # target: "/tmp/phpipam_schema.sql"
+    target: "{{ phpipam_root }}/db/SCHEMA.sql"
   when: >
         phpipam_pre_load_db and
         not phpipam_db_imported.stat.exists and
@@ -91,7 +100,8 @@
   mysql_db:
     name: "{{ phpipam_db_name }}"
     state: import
-    target: "/tmp/phpipam_schema.sql"
+    # target: "/tmp/phpipam_schema.sql"
+    target: "{{ phpipam_root }}/db/SCHEMA.sql"
   when: >
         phpipam_pre_load_db and
         inventory_hostname == phpipam_primary and

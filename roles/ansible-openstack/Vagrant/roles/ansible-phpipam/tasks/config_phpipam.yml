@@ -1,0 +1,174 @@
+---
+- name: config_phpipam | downloading phpipam {{ phpipam_version }}
+  get_url:
+    url: "{{ phpipam_download }}"
+    dest: "/opt/{{ phpipam_download_file }}"
+
+- name: config_phpipam | extracting phpipam package to {{ web_root }}
+  unarchive:
+    src: "/opt/{{ phpipam_download_file }}"
+    dest: "{{ web_root }}"
+    copy: no
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+    creates: "{{ phpipam_root }}/config.php"
+
+- name: config_phpipam | creating phpipam web config
+  template:
+    src: "config.php-{{ phpipam_version }}.j2"
+    dest: "{{ phpipam_root }}/config.php"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+    backup: yes
+
+- name: config_phpipam | configuring .htacess
+  template:
+    src: "htaccess-{{ phpipam_version }}.j2"
+    dest: "{{ phpipam_root }}/.htaccess"
+    owner: root
+    group: root
+    backup: yes
+
+- name: config_phpipam | creating phpipam db
+  mysql_db:
+    name: "{{ phpipam_db_name }}"
+    state: present
+  when: >
+        phpipam_pre_load_db and
+        not phpipam_db_cluster
+
+- name: config_phpipam | creating phpipam db
+  mysql_db:
+    name: "{{ phpipam_db_name }}"
+    state: present
+  when: >
+        phpipam_pre_load_db and
+        inventory_hostname == phpipam_primary and
+        phpipam_db_cluster
+
+- name: config_phpipam | creating phpipam db user
+  mysql_user:
+    name: "{{ phpipam_db_user }}"
+    password: "{{ phpipam_db_pass }}"
+    priv: "{{ phpipam_db_name }}.*:ALL"
+    state: present
+  when: >
+        not phpipam_db_cluster
+
+- name: config_phpipam | creating phpipam db user
+  mysql_user:
+    name: "{{ phpipam_db_user }}"
+    password: "{{ phpipam_db_pass }}"
+    priv: "{{ phpipam_db_name }}.*:ALL"
+    state: present
+  when: >
+        inventory_hostname == phpipam_primary and
+        phpipam_db_cluster
+
+- name: config_phpipam | checking if phpipam db already imported
+  stat:
+    path: "/var/log/phpipam_db_imported"
+  register: phpipam_db_imported
+  when: phpipam_pre_load_db
+
+- name: config_phpipam | copying db schema
+  template:
+    src: "phpipam_schema-{{ phpipam_version }}.sql.j2"
+    dest: "/tmp/phpipam_schema.sql"
+  when: phpipam_pre_load_db
+
+- name: config_phpipam | importing phpipam database
+  mysql_db:
+    name: "{{ phpipam_db_name }}"
+    state: import
+    target: "/tmp/phpipam_schema.sql"
+  when: >
+        phpipam_pre_load_db and
+        not phpipam_db_imported.stat.exists and
+        not phpipam_db_cluster
+
+- name: config_phpipam | importing phpipam database
+  mysql_db:
+    name: "{{ phpipam_db_name }}"
+    state: import
+    target: "/tmp/phpipam_schema.sql"
+  when: >
+        phpipam_pre_load_db and
+        inventory_hostname == phpipam_primary and
+        not phpipam_db_imported.stat.exists and
+        phpipam_db_cluster
+
+- name: config_phpipam | setting phpipam db imported
+  file:
+    path: "/var/log/phpipam_db_imported"
+    state: touch
+  when: >
+        phpipam_pre_load_db and
+        not phpipam_db_imported.stat.exists
+
+# need to validate this is still needed as versions change
+- name: config_phpipam | patching functions-network.php
+  template:
+    src: "functions/functions-network.php.j2"
+    dest: "{{ phpipam_root }}/functions/functions-network.php"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+  when: >
+        phpipam_patch_discovery is defined and
+        phpipam_patch_discovery
+
+# need to validate this is still needed as versions change
+- name: config_phpipam | patching email
+  template:
+    src: "functions/functions-mail.php.j2"
+    dest: "{{ phpipam_root }}/functions/functions-mail.php"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+  when: >
+        phpipam_patch_email is defined and
+        phpipam_patch_email
+
+# need to validate this is still needed as versions change
+- name: config_phpipam | patching email
+  template:
+    src: "site/admin/mailSettingsTestMail.php.j2"
+    dest: "{{ phpipam_root }}/site/admin/mailSettingsTestMail.php"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+  when: >
+        phpipam_patch_email is defined and
+        phpipam_patch_email
+
+# need to validate this is still needed as versions change
+- name: config_phpipam | adding dnsCheck.php script
+  template:
+    src: "functions/scripts/dnsCheck.php.j2"
+    dest: "{{ phpipam_root }}/functions/scripts/dnsCheck.php"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+    mode: 0755
+  when: >
+        phpipam_patch_discovery is defined and
+        phpipam_patch_discovery
+
+# need to validate this is still needed as versions change
+- name: config_phpipam | checking for fping path
+  command: which fping
+  register: fping_path
+  always_run: true  #allows checks and diffs to pass
+  changed_when: false
+
+# need to validate this is still needed as versions change
+- name: config_phpipam | adding fpingDiscovery script(s)
+  template:
+    src: "functions/scripts/{{ item }}.j2"
+    dest: "{{ phpipam_root }}/functions/scripts/{{ item }}"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+    mode: 0755
+  with_items:
+    - fpingDiscoveryCheck.php
+    - fpingThread.php
+  when: >
+        phpipam_patch_discovery is defined and
+        phpipam_patch_discovery

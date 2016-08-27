@@ -1,0 +1,45 @@
+---
+- name: openstack_cinder_storage_nodes | installing Cinder packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - cinder-volume
+    - python-mysqldb
+
+- name: openstack_cinder_storage_nodes | installing QEMU
+  apt:
+    name: qemu
+    state: present
+
+- name: openstack_cinder_storage_nodes | configuring LVM
+  template:
+    src: etc/lvm/lvm.conf.j2
+    dest: /etc/lvm/lvm.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: openstack_cinder_storage_nodes | ensuring image conversion directory exists
+  file:
+    path: "{{ openstack_cinder_image_conversion_dir }}"
+    state: directory
+    owner: cinder
+    group: cinder
+    mode: 0774
+
+- name: openstack_cinder_storage_nodes | configuring cinder
+  template:
+    src: etc/cinder/cinder.conf.j2
+    dest: /etc/cinder/cinder.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart tgt
+    - restart cinder-volume
+
+- name: openstack_cinder_storage_nodes | deleting cinder sqlite db
+  file:
+    path: /var/lib/cinder/cinder.sqlite
+    state: absent

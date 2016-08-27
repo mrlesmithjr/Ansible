@@ -1,0 +1,24 @@
+---
+- name: openstack_keystone_roles | assigning user roles for tenants
+  keystone_user:
+    user: "{{ item.user }}"
+    tenant: "{{ item.tenant }}"
+    role: "{{ item.name }}"
+    token: "{{ openstack_keystone_temp_admin_token }}"
+    state: present
+  with_items: openstack_keystone_roles
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
+
+- name: openstack_keystone_roles | assigning user roles for tenants  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
+  keystone_user:
+    user: "{{ item.user }}"
+    tenant: "{{ item.tenant }}"
+    role: "{{ item.name }}"
+    token: "{{ openstack_keystone_temp_admin_token }}"
+    state: present
+  with_items: openstack_keystone_roles
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)

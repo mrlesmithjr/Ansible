@@ -1,0 +1,23 @@
+---
+config_network_interfaces: true
+network_interfaces:  #define interfaces and settings. (Define separately for each node in host_vars) - Anything not defined can be added to addl_settings.
+  - name: eth1
+    configure: false
+    comment: management interface
+    method: dhcp
+    address:
+    netmask:
+    netmask_cidr:
+    gateway:
+#    addl_settings:
+#      - bond_master bond0
+  - name: eth2
+    configure: false
+    comment: tunnel interface
+    method: static
+    address: '{{ openstack_instance_tunnel_ip }}'
+    netmask: 255.255.255.0
+    netmask_cidr: 24
+    gateway:
+#    addl_settings:
+#      - bond_master bond0

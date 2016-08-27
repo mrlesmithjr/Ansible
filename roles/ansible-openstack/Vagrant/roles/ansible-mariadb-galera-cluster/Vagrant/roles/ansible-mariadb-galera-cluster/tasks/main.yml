@@ -1,0 +1,24 @@
+---
+# tasks file for ansible-mariadb-galera-cluster
+- include: unconfigure_cluster.yml
+  when: >
+        reconfigure_galera is defined and
+        reconfigure_galera
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: setup_cluster.yml
+
+- include: galera_monitoring.yml
+  tags:
+    - config_galera_monitoring
+  when: enable_galera_monitoring_script
+
+- include: configure_root_access.yml
+
+- include: cacti.yml
+  when: enable_cacti_monitoring

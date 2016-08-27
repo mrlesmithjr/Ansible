@@ -56,6 +56,9 @@ Role Variables
 ````
 ---
 # defaults file for ansible-zfs
+create_zfs_pools: false  #defines if ZFS pool(s) are created
+create_zfs_filesystems: false  #defines if ZFS filesystem(s) are created
+create_zfs_volumes: false  #defines if ZFS volumes(s) are created
 zfs_debian_package: 'zfsonlinux_{{ zfs_debian_package_version }}_all.deb'
 zfs_debian_package_key: 'http://zfsonlinux.org/4D5843EA.asc'
 zfs_debian_package_url: 'http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux'

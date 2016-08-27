@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-bootstrap
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: debian_security.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: redhat_security.yml
+  when: ansible_os_family == "RedHat"
+
+- include: lockdown.yml

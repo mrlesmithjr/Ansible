@@ -1,0 +1,36 @@
+---
+- name: debian_update_dns_nameservers | setting dns nameservers
+  lineinfile:
+    dest: /etc/network/interfaces
+    regexp: "^dns-nameservers"
+    line: "dns-nameservers {{ dns_nameservers }}"
+    state: present
+  notify: update resolvconf
+  when: update_dns_nameservers and pri_interface_method is defined and pri_interface_method == "static"
+
+- name: debian_update_dns_nameservers | removing dns nameservers
+  lineinfile:
+    dest: /etc/network/interfaces
+    regexp: "^dns-nameservers"
+    line: "dns-nameservers {{ dns_nameservers }}"
+    state: absent
+  notify: update resolvconf
+  when: update_dns_nameservers and pri_interface_method is defined and pri_interface_method == "dhcp"
+
+- name: debian_update_dns_nameservers | removing dns nameservers
+  lineinfile:
+    dest: /etc/network/interfaces
+    regexp: "^dns-nameservers"
+    line: "dns-nameservers {{ dns_nameservers }}"
+    state: absent
+  notify: update resolvconf
+  when: update_dns_nameservers and pri_interface_method is not defined
+
+- name: debian_update_dns_nameservers | removing dns nameservers
+  lineinfile:
+    dest: /etc/network/interfaces
+    regexp: "^dns-nameservers"
+    line: "dns-nameservers {{ dns_nameservers }}"
+    state: absent
+  notify: update resolvconf
+  when: not update_dns_nameservers and pri_interface_method is defined and pri_interface_method == "dhcp"

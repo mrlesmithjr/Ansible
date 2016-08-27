@@ -1,0 +1,106 @@
+---
+- name: setup_cluster | configuring db server and galera
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - src: 'etc/mysql/debian.cnf.j2'
+      dest: '/etc/mysql/debian.cnf'
+    - src: 'etc/mysql/my.cnf.j2'
+      dest: '/etc/mysql/my.cnf'
+    - src: 'etc/mysql/conf.d/galera.cnf.j2'
+      dest: '/etc/mysql/conf.d/galera.cnf'
+  when: ansible_os_family == "Debian"
+
+- name: setup_cluster | configuring db server and galera
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+#    - src: 'etc/mysql/my.cnf.j2'
+#      dest: '/etc/mysql/my.cnf'
+    - src: 'etc/my.cnf.d/server.cnf.j2'
+      dest: '/etc/my.cnf.d/server.cnf'
+  when: ansible_os_family == "RedHat"
+
+- name: setup_cluster | checking if galera cluster setup
+  stat:
+    path: "/etc/galera_cluster_configured"
+  register: "galera_cluster_configured"
+
+- name: setup_cluster | stopping mysql
+  service:
+    name: "mysql"
+    state: "stopped"
+  when: not galera_cluster_configured.stat.exists
+
+- name: setup_cluster | killing lingering mysql processes
+  command: "pkill mysqld"
+  ignore_errors: true
+  when: not galera_cluster_configured.stat.exists
+
+- name: setup_cluster | configuring temp galera config
+  template:
+    src: "etc/mysql/conf.d/temp.galera.cnf.j2"
+    dest: "/etc/mysql/conf.d/galera.cnf"
+  when: >
+        ansible_os_family == "Debian" and
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: setup_cluster | configuring temp galera config
+  template:
+    src: "etc/my.cnf.d/temp.server.cnf.j2"
+    dest: "/etc/my.cnf.d/server.cnf"
+  when: >
+        ansible_os_family == "RedHat" and
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: setup_cluster | bootstrapping galera cluster
+  service:
+    name: "mysql"
+    state: "restarted"
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: setup_cluster | joining galera cluster
+  service:
+    name: "mysql"
+    state: "restarted"
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname != mysql_master_node
+
+- name: setup_cluster | configuring galera on mysql_master
+  template:
+    src: "etc/mysql/conf.d/galera.cnf.j2"
+    dest: "/etc/mysql/conf.d/galera.cnf"
+  when: >
+        ansible_os_family == "Debian" and
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: setup_cluster | configuring galera on mysql_master
+  template:
+    src: "etc/my.cnf.d/server.cnf.j2"
+    dest: "/etc/my.cnf.d/server.cnf"
+  when: >
+        ansible_os_family == "RedHat" and
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: setup_cluster | restarting galera on mysql_master
+  service:
+    name: "mysql"
+    state: "restarted"
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node
+
+- name: setup_cluster | marking galera cluster as configured
+  file:
+    path: "/etc/galera_cluster_configured"
+    state: "touch"
+  when: not galera_cluster_configured.stat.exists

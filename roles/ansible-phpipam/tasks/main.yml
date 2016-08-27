@@ -3,7 +3,9 @@
 - include: set_facts.yml
 
 - include: upgrade.yml
-  when: phpipam_upgrade
+  when: >
+        phpipam_upgrade or
+        phpipam_install_from_git
 
 - include: debian.yml
   when: ansible_os_family == "Debian"

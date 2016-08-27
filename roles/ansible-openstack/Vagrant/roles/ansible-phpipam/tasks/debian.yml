@@ -1,0 +1,29 @@
+---
+- name: debian | installing pre-req packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - fping
+    - libapache2-mod-php5
+    - python-mysqldb
+    - php5
+    - php5-cli
+    - php5-gmp
+    - php-pear
+#    - php5-mysql
+    - php5-mysqlnd
+    - php5-ldap
+    - php5-mcrypt
+    - php5-curl
+    - php5-sqlite
+    - wget
+
+- name: debian | enabling php5-mcrypt
+  command: php5enmod mcrypt
+
+- name: debian | enabling apache mod_rewrite
+  apache2_module:
+    name: rewrite
+    state: present
+  notify: restart apache2

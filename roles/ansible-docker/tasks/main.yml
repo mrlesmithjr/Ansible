@@ -16,4 +16,6 @@
 - include: manage_python_modules.yml
 
 - include: images.yml
-  when: docker_images is defined
+  when: >
+        manage_docker_images and
+        docker_images is defined

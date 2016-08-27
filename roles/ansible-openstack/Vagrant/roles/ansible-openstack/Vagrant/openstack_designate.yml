@@ -1,0 +1,56 @@
+---
+- name: Configuring DDI
+  hosts: ddi
+  become: true
+  any_errors_fatal: true
+  roles:
+  tasks:
+    - name: Configuring DB Access
+      mysql_user:
+        name: "powerdns"
+        password: "powerdns"
+        priv: "powerdns.*:ALL"
+        host: "{{ item }}"
+      with_items:
+        - 'localhost'
+        - '%'
+        - 'ansible_hostname'
+
+- name: Installing OpenStack Designate
+  hosts: openstack-controller-nodes
+  become: true
+  any_errors_fatal: true
+  vars:
+    - openstack_designate_apt_install: true
+  roles:
+  tasks:
+    - name: Installing Designate Pre-Reqs
+      apt:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - 'python-pip'
+        - 'python-virtualenv'
+        - 'git'
+#      when: not openstack_designate_apt_install
+
+    - name: Installing Python Modules
+      pip:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - 'pymysql'
+
+    - name: Installing OpenStack Designate
+      apt:
+        name: "designate"
+        state: "present"
+#      when: openstack_designate_apt_install
+
+    - name: Creating OpenStack Designate DB's
+      mysql_db:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - 'designate'
+        - 'designate_pool_manager'

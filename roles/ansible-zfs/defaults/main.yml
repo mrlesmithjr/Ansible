@@ -1,5 +1,8 @@
 ---
 # defaults file for ansible-zfs
+create_zfs_pools: false  #defines if ZFS pool(s) are created
+create_zfs_filesystems: false  #defines if ZFS filesystem(s) are created
+create_zfs_volumes: false  #defines if ZFS volumes(s) are created
 zfs_debian_package: 'zfsonlinux_{{ zfs_debian_package_version }}_all.deb'
 zfs_debian_package_key: 'http://zfsonlinux.org/4D5843EA.asc'
 zfs_debian_package_url: 'http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux'
@@ -13,6 +16,7 @@ zfs_filesystems:  #defines filesystems to manage
     atime: 'off'
     compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
     logbias: 'latency'  # latency (default) | throughput
+    # mountpoint: '/var/lib/docker'  #define an alternate mountpoint
     primarycache: 'all'  # all (default) | none | metadata
     quota: '3G'
     recordsize: '16K'  #defines recordsize.. 16K | 32K | 64K | 128K (default) | and etc.

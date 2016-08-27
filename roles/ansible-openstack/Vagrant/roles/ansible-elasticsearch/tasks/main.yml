@@ -1,0 +1,31 @@
+---
+# tasks file for ansible-elasticsearch
+- include: config_data_paths.yml
+  when: es_config_path_data
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: elasticsearch_conf.yml
+
+- include: elasticsearch_security_limits.yml
+
+- include: plugins.yml
+  tags:
+    - elasticsearch-plugins
+
+- include: nfs.yml
+  tags:
+    - elasticsearch-nfs-mount
+  when: es_config_nfs is defined and es_config_nfs
+
+- include: resize_lvm.yml
+  tags:
+    - es_resize_lvm
+  when: es_resize_lvm is defined and es_resize_lvm
+
+- include: network_tweaks.yml
+  when: es_enable_network_tweaks

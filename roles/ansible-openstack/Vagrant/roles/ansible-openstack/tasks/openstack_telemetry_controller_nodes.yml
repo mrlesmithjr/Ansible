@@ -1,0 +1,101 @@
+---
+- name: openstack_telemetry_controller_nodes | installing mongodb packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mongodb-server
+    - mongodb-clients
+    - python-pymongo
+
+- name: openstack_telemetry_controller_nodes | configuring mongodb
+  template:
+    src: etc/mongodb.conf.j2
+    dest: /etc/mongodb.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart mongodb
+  register: mongodb_reconfigured
+
+- name: openstack_telemetry_controller_nodes | restarting mongodb
+  service:
+    name: mongodb
+    state: restarted
+  when: mongodb_reconfigured.changed
+
+- name: openstack_telemetry_controller_nodes | waiting for mongodb
+  wait_for:
+    port: 27017
+    delay: 10
+
+- name: openstack_telemetry_controller_nodes | creating ceilometer mongodb user/db
+  mongodb_user:
+    database: ceilometer
+    name: ceilometer
+    password: "{{ openstack_ceilometer_dbpass }}"
+    roles: "readWrite,dbAdmin"
+    state: present
+  when: >
+        openstack_mongodb_master is defined and
+        openstack_mongodb_master
+
+- name: openstack_telemetry_controller_nodes | checking if mongodb-keyfile exists
+  stat:
+    path: "{{ openstack_mongodb_keyfile }}"
+  register: mongodb_keyfile
+
+- name: openstack_telemetry_controller_nodes | generating mongodb-keyfile
+  shell: openssl rand -base64 741 > {{ openstack_mongodb_keyfile }}
+  when: >
+        not mongodb_keyfile.stat.exists and
+        (openstack_mongodb_master is defined and
+        openstack_mongodb_master)
+
+- name: openstack_telemetry_controller_nodes | copying mongodb-keyfile local
+  fetch:
+    dest: "/tmp{{ openstack_mongodb_keyfile }}"
+    flat: yes
+    src: "{{ openstack_mongodb_keyfile }}"
+  when: >
+        not mongodb_keyfile.stat.exists and
+        (openstack_mongodb_master is defined and
+        openstack_mongodb_master)
+
+- name: openstack_telemetry_controller_nodes | copying mongodb-keyfile
+  copy:
+    src: "/tmp{{ openstack_mongodb_keyfile }}"
+    dest: "{{ openstack_mongodb_keyfile }}"
+    owner: root
+    group: root
+    mode: 0600
+  when: not mongodb_keyfile.stat.exists
+
+- name: openstack_telemetry_controller_nodes | installing Telemetry packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ceilometer-api
+    - ceilometer-collector
+    - ceilometer-agent-central
+    - ceilometer-agent-notification
+    - ceilometer-alarm-evaluator
+    - ceilometer-alarm-notifier
+    - python-ceilometerclient
+
+- name: openstack_telemetry_controller_nodes | configuring Ceilometer
+  template:
+    src: etc/ceilometer/ceilometer.conf.j2
+    dest: /etc/ceilometer/ceilometer.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ceilometer-agent-central
+    - restart ceilometer-agent-notification
+    - restart ceilometer-api
+    - restart ceilometer-collector
+    - restart ceilometer-alarm-evaluator
+    - restart ceilometer-alarm-notifier

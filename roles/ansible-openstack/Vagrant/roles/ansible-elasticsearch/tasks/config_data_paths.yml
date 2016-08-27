@@ -1,0 +1,14 @@
+---
+- name: config_data_paths | creating filesystem(s)
+  filesystem:
+    fstype: ext4
+    dev: "{{ item.disk }}"
+  with_items: '{{ es_path_data_info }}'
+
+- name: config_data_paths | mounting filesystem(s)
+  mount:
+    name: "{{ item.path }}"
+    src: "{{ item.disk }}"
+    fstype: ext4
+    state: mounted
+  with_items: '{{ es_path_data_info }}'

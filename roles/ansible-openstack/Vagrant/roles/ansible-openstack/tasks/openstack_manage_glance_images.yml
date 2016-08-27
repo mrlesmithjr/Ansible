@@ -1,0 +1,54 @@
+---
+- name: manage_glance_images | uploading glance images
+  glance_image:
+    login_username: admin
+    login_password: "{{ openstack_admin_pass }}"
+    login_tenant_name: admin
+    name: "{{ item.name }}"
+    container_format: "{{ item.container_format }}"
+    disk_format: "{{ item.disk_format }}"
+    state: present
+    copy_from: "{{ item.image_url }}"
+  with_items: openstack_glance_images
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
+
+- name: manage_glance_images | uploading glance images  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
+  glance_image:
+    login_username: admin
+    login_password: "{{ openstack_admin_pass }}"
+    login_tenant_name: admin
+    name: "{{ item.name }}"
+    container_format: "{{ item.container_format }}"
+    disk_format: "{{ item.disk_format }}"
+    state: present
+    copy_from: "{{ item.image_url }}"
+  with_items: openstack_glance_images
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)
+
+- name: manage_glance_images | removing glance images
+  glance_image:
+    login_username: admin
+    login_password: "{{ openstack_admin_pass }}"
+    login_tenant_name: admin
+    name: "{{ item.name }}"
+    state: absent
+  with_items: openstack_glance_images
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)
+
+- name: manage_glance_images | removing glance images  #duplicated to ensure that if openstack_keystone_api_master does not match an inventory_hostname
+  glance_image:
+    login_username: admin
+    login_password: "{{ openstack_admin_pass }}"
+    login_tenant_name: admin
+    name: "{{ item.name }}"
+    state: absent
+  with_items: openstack_glance_images
+  when: >
+        openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)

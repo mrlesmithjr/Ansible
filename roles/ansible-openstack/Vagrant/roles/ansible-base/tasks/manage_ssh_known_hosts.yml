@@ -1,0 +1,73 @@
+---
+- name: identifying hosts
+  local_action: ping
+  register: id_hosts
+
+- name: cleaning up
+  file:
+    path: /tmp/hosts
+    state: absent
+
+- name: cleaning up
+  file:
+    path: /tmp/hosts
+    state: absent
+  delegate_to: localhost
+  run_once: true
+
+- name: creating temporary hosts file
+  file:
+    path: /tmp/hosts
+    state: touch
+    mode: 0777
+  delegate_to: localhost
+  run_once: true
+
+- name: adding hosts to temporary hosts file
+  lineinfile:
+    dest: /tmp/hosts
+    regexp: "^{{ ansible_hostname }}"
+    line: "{{ ansible_hostname }}"
+    state: present
+  delegate_to: localhost
+  with_items: id_hosts.results
+
+- name: adding hosts to temporary hosts file
+  lineinfile:
+    dest: /tmp/hosts
+    regexp: "^{{ ansible_hostname }}.{{ pri_domain_name }}"
+    line: "{{ ansible_hostname }}.{{ pri_domain_name }}"
+    state: present
+  delegate_to: localhost
+  with_items: id_hosts.results
+
+- name: adding hosts to temporary hosts file
+  lineinfile:
+    dest: /tmp/hosts
+    regexp: "^{{ ansible_default_ipv4.address }}"
+    line: "{{ ansible_default_ipv4.address }}"
+    state: present
+  delegate_to: localhost
+  with_items: id_hosts.results
+
+- name: keyscan
+  shell: "ssh-keyscan -H -f /tmp/hosts >> /tmp/hosts.ready"
+  delegate_to: localhost
+  run_once: true
+
+- name: sort
+  shell: "sort -u /tmp/hosts.ready > /tmp/hosts.sorted"
+  delegate_to: localhost
+  run_once: true
+
+- name: copying new ssh_known_hosts
+  copy:
+    src: /tmp/hosts.sorted
+    dest: /etc/ssh/ssh_known_hosts
+
+- name: cleaning up
+  file:
+    path: /tmp/hosts
+    state: absent
+  delegate_to: localhost
+  run_once: true

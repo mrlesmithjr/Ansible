@@ -1,0 +1,57 @@
+---
+- name: openstack_neutron_compute_nodes | setting kernel networking parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - name: net.ipv4.conf.all.rp_filter
+      value: 0
+    - name: net.ipv4.conf.default.rp_filter
+      value: 0
+#    - name: net.bridge.bridge-nf-call-iptables
+#      value: 1
+#    - name: net.bridge.bridge-nf-call-ip6tables
+#      value: 1
+
+- name: openstack_neutron_compute_nodes | installing Neutron packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - neutron-plugin-ml2
+    - neutron-plugin-openvswitch-agent
+
+- name: openstack_neutron_compute_nodes | configuring Neutron
+  template:
+    src: etc/neutron/neutron.conf.j2
+    dest: /etc/neutron/neutron.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart openvswitch-switch
+    - restart neutron-plugin-openvswitch-agent
+
+- name: openstack_neutron_compute_nodes | configuring Neutron ML2 Plugin(s)
+  template:
+    src: etc/neutron/plugins/ml2/ml2_conf.ini.j2
+    dest: /etc/neutron/plugins/ml2/ml2_conf.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart openvswitch-switch
+    - restart neutron-plugin-openvswitch-agent
+
+- name: openstack_neutron_compute_nodes | configuring nova
+  template:
+    src: etc/nova/nova.conf.j2
+    dest: /etc/nova/nova.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nova-compute
+    - restart neutron-plugin-openvswitch-agent

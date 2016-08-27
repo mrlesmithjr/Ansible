@@ -1,0 +1,33 @@
+---
+- name: lockdown | disabling root SSH access
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify: restart ssh
+  when: ansible_os_family == "Debian"
+
+- name: lockdown | disabling root SSH access
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify: restart sshd
+  when: ansible_os_family == "RedHat"
+
+- name: lockdown | changing root password (RedHat)
+  user:
+    name: root
+    password: "{{ root_password }}"
+  when: ansible_os_family == "RedHat"
+
+- name: lockdown | changing/setting root password (Debian)
+  user:
+    name: root
+    password: "{{ root_password }}"
+  when: >
+        (debian_set_root_pw is defined and debian_set_root_pw) and
+        ansible_os_family == "Debian" and
+        root_password is defined

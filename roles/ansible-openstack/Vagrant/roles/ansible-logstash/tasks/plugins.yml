@@ -1,0 +1,12 @@
+---
+- name: plugins | collecting installed plugins
+  shell: "/opt/logstash/bin/plugin list"
+  register: "logstash_plugins_installed"
+  changed_when: false
+  always_run: true  #allows checks and diffs to pass
+
+- name: plugins | installing logstash plugins
+  command: "/opt/logstash/bin/plugin install {{ item }}"
+  notify: "restart logstash"
+  with_items: '{{ logstash_plugins }}'
+  when: item not in logstash_plugins_installed.stdout

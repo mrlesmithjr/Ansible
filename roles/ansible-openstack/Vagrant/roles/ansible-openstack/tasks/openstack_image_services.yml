@@ -1,0 +1,125 @@
+---
+- name: openstack_image_services | creating Glance DB
+  mysql_db:
+    name: glance
+    state: present
+  when: mysql_master
+
+- name: openstack_image_services | creating Glance DB
+  mysql_db:
+    name: glance
+    state: present
+  when: not mysql_master
+
+- name: openstack_image_services | granting permissions to Glance DB
+  mysql_user:
+    name: glance
+    password: "{{ openstack_glance_dbpass }}"
+    priv: "glance.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: mysql_master
+
+- name: openstack_image_services | granting permissions to Glance DB
+  mysql_user:
+    name: glance
+    password: "{{ openstack_glance_dbpass }}"
+    priv: "glance.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: not mysql_master
+
+- name: openstack_image_services | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - glance
+    - python-glanceclient
+
+- name: openstack_image_services | configuring glance-api
+  template:
+    src: etc/glance/glance-api.conf.j2
+    dest: /etc/glance/glance-api.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart glance-api
+
+- name: openstack_image_services | configuring glance-registry
+  template:
+    src: etc/glance/glance-registry.conf.j2
+    dest: /etc/glance/glance-registry.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart glance-registry
+
+- name: openstack_image_services | checking if glance has been populated
+  stat:
+    path: /etc/glance/glance_populated
+  register: glance_is_populated
+  always_run: yes
+
+- name: openstack_image_services | populating glance
+  command: su -s /bin/sh -c "glance-manage db_sync" glance
+  register: glance_populated
+  when: >
+        not glance_is_populated.stat.exists and
+        mysql_master
+
+- name: openstack_image_services | marking glance as populated
+  file:
+    path: /etc/glance/glance_populated
+    state: touch
+  when: glance_populated.changed
+
+- name: openstack_image_services | removing glance sqlite db
+  file:
+    path: /var/lib/glance/glance.sqlite
+    state: absent
+
+- name: openstack_image_services | downloading glance-api pacemaker config
+  get_url:
+    url: https://git.openstack.org/cgit/openstack/openstack-resource-agents/plain/ocf/glance-api
+    dest: /usr/lib/ocf/resource.d/openstack/glance-api
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_image_services | setting permissions on glance-api pacemaker file
+  file:
+    path: /usr/lib/ocf/resource.d/openstack/glance-api
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+#- name: openstack_image_services | configuring glance-api monitoring on pacemaker
+#  pacemaker: >
+#    primitive p_glance-api ocf:openstack:glance-api
+#    params config="/etc/glance/glance-api.conf"
+#    os_password="{{ openstack_admin_pass }}"
+#    os_username="admin"
+#    os_tenant_name="admin"
+#    os_auth_url="{{ openstack_keystone_url }}:5000/v2.0/"
+#    op monitor interval="30s" timeout="30s"
+#  tags:
+#    - pacemaker
+#  notify:
+#    - pacemaker commit
+#  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup

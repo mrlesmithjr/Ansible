@@ -5,6 +5,7 @@ This role is to provision out a complete OpenStack (Kilo) deployment. Including 
 
 Requirements
 ------------
+###### Currently Ansible `1.9.6` is the latest supported due to Pacemaker module.
 
 You must define an IP address and DNS FQDN to be used for Load Balancing and services to connect to. These vars are defined in openstack_services_vip and openstack_services_vip_fqdn
 
@@ -18,21 +19,21 @@ Also make sure to define one of your controller nodes as mysql_master...should b
 ````
 openstack_keystone_api_master: os-controller-01
 ````
-host_vars/os-controller-01.yml
+`host_vars/os-controller-01.yml`
 ````
 mysql_master: true
 ````
-group_vars/openstack-controller-nodes/main.yml
+`group_vars/openstack-controller-nodes/main.yml`
 ````
 corosync_mcastaddr: 239.255.42.1
 ````
 
-group_vars/openstack-haproxy-nodes/main.yml
+`group_vars/openstack-haproxy-nodes/main.yml`
 ````
 corosync_mcastaddr: 239.255.42.2
 ````
 
-All additional Ansible requirements are included in the requirements.yml file.
+All additional Ansible requirements are included in the `requirements.yml` file.
 ````
 sudo ansible-galaxy install -r requirements.yml
 ````
@@ -567,7 +568,7 @@ Example Playbook
       with_items: openstack_glance_images
       when: (openstack_glance_manage_images is defined and openstack_glance_manage_images) and (item.installed is defined and not item.installed)
 ````
-group_vars/all/accounts.yml
+`group_vars/all/accounts.yml`
 ````
 ---
 # generate passwords and keys using 'openssl rand -hex 10'
@@ -595,13 +596,13 @@ openstack_rabbit_pass: 6bd8dbb369181e89bf3a  #Password of user guest of RabbitMQ
 openstack_trove_dbpass: c6c2792fa14319dbe9da  #Database password of Database service
 openstack_trove_pass: 892ba2ff14319c299b54  #Password of Database Service user trove
 ````
-group_vars/all/main.yml
+`group_vars/all/main.yml`
 ````
 ---
 pri_domain_name: example.org  #defines primary domain name of site.
 update_etc_hosts: true
 ````
-group_vars/openstack-compute-nodes/main.yml
+`group_vars/openstack-compute-nodes/main.yml`
 ````
 ---
 config_network_interfaces: true
@@ -627,7 +628,7 @@ network_interfaces:  #define interfaces and settings. (Define separately for eac
 #    addl_settings:
 #      - bond_master bond0
 ````
-group_vars/openstack-controller-nodes/main.yml
+`group_vars/openstack-controller-nodes/main.yml`
 ````
 ---
 config_rabbitmq_ha: true
@@ -640,12 +641,12 @@ rabbitmq_config:
     durable: true
     tags: 'ha-mode=all,ha-sync-mode=automatic'
 ````
-group_vars/openstack-haproxy-nodes/main.yml
+`group_vars/openstack-haproxy-nodes/main.yml`
 ````
 ---
 corosync_mcastaddr: 239.255.42.1
 ````
-group_vars/openstack-network-nodes/main.yml
+`group_vars/openstack-network-nodes/main.yml`
 ````
 ---
 config_network_interfaces: true
@@ -683,7 +684,7 @@ network_interfaces:  #define interfaces and settings. (Define separately for eac
       - down ip link set $IFACE promisc off
       - down ifconfig $IFACE down
 ````
-group_vars/openstack-nodes/main.yml
+`group_vars/openstack-nodes/main.yml`
 ````
 ---
 config_openstack_neutron_networks: true
@@ -701,31 +702,31 @@ openstack_neutron_verbose_logging: true  #defines if neutron should enable verbo
 openstack_nova_virt_type: qemu  #Nova virtualization Type, set to KVM if supported and QEMU if not
 rabbitmq_master: os-controller-01
 ````
-host_vars/os-compute-01
+`host_vars/os-compute-01`
 ````
 ---
 ansible_ssh_host: 10.0.101.143
 openstack_instance_tunnel_ip: 10.0.111.31 #define interface address for tunnel interface....ex. {{ ansible_eth2.ipv4.addres }}
 ````
-host_vars/os-compute-02
+`host_vars/os-compute-02`
 ````
 ---
 ansible_ssh_host: 10.0.101.191
 openstack_instance_tunnel_ip: 10.0.111.32 #define interface address for tunnel interface....ex. {{ ansible_eth2.ipv4.addres }}
 ````
-host_vars/os-controller-01
+`host_vars/os-controller-01`
 ````
 ---
 mysql_master: true
 pacemaker_primary_server: true
 ````
-host_vars/os-network-01
+`host_vars/os-network-01`
 ````
 ---
 ansible_ssh_host: 10.0.101.141
 openstack_instance_tunnel_ip: 10.0.111.21 #define interface address for tunnel interface....ex. {{ ansible_eth2.ipv4.addres }}
 ````
-host_vars/os-network-02
+`host_vars/os-network-02`
 ````
 ---
 ansible_ssh_host: 10.0.101.142

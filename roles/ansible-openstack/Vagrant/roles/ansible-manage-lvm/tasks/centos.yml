@@ -1,0 +1,19 @@
+---
+- name: centos | installing lvm2
+  yum:
+    name: system-storage-manager
+    state: present
+
+- name: centos | installing sg3_utils
+  yum:
+    name: sg3_utils
+    state: present
+
+- name: centos | checking for scsi devices
+  shell: sg_scan
+  register: scsi_devices
+  changed_when: False
+
+- name: centos | rescanning for new disks
+  command: /usr/bin/rescan-scsi-bus.sh
+  changed_when: False

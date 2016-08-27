@@ -15,7 +15,8 @@ Role Variables
 ---
 # defaults file for ansible-docker
 config_docker_service: true  #defines if docker service should be configured
-config_docker_users: false  #defines if users should be added to docker group to allow non sudo access to docker
+docker_config_alt_data_dir: false  #defines if docker should be configured to store data in alternate location..ensure to enable -g option in docker_opts if true
+docker_alt_data_dir: /mnt/docker  #Ensure this exists if setting docker to alternate data directory...We do not create this to ensure any add'l mounts do not overlay this path..Service may fail to start if not.
 docker_images:  #defines docker images to be installed
   - image: centos  #defines image name...ex. docker hub image name
     state: present  #defines state of container....present, started, reloaded, restarted, stopped, killed or absent
@@ -28,13 +29,15 @@ docker_images:  #defines docker images to be installed
 docker_opts:  #defines docker service options to be configured
   - '--dns {{ pri_dns }}'
   - '--dns {{ sec_dns }}'
+#  - '-g {{ docker_alt_data_dir }}'  #example to change location of where Docker will store data...to change - change docker_data_dir var above.
 docker_set_grub_memory_limit: true  #defines if docker memory limits should be added to grub boot loader
 docker_ubuntu_repo_info:  #defines docker ubuntu repo info for installing from
   - id: 58118E89F3A912897C070ADBF76221572C52609D
     keyserver: hkp://p80.pool.sks-keyservers.net:80
-    repo: "deb https://apt.dockerproject.org/repo ubuntu-{{ ansible_distribution_release }} main"
+    repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main"
 docker_users:  #defines users to be added to docker group to allow non sudo access to docker
   - vagrant
+manage_docker_images: false  #defines if images defined in docker_images are managed
 pri_dns: 8.8.8.8  #defines primary dns server for your site
 sec_dns: 8.8.4.4  #defines secondary dns server for your site
 ````

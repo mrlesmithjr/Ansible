@@ -1,0 +1,100 @@
+---
+- name: openstack_compute_services | creating Nova DB
+  mysql_db:
+    name: nova
+    state: present
+  when: mysql_master
+
+- name: openstack_compute_services | creating Nova DB
+  mysql_db:
+    name: nova
+    state: present
+  when: not mysql_master
+
+- name: openstack_compute_services | granting permissions to Nova DB
+  mysql_user:
+    name: nova
+    password: "{{ openstack_nova_dbpass }}"
+    priv: "nova.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: mysql_master
+
+- name: openstack_compute_services | granting permissions to Nova DB
+  mysql_user:
+    name: nova
+    password: "{{ openstack_nova_dbpass }}"
+    priv: "nova.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: not mysql_master
+
+- name: openstack_compute_services | install nova packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nova-api
+    - nova-cert
+    - nova-conductor
+    - nova-consoleauth
+    - nova-novncproxy
+    - nova-scheduler
+    - python-novaclient
+
+- name: openstack_compute_services | configuring nova
+  template:
+    src: etc/nova/nova.conf.j2
+    dest: /etc/nova/nova.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - configure_nova
+  notify:
+    - restart nova-api
+    - restart nova-cert
+    - restart nova-consoleauth
+    - restart nova-scheduler
+    - restart nova-conductor
+    - restart nova-novncproxy
+
+- name: openstack_compute_services | checking if nova has been populated
+  stat:
+    path: /etc/nova/nova_populated
+  register: nova_is_populated
+  always_run: yes
+
+- name: openstack_compute_services | populating nova
+  command: su -s /bin/sh -c "nova-manage db sync" nova
+  register: nova_populated
+  when: >
+        not nova_is_populated.stat.exists and
+        mysql_master
+
+- name: openstack_compute_services | marking nova as populated
+  file:
+    path: /etc/nova/nova_populated
+    state: touch
+  when: nova_populated.changed
+
+- name: openstack_compute_services | removing sqlite db
+  file:
+    path: /var/lib/nova/nova.sqlite
+    state: absent
+
+- name: openstack_compute_services | configuring memcached
+  template:
+    src: etc/memcached.conf.j2
+    dest: /etc/memcached.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart memcached

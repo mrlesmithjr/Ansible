@@ -1,0 +1,19 @@
+---
+- name: redhat | installing pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+    - python-dnf  #preparing for switchover to dnf instead of yum
+  when: >
+        ansible_distribution != "Fedora"
+
+- name: redhat | installing pre-reqs
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+  when: >
+        ansible_distribution == "Fedora"

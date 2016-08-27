@@ -1,0 +1,33 @@
+---
+- name: setting Debian facts
+  set_fact:
+    apache2_log_dir: "/var/log/apache2"
+    apache2_web_group: "www-data"
+    apache2_web_owner: "www-data"
+    apache2_web_root: "/var/www/html"
+  when: ansible_os_family == "Debian"
+
+- name: setting RedHat facts
+  set_fact:
+    apache2_log_dir: "/var/log/httpd"
+    apache2_web_group: "apache"
+    apache2_web_owner: "apache"
+    apache2_web_root: "/var/www/html"
+  when: ansible_os_family == "RedHat"
+
+# - name: setting PHP version
+#   set_fact:
+#     apache2_php_path: 'etc/php5'  #no leading / for template path
+#     apache2_php_ver: 5
+#   when: >
+#         ansible_distribution == "Debian" or
+#         (ansible_distribution == "Ubuntu" and
+#         ansible_distribution_version <= '14.04')
+#
+# - name: setting PHP version
+#   set_fact:
+#     apache2_php_path: 'etc/php/7.0'  #no leading / for template path
+#     apache2_php_ver: 7.0
+#   when: >
+#         (ansible_distribution == "Ubuntu" and
+#         ansible_distribution_version >= '16.04')

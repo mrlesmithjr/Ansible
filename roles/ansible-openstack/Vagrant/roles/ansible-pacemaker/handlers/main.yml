@@ -1,0 +1,15 @@
+---
+# handlers file for ansible-pacemaker
+#- name: pacemaker commit ###commented out for now...broken in ansible 2.0
+#  pacemaker: commit
+
+- name: restart corosync
+  service:
+    name: corosync
+    state: restarted
+
+- name: restart pacemaker
+  service:
+    name: pacemaker
+    sleep: 10
+    state: restarted

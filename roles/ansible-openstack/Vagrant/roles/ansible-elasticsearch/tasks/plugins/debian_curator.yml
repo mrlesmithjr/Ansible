@@ -1,0 +1,42 @@
+---
+- name: install dependencies
+  apt:
+    name: python-pip
+    state: present
+
+# remove old version install via pip module
+#- pip: name=elasticsearch-curator state=absent
+
+- name: adding curator apt repo
+  apt_repository:
+    repo: "deb http://packages.elasticsearch.org/curator/3/debian stable main"
+    state: present
+
+- name: installing elasticsearch curator
+  apt:
+    name: python-elasticsearch-curator
+    state: present
+
+- name: install curator crontab
+  cron:
+    name: es_curator_delete
+    minute: 0
+    hour: 10
+    user: root
+    job: '/usr/local/bin/curator --host {{ es_fqdn }} delete indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_max_keep_days | default(360) }}'
+    cron_file: es_curator_delete
+    state: present
+  tags:
+    - cron
+
+- name: install curator crontab
+  cron:
+    name: es_curator_close
+    minute: 45
+    hour: 9
+    user: root
+    job: '/usr/local/bin/curator --host {{ es_fqdn }} close indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_close_after_days | default(14) }}'
+    cron_file: es_curator_close
+    state: present
+  tags:
+    - cron

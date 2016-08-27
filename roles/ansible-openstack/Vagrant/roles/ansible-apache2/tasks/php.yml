@@ -1,0 +1,31 @@
+---
+- name: php | installing php5 for apache2
+  apt:
+    name: "libapache2-mod-php5"
+    state: present
+  notify: restart apache2
+  when: >
+        ansible_os_family == "Debian"
+
+- name: php | installing php5-sqlite for apache2
+  apt:
+    name: "php5-sqlite"
+    state: present
+  notify: restart apache2
+  when: >
+        ansible_os_family == "Debian" and
+        (apache2_install_php_sqlite is defined and
+        apache2_install_php_sqlite)
+
+- name: php | configuring php
+  template:
+    src: "etc/php5/apache2/php.ini.j2"
+    dest: "/etc/php5/apache2/php.ini"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache2
+  when: >
+        ansible_os_family == "Debian" and
+        (apache2_config_php is defined and
+        apache2_config_php)

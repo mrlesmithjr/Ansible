@@ -1,0 +1,8 @@
+---
+# tasks file for ansible-manage-ssh-keys
+- include: manage_ssh_keys.yml
+  tags:
+    - manage_ssh_keys
+  when: >
+        enable_manage_ssh_keys is defined and
+        enable_manage_ssh_keys

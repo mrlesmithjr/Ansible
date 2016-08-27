@@ -1,0 +1,9 @@
+---
+- name: configuring /etc/localtime
+  tags: [configuration,timezone]
+  copy: src=/usr/share/zoneinfo/{{ timezone }} dest=/etc/localtime owner=root group=root mode=0644 backup=yes force=yes
+
+- name: configuring /etc/timezone
+  tags: [configuration,timezone]
+  template: src=timezone.j2 dest=/etc/timezone
+  notify: update tzdata

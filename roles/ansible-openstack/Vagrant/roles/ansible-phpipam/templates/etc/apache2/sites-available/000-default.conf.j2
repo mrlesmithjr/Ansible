@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName {{ ansible_fqdn }}
+    ServerAdmin webmaster@localhost
+    DocumentRoot {{ web_root }}
+    <Directory {{ phpipam_root }}>
+        Options FollowSymLinks
+        AllowOverride all
+        Order allow,deny
+        Allow from all
+    </Directory>
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>

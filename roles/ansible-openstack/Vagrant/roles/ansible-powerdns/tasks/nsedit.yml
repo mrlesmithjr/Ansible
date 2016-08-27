@@ -1,0 +1,34 @@
+---
+- name: nsedit | installing Apache pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  notify:
+    - 'restart apache2'
+  with_items:
+    - 'php5-curl'
+    - 'php5-sqlite'
+  when: ansible_os_family == "Debian"
+
+- name: nsedit | installing nsedit
+  git:
+    repo: "https://github.com/tuxis-ie/nsedit"
+    recursive: "yes"
+    dest: "{{ web_root }}/nsedit"
+
+- name: nsedit | changing ownership of nsedit
+  file:
+    path: "{{ item }}"
+    state: "directory"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"
+  with_items:
+    - '{{ web_root }}/nsedit'
+    - '{{ web_root }}/etc'
+
+- name: nsedit | configuring nsedit
+  template:
+    src: "nsedit.config.inc.php.j2"
+    dest: "{{ web_root }}/nsedit/includes/config.inc.php"
+    owner: "{{ web_owner }}"
+    group: "{{ web_group }}"

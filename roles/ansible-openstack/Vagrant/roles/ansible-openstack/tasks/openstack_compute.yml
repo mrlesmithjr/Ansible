@@ -1,0 +1,27 @@
+---
+- name: openstack_compute | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nova-compute
+    - sysfsutils
+
+- name: openstack_compute | configuring nova
+  template:
+    src: etc/nova/nova.conf.j2
+    dest: /etc/nova/nova.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - configure_nova
+  notify:
+    - restart nova-compute
+
+- name: openstack_compute | configuring nova-compute
+  template:
+    src: etc/nova/nova-compute.conf.j2
+    dest: /etc/nova/nova-compute.conf
+  notify:
+    - restart nova-compute

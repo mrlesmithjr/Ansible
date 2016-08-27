@@ -1,0 +1,26 @@
+---
+# curator tool
+- include: plugins/debian_curator.yml
+  when: install_curator is defined and install_curator and ansible_os_family == "Debian"
+
+- include: plugins/redhat_curator.yml
+  when: install_curator is defined and install_curator and ansible_os_family == "RedHat"
+
+###Below is new method of installing plugins
+- name: checking for existing plugins
+  shell: '{{ es_plugin_bin }} {{ es_plugin_list }}'
+  register: es_plugins_installed
+  always_run: yes
+  changed_when: false
+
+- name: uninstalling plugins
+  shell: '{{ es_plugin_bin }} -r {{ item }}'
+  with_items: es_plugins_installed.stdout
+  when: >
+        (es_uninstall_plugins is defined and es_uninstall_plugins) and
+        es_version|int == 1.7
+
+- name: installing plugins
+  command: '{{ es_plugin_bin }} {{ es_plugin_install }} {{ item.plugin }}{{ item.name }}'
+  with_items: es_plugins_install
+  when: item.name not in es_plugins_installed.stdout

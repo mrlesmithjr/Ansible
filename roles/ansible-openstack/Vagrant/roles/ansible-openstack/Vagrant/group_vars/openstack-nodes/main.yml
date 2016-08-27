@@ -1,0 +1,19 @@
+---
+config_openstack_neutron_networks: true
+mysql_allow_remote_connections: true  #defines if mysql should listen on loopback (default) or allow remove connections
+ntp_servers:  #defines internal ntp servers for clients to poll
+  - 'oscontroller.{{ pri_domain_name }}'
+openstack_ceilometer_verbose_logging: true  #Defines if ceilometer should enable verbose logging for troubleshooting
+openstack_cinder_verbose_logging: true  #Defines if cinder should enable verbose logging for troubleshooting
+openstack_enable_remote_syslog: true  #defines if all openstack services should write to syslog which allows remote syslog functionality...
+openstack_glance_verbose_logging: true  #defines if glance should enable verbose logging for troubleshooting
+openstack_group_based_policy_install: false  #Defines if Group Based Policy Should be installed. https://wiki.openstack.org/wiki/GroupBasedPolicy/InstallUbuntu
+openstack_haproxy_install: true  #defines if haproxy should be installed on controller nodes....can separate out but installing on controller nodes is common practice and use corosync/pacemaker to handle the VIP.
+openstack_heat_verbose_logging: true  #defines if glance should enable verbose logging for troubleshooting
+openstack_horizon_remove_ubuntu_theme: true  #defines if the Ubuntu Horizon theme should be removed and the original Horizon theme restored
+openstack_keystone_verbose_logging: true  #defines if keystone should enable verbose logging for troubleshooting
+openstack_multi_controller_setup: false
+openstack_neutron_lbaas_install: false  #defines if Neutron LBAAS services should be installed.
+openstack_neutron_verbose_logging: true  #defines if neutron should enable verbose logging for troubleshooting
+openstack_nova_virt_type: qemu  #Nova virtualization Type, set to KVM if supported and QEMU if not
+rabbitmq_master: oscontroller

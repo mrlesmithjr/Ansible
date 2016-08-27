@@ -1,0 +1,149 @@
+# {{ ansible_managed }}
+# Any changes made here will be lost
+
+auto lo
+iface lo inet loopback
+
+{% if config_network_interfaces is defined and config_network_interfaces %}
+########## Network Interfaces
+{%   for item in network_interfaces %}
+{%     if item.configure is defined and item.configure %}
+{%       if item.comment is defined and item.comment != None %}
+# {{ item.comment }}
+{%       endif %}
+{%       if item.method == "static" or item.method == "manual" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%         if item.address is defined and item.address != None %}
+  address {{ item.address }}
+{%         endif %}
+{%         if item.netmask is defined and item.netmask != None %}
+  netmask {{ item.netmask }}
+{%         endif %}
+{%         if item.gateway is defined and item.gateway != None %}
+  gateway {{ item.gateway }}
+{%         endif %}
+{%       endif %}
+{%       if item.method == "dhcp" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%       endif %}
+{%       if item.wireless_network is defined and item.wireless_network %}
+  wpa-ssid {{ item.wpa_ssid }}
+  wpa-psk {{ item.wpa_psk }}
+{%       endif %}
+{%       if item.addl_settings is defined and item.addl_settings != None %}
+{%         for setting in item.addl_settings %}
+  {{ setting }}
+{%         endfor %}
+{%       endif %}
+{%     endif %}
+
+{%   endfor %}
+########## End of Network Interfaces
+{% endif %}
+
+{% if config_network_bonds is defined and config_network_bonds %}
+########## Network Bonds
+{%   for item in network_bonds %}
+{%     if item.configure is defined and item.configure %}
+{%       if item.comment is defined and item.comment != None %}
+# {{ item.comment }}
+{%       endif %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%       if item.slaves is defined and item.slaves != None %}
+  bond_slaves {{ item.slaves }}
+{%       endif %}
+{%       if item.primary is defined and item.primary != None %}
+  bond_primary {{ item.primary }}
+{%       endif %}
+{%       if item.addl_settings is defined and item.addl_settings != None %}
+{%         for setting in item.addl_settings %}
+  {{ setting }}
+{%         endfor %}
+{%       endif %}
+{%     endif %}
+
+{%   endfor %}
+########## End of Network Bonds
+{% endif %}
+
+{% if config_network_vlans is defined and config_network_vlans %}
+########## Network VLANS
+{%   for item in network_vlans %}
+{%     if item.configure is defined and item.configure %}
+{%       if item.comment is defined %}
+# {{ item.comment }}
+{%       endif %}
+{%       if item.method == "static" or item.method == "manual" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%         if item.address is defined and item.address != None %}
+  address {{ item.address }}
+{%         endif %}
+{%         if item.netmask is defined and item.netmask != None %}
+  netmask {{ item.netmask }}
+{%         endif %}
+{%         if item.gateway is defined and item.gateway != None %}
+  gateway {{ item.gateway }}
+{%         endif %}
+{%       endif %}
+{%       if item.method == "dhcp" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%       endif %}
+{%       if item.addl_settings is defined and item.addl_settings != None %}
+{%         for setting in item.addl_settings %}
+  {{ setting }}
+{%         endfor %}
+{%       endif %}
+  vlan_raw_device {{ item.vlan_device }}
+{%     endif %}
+
+{%   endfor %}
+########## End of Network VLANS
+{% endif %}
+
+{% if config_network_bridges is defined and config_network_bridges %}
+########## Network Bridges
+{%   for item in network_bridges %}
+{%     if item.configure is defined and item.configure %}
+{%       if item.comment is defined %}
+# {{ item.comment }}
+{%       endif %}
+{%       if item.method == "static" or item.method == "manual" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%         if item.address is defined and item.address != None %}
+  address {{ item.address }}
+{%         endif %}
+{%         if item.netmask is defined and item.netmask != None %}
+  netmask {{ item.netmask }}
+{%         endif %}
+{%         if item.gateway is defined and item.gateway != None %}
+  gateway {{ item.gateway }}
+{%         endif %}
+{%       endif %}
+{%       if item.method == "dhcp" %}
+auto {{ item.name }}
+iface {{ item.name }} inet {{ item.method }}
+{%       endif %}
+{%       if item.addl_settings is defined and item.addl_settings != None %}
+{%         for setting in item.addl_settings %}
+  {{ setting }}
+{%         endfor %}
+{%       endif %}
+  bridge_ports {{ item.ports }}
+{%     endif %}
+
+{%   endfor %}
+########## End of Network Bridges
+{% endif %}
+
+{% if dns_nameservers is defined %}
+dns-nameservers {{ dns_nameservers }}
+{% endif %}
+{% if dns_search is defined %}
+dns-search {{ dns_search }}
+{% endif %}

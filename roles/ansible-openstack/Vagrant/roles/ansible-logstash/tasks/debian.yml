@@ -1,0 +1,39 @@
+---
+- name: debian | installing logstash repo key
+  apt_key:
+    url: "{{ logstash_repo_key }}"
+    state: "present"
+
+- name: debian | adding logstash repo
+  apt_repository:
+    repo: "{{ logstash_deb_repo }}"
+    state: "present"
+
+- name: debian | installing logstash and java
+  apt:
+    name: "{{ item }}"
+    state: "latest"
+    force: yes
+  with_items:
+    - 'logstash'
+    - 'default-jre-headless'
+  notify: "init logstash"
+
+- name: debian | checking for logstash-web
+  stat:
+    path: "/etc/init/logstash-web.conf"
+  register: "logstash_web"
+
+- name: debian | disabling logstash-web
+  replace:
+    dest: "/etc/init/logstash-web.conf"
+    regexp: "^start on virtual-filesystems"
+    replace: "start on never"
+  notify: "stop logstash-web"
+  when: logstash_web.stat.exists
+
+- name: debian | ensuring logstash is started and enabled on boot
+  service:
+    name: "logstash"
+    state: "started"
+    enabled: yes

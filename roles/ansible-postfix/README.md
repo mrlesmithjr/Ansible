@@ -44,6 +44,8 @@ postfix_generic_template: generic.j2
 postfix_altgeneric_maps:
   - "/^(.*@)something.com$/     ${1}somethingelse.co.uk"
 
+# when SMTP relay, if true force it to always add missing headers such as message-id
+enable_always_add_missing_headers: false
 ````
 
 Dependencies

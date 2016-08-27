@@ -1,0 +1,45 @@
+---
+- include: mysql_root_pw.yml
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'software-properties-common'
+    - 'python-mysqldb'
+    - 'rsync'
+
+- name: debian | adding mariadb repo keys
+  apt_key:
+    keyserver: "{{ mariadb_debian_repo_keyserver }}"
+    id: "{{ mariadb_debian_repo_key }}"
+    state: "present"
+
+- name: debian | adding mariadb repo
+  apt_repository:
+    repo: "{{ mariadb_debian_repo }}"
+    state: "present"
+
+- name: debian | installing mariadb-galera packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'mariadb-server'
+    - 'galera-3'
+
+- name: debian | configuring root my.cnf
+  template:
+    src: "root/my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=,o="
+
+- name: debian | adding debian-sys-maintenance permissions to mysql
+  mysql_user:
+    name: "debian-sys-maint"
+    password: "{{ deb_db_password }}"
+    priv: "*.*:ALL,GRANT"
+    state: "present"

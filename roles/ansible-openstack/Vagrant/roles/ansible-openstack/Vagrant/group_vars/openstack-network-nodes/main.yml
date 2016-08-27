@@ -1,0 +1,42 @@
+---
+config_network_interfaces: false
+network_interfaces:  #define interfaces and settings. (Define separately for each node in host_vars) - Anything not defined can be added to addl_settings.
+  - name: eth0
+    configure: false
+    comment: management interface
+    method: dhcp
+    address:
+    netmask:
+    netmask_cidr:
+    gateway:
+#    addl_settings:
+#      - bond_master bond0
+  - name: eth1
+    configure: false
+    comment: tunnel interface
+    method: static
+    address: '{{ openstack_instance_tunnel_ip }}'
+    netmask: 255.255.255.0
+    netmask_cidr: 24
+    gateway:
+#    addl_settings:
+#      - bond_master bond0
+  - name: eth2
+    configure: false
+    comment: tunnel interface
+    method: manual
+    address: 0.0.0.0
+    netmask: 255.255.255.0
+    netmask_cidr: 24
+    gateway:
+    addl_settings:
+      - up ip link set $IFACE promisc on
+      - down ip link set $IFACE promisc off
+      - down ifconfig $IFACE down
+openstack_neutron_bridges:  #defines OVS bridges and physical interface(s)
+  - bridge_name: br-ex  #defines the OVS Bridge name to create.
+    physical_networks:
+      - external  #defines the physical_network name which maps to the OVS bridge_name
+#      - external-vlans
+    ports:  #defines the physical interface port(s)
+      - eth3

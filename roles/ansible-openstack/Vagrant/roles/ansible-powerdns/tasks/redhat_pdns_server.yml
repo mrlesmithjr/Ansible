@@ -1,0 +1,34 @@
+---
+- name: redhat_pdns_server | downloading powerdns
+  get_url:
+    url: "{{ pdns_download_url }}/rpm/pdns-static-{{ pdns_server_version }}.x86_64.rpm"
+    dest: "/opt/pdns-static-{{ pdns_server_version }}.x86_64.rpm"
+
+- name: redhat_pdns_server | installing powerdns
+  yum:
+    name: "/opt/pdns-static-{{ pdns_server_version }}.x86_64.rpm"
+  notify: restart pdns
+
+- name: redhat_pdns_server | installing powerdns pre-reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - git
+    - jq
+    - MySQL-python
+
+#- name: redhat_pdns_server | enabling MySQL socket
+#  lineinfile:
+#    dest: "/etc/my.cnf"
+#    line: "socket = /var/run/mysqld/mysqld.sock"
+#  register: mysql_socket
+#  notify:
+#    - restart mysql
+#    - restart pdns
+
+#- name: redhat_pdns_server | restarting mysql
+#  service:
+#    name: "mysql"
+#    state: restarted
+#  when: mysql_socket.changed

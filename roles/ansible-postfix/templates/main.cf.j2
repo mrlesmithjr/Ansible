@@ -72,3 +72,6 @@ milter_protocol         = 2
 {% if enable_smtp_helo_name %}
 smtp_helo_name = {{ postfix_smtp_helo_name }}
 {% endif %}
+{% if enable_always_add_missing_headers %}
+always_add_missing_headers = yes
+{% endif %}

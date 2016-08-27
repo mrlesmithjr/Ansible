@@ -22,7 +22,7 @@
   when: ansible_os_family == "RedHat"
 
 - name: config_apache2 | enabling php mod extensions
-  command: "php5enmod {{ item }}"
+  command: "{{ phpenmod_command }} {{ item }}"
   with_items:
     - json
   when: ansible_os_family == "Debian"

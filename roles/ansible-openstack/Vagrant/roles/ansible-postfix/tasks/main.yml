@@ -1,0 +1,59 @@
+---
+# tasks file for ansible-postfix
+- name: Checking to make sure postfix is installed
+  apt: name={{ item }} state=installed
+  tags: [postfix]
+  with_items:
+    - postfix
+    - mailutils
+  when: ansible_os_family == 'Debian'
+
+- name: Checking to make sure postfix is installed
+  yum: name={{ item }} state=installed
+  tags: [postfix]
+  with_items:
+    - postfix
+    - mailx
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+- name: Checking to make sure postfix is installed
+  dnf: name={{ item }} state=installed
+  tags: [postfix]
+  with_items:
+    - postfix
+    - mailx
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+- name: Create canonical maps if enabled
+  template: src=templates/canonical.j2 dest={{ postfix_conf_dir }}/canonical mode=0644 owner=root group=root backup=yes
+  tags: [postfix]
+  notify: restart postfix
+  when: enable_sender_canonical
+
+- name: Create postfix configuration main.cf
+  template: src=templates/main.cf.j2 dest={{ postfix_conf_dir }}/main.cf mode=0644 owner=root group=root backup=yes
+  tags: [postfix]
+  register: postfix
+  notify: restart postfix
+  when: configure_postfix is defined and configure_postfix
+
+- name: Create postfix configuration 'generic'
+  template: src=templates/{{ postfix_generic_template }} dest={{ postfix_conf_dir }}/generic mode=0644 owner=root group=root backup=yes
+  tags: [postfix]
+  register: postfix
+  notify: restart postfix
+  when: configure_postfix is defined and configure_postfix
+
+- name: Checking to make sure postfix is running
+  service: name=postfix state=running enabled=yes
+  tags: [postfix]
+
+- name: rebuilding generic.db
+  command: postmap /etc/postfix/generic
+  tags: [postfix]
+  notify: restart postfix
+  when: postfix.changed and postfix_domain_rewrite_filetype == 'hash'

@@ -1,0 +1,99 @@
+[DEFAULT]
+{% if openstack_cinder_verbose_logging is defined and openstack_cinder_verbose_logging %}
+verbose = True
+{% elif openstack_cinder_verbose_logging is defined and not openstack_cinder_verbose_logging %}
+verbose = False
+{% endif %}
+rootwrap_config = /etc/cinder/rootwrap.conf
+api_paste_confg = /etc/cinder/api-paste.ini
+volume_name_template = volume-%s
+auth_strategy = keystone
+state_path = /var/lib/cinder
+volumes_dir = /var/lib/cinder/volumes
+volume_group = cinder-volumes
+iscsi_helper = tgtadm
+
+# Below added by Ansible
+rpc_backend = rabbit
+#glance_api_version = 2
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+my_ip={{ openstack_nova_my_ip }}
+{% endif %}
+{% if inventory_hostname in groups['openstack-storage-nodes'] %}
+my_ip={{ openstack_nova_my_ip }}
+enabled_backends = lvm
+{%   if openstack_multi_controller_setup is defined and openstack_multi_controller_setup %}
+{%     if openstack_services_vip_fqdn is defined %}
+glance_host = {{ openstack_services_vip_fqdn }}
+glance_api_servers = {{ openstack_services_vip_fqdn }}:9292
+{%     elif openstack_services_vip_fqdn is not defined and openstack_services_vip is defined %}
+glance_host = {{ openstack_services_vip }}
+glance_api_servers = {{ openstack_services_vip }}:9292
+{%     endif %}
+{%   endif %}
+{%   if openstack_telementry_install is defined and openstack_telementry_install %}
+#control_exchange = cinder
+notification_driver = messagingv2
+{%   endif %}
+#image_conversion_dir = {{ openstack_cinder_image_conversion_dir }}
+{% endif %}
+
+[database]
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+connection = mysql://cinder:{{ openstack_cinder_dbpass }}@{{ openstack_cinder_dbhost }}/cinder
+{% endif %}
+{% if inventory_hostname in groups['openstack-storage-nodes'] %}
+connection = mysql://cinder:{{ openstack_cinder_dbpass }}@{{ openstack_cinder_dbhost }}/cinder
+{% endif %}
+
+[keystone_authtoken]
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+auth_uri = {{ openstack_keystone_url }}:5000
+auth_url = {{ openstack_keystone_url }}:35357
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+project_name = service
+username = cinder
+password = {{ openstack_cinder_pass }}
+{% endif %}
+{% if inventory_hostname in groups['openstack-storage-nodes'] %}
+auth_uri = {{ openstack_keystone_url }}:5000
+auth_url = {{ openstack_keystone_url }}:35357
+auth_plugin = password
+project_domain_id = default
+user_domain_id = default
+project_name = service
+username = cinder
+password = {{ openstack_cinder_pass }}
+{% endif %}
+{% if openstack_multi_controller_setup is defined and openstack_multi_controller_setup %}
+memcached_servers = {% for host in groups['openstack-controller-nodes'] %}{{ host }}:11211{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+[lvm]
+{% if inventory_hostname in groups['openstack-storage-nodes'] %}
+volume_driver = cinder.volume.drivers.lvm.LVMVolumeDriver
+iscsi_protocol = iscsi
+lvm_conf_file = /etc/lvm/lvm.conf
+{% endif %}
+
+[oslo_concurrency]
+lock_path = /var/lock/cinder
+
+[oslo_messaging_rabbit]
+rabbit_port = 5672
+rabbit_userid = {{ openstack_rabbit_user }}
+rabbit_password = {{ openstack_rabbit_pass }}
+{% if openstack_multi_controller_setup is defined and openstack_multi_controller_setup %}
+rabbit_durable_queues = true
+rabbit_ha_queues = true
+rabbit_hosts={% for host in groups['openstack-controller-nodes'] %}{{ host }}:5672{% if not loop.last %},{% endif %}{% endfor %}
+
+rabbit_retry_interval=1
+rabbit_retry_backoff=2
+rabbit_max_retries=0
+{% elif openstack_multi_controller_setup is defined and not openstack_multi_controller_setup %}
+rabbit_host = {{ openstack_rabbit_host }}
+{% endif %}

@@ -1,0 +1,117 @@
+---
+- name: openstack_cinder_controller_nodes | creating Cinder DB
+  mysql_db:
+    name: cinder
+    state: present
+  when: mysql_master
+
+- name: openstack_cinder_controller_nodes | creating Cinder DB
+  mysql_db:
+    name: cinder
+    state: present
+  when: not mysql_master
+
+- name: openstack_cinder_controller_nodes | granting permissions to Cinder DB
+  mysql_user:
+    name: cinder
+    password: "{{ openstack_cinder_dbpass }}"
+    priv: "cinder.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: mysql_master
+
+- name: openstack_cinder_controller_nodes | granting permissions to Cinder DB
+  mysql_user:
+    name: cinder
+    password: "{{ openstack_cinder_dbpass }}"
+    priv: "cinder.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: not mysql_master
+
+- name: openstack_cinder_controller_nodes | installing Cinder packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - cinder-api
+    - cinder-scheduler
+    - python-cinderclient
+
+- name: openstack_cinder | configuring cinder
+  template:
+    src: etc/cinder/cinder.conf.j2
+    dest: /etc/cinder/cinder.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart cinder-scheduler
+    - restart cinder-api
+
+- name: openstack_cinder | checking if cinder has been populated
+  stat:
+    path: /etc/cinder/cinder_populated
+  register: cinder_is_populated
+  always_run: yes
+
+- name: openstack_cinder | populating cinder
+  command: su -s /bin/sh -c "cinder-manage db sync" cinder
+  register: cinder_populated
+  when: >
+        not cinder_is_populated.stat.exists and
+        mysql_master
+
+- name: openstack_cinder | marking cinder as populated
+  file:
+    path: /etc/cinder/cinder_populated
+    state: touch
+  when: cinder_populated.changed
+
+- name: openstack_cinder | deleting cinder sqlite db
+  file:
+    path: /var/lib/cinder/cinder.sqlite
+    state: absent
+
+- name: openstack_cinder | downloading cinder-api pacemaker config
+  get_url:
+    url: https://git.openstack.org/cgit/openstack/openstack-resource-agents/plain/ocf/cinder-api
+    dest: /usr/lib/ocf/resource.d/openstack/cinder-api
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_cinder | setting permissions on cinder-api pacemaker file
+  file:
+    path: /usr/lib/ocf/resource.d/openstack/cinder-api
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+#- name: openstack_cinder | configuring glance-api monitoring on pacemaker
+#  pacemaker: >
+#    primitive p_cinder-api ocf:openstack:cinder-api
+#    params config="/etc/cinder/cinder.conf"
+#    os_password="{{ openstack_admin_pass }}"
+#    os_username="admin"
+#    os_tenant_name="admin"
+#    keystone_get_token_url="{{ openstack_keystone_url }}:5000/v2.0/tokens"
+#    op monitor interval="30s" timeout="30s"
+#  tags:
+#    - pacemaker
+#  notify:
+#    - pacemaker commit
+#  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup

@@ -1,0 +1,32 @@
+---
+# defaults file for ansible-postfix
+configure_postfix: false  #defines if postfix should be configured
+enable_postfix_domain_rewrite: false  #defines if outgoing email domain should be changed
+enable_postfix_relayhost: false  #defines if a relay host should be used
+postfix_conf_dir: /etc/postfix
+postfix_mynetworks:  #defines which networks are allowed to relay through postfix server...this is defined for all nodes which have roles/postfix applied
+  - 127.0.0.0/8
+#  - 10.0.101.0/24
+#  - 172.16.0.0/16
+#  - 192.168.0.0/16
+postfix_relayhost: '[smtp.example.org]'  #define smtp relay server...define here or globally in group_vars/all
+postfix_rewrite_domain: example.org  #defines what domain all outgoing email should be set to for @domain.example...should be the same as smtp_domain_name
+postfix_use_tls: true  #defines if tls should be used or not
+postfix_tls_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
+postfix_tls_cert_key: /etc/ssl/private/ssl-cert-snakeoil.key
+enable_sender_canonical: false
+postfix_sender_canonical_maps:
+  - "/^(.*@)example.com$/     ${1}example.co.uk"
+
+# Can be set to 'hash' or 'regexp' filetype
+postfix_domain_rewrite_filetype: hash
+
+# set which template to use for generic maps file
+postfix_generic_template: generic.j2
+postfix_altgeneric_maps:
+  - "/^(.*@)something.com$/     ${1}somethingelse.co.uk"
+enable_postifx_dkim: false
+
+# Support the setting of the helo name
+enable_smtp_helo_name: false
+postfix_smtp_helo_name: "{{ ansible_fqdn }}"

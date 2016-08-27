@@ -1,0 +1,6 @@
+[elasticsearch-{{ es_version }}]
+name=Elasticsearch repository for {{ es_version }}.x packages
+baseurl={{ es_repo_url }}/{{ es_version }}/centos
+gpgcheck=1
+gpgkey={{ es_repo_key }}
+enabled=1

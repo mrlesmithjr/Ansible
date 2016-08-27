@@ -1,0 +1,27 @@
+---
+- name: tweaks | tweaking redis memory (Debian)
+  sysctl:
+    name: "vm.overcommit_memory"
+    value: 1
+    state: "present"
+    reload: yes
+  notify: 'restart redis-server'
+  when: ansible_os_family == "Debian"
+
+- name: tweaks | tweaking redis memory (OpenSUSE)
+  sysctl:
+    name: "vm.overcommit_memory"
+    value: 1
+    state: "present"
+    reload: yes
+  notify: 'restart redis'
+  when: ansible_os_family == "openSUSE Leap"
+
+- name: tweaks | tweaking redis memory (RedHat)
+  sysctl:
+    name: "vm.overcommit_memory"
+    value: 1
+    state: "present"
+    reload: yes
+  notify: 'restart redis'
+  when: ansible_os_family == "RedHat"

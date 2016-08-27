@@ -1,5 +1,7 @@
 ---
 # tasks file for ansible-apache2
+- include: set_facts.yml
+
 - include: debian.yml
   tags:
     - install_apache2
@@ -12,6 +14,9 @@
 
 - include: opensuse.yml
   when: ansible_os_family == "openSUSE Leap"
+
+- include: config_apache2.yml
+  when: config_apache2
 
 - include: php.yml
   tags:

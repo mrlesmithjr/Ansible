@@ -16,7 +16,8 @@
     state: "started"
     enabled: yes
   when: >
-        mariadb_server_installed is defined and
+        (mariadb_server_installed is defined and
+        ansible_os_family == "RedHat") and
         (mysql_docker_install is defined and
         not mysql_docker_install) or
         mysql_docker_install is not defined

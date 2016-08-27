@@ -1,0 +1,105 @@
+---
+- name: openstack_neutron_network_nodes | setting kernel networking parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - name: net.ipv4.ip_forward
+      value: 1
+    - name: net.ipv4.conf.all.rp_filter
+      value: 0
+    - name: net.ipv4.conf.default.rp_filter
+      value: 0
+
+- name: openstack_neutron_network_nodes | installing Neutron packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - neutron-plugin-ml2
+    - neutron-plugin-openvswitch-agent
+    - neutron-l3-agent
+    - neutron-dhcp-agent
+    - neutron-metadata-agent
+
+- name: openstack_neutron_network_nodes | configuring Neutron
+  template:
+    src: etc/neutron/neutron.conf.j2
+    dest: /etc/neutron/neutron.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-plugin-openvswitch-agent
+    - restart neutron-l3-agent
+    - restart neutron-dhcp-agent
+    - restart neutron-metadata-agent
+
+- name: openstack_neutron_network_nodes | configuring Neutron ML2 Plugin(s)
+  template:
+    src: etc/neutron/plugins/ml2/ml2_conf.ini.j2
+    dest: /etc/neutron/plugins/ml2/ml2_conf.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-plugin-openvswitch-agent
+    - restart neutron-l3-agent
+    - restart neutron-dhcp-agent
+    - restart neutron-metadata-agent
+
+- name: openstack_neutron_network_nodes | configuring Neutron L3 Agent
+  template:
+    src: etc/neutron/l3_agent.ini.j2
+    dest: /etc/neutron/l3_agent.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-plugin-openvswitch-agent
+    - restart neutron-l3-agent
+    - restart neutron-dhcp-agent
+    - restart neutron-metadata-agent
+
+- name: openstack_neutron_network_nodes | configuring Neutron DHCP Agent
+  template:
+    src: etc/neutron/dhcp_agent.ini.j2
+    dest: /etc/neutron/dhcp_agent.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-plugin-openvswitch-agent
+    - restart neutron-l3-agent
+    - restart neutron-dhcp-agent
+    - restart neutron-metadata-agent
+
+- name: openstack_neutron_network_nodes | configuring Neutron MetaData Agent
+  template:
+    src: etc/neutron/metadata_agent.ini.j2
+    dest: /etc/neutron/metadata_agent.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-plugin-openvswitch-agent
+    - restart neutron-l3-agent
+    - restart neutron-dhcp-agent
+    - restart neutron-metadata-agent
+
+- name: openstack_neutron_network_nodes | Creating OVS Bridge(s)
+  openvswitch_bridge:
+    bridge: "{{ item.bridge_name }}"
+    state: present
+  with_items: openstack_neutron_bridges
+
+- name: openstack_neutron_network_nodes | adding port to Openvswitch Bridge (br-ex)
+  openvswitch_port:
+    bridge: "{{ item.0.bridge_name }}"
+    port: "{{ item.1 }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_bridges
+    - ports

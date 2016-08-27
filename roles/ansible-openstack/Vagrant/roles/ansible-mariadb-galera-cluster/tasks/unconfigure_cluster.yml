@@ -1,0 +1,22 @@
+---
+- name: unconfigure_cluster | unconfiguring galera cluster (Debian)
+  file:
+    path: "/etc/mysql/conf.d/galera.cnf"
+    state: "absent"
+  when: ansible_os_family == "Debian"
+
+- name: unconfigure_cluster | unconfiguring galera cluster (RedHat)
+  template:
+    src: "etc/my.cnf.d/reset.server.cnf.j2"
+    dest: "/etc/my.cnf.d/server.cnf"
+  when: ansible_os_family == "RedHat"
+
+- name: unconfigure_cluster | unconfiguring galera cluster
+  file:
+    path: "/etc/galera_cluster_configured"
+    state: "absent"
+
+- name: unconfigure_cluster | restarting mysql when reconfiguring galera cluster
+  service:
+    name: "mysql"
+    state: "restarted"

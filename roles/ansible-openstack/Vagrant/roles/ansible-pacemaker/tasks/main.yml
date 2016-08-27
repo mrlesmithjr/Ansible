@@ -1,0 +1,4 @@
+---
+# tasks file for ansible-pacemaker
+- include: debian.yml
+  when: ansible_os_family == "Debian"

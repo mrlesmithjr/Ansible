@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  remote_user: root
+  vars:
+    - install_php: true
+  roles:
+    - ansible-apache2
+    - ansible-powerdns

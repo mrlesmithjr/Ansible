@@ -1,0 +1,34 @@
+---
+- name: redhat_elasticsearch | adding elasticsearch repo key
+  rpm_key:
+    key: "{{ es_repo_key }}"
+    state: present
+
+- name: redhat_elasticsearch | adding elasticsearch repo
+  template:
+    src: elasticsearch_repo.j2
+    dest: /etc/yum.repos.d/elasticsearch.repo
+
+- name: redhat | installing elasticsearch
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - elasticsearch
+    - java-1.7.0-openjdk
+  when: ansible_distribution != "Fedora"
+
+- name: redhat_elasticsearch | installing elasticsearch
+  dnf:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - elasticsearch
+    - java
+  when: ansible_distribution == "Fedora"
+
+- name: redhat_elasticsearch | ensuring elasticsearch is running and enabled
+  service:
+    name: "elasticsearch"
+    state: started
+    enabled: yes

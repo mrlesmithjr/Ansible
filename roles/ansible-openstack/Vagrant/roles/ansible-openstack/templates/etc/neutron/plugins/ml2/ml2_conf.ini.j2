@@ -1,0 +1,187 @@
+[agent]
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+#tunnel_types = gre
+tunnel_types = {% for item in openstack_neutron_tunnel_types %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+#tunnel_types = gre
+tunnel_types = {% for item in openstack_neutron_tunnel_types %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+[ml2]
+# (ListOpt) List of network type driver entrypoints to be loaded from
+# the neutron.ml2.type_drivers namespace.
+#
+# type_drivers = local,flat,vlan,gre,vxlan
+# Example: type_drivers = flat,vlan,gre,vxlan
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+type_drivers = {% for item in openstack_neutron_type_drivers %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+type_drivers = {% for item in openstack_neutron_type_drivers %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+type_drivers = {% for item in openstack_neutron_type_drivers %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+# (ListOpt) Ordered list of network_types to allocate as tenant
+# networks. The default value 'local' is useful for single-box testing
+# but provides no connectivity between hosts.
+#
+# tenant_network_types = local
+# Example: tenant_network_types = vlan,gre,vxlan
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+tenant_network_types = {% for item in openstack_neutron_tenant_network_types %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+tenant_network_types = {% for item in openstack_neutron_tenant_network_types %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+tenant_network_types = {% for item in openstack_neutron_tenant_network_types %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+# (ListOpt) Ordered list of networking mechanism driver entrypoints
+# to be loaded from the neutron.ml2.mechanism_drivers namespace.
+# mechanism_drivers =
+# Example: mechanism_drivers = openvswitch,mlnx
+# Example: mechanism_drivers = arista
+# Example: mechanism_drivers = cisco,logger
+# Example: mechanism_drivers = openvswitch,brocade
+# Example: mechanism_drivers = linuxbridge,brocade
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+mechanism_drivers = {% for item in openstack_neutron_mechanism_drivers %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+mechanism_drivers = {% for item in openstack_neutron_mechanism_drivers %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+mechanism_drivers = {% for item in openstack_neutron_mechanism_drivers %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+# (ListOpt) Ordered list of extension driver entrypoints
+# to be loaded from the neutron.ml2.extension_drivers namespace.
+# extension_drivers =
+# Example: extension_drivers = anewextensiondriver
+
+# =========== items for MTU selection and advertisement =============
+# (IntOpt) Path MTU.  The maximum permissible size of an unfragmented
+# packet travelling from and to addresses where encapsulated Neutron
+# traffic is sent.  Drivers calculate maximum viable MTU for
+# validating tenant requests based on this value (typically,
+# path_mtu - max encap header size).  If <=0, the path MTU is
+# indeterminate and no calculation takes place.
+# path_mtu = 0
+
+# (IntOpt) Segment MTU.  The maximum permissible size of an
+# unfragmented packet travelling a L2 network segment.  If <=0,
+# the segment MTU is indeterminate and no calculation takes place.
+# segment_mtu = 0
+
+# (ListOpt) Physical network MTUs.  List of mappings of physical
+# network to MTU value.  The format of the mapping is
+# <physnet>:<mtu val>.  This mapping allows specifying a
+# physical network MTU value that differs from the default
+# segment_mtu value.
+# physical_network_mtus =
+# Example: physical_network_mtus = physnet1:1550, physnet2:1500
+# ======== end of items for MTU selection and advertisement =========
+
+[ml2_type_flat]
+# (ListOpt) List of physical_network names with which flat networks
+# can be created. Use * to allow flat networks with arbitrary
+# physical_network names.
+#
+# flat_networks =
+# Example:flat_networks = physnet1,physnet2
+# Example:flat_networks = *
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+#flat_networks = external
+flat_networks = {% for item in openstack_neutron_flat_networks %}{{ item }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+[ml2_type_vlan]
+# (ListOpt) List of <physical_network>[:<vlan_min>:<vlan_max>] tuples
+# specifying physical_network names usable for VLAN provider and
+# tenant networks, as well as ranges of VLAN tags on each
+# physical_network available for allocation as tenant networks.
+#
+# network_vlan_ranges =
+# Example: network_vlan_ranges = physnet1:1000:2999,physnet2
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+network_vlan_ranges = {% for item in openstack_neutron_vlans %}{{ item.physical_network }}{% for vlan in item.vlans %}:{{ vlan.range }}{% if not loop.last %}{% endif %}{% endfor %}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% endif %}
+
+[ml2_type_gre]
+# (ListOpt) Comma-separated list of <tun_min>:<tun_max> tuples enumerating ranges of GRE tunnel IDs that are available for tenant network allocation
+# tunnel_id_ranges =
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+tunnel_id_ranges = 1:1000
+{% endif %}
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+tunnel_id_ranges = 1:1000
+{% endif %}
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+tunnel_id_ranges = 1:1000
+{% endif %}
+
+[ml2_type_vxlan]
+# (ListOpt) Comma-separated list of <vni_min>:<vni_max> tuples enumerating
+# ranges of VXLAN VNI IDs that are available for tenant network allocation.
+#
+# vni_ranges =
+
+# (StrOpt) Multicast group for the VXLAN interface. When configured, will
+# enable sending all broadcast traffic to this multicast group. When left
+# unconfigured, will disable multicast VXLAN mode.
+#
+# vxlan_group =
+# Example: vxlan_group = 239.1.1.1
+
+[ovs]
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+local_ip = {{ openstack_instance_tunnel_ip }}
+{% endif %}
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+local_ip = {{ openstack_instance_tunnel_ip }}
+#bridge_mappings = external:br-ex
+bridge_mappings = {% for item in openstack_neutron_bridges %}{% for phys_network in item.physical_networks %}{{ phys_network }}:{{ item.bridge_name }}{% if not loop.last %},{% endif %}{% endfor %}{% endfor %}
+
+{% endif %}
+
+[securitygroup]
+# Controls if neutron security group is enabled or not.
+# It should be false when you use nova security group.
+# enable_security_group = True
+{% if inventory_hostname in groups['openstack-compute-nodes'] %}
+enable_security_group = True
+enable_ipset = True
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+{% endif %}
+{% if inventory_hostname in groups['openstack-controller-nodes'] %}
+enable_security_group = True
+enable_ipset = True
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+{% endif %}
+{% if inventory_hostname in groups['openstack-network-nodes'] %}
+enable_security_group = True
+enable_ipset = True
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+{% endif %}
+
+# Use ipset to speed-up the iptables security groups. Enabling ipset support
+# requires that ipset is installed on L2 agent node.
+# enable_ipset = True

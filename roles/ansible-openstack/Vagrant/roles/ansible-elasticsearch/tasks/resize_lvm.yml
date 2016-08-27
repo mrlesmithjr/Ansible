@@ -1,0 +1,37 @@
+---
+  ###### These steps will shutdown elasticsearch, unmount filesystem, resize filesystem and then restart elasticsearch ***USE W/CAUTION***
+- name: extending existing filesystem
+  command: lvextend {{ es_lvextend_options }} /dev/{{ es_vgname }}/{{ es_lvname }}
+
+- name: stopping elasticsearch
+  service:
+    name: elasticsearch
+    state: stopped
+
+- name: unmounting filesystem
+  mount:
+    name: "{{ es_mntp }}"
+    src: "/dev/{{ es_vgname }}/{{ es_lvname }}"
+    fstype: ext4
+    state: unmounted
+
+- name: checking filesystem
+  command: e2fsck -f -y /dev/{{ es_vgname }}/{{ es_lvname }}
+
+- name: resizing filesystem
+  command: resize2fs /dev/{{ es_vgname }}/{{ es_lvname }}
+
+- name: checking filesystem
+  command: e2fsck -y /dev/{{ es_vgname }}/{{ es_lvname }}
+
+- name: mounting filesystem
+  mount:
+    name: "{{ es_mntp }}"
+    src: "/dev/{{ es_vgname }}/{{ es_lvname }}"
+    fstype: ext4
+    state: mounted
+
+- name: restarting elasticsearch
+  service:
+    name: elasticsearch
+    state: started

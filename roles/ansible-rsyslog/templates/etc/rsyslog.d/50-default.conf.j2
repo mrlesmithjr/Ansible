@@ -1,7 +1,18 @@
-# {{ ansible_managed }}
 #  Default rules for rsyslog.
 #
 #			For more information see rsyslog.conf(5) and /etc/rsyslog.conf
+
+# Set our initial redirects here to ensure we catch everything
+{% if syslog_servers is defined %}
+{%   for item in syslog_servers %}
+{%     if item.proto == "tcp" %}
+*.* @@{{ item.name }}:{{ item.port }}
+{%     endif %}
+{%     if item.proto == "udp" %}
+*.* @{{ item.name }}:{{ item.port }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
 
 #
 # First some standard log files.  Log by facility.
@@ -67,13 +78,3 @@ daemon.*;mail.*;\
 	news.err;\
 	*.=debug;*.=info;\
 #	*.=notice;*.=warn	|/dev/xconsole
-{% if syslog_servers is defined %}
-{%   for item in syslog_servers %}
-{%     if item.proto == "tcp" %}
-*.* @@{{ item.name }}:{{ item.port }}
-{%     endif %}
-{%     if item.proto == "udp" %}
-*.* @{{ item.name }}:{{ item.port }}
-{%     endif %}
-{%   endfor %}
-{% endif %}

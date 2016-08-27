@@ -1,0 +1,39 @@
+---
+- name: openstack_horizon | installing Horizon Dashboard
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-dashboard
+
+
+- name: openstack_horizon | configuring Horizon
+  template:
+    src: etc/openstack-dashboard/local_settings.py.j2
+    dest: /etc/openstack-dashboard/local_settings.py
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart apache2
+
+- name: openstack_horizon | removing Ubuntu Horizon theme
+  apt:
+    name: openstack-dashboard-ubuntu-theme
+    state: absent
+  tags:
+    - uninstall_ubuntu_horizon_dashboard
+  when: >
+        openstack_horizon_remove_ubuntu_theme is defined and
+        openstack_horizon_remove_ubuntu_theme
+
+- name: openstack_horizon | installing Ubuntu Horizon theme
+  apt:
+    name: openstack-dashboard-ubuntu-theme
+    state: present
+  tags:
+    - install_ubuntu_horizon_dashboard
+  when: >
+        (openstack_horizon_remove_ubuntu_theme is defined and
+        not openstack_horizon_remove_ubuntu_theme) or
+        openstack_horizon_remove_ubuntu_theme is not defined

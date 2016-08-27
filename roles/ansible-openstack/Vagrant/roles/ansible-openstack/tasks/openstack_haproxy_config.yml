@@ -1,0 +1,96 @@
+---
+- name: openstack_haproxy_config | configuring haproxy
+  template:
+    src: etc/haproxy/haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+  register: haproxy_reconfigured
+  notify: restart haproxy
+
+- name: openstack_haproxy_config | downloading haproxy pacemaker config
+  get_url:
+    url: http://github.com/russki/cluster-agents/raw/master/haproxy
+    dest: /usr/lib/ocf/resource.d/heartbeat/haproxy
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_haproxy_config | setting permissions on haproxy pacemaker file
+  file:
+    path: /usr/lib/ocf/resource.d/heartbeat/haproxy
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_haproxy_config | configuring VIP on pacemaker
+  pacemaker: >
+    primitive failover-ip ocf:heartbeat:IPaddr2
+    params ip="{{ openstack_services_vip }}" cidr_netmask="{{ openstack_services_vip_cidr }}"
+    op monitor interval="1s"
+    commit=yes
+  ignore_errors: yes  #added this to get around having to set this setting using shell...it works the first time and then fails the next becuase it is already set...will investigate..
+  tags:
+    - pacemaker
+  notify:
+    - pacemaker commit
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_haproxy_config | configuring stickiness on pacemaker
+  pacemaker: >
+    rsc_defaults resource-stickiness=100
+  tags:
+    - pacemaker
+  notify:
+    - pacemaker commit
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_haproxy_config | configuring HAProxy monitoring on pacemaker
+  pacemaker: >
+    primitive haproxyLB ocf:heartbeat:haproxy
+    params conffile="/etc/haproxy/haproxy.cfg"
+    op monitor interval="1s"
+  tags:
+    - pacemaker
+  notify:
+    - pacemaker commit
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+- name: openstack_haproxy_config | configuring colocation for HAProxy VIP on pacemaker
+  shell: "crm configure colocation haproxy-with-public-IPS INFINITY: haproxyLB failover-ip"
+  ignore_errors: yes  #added this to get around having to set this setting using shell...it works the first time and then fails the next becuase it is already set...will investigate..
+  tags:
+    - pacemaker
+  when: >
+        openstack_multi_controller_setup is defined and
+        openstack_multi_controller_setup
+
+#- name: openstack_haproxy_config | configuring order for HAProxy VIP on pacemaker
+#  pacemaker: >
+#    order haproxy-after-IP
+#    Mandatory: failover-ip haproxy
+#  tags:
+#    - pacemaker
+#  notify:
+#    - pacemaker commit
+#  when: openstack_multi_controller_setup is defined and openstack_multi_controller_setup
+
+- name: openstack_haproxy_config | restarting haproxy if reconfigured
+  service:
+    name: haproxy
+    state: restarted
+  when: haproxy_reconfigured.changed

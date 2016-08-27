@@ -1,0 +1,176 @@
+---
+- name: openstack_neutron_manage_external_networks | creating external network(s)
+  neutron_network:
+    admin_state_up: "{{ item.1.admin_state_up|default ('true') }}"
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    name: "{{ item.1.name }}"
+    provider_network_type: "{{ item.1.provider_network_type|default ('None') }}"
+    provider_physical_network: "{{ item.1.provider_physical_network|default ('None') }}"
+    provider_segmentation_id: "{{ item.1.provider_segmentation_id|default ('None') }}"
+    region_name: "{{ item.0.region_name|default ('None') }}"
+    router_external: "{{ item.1.router_external|default ('false') }}"
+    shared: "{{ item.1.shared|default ('false') }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_external_networks
+    - networks
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating external network(s)
+  neutron_network:
+    admin_state_up: "{{ item.1.admin_state_up|default ('true') }}"
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    name: "{{ item.1.name }}"
+    provider_network_type: "{{ item.1.provider_network_type|default ('None') }}"
+    provider_physical_network: "{{ item.1.provider_physical_network|default ('None') }}"
+    provider_segmentation_id: "{{ item.1.provider_segmentation_id|default ('None') }}"
+    region_name: "{{ item.0.region_name|default ('None') }}"
+    router_external: "{{ item.1.router_external|default ('false') }}"
+    shared: "{{ item.1.shared|default ('false') }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_external_networks
+    - networks
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating external network(s) subnet(s)
+  neutron_subnet:
+    allocation_pool_end: "{{ item.1.allocation_pool_end|default ('None') }}"
+    allocation_pool_start: "{{ item.1.allocation_pool_start|default ('None') }}"
+    cidr: "{{ item.1.cidr|default ('None') }}"
+    dns_nameservers: "{{ item.1.dns_nameservers|default ('None') }}"
+    enable_dhcp: "{{ item.1.enable_dhcp|default ('true') }}"
+    gateway_ip: "{{ item.1.gateway_ip|default ('None') }}"
+    ip_version: "{{ item.1.ip_version|default ('4') }}"
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    name: "{{ item.1.name }}"
+    network_name: "{{ item.1.network_name }}"
+    no_gateway: "{{ item.1.no_gateway|default ('false') }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_external_networks
+    - subnets
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating external network(s) subnet(s)
+  neutron_subnet:
+    allocation_pool_end: "{{ item.1.allocation_pool_end|default ('None') }}"
+    allocation_pool_start: "{{ item.1.allocation_pool_start|default ('None') }}"
+    cidr: "{{ item.1.cidr|default ('None') }}"
+    dns_nameservers: "{{ item.1.dns_nameservers|default ('None') }}"
+    enable_dhcp: "{{ item.1.enable_dhcp|default ('true') }}"
+    gateway_ip: "{{ item.1.gateway_ip|default ('None') }}"
+    ip_version: "{{ item.1.ip_version|default ('4') }}"
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    name: "{{ item.1.name }}"
+    network_name: "{{ item.1.network_name }}"
+    no_gateway: "{{ item.1.no_gateway|default ('false') }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_external_networks
+    - subnets
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating external router(s)
+  neutron_router:
+    admin_state_up: "{{ item.1.admin_state_up|default ('true') }}"
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    name: "{{ item.1.name }}"
+    region_name: "{{ item.0.region_name|default ('None') }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_external_networks
+    - routers
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating external router(s)
+  neutron_router:
+    admin_state_up: "{{ item.1.admin_state_up|default ('true') }}"
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    name: "{{ item.1.name }}"
+    region_name: "{{ item.0.region_name|default ('None') }}"
+    state: present
+  with_subelements:
+    - openstack_neutron_external_networks
+    - routers
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating router(s) interface(s)
+  neutron_router_interface:
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    region_name: "{{ item.0.region_name|default ('None') }}"
+    router_name: "{{ item.1.router_name }}"
+    state: present
+    subnet_name: "{{ item.1.subnet_name }}"
+  with_subelements:
+    - openstack_neutron_external_networks
+    - router_interfaces
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname == openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")
+
+- name: openstack_neutron_manage_external_networks | creating router(s) interface(s)
+  neutron_router_interface:
+    login_password: "{{ item.0.login_password }}"
+    login_tenant_name: "{{ item.0.login_tenant_name }}"
+    login_username: "{{ item.0.login_username }}"
+    region_name: "{{ item.0.region_name|default ('None') }}"
+    router_name: "{{ item.1.router_name }}"
+    state: present
+    subnet_name: "{{ item.1.subnet_name }}"
+  with_subelements:
+    - openstack_neutron_external_networks
+    - router_interfaces
+  when: >
+        (openstack_keystone_api_master is defined and
+        (inventory_hostname != openstack_keystone_api_master)) and
+        (item.0 is defined and
+        item.1 is defined and
+        item.1.state == "present")

@@ -1,0 +1,84 @@
+---
+- name: openstack_neutron_controller_nodes | creating Neutron DB
+  mysql_db:
+    name: neutron
+    state: present
+  when: mysql_master
+
+- name: openstack_neutron_controller_nodes | creating Neutron DB
+  mysql_db:
+    name: neutron
+    state: present
+  when: not mysql_master
+
+- name: openstack_neutron_controller_nodes | granting permissions to Nova DB
+  mysql_user:
+    name: neutron
+    password: "{{ openstack_neutron_dbpass }}"
+    priv: "neutron.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: mysql_master
+
+- name: openstack_neutron_controller_nodes | granting permissions to Nova DB
+  mysql_user:
+    name: neutron
+    password: "{{ openstack_neutron_dbpass }}"
+    priv: "neutron.*:ALL"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - '%'
+  when: not mysql_master
+
+- name: openstack_neutron_controller_nodes | installing Neutron packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - neutron-server
+    - neutron-plugin-ml2
+    - python-neutronclient
+
+- name: openstack_neutron_controller_nodes | configuring Neutron
+  template:
+    src: etc/neutron/neutron.conf.j2
+    dest: /etc/neutron/neutron.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-server
+
+- name: openstack_neutron_controller_nodes | configuring Neutron ML2 Plugin(s)
+  template:
+    src: etc/neutron/plugins/ml2/ml2_conf.ini.j2
+    dest: /etc/neutron/plugins/ml2/ml2_conf.ini
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart neutron-server
+
+- name: openstack_neutron_controller_nodes | checking if neutron has been populated
+  stat:
+    path: /etc/neutron/neutron_populated
+  register: neutron_is_populated
+  always_run: yes
+
+- name: openstack_neutron_controller_nodes | populating neutron
+  command: su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+  register: neutron_populated
+  when: >
+        not neutron_is_populated.stat.exists and
+        mysql_master
+
+- name: openstack_neutron_controller_nodes | marking neutron as populated
+  file:
+    path: /etc/neutron/neutron_populated
+    state: touch
+  when: neutron_populated.changed

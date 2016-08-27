@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+
+# Allow snmpd ports
+table filter{
+    chain SNMPD-Allowed;
+    chain INPUT {
+        proto udp dport (161) jump SNMPD-Allowed;
+    }
+    chain SNMPD-Allowed {
+        proto udp dport (161) mod state state NEW jump LOGGING-Allowed;
+    }
+}

@@ -1,0 +1,7 @@
+---
+- include: debian_lvm.yml
+  tags:
+    - es_config_lvm
+  when: es_config_lvm is defined and es_config_lvm
+
+- include: debian_elasticsearch.yml

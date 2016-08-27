@@ -1,0 +1,19 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+     - lvm2
+     - scsitools
+     - xfsprogs
+
+- name: debian | checking for scsi devices
+  shell: sg_scan
+  register: scsi_devices
+  changed_when: False
+
+- name: debian | rescanning for new disks added
+  command: /sbin/rescan-scsi-bus
+  changed_when: False
+  when: scsi_devices.stdout != ""

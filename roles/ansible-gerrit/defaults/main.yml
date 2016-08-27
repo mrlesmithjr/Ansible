@@ -7,6 +7,7 @@ gerrit_account_info:
   group: gerrit  #defines usernames groupname
 gerrit_allow_remote_admin: false  #defines if gerrit should allow remote admin capabilities
 gerrit_auth_type: OPENID  #defines authorization type...OPENID, LDAP, LDAP_BIND...
+gerrit_canonical_web_url: http://{{ ansible_hostname }}.{{ pri_domain_name }}:{{ gerrit_http_listen_port }}/
 gerrit_db_info:
   - host: localhost
     type: h2

@@ -37,7 +37,7 @@
         regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         state: present
-      with_items: groups['all']
+      with_items: '{{ play_hosts }}'
 
     - name: updating /etc/hosts
       lineinfile:
@@ -59,6 +59,17 @@
     - role: ansible-postfix
     - role: ansible-snmpd
     - role: ansible-timezone
+
+- name: Setting up DDI
+  hosts: ddi
+  any_errors_fatal: true
+  become: true
+  vars:
+  roles:
+    - role: ansible-apache2
+    - role: ansible-mariadb-mysql
+    - role: ansible-powerdns
+    - role: ansible-phpipam
 
 - name: Setting up ELK
   hosts: logstash

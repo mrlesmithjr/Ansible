@@ -2,8 +2,8 @@
 	basePath = git
 {% if gerrit_vagrant_install is defined and gerrit_vagrant_install %}
   canonicalWebUrl = http://127.0.0.1:{{ gerrit_http_listen_port }}/
-{% elif (gerrit_vagrant_install is defined and not gerrit_vagrant_install) or gerrit_vagrant_install is not defined %}
-	canonicalWebUrl = http://{{ ansible_hostname }}.{{ pri_domain_name }}:{{ gerrit_http_listen_port }}/
+{% elif gerrit_canonical_web_url is defined %}
+	canonicalWebUrl = {{ gerrit_canonical_web_url }}
 {% endif %}
 
 [database]

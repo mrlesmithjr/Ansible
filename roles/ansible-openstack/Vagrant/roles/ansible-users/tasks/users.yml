@@ -1,0 +1,36 @@
+---
+- name: users | managing user accounts
+  user:
+    name: "{{ item.user }}"
+    password: "{{ item.pass }}"
+    shell: "{{ item.shell|default (omit) }}"
+    comment: "{{ item.comment|default (omit) }}"
+    generate_ssh_key: "{{ item.generate_keys|default (omit) }}"
+    system: "{{ item.system_account|default (omit) }}"
+    state: "{{ item.state }}"
+  with_items: '{{ create_users }}'
+
+- name: users | adding users to sudoers
+  lineinfile:
+    dest: "/etc/sudoers"
+    regexp: '^{{ item.user }} ALL'
+    line: '{{ item.user }} ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+    state: present
+  with_items: '{{ create_users }}'
+  when: >
+        item.state == "present" and
+        item.sudo
+
+- name: users | removing users from sudoers
+  lineinfile:
+    dest: "/etc/sudoers"
+    regexp: '^{{ item.user }} ALL'
+    line: '{{ item.user }} ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+    state: absent
+  with_items: '{{ create_users }}'
+  when: >
+        (item.state == "present" and
+        not item.sudo) or
+        item.state == "absent"

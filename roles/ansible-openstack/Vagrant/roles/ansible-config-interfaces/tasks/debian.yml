@@ -1,0 +1,36 @@
+---
+- name: debian | installing pre-req packages
+  apt: name={{ item }} state=present
+  with_items:
+    - bridge-utils
+    - ifenslave
+    - lldpd
+    - vlan
+
+#- name: debian | grabbing interfaces
+#  shell: ifconfig -a | sed 's/[ \t].*//;/^\(lo\|\)$/d'
+#  register: show_interfaces
+
+- name: debian | configuring defined interfaces
+  template: src=etc/network/interfaces.j2 dest=/etc/network/interfaces owner=root group=root mode=0644
+  register: config_interface
+  when: config_network_interfaces is defined and config_network_interfaces
+
+#- name: debian | ensuring interfaces.d folder exists
+#  file: path=/etc/network/interfaces.d state=directory
+
+#- name: debian | configuring defined interfaces
+#  template: src=etc/network/interfaces.d/interfaces.j2 dest=/etc/network/interfaces.d/ifcfg-{{ item.name }} owner=root group=root mode=0644
+#  register: config_interface
+#  with_items: interfaces
+#  when: config_network_interfaces is defined and config_network_interfaces
+
+- name: debian | restarting network interfaces
+  shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
+  with_items: network_interfaces
+  when: (config_network_interfaces is defined and config_network_interfaces) and item.configure and config_interface.changed and (enable_configured_interfaces_after_defining is defined and enable_configured_interfaces_after_defining)
+
+- name: debian | restarting network interfaces
+  shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
+  with_items: network_vlans
+  when: (config_network_vlans is defined and config_network_vlans) and item.configure and config_interface.changed and (enable_configured_interfaces_after_defining is defined and enable_configured_interfaces_after_defining)
