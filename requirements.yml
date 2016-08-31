@@ -1,5 +1,6 @@
 ---
 - src: https://github.com/mrlesmithjr/ansible-aci
+- src: https://github.com/mrlesmithjr/ansible-control-machine
 - src: https://github.com/mrlesmithjr/ansible-apache2
 - src: https://github.com/mrlesmithjr/ansible-apf-firewall
 - src: https://github.com/mrlesmithjr/ansible-apt-cacher-ng

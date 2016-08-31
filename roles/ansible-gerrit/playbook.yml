@@ -3,7 +3,7 @@
   hosts: all
   become: true
   vars:
-    - gerrit_auth_type: OPENID  #defines authorization type...OPENID, LDAP, LDAP_BIND...
+    - gerrit_auth_type: DEVELOPMENT_BECOME_ANY_ACCOUNT
     - gerrit_db_info:
 #        - host: localhost
 #          type: h2

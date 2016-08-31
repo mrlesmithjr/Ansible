@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  become: true
+  connection: local
+  vars:
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-control-machine
+  tasks:
