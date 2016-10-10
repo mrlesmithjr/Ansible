@@ -3,7 +3,10 @@ Role Name
 
 An Ansible role that installs/configures PowerDNS https://www.powerdns.com/ (MySQL cluster ready)
 
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-powerdns.svg)](https://travis-ci.org/mrlesmithjr/ansible-powerdns)
+* IMPORTANT - This repo is now deprecated. PowerDNS roles are now separate.
+
+  - https://github.com/mrlesmithjr/ansible-powerdns-authoritative
+  - https://github.com/mrlesmithjr/ansible-powerdns-recursor
 
 Requirements
 ------------

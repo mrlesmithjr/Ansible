@@ -1,6 +1,6 @@
-[logstash-{{ logstash_version }}]
-name=logstash repository for {{ logstash_version }}.x packages
-baseurl={{ logstash_repo_url }}/{{ logstash_version }}/centos
+[logstash-{{ logstash_major_ver }}]
+name=logstash repository for {{ logstash_major_ver }}.x packages
+baseurl={{ logstash_repo_url }}/{{ logstash_major_ver }}/centos
 gpgcheck=1
 gpgkey={{ logstash_repo_key }}
 enabled=1

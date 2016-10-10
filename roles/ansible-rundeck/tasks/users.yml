@@ -17,5 +17,5 @@
 - name: users | downloading rundeck users ssh public key
   fetch:
     src: "{{ rundeck_framework_ssh_keypath_file }}.pub"
-    dest: "./ssh_pub_keys/{{ rundeck_framework_ssh_user }}@{{ ansible_hostname }}.pub"
+    dest: "{{ rundeck_ssh_keydir }}/{{ rundeck_framework_ssh_user }}@{{ ansible_hostname }}.pub"
     flat: yes

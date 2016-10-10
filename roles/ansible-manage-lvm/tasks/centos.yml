@@ -1,7 +1,7 @@
 ---
 - name: centos | installing lvm2
   yum:
-    name: system-storage-manager
+    name: lvm2
     state: present
 
 - name: centos | installing sg3_utils

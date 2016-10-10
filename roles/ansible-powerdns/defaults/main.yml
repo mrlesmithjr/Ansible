@@ -16,8 +16,14 @@ install_pdns_recursor: true   #defines if recursive caching server is to be inst
 install_pdns_server: true  #defines if authoriative dns server is to be installed
 install_poweradmin: false  #use NSEDIT instead
 nsedit_apiip: 127.0.0.1  #defines the IP address of the NSEDIT API IP to connect to...should be localhost in most cases.
+pdns_also_notify:  #Defines if additional nameservers should be notified of zone updates.
+  configure: false  #Set to true to enable.
+  notify_ips:
+    - '192.168.200.201'
+    - '192.168.200.202'
 pdns_api_key: changeme  #define here or globally in group_vars/all/accounts
 pdns_api_url: "http://127.0.0.1:{{ pdns_webserver_port }}/servers/localhost/zones"
+pdns_auth_port: '53'
 pdns_curl_header: "-H 'X-API-Key: {{ pdns_api_key }}'"
 pdns_db_cluster: false  #defines if backend db for pdns is clustered...define here or in group_vars/group
 pdns_db_host: localhost

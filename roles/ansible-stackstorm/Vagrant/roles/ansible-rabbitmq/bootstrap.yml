@@ -1,0 +1,152 @@
+---
+- hosts: all
+  remote_user: vagrant
+  become: true
+  vars:
+    - host_vars_directory: './host_vars'
+    - host_vars_file: '{{ host_vars_directory }}/{{ inventory_hostname }}.yml'
+    - pri_domain_name: 'vagrant.local'
+    - ssh_key_path: '.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key'
+    - update_host_vars: true
+  roles:
+  tasks:
+    - name: updating apt cache (Debian)
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: installing ansible pre-reqs (Debian)
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python-dev
+        - python-pip
+      when: ansible_os_family == "Debian"
+
+    - name: installing epel repo (RedHat)
+      yum:
+        name: "epel-release"
+        state: present
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+    - name: installing ansible pre-reqs (RedHat)
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python-devel
+        - python-dnf
+        - python-pip
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+    - name: installing ansible pre-reqs (Fedora)
+      dnf:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - gmp-devel
+        - python-crypto
+        - python-devel
+        - python-dnf
+        - python-pip
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution == "Fedora"
+
+    - name: installing ansible
+      pip:
+        name: "ansible"
+        state: present
+
+    - name: ensuring host_vars directory exists
+      file:
+        path: "./host_vars"
+        state: directory
+      delegate_to: localhost
+      run_once: true
+      become: false
+      when: update_host_vars is defined and update_host_vars
+
+    - name: ensuring host file exists in host_vars
+      stat:
+        path: "{{ host_vars_file }}"
+      delegate_to: localhost
+      register: host_var
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars
+
+    - name: creating missing host_vars
+      file:
+        path: "{{ host_vars_file }}"
+        state: touch
+      delegate_to: localhost
+      become: false
+      when: not host_var.stat.exists
+
+    - name: updating ansible_ssh_port
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_port{{ ':' }}"
+        line: "ansible_ssh_port{{ ':' }} 22"
+      delegate_to: localhost
+      become: false
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            (ansible_eth1 is defined or
+            ansible_enp0s8 is defined)
+
+    - name: updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1.ipv4.address }}"
+      delegate_to: localhost
+      become: false
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            ansible_eth1 is defined
+
+    - name: updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8.ipv4.address }}"
+      delegate_to: localhost
+      become: false
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            ansible_enp0s8 is defined
+
+    - name: updating ansible_ssh_key
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_private_key_file{{ ':' }}"
+        line: "ansible_ssh_private_key_file{{ ':' }} {{ ssh_key_path }}"
+      delegate_to: localhost
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars
+
+    - name: ensuring host_vars is yaml formatted
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "---"
+        line: "---"
+        insertbefore: BOF
+      delegate_to: localhost
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars

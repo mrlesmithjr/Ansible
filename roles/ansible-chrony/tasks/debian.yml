@@ -1,0 +1,5 @@
+---
+- name: debian | Installing Chrony
+  apt:
+    name: "chrony"
+    state: "present"

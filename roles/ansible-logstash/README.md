@@ -1,21 +1,24 @@
 Role Name
 =========
 
-An Ansible role that Installs/configures logstash https://www.elastic.co/products/logstash
+An Ansible role that Installs/configures [Logstash]
 
 Requirements
 ------------
 
-Default config if config_logstash=true is to open tcp/udp 10514 because ports < 1024 require root access.  
-Configure clients to send to udp/tcp 10514.  
-You can configure rsyslog to listen on tcp/udp 514 and redirect rsyslog to send to localhost on tcp/udp 10514
-to accomodate clients which cannot send to a different port. See example below.  
-###### /etc/rsyslog.d/50-default.conf
-tcp
+Default config if `config_logstash=true` is to open `tcp/udp 10514` because
+ports < 1024 require root access. Configure clients to send to `udp/tcp 10514`.
+You can configure rsyslog to listen on `tcp/udp 514` and redirect rsyslog
+to send to localhost on `tcp/udp 10514` to accomodate clients which cannot
+send to a different port. See example below:
+
+`/etc/rsyslog.d/50-default.conf`
+
+`tcp`
 ````
 *.* @@localhost:10514
 ````
-udp
+`udp`
 ````
 *.* @localhost:10514
 ````
@@ -31,22 +34,10 @@ When done testing you can tear-down
 ./cleanup.sh
 ````
 
-Docker
-------
-Latest version
-
-````
-docker run -d mrlesmithjr/logstash -f /etc/logstash/conf.d
-````
-Specific version  
-````
-docker run -d mrlesmithjr/logstash:2.2 -f /etc/logstash/conf.d
-````  
-
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-logstash
 clear_logstash_config: false  #defines if logstash_config_dir should be cleared out
@@ -81,14 +72,16 @@ logstash_base_inputs:  #define inputs below to configure
 #    threads: '2'
 #  - type: 'syslog'
 #    port: '514'  #reminder....ports < 1024 require root access..
-logstash_deb_repo: 'deb {{ logstash_repo_url }}/{{ logstash_version }}/debian stable main'
-logstash_folder: '/opt/logstash'
 logstash_base_outputs:
   - output: 'redis'
     output_host: '{{ logstash_server_fqdn }}'
+logstash_deb_repo: 'deb https://packages.elastic.co/logstash/{{ logstash_major_ver }}/debian stable main'
+logstash_folder: '/opt/logstash'
 logstash_log_dir: '/var/log/logstash'
+logstash_major_ver: '2.4'  # Define major version to install
+logstash_minor_ver: '1:2.4.0-1'  # Define minor version to install
 logstash_plugins:
-  - 'logstash-codec-nmap'
+#  - 'logstash-codec-nmap'
   - 'logstash-filter-elasticsearch'
   - 'logstash-filter-json_encode'
   - 'logstash-filter-translate'
@@ -99,11 +92,8 @@ logstash_plugins:
 logstash_repo_key: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
 logstash_repo_url: 'http://packages.elastic.co/logstash'
 logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server to send to...fqdn or localhost
-logstash_version: '2.2'
-#logstash_version: '2.1'
-#logstash_version: '1.5'
 pri_domain_name: 'example.org'
-````
+```
 
 Dependencies
 ------------
@@ -113,8 +103,8 @@ None
 Example Playbook
 ----------------
 
-#### GitHub
-````
+* GitHub
+```
 ---
 - hosts: all
   sudo: true
@@ -123,9 +113,9 @@ Example Playbook
   roles:
     - role: ansible-logstash
   tasks:
-````
-#### Galaxy
-````
+```
+* Galaxy
+```
 ---
 - hosts: all
   sudo: true
@@ -134,7 +124,7 @@ Example Playbook
   roles:
     - role: mrlesmithjr.logstash
   tasks:
-````
+```
 
 License
 -------
@@ -148,3 +138,5 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Logstash]: <https://www.elastic.co/products/logstash>

@@ -1,0 +1,96 @@
+---
+- include: debian_pdns_server.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat_pdns_server.yml
+  when: ansible_os_family == "RedHat"
+
+- name: pdns_server | configuring powerdns
+  template:
+    src: "etc/powerdns/pdns.conf.j2"
+    dest: "/etc/powerdns/pdns.conf"
+    owner: "root"
+    group: "root"
+  register: "pdns_configured"
+
+- name: pdns_server | ensuring pdns service is enabled
+  service:
+    name: "pdns"
+    enabled: yes
+
+- name: pdns_server | restarting powerdns
+  service:
+    name: "pdns"
+    state: "restarted"
+    sleep: 10
+  when: pdns_configured.changed
+
+- name: pdns_server | creating powerdns db
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: "present"
+  when: not pdns_db_cluster
+
+- name: pdns_server | creating powerdns db
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: "present"
+  run_once: true
+  when: pdns_db_cluster
+
+- name: pdns_server | creating powerdns user
+  mysql_user:
+    name: "{{ pdns_db_user }}"
+    password: "{{ pdns_db_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    state: present
+  when: not pdns_db_cluster
+
+- name: pdns_server | creating powerdns user
+  mysql_user:
+    name: "{{ pdns_db_user }}"
+    password: "{{ pdns_db_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    state: present
+  run_once: true
+  when: pdns_db_cluster
+
+- name: pdns_server | copying db schema file
+  copy:
+    src: "db_schema"
+    dest: "/tmp"
+
+- name: pdns_server | checking for existing db schema import
+  stat:
+    path: "/var/log/db_schema_imported"
+  register: "db_schema_imported"
+
+- name: pdns_server | importing db schema
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: "import"
+    target: "/tmp/db_schema"
+  when: >
+        not pdns_db_cluster and
+        not db_schema_imported.stat.exists
+
+- name: pdns_server | importing db schema
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: "import"
+    target: "/tmp/db_schema"
+  run_once: true
+  when: >
+        pdns_db_cluster and
+        not db_schema_imported.stat.exists
+
+- name: pdns_server | marking db schema as imported
+  file:
+    path: "/var/log/db_schema_imported"
+    state: "touch"
+  when: not db_schema_imported.stat.exists
+
+- name: pdns_server | ensuring pdns server is running and enabled on boot
+  service:
+    name: "pdns"
+    state: "started"

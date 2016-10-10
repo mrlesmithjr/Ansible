@@ -9,14 +9,15 @@
     repo: "{{ logstash_deb_repo }}"
     state: "present"
 
-- name: debian | installing logstash and java
+- name: debian | installing java
   apt:
-    name: "{{ item }}"
-    state: "latest"
-    force: yes
-  with_items:
-    - 'logstash'
-    - 'default-jre-headless'
+    name: "default-jre-headless"
+    state: "present"
+
+- name: debian | Installing Logstash
+  apt:
+    name: "logstash={{ logstash_minor_ver }}"
+    state: "present"
   notify: "init logstash"
 
 - name: debian | checking for logstash-web

@@ -1,0 +1,13 @@
+---
+- name: packs | checking status of packs
+  shell: "st2 action list --pack={{ item.name }} | grep 'No matching items found'"
+  register: "pack_status"
+  with_items: '{{ stackstorm_packs }}'
+  changed_when: false
+  failed_when: pack_status.rc > 1
+
+- name: packs | installing packs
+  command: "st2 run packs.install packs={{ item.item.name }}"
+  with_items: '{{ pack_status.results }}'
+  when: >
+        item.rc == 0

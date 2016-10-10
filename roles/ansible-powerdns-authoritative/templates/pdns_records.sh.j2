@@ -1,0 +1,6 @@
+#!/bin/bash
+{% if pdns_records is defined %}
+{%   for item in pdns_records %}
+curl -X PATCH --data '{"rrsets": [ {"name": "{{ item.name }}.{{ item.zone }}", "type": "{{ item.type }}", "changetype": "{{ item.changetype }}", "records": [ {"content": "{{ item.content }}", "disabled": {{ item.disabled|lower }}, "name": "{{ item.name }}.{{ item.zone }}", "ttl": {{ item.ttl }}, "type": "{{ item.type }}"{% if item.type == "A" or item.type == "AAAA" %}, "set-ptr": true{% endif %}, "priority": "{{ item.priority }}"} ] } ]}' {{ pdns_curl_header }} {{ pdns_api_url }}/{{ item.zone }}
+{%    endfor %}
+{% endif %}

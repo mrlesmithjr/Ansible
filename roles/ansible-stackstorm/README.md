@@ -85,6 +85,15 @@ Example Playbook
     - role: ansible-stackstorm
   tasks:
 ````
+Vagrant
+-------
+Spin up StackStorm using Vagrant.
+```
+cd Vagrant
+vagrant up
+```
+You should now be able to connet to https://192.168.202.200
+`st2admin\Ch@ngeMe`
 
 License
 -------

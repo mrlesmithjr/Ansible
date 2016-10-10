@@ -1,0 +1,12 @@
+---
+- hosts: test-nodes
+  become: true
+  vars:
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-mongodb
+    - role: ansible-nginx
+    - role: ansible-postgresql
+    - role: ansible-rabbitmq
+    - role: ansible-stackstorm
+  tasks:

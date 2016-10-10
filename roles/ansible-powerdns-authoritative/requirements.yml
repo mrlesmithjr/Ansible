@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-mysql.git
+- src: https://github.com/mrlesmithjr/ansible-mariadb-galera-cluster.git
+- src: https://github.com/mrlesmithjr/ansible-powerdns-authoritative.git

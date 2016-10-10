@@ -53,4 +53,5 @@ ansible_versions:
       - 'pysphere'
       - 'pyvmomi'
 ansible_virtualenv_dir: '/opt/ansible_virtualenvs'
+clone_ansible_roles: false
 easy_install_pip: false

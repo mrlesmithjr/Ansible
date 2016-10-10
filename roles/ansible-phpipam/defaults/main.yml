@@ -13,7 +13,7 @@ phpipam_db_user: phpipam  #define db user or define in group_vars/group
 phpipam_define_cron_jobs: false  #defines if cron jobs for scanning and etc. should be defined.
 phpipam_download: 'https://sourceforge.net/projects/phpipam/files/{{ phpipam_download_file }}'
 phpipam_download_file: 'phpipam-{{ phpipam_version }}.tar'
-phpipam_install_from_git: false  #defines if phpIPAM is pulled from https://github.com/phpipam/phpipam to install
+phpipam_install_from_git: true  #defines if phpIPAM is pulled from https://github.com/phpipam/phpipam to install
 phpipam_patch_discovery: false  #defines if current discovery functionality should be patched
 phpipam_patch_email: false  #defines if current email test functionality should be patched
 phpipam_pre_load_db: true

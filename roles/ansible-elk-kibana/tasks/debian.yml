@@ -1,6 +1,15 @@
 ---
-- name: debian | configuring kibana service
-  template:
-    src: etc/init/kibana.conf.j2
-    dest: /etc/init/kibana.conf
-  notify: restart kibana
+- name: debian | Adding Elasticsearch Repo Key
+  apt_key:
+    url: "{{ kibana_debian_repo_info.key }}"
+    state: "present"
+
+- name: debian | Adding Kibana Repo
+  apt_repository:
+    repo: "{{ kibana_debian_repo_info.repo }}"
+    state: "present"
+
+- name: debian | Installing Kibana
+  apt:
+    name: "kibana={{ kibana_version }}"
+    state: "present"

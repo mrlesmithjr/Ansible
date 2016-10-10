@@ -1,0 +1,27 @@
+---
+# defaults file for ansible-chrony
+chrony_ntp_servers:
+  - server: '0.debian.pool.ntp.org'
+    options:
+      - option: 'offline'
+        val: []
+      - option: 'minpoll'
+        val: 8
+  - server: '1.debian.pool.ntp.org'
+    options:
+      - option: 'offline'
+        val: []
+      - option: 'minpoll'
+        val: 8
+  - server: '2.debian.pool.ntp.org'
+    options:
+      - option: 'offline'
+        val: []
+      - option: 'minpoll'
+        val: 8
+  - server: '3.debian.pool.ntp.org'
+    options:
+      - option: 'offline'
+        val: []
+      - option: 'minpoll'
+        val: 8

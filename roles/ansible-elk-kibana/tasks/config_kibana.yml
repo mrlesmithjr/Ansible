@@ -1,0 +1,6 @@
+---
+- name: kibana | configuring kibana
+  template:
+    src: "kibana.yml.j2"
+    dest: "{{ kibana_dir }}/config/kibana.yml"
+  notify: "restart kibana"

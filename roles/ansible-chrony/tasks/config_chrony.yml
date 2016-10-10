@@ -1,0 +1,9 @@
+---
+- name: config_chrony | Configuring Chrony
+  template:
+    src: "etc/chrony/chrony.conf.j2"
+    dest: "/etc/chrony/chrony.conf"
+    owner: "root"
+    group: "root"
+  notify:
+    - 'restart chrony'

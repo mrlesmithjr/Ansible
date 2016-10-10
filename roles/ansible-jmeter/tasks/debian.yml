@@ -1,0 +1,6 @@
+---
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ jmeter_debian_pre_reqs }}'

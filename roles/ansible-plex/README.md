@@ -32,7 +32,7 @@ plex_smb_mounts: [] #define smb mounts to connect to on plex_smb_server...define
 #  - music
 #  - tv_shows
 plex_smb_server: []  #define smb server to mount shares from...defined in group_vars/plex-servers
-plex_version: 0.9.12.18.1520-6833552  #define version from https://plex.tv to download and install
+plex_version: '1.2.2.2857-d34b464'  #define version from https://plex.tv to download and install
 ````
 Dependencies
 ------------

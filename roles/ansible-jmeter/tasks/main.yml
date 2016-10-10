@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-jmeter
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: setup.yml

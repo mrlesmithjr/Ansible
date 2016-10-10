@@ -1,0 +1,42 @@
+{% if ansible_distribution == "Ubuntu" %}
+Unattended-Upgrade::Allowed-Origins {
+{%   for item in debian_autoupdates_ubuntu_allowed_origins %}
+	"${distro_id}:${distro_codename}-{{ item }}";
+{%   endfor %}
+};
+{% endif %}
+{% if ansible_distribution == "Debian" %}
+Unattended-Upgrade::Origins-Pattern {
+{%   for item in debian_autoupdates_debian_allowed_origins %}
+"o=Debian,n=${distro_codename},l=Debian-{{ item }}";
+{%   endfor %}
+{% endif %}
+
+Unattended-Upgrade::Package-Blacklist {
+{% if enable_debian_autoupdates_blacklist %}
+{%   for item in debian_autoupdates_blacklist %}
+  "{{ item }}";
+{%   endfor %}
+{% endif %}
+};
+
+Unattended-Upgrade::AutoFixInterruptedDpkg "{{ debian_autoupdates_autofix_interrupted|lower }}";
+
+Unattended-Upgrade::MinimalSteps "{{ debian_autoupdates_minimalsteps|lower }}";
+
+Unattended-Upgrade::InstallOnShutdown "{{ debian_autoupdates_installonshutdown|lower }}";
+
+{% if enable_debian_autoupdates_email %}
+Unattended-Upgrade::Mail "{{ debian_autoupdates_email_address }}";
+Unattended-Upgrade::MailOnlyOnError "{{ debian_autoupdates_email_on_error_only|lower }}";
+{% endif %}
+
+Unattended-Upgrade::Remove-Unused-Dependencies "{{ debian_autoupdates_remove_unused_dependencies|lower }}";
+
+Unattended-Upgrade::Automatic-Reboot "{{ debian_autoupdates_auto_reboot|lower }}";
+
+Unattended-Upgrade::Automatic-Reboot-Time "{{ debian_autoupdates_auto_reboot_time }}";
+
+{% if enable_debian_autoupdates_bandwidth_limit %}
+Acquire::http::Dl-Limit "{{ debian_autoupdates_bandwidth_limit }}";
+{% endif %}

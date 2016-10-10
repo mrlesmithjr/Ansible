@@ -4,18 +4,15 @@
     name: python-pip
     state: present
 
-# remove old version install via pip module
-#- pip: name=elasticsearch-curator state=absent
-
 - name: adding curator apt repo
   apt_repository:
-    repo: "deb http://packages.elasticsearch.org/curator/3/debian stable main"
-    state: present
+    repo: "{{ es_curator_debian_repo }}"
+    state: "present"
 
 - name: installing elasticsearch curator
   apt:
-    name: python-elasticsearch-curator
-    state: present
+    name: "python-elasticsearch-curator"
+    state: "latest"
 
 - name: install curator crontab
   cron:
@@ -28,6 +25,7 @@
     state: present
   tags:
     - cron
+  when: es_curator_version == "3"
 
 - name: install curator crontab
   cron:
@@ -40,3 +38,49 @@
     state: present
   tags:
     - cron
+  when: es_curator_version == "3"
+
+- name: Remove Curator Cron
+  cron:
+    name: "es_curator_delete"
+    minute: "0"
+    hour: "10"
+    user: "root"
+    job: '/usr/local/bin/curator --host {{ es_fqdn }} delete indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_max_keep_days | default(360) }}'
+    cron_file: "es_curator_delete"
+    state: "absent"
+  tags:
+    - cron
+  when: es_curator_version != "3"
+
+- name: Remove Curator Cron
+  cron:
+    name: "es_curator_close"
+    minute: "45"
+    hour: "9"
+    user: "root"
+    job: '/usr/local/bin/curator --host {{ es_fqdn }} close indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_close_after_days | default(14) }}'
+    cron_file: "es_curator_close"
+    state: "absent"
+  tags:
+    - cron
+  when: es_curator_version != "3"
+
+- name: Configuring Curator
+  template:
+    src: "curator/{{ item }}.j2"
+    dest: "/opt/{{ item }}"
+  with_items:
+    - 'curator_actions.yml'
+    - 'curator_config.yml'
+  when: es_curator_version != "3"
+
+- name: install curator crontab
+  cron:
+    name: "es_curator"
+    special_time: "daily"
+    user: "www-data"
+    job: '/usr/local/bin/curator --config /opt/curator_config.yml /opt/curator_actions.yml'
+    cron_file: "es_curator"
+    state: "present"
+  when: es_curator_version != "3"

@@ -1,0 +1,35 @@
+---
+- name: remove_legacy_install | Checking For Legacy Install
+  stat:
+    path: "/etc/init/kibana.conf"
+  register: "legacy_kibana"
+
+- name: remove_legacy_install | Stopping Kibana Service
+  service:
+    name: "kibana"
+    state: "stopped"
+  when: legacy_kibana.stat.exists
+
+- name: remove_legacy_install | Disabling Kibana Service
+  service:
+    name: "kibana"
+    enabled: no
+  when: legacy_kibana.stat.exists
+
+- name: remove_legacy_install | Removing Kibana Config
+  file:
+    path: "/etc/init/kibana.conf"
+    state: "absent"
+  when: legacy_kibana.stat.exists
+
+- name: remove_legacy_install | Remove Kibana User
+  user:
+    name: "kibana"
+    state: "absent"
+  when: legacy_kibana.stat.exists
+
+- name: remove_legacy_install | Removing Legacy Kibana Folder
+  file:
+    path: "{{ kibana_dir }}"
+    state: "absent"
+  when: legacy_kibana.stat.exists

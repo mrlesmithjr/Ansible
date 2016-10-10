@@ -16,21 +16,29 @@ Role Variables
 ````
 ---
 # defaults file for ansible-elk-kibana
-kibana_dir: /opt
-kibana_dl_dir: /opt
-kibana_dl_file: "kibana-{{ kibana_version }}-linux-x64"
-kibana_dl_url: "https://download.elastic.co/kibana/kibana"
+config_kibana: true  #Defines if Kibana should be configured
+kibana_dir: '/opt/kibana'
+kibana_debian_repo_info:
+  key: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
+  repo: 'deb http://packages.elastic.co/kibana/{{ kibana_major_version }}/debian stable main'
 kibana_docker_elasticsearch_container_name: elasticsearch  #defines the Docker container name to link to for elasticsearch
 kibana_docker_install: false  #defines if Kibana is being installed as a Docker container
 kibana_elasticsearch_url: localhost  #defines where to connect to elasticsearch for kibana...default is localhost...change to fit environment requirements...define here or in group_vars/group
 kibana_fix_babelcache_perms: false   #defines if babelcache permissions need to be fixed...not always needed.
-kibana_index: .kibana
 kibana_host: 0.0.0.0  #defines Kibana host...should remain as 0.0.0.0 unless other requirements are required...research before changing
-kibana_log: /var/log/kibana.log
-kibana_log_rotate_count: 5
-kibana_log_rotate_interval: daily
 kibana_port: 5601
-kibana_version: 4.4.0
+kibana_major_version: '4.6'
+kibana_version: '4.6.1'
+remove_legacy_kibana_install: true
+
+## Below are legacy settings prior to package installer method...will be removed..
+# kibana_dl_dir: /opt
+# kibana_dl_file: "kibana-{{ kibana_version }}-linux-x86_64"
+# kibana_dl_url: "https://download.elastic.co/kibana/kibana"
+# kibana_index: .kibana
+# kibana_log: /var/log/kibana.log
+# kibana_log_rotate_count: 5
+# kibana_log_rotate_interval: daily
 ````
 
 Dependencies

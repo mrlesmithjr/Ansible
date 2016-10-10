@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+  vars:
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+  tasks:
+    - name: updating /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
+        line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
+        state: present
+      with_items: groups['all']
+      
+- hosts: all
+  become: true
+  vars:
+    - config_rabbitmq_ha: true
+    - enable_rabbitmq_clustering: true
+    - pri_domain_name: 'test.vagrant.local'
+    - rabbitmq_master: 'node0'
+  roles:
+    - role: ansible-rabbitmq
+  tasks:

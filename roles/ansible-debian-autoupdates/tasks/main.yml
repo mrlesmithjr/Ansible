@@ -1,0 +1,19 @@
+---
+# tasks file for ansible-debian-autoupdates
+- name: main | installing unattended-upgrades packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ debian_autoupdates_packages }}'
+
+- name: main | configuring unattended-upgrades
+  template:
+    src: "etc/apt/apt.conf.d/{{ item }}.j2"
+    dest: "/etc/apt/apt.conf.d/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  with_items:
+    - '02periodic'
+    - '20auto-upgrades'
+    - '50unattended-upgrades'

@@ -10,7 +10,11 @@ es_config_path_data: false  #defines if elasticsearch should be configured to st
 es_config_unicast: false  #defines if unicast discovery should be configured...ES 2.x
 es_config_unicast_group: 'es-cluster-nodes'  #define inventory group to configure unicast discovery.
 es_curator_close_after_days: 14  #defines the number of days before closing indexes
+es_curator_debian_repo: 'deb http://packages.elastic.co/curator/{{ es_curator_version }}/debian stable main'
+es_curator_elasticsearch_hosts: # Define the host(s) to run curator against
+  - 'localhost'
 es_curator_max_keep_days: 30  #defines the max number of days to keep indexes
+es_curator_version: 4
 es_data_node: true  #defines if node should be a data node in the cluster...default is true...define here or in group_vars/group
 es_debian_repo: 'deb http://packages.elastic.co/elasticsearch/{{ es_version }}/debian stable main'
 es_disks:  #define disk device names to add to LVM VG if using

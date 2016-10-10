@@ -1,0 +1,40 @@
+---
+- name: config_db | granting db permissions for user {{ stackstorm_db_info.user }}
+  become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
+  postgresql_user:
+    name: "{{ stackstorm_db_info.user }}"
+    password: "{{ stackstorm_db_info.password }}"
+    role_attr_flags: "CREATEDB"
+    encrypted: yes
+    state: present
+
+- name: config_db | creating db {{ stackstorm_db_info.db }}
+  become_user: "postgres"
+  vars:
+    ansible_ssh_pipelining: true
+  postgresql_db:
+    name: "{{ stackstorm_db_info.db }}"
+    owner: "{{ stackstorm_db_info.user }}"
+    state: present
+
+- name: config_db | checking if db {{ stackstorm_db_info.db }} has been populated
+  stat:
+    path: "/etc/mistral/.db_populated"
+  register: "mistral_db_populated_check"
+
+- name: config_db | populating db {{ stackstorm_db_info.db }}
+  command: "/opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf upgrade head"
+  register: "mistral_db_populated"
+  when: not mistral_db_populated_check.stat.exists
+
+- name: config_db | registering mistral actions
+  command: "/opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf populate"
+  when: mistral_db_populated.changed
+
+- name: config_db | marking db {{ stackstorm_db_info.db }} as populated
+  file:
+    path: "/etc/mistral/.db_populated"
+    state: touch
+  when: mistral_db_populated.changed

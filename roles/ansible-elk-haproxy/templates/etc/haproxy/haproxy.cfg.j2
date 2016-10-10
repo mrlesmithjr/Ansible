@@ -1,74 +1,51 @@
-# {{ ansible_managed }}
-#
 global
 {% if (enable_haproxy_remote_syslog is defined and not enable_haproxy_remote_syslog) or enable_haproxy_remote_syslog is not defined %}
 {%   if (haproxy_docker_install is defined and not haproxy_docker_install) or haproxy_docker_install is not defined %}
-  log /dev/log    local0
-  log /dev/log    local1 notice
+    log /dev/log local0
+    log /dev/log local1 notice
 {%   endif %}
 {% endif %}
 {% if (enable_haproxy_remote_syslog is defined and enable_haproxy_remote_syslog) and syslog_servers is defined %}
-# Remote syslog servers
+    # Remote syslog servers
 {%   for item in syslog_servers %}
-  log {{ item.name }}:{{ item.port }} local0
+    log {{ item.name }}:{{ item.port }} local0
 {%   endfor %}
-  #log-send-hostname
+    #log-send-hostname
 {% endif %}
-  chroot /var/lib/haproxy
-  user haproxy
-  group haproxy
 {% if haproxy_docker_install is defined and not haproxy_docker_install %}
-  daemon
+    daemon
 {% endif %}
-  maxconn 40000
-  spread-checks 3
-  stats socket {{ haproxy_socket_file }} mode 660 level admin
-  stats timeout 30s
+{% for item in haproxy_global %}
+    {{ item }}
+{% endfor %}
+    # Default SSL material locations
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
 
-  # Default SSL material locations
-  ca-base /etc/ssl/certs
-  crt-base /etc/ssl/private
-
-  # Default ciphers to use on SSL-enabled listening sockets.
-  # For more information, see ciphers(1SSL).
-  ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
-  ssl-default-bind-options no-sslv3
+    # Default ciphers to use on SSL-enabled listening sockets.
+    # For more information, see ciphers(1SSL).
+    ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
+    ssl-default-bind-options no-sslv3
 
 defaults
-  log     global
-  mode    tcp
-  maxconn 40000
-  option  httplog
-  option  dontlognull
-  option redispatch
-  option tcp-smart-accept
-  option tcp-smart-connect
-  retries 3
-  timeout queue 5000
-  timeout connect 50000
-  timeout client 50000
-  timeout server 50000
-  errorfile 400 /etc/haproxy/errors/400.http
-  errorfile 403 /etc/haproxy/errors/403.http
-  errorfile 408 /etc/haproxy/errors/408.http
-  errorfile 500 /etc/haproxy/errors/500.http
-  errorfile 502 /etc/haproxy/errors/502.http
-  errorfile 503 /etc/haproxy/errors/503.http
-  errorfile 504 /etc/haproxy/errors/504.http
+{% for item in haproxy_defaults %}
+    {{ item }}
+{% endfor %}
 
 {% if enable_haproxy_admin_page %}
 userlist STATSUSERS
-  group admin users admin
-  user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
+    group admin users admin
+    user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
 
-listen admin_page 0.0.0.0:{{ haproxy_admin_port }}
-  mode http
-  stats enable
-  stats refresh 60s
-  stats uri /
-  acl AuthOkay_ReadOnly http_auth(STATSUSERS)
-  acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
-  stats http-request auth realm admin_page unless AuthOkay_ReadOnly
+listen stats
+    bind *:{{ haproxy_admin_port }}
+    mode http
+    stats enable
+    stats refresh 60s
+    stats uri /
+    acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+    acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+    stats http-request auth realm stats unless AuthOkay_ReadOnly
 {% endif %}
 
 {% if haproxy_configs is defined and haproxy_configs != 'None' %}

@@ -36,12 +36,14 @@
   file:
     path: "{{ ansible_roles_dir }}"
     state: "directory"
+  when: clone_ansible_roles
 
 - name: setup | Cloning Ansible Repos to {{ ansible_roles_dir }}
   git:
     repo: "{{ item.repo }}"
     dest: "{{ ansible_roles_dir }}/{{ item.dest }}"
   with_items: '{{ ansible_roles }}'
+  when: clone_ansible_roles
 
 - name: setup | Ensuring Ansible Playbooks Directory Exists {{ ansible_playbooks_dir }}
   file:

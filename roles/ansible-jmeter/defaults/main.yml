@@ -1,0 +1,15 @@
+---
+# defaults file for ansible-jmeter
+jmeter_client_rmi_port: 0  #Define client local port to listen on...default is 0=random
+jmeter_debian_pre_reqs:
+  - 'default-jre'
+  - 'unzip'
+jmeter_dl_file: 'apache-jmeter-{{ jmeter_version }}'
+jmeter_dl_path: '/opt'
+jmeter_dl_url: 'http://apache.mirror.anlx.net/jmeter/binaries'
+jmeter_plugins_dl_file: 'JMeterPlugins-Standard-{{ jmeter_plugins_version }}'
+jmeter_plugins_dl_path: '{{ jmeter_dl_path }}/{{ jmeter_dl_file }}/bin'
+jmeter_plugins_dl_url: 'http://jmeter-plugins.org/downloads/file'
+jmeter_plugins_version: 1.3.0
+jmeter_server_rmi_port: 4000  #define server local port to listen on...default is 4000
+jmeter_version: 2.13

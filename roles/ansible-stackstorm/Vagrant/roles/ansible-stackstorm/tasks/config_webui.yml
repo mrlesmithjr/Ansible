@@ -1,0 +1,38 @@
+---
+- name: config_webui | creating webui login
+  htpasswd:
+    path: "{{ stackstorm_webui_login_info.password_file }}"
+    name: "{{ stackstorm_webui_login_info.user }}"
+    password: "{{ stackstorm_webui_login_info.password }}"
+    state: present
+
+- name: config_webui | ensuring {{ stackstorm_ssl_info.cert_dir }} directory exists
+  file:
+    path: "{{ stackstorm_ssl_info.cert_dir }}"
+    state: directory
+
+- name: config_webui | generating ssl certs
+  command: "openssl req -x509 -newkey rsa:2048 -keyout {{ stackstorm_ssl_info.cert_dir }}/st2.key -out {{ stackstorm_ssl_info.cert_dir }}/st2.crt -days {{ stackstorm_ssl_info.cert_days }} -nodes -subj \"{{ stackstorm_ssl_info.cert_info }}\""
+  args:
+    creates: "{{ stackstorm_ssl_info.cert_dir }}/st2.crt"
+
+- name: config_webui | removing nginx default website
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+
+- name: config_webui | configuring stackstorm nginx site
+  template:
+    src: "etc/nginx/sites-available/st2.conf.j2"
+    dest: "/etc/nginx/sites-available/st2.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nginx
+
+- name: config_webui | enabling stackstorm nginx site
+  file:
+    src: "/etc/nginx/sites-available/st2.conf"
+    dest: "/etc/nginx/sites-enabled/st2.conf"
+    state: link

@@ -12,6 +12,9 @@
 - name: debian_client | adding brightbox ruby repository
   apt_repository:
     repo: 'ppa:brightbox/ruby-ng'
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')
 
 - name: debian_client | installing pre-reqs and sensu
   apt:
@@ -24,3 +27,13 @@
     name: "{{ item }}"
     enabled: yes
   with_items: sensu_client_services
+
+- name: debian_client | Disabling Sensu Server Service
+  service:
+    name: "{{ item }}"
+    enabled: no
+    state: "stopped"
+  with_items:
+    - 'sensu-api'
+    - 'sensu-server'
+  when: not sensu_server

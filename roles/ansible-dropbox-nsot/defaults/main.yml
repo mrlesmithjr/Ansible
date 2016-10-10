@@ -1,0 +1,14 @@
+---
+# defaults file for ansible-dropbox-nsot
+dropbox_nsot_conf_file: '/etc/nsot.conf.py'
+dropbox_nsot_debian_pre_reqs:
+  - 'build-essential'
+  - 'git'
+  - 'libffi-dev'
+  - 'libssl-dev'
+  - 'python-dev'
+dropbox_nsot_host: '0.0.0.0'
+dropbox_nsot_port: 8990
+dropbox_nsot_python_modules:
+  - 'mrproxy'
+  - 'pynsot'

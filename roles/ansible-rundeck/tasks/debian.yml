@@ -4,15 +4,27 @@
     update_cache: yes
     cache_valid_time: 86400
 
-- name: debian | installing pre-reqs
+- name: debian | installing pre-reqs for rundeck
   apt:
     name: "{{ item }}"
     state: "present"
   with_items:
-    - 'python-pip'
-    - 'python-dev'
     - 'default-jre-headless'
-    - 'software-properties-common'
+
+- name: debian | installing pre-reqs for ansible
+  apt:
+   name: "{{ item }}"
+   state: "present"
+  with_items:
+   - 'python-pip'
+   - 'python-dev'
+   - 'software-properties-common'
+   - 'gcc'
+   - 'libyaml-dev'
+   - 'libpython2.7-dev'
+   - 'libffi-dev'
+   - 'libssl-dev'
+  when: rundeck_install_ansible is defined and rundeck_install_ansible
 
 - name: debian | downloading rundeck
   get_url:
@@ -28,3 +40,5 @@
   pip:
     name: "ansible"
     state: "present"
+    version: "{{ rundeck_install_ansible_version }}"
+  when: rundeck_install_ansible is defined and rundeck_install_ansible

@@ -1,5 +1,14 @@
 ---
-- name: Set MariaDB root password
-  command: "debconf-set-selections <<< 'mysql-server-10.0 mysql-server/root_password password {{ mysql_root_password }}'"
-  command: "debconf-set-selections <<< 'mysql-server-10.0 mysql-server/root_password_again password {{ mysql_root_password }}'"
-  changed_when: false # Never report as changed
+- name: mysql_root_pw | setting
+  debconf:
+    name: "mariadb-server-{{ mariadb_version }}"
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "password"
+  changed_when: false
+  with_items:
+    - question: 'mysql-server/root_password'
+      value: '{{ mysql_root_password }}'
+    - question: 'mysql-server/root_password_again'
+      value: '{{ mysql_root_password }}'
+  when: ansible_os_family == "Debian"

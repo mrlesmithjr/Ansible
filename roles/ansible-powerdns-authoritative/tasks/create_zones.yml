@@ -1,0 +1,9 @@
+---
+- name: create_zones | adding dns zones
+  template:
+    src: "pdns_zones.sh.j2"
+    dest: "/tmp/pdns_zones.sh"
+    mode: 0774
+
+- name: create_zones | configuring zones
+  command: "/tmp/pdns_zones.sh"

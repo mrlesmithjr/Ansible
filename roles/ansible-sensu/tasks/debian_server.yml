@@ -2,7 +2,10 @@
 - name: debian_server | adding brightbox ruby repository
   apt_repository:
     repo: 'ppa:brightbox/ruby-ng'
-
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')
+        
 - name: debian_server | adding sensu repo key
   apt_key:
     url: "{{ sensu_debian_repo_key }}"

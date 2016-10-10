@@ -1,0 +1,11 @@
+---
+- name: debian | update apt-cache
+  apt:
+    update_cache: "yes"
+    cache_valid_time: 86400
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ dropbox_nsot_debian_pre_reqs }}'

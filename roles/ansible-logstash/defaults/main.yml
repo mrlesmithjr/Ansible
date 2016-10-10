@@ -32,12 +32,14 @@ logstash_base_inputs:  #define inputs below to configure
 #    threads: '2'
 #  - type: 'syslog'
 #    port: '514'  #reminder....ports < 1024 require root access..
-logstash_deb_repo: 'deb {{ logstash_repo_url }}/{{ logstash_version }}/debian stable main'
-logstash_folder: '/opt/logstash'
 logstash_base_outputs:
   - output: 'redis'
     output_host: '{{ logstash_server_fqdn }}'
+logstash_deb_repo: 'deb https://packages.elastic.co/logstash/{{ logstash_major_ver }}/debian stable main'
+logstash_folder: '/opt/logstash'
 logstash_log_dir: '/var/log/logstash'
+logstash_major_ver: '2.4'  # Define major version to install
+logstash_minor_ver: '1:2.4.0-1'  # Define minor version to install
 logstash_plugins:
 #  - 'logstash-codec-nmap'
   - 'logstash-filter-elasticsearch'
@@ -50,7 +52,4 @@ logstash_plugins:
 logstash_repo_key: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
 logstash_repo_url: 'http://packages.elastic.co/logstash'
 logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server to send to...fqdn or localhost
-logstash_version: '2.2'
-#logstash_version: '2.1'
-#logstash_version: '1.5'
 pri_domain_name: 'example.org'

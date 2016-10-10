@@ -5,6 +5,7 @@ enable_rundeck: true
 enable_rundeck_plugins: true
 pri_domain_name: 'example.org'
 rundeck_base: '/var/lib/rundeck'
+rundeck_ssh_keydir: './ssh_pub_keys/'
 rundeck_configs:
   - 'framework.properties'
   - 'rundeck-config.properties'
@@ -30,3 +31,4 @@ rundeck_mysql_backend: false
 rundeck_root_dir: '/etc/rundeck'
 rundeck_vagrant_install: false  #defines if installing under Vagrant
 rundeck_version: '2.6.9-1'
+rundeck_install_ansible_version: '2.1.1.0'

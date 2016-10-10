@@ -9,6 +9,9 @@ mask_secrets = True
 # allow_origin is required for handling CORS in st2 web UI.
 # allow_origin = http://myhost1.example.com:3000,http://myhost2.example.com:3000
 
+[stream]
+logging = /etc/st2/logging.stream.conf
+
 [sensorcontainer]
 logging = /etc/st2/logging.sensorcontainer.conf
 
@@ -51,8 +54,11 @@ api_url =
 [system]
 base_path = /opt/stackstorm
 
+# [webui]
+# webui_base_url = https://mywebhost.domain
+
 [syslog]
-host = localhost
+host = 127.0.0.1
 port = 514
 facility = local7
 protocol = udp
@@ -67,8 +73,7 @@ user = {{ stackstorm_ssh_info.user }}
 ssh_key_file = /home/{{ stackstorm_ssh_info.user }}/.ssh/{{ stackstorm_ssh_info.user }}_rsa
 
 [messaging]
-url = amqp://guest:guest@localhost:5672/
+url = amqp://guest:guest@127.0.0.1:5672/
 
 [ssh_runner]
 remote_dir = /tmp
-use_paramiko_ssh_runner = True

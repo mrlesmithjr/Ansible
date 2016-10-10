@@ -313,6 +313,36 @@ haproxy_configs:  #defines load balancer configurations to enable/disable
     options:  #Defines options to add to backend group (not the same as default_server_options)
       - tcpka
       - tcplog
+haproxy_defaults:  #defines default configurations for default block
+  - 'errorfile 400 /etc/haproxy/errors/400.http'
+  - 'errorfile 403 /etc/haproxy/errors/403.http'
+  - 'errorfile 408 /etc/haproxy/errors/408.http'
+  - 'errorfile 500 /etc/haproxy/errors/500.http'
+  - 'errorfile 502 /etc/haproxy/errors/502.http'
+  - 'errorfile 503 /etc/haproxy/errors/503.http'
+  - 'errorfile 504 /etc/haproxy/errors/504.http'
+  - 'log global'
+  - 'maxconn 40000'
+  - 'mode tcp'
+  - 'option dontlognull'
+  - 'option redispatch'
+  - 'option tcp-smart-accept'
+  - 'option tcp-smart-connect'
+  - 'option tcplog'
+  - 'retries 3'
+  - 'timeout client 50000'
+  - 'timeout connect 50000'
+  - 'timeout queue 5000'
+  - 'timeout server 50000'
+haproxy_docker_install: false  #defines if haproxy is being installed in Docker
+haproxy_global:  #defines global settings for global block
+  - 'chroot /var/lib/haproxy'
+  - 'group haproxy'
+  - 'maxconn 40000'
+  - 'spread-checks 3'
+  - 'stats socket {{ haproxy_socket_file }} mode 660 level admin'
+  - 'stats timeout 30s'
+  - 'user haproxy'
 haproxy_lb_vip: '{{ logstash_vip }}'
 haproxy_socket_file: /var/run/haproxy.sock
 keepalived_router_info:

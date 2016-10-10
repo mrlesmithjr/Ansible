@@ -1,0 +1,18 @@
+---
+# handlers file for ansible-stackstorm
+- name: reload stackstorm
+  command: "st2ctl reload"
+
+- name: restart nginx
+  service:
+    name: "nginx"
+    state: restarted
+    
+- name: restart st2api
+  command: "st2ctl restart-component st2api"
+
+- name: restart stackstorm
+  command: "st2ctl restart"
+
+- name: start stackstorm
+  command: "st2ctl start"

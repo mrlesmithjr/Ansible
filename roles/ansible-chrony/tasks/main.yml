@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-chrony
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_chrony.yml

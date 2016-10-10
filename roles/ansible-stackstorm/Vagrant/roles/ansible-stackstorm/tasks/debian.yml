@@ -1,0 +1,23 @@
+---
+- name: debian | adding stackstorm repo key
+  apt_key:
+    url: "{{ stackstorm_debian_repo_info.repo_key }}"
+    state: present
+
+- name: debian | adding stackstorm repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: '{{ stackstorm_debian_repo_info.repos }}'
+
+- name: debian | installing apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: debian | installing stackstorm packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items: '{{ stackstorm_debian_packages }}'

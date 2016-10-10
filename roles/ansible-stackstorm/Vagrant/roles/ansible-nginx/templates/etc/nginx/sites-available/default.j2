@@ -1,0 +1,22 @@
+{% for item in nginx_server_block %}
+server {
+{%   for la in item.listen_address %}
+	listen {{ la }}:{{ item.listen_port }}{% if item.default_server is defined and item.default_server %} default_server{% endif %};
+{%   endfor %}
+	root {{ item.root }};
+	index {{ item.index|join (' ') }};
+	server_name {{ item.server_name }};
+
+	location {{ item.location }} {
+		try_files {{ item.try_files }};
+	}
+{%   if item.enable_php %}
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		include fastcgi_params;
+	}
+{%   endif %}
+}
+{% endfor %}

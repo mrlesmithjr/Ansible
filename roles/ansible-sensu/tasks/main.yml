@@ -12,6 +12,7 @@
 - include: config_plugins.yml
 
 - include: config_checks.yml
+  when: sensu_server
 
 - include: config_client.yml
   when: sensu_client

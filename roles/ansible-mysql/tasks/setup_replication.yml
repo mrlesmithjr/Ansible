@@ -25,7 +25,8 @@
   when: >
         ansible_os_family == "Debian" and
         (mysql_reconfigured_14_04.changed or
-        mysql_reconfigured_16_04.changed)
+        mysql_reconfigured_16_04.changed or
+        mysql_reconfigured_debian.changed)
 
 - name: setup_replication | restarting mysql if reconfigured
   service:

@@ -26,7 +26,9 @@
   register: "mysql_reconfigured_14_04"
   notify: "restart mysql"
   when: >
-        ansible_distribution_version <= '14.04'
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04') or
+        ansible_distribution == "Debian"
 
 - name: debian | configuring mysql
   template:
@@ -38,7 +40,19 @@
   register: "mysql_reconfigured_16_04"
   notify: "restart mysql"
   when: >
-        ansible_distribution_version >= '16.04'
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04')
+
+- name: debian | configuring mysql
+  template:
+    src: "etc/mysql/mysql.conf.d/mysqld.cnf.j2"
+    dest: "/etc/mysql/conf.d/mysqld.cnf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  register: "mysql_reconfigured_debian"
+  notify: "restart mysql"
+  when: ansible_distribution == "Debian"
 
 - name: debian | configuring client configuration
   template:

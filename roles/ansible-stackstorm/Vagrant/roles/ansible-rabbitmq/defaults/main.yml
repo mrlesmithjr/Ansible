@@ -1,0 +1,28 @@
+---
+# defaults file for ansible-rabbitmq
+config_rabbitmq_ha: false  #defines if rabbitmq ha should be configured...define here or in group_vars/group
+enable_rabbitmq_clustering: false  #defines if setting up a rabbitmq cluster...define here or in group_vars/group
+erlang_cookie: 'LSKNKBELKPSTDBBCHETL'  #define erlang cookie for cluster...define here or in group_vars/group
+erlang_cookie_file: '/var/lib/rabbitmq/.erlang.cookie'
+rabbitmq_config:
+  - queue_name: logstash
+    durable: true
+    exchange_name: logstash
+    type: direct
+    routing_key: logstash
+    tags: 'ha-mode=all,ha-sync-mode=automatic'
+rabbitmq_debian_repo: 'deb http://www.rabbitmq.com/debian/ testing main'
+rabbitmq_debian_repo_key: 'https://www.rabbitmq.com/rabbitmq-release-signing-key.asc'
+rabbitmq_master: []  #defines the inventory host that should be considered master...define here or in group_vars/group
+rabbitmq_redhat_repo_key: 'https://www.rabbitmq.com/rabbitmq-signing-key-public.asc'
+rabbitmq_redhat_package: 'rabbitmq-server-{{ rabbitmq_redhat_version }}-1.noarch.rpm'
+rabbitmq_redhat_url: 'http://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbitmq_redhat_version }}'
+rabbitmq_redhat_version: '3.6.1'
+rabbitmq_users:  #define admin user to create in order to login to WebUI
+  - name: rabbitmqadmin
+    password: rabbitmqadmin
+    vhost: /
+    configure_priv: '.*'
+    read_priv: '.*'
+    write_priv: '.*'
+    tags: 'administrator'  #define comma separated list of tags to assign to user....management,policymaker,monitoring,administrator...required for management plugin. https://www.rabbitmq.com/management.html

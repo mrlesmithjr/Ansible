@@ -1,0 +1,24 @@
+---
+- name: debian_pdns_recursor | downloading powerdns recursor
+  get_url:
+    url: "{{ pdns_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
+    dest: "/opt/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
+  when: ansible_architecture == "x86_64"
+
+- name: debian_pdns_recursor | installing powerdns recursor
+  apt:
+    deb: "/opt/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
+  notify: restart pdns recursor
+  when: ansible_architecture == "x86_64"
+
+- name: debian_pdns_recursor | downloading powerdns recursor
+  get_url:
+    url: "{{ pdns_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
+    dest: "/opt/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
+  when: ansible_architecture == "i386"
+
+- name: debian_pdns_recursor | installing powerdns recursor
+  apt:
+    deb: "/opt/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
+  notify: restart pdns recursor
+  when: ansible_architecture == "i386"
