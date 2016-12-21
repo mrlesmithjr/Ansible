@@ -1,5 +1,3 @@
-# {{ ansible_managed }}
-
 #### Below is for managing the whole stack involved in Quagga HA
 vrrp_script chk_zebra {
    script "killall -0 zebra"   # verify the pid existance

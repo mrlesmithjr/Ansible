@@ -25,11 +25,6 @@ Role Variables
 ```
 ---
 # defaults file for ansible-sensu
-email_notifications: 'notifications@{{ pri_domain_name }}'
-logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'
-notification_email_to: '{{ email_notifications }}'      #set to email address to send alerts to
-notification_email_from: 'sensu@{{ smtp_domain_name }}'
-pri_domain_name: 'example.org'
 sensu_api_auth: false  #enable user/pass auth for api access...default is false...no user/pass required
 sensu_api_pass: sensu
 sensu_api_user: sensu
@@ -110,6 +105,9 @@ sensu_default_handler: default  #leave set to default...this is a built-in plugi
 sensu_default_handlers:
   - logstash
 #  - mailer
+sensu_notification_email_from: 'sensu@{{ sensu_smtp_domain_name }}'
+sensu_notification_email_to: '{{ sensu_email_notifications }}'      #set to email address to send alerts to
+sensu_email_notifications: 'notifications@{{ sensu_pri_domain_name }}'
 sensu_enable_cpu_monitors: true
 sensu_enable_disk_monitors: true
 sensu_enable_es_monitors: false
@@ -118,7 +116,7 @@ sensu_enable_haproxy_monitors: false
 sensu_enable_process_monitors: true
 sensu_enable_redis_monitors: false
 sensu_handlers_dir: '{{ sensu_root_dir }}/handlers'
-sensu_host: 'sensu.{{ pri_domain_name }}'
+sensu_host: 'sensu.{{ sensu_pri_domain_name }}'
 sensu_host_port: 3000
 # sensu_monitor_cpu:  #set enabled to either (y)es or (n)o below
 #   - name: cpu
@@ -251,6 +249,7 @@ sensu_host_port: 3000
 #   - name: ping
 #     interval: 60
 #     sub: redis
+sensu_logstash_server_fqdn: 'logstash.{{ sensu_pri_domain_name }}'
 sensu_multiple_handlers: true  #defines the use of using multiple handlers if enable_handlers is true and more than one default_handler is required
 sensu_plugins:
   - 'json'
@@ -262,6 +261,7 @@ sensu_plugins:
   - 'sensu-plugins-disk-checks'
   - 'sensu-plugins-memory-checks'
 sensu_plugins_dir: '{{ sensu_root_dir }}/plugins'
+sensu_pri_domain_name: 'example.org'
 sensu_rabbitmq_info:
   user: 'sensu'
   password: 'sensu'
@@ -282,9 +282,9 @@ sensu_server_services:
   - sensu-client
   - sensu-api
   - uchiwa
-smtp_domain_name: '{{ pri_domain_name }}'
-smtp_server: 'smtp.{{ pri_domain_name }}'
-smtp_server_port: 25
+sensu_smtp_domain_name: '{{ sensu_pri_domain_name }}'
+sensu_smtp_server: 'smtp.{{ sensu_pri_domain_name }}'
+sensu_smtp_server_port: 25
 ```
 
 Dependencies
@@ -303,7 +303,7 @@ Example Playbook
 - hosts: all
   become: true
   vars:
-    - pri_domain_name: 'vagrant.local'
+    - sensu_pri_domain_name: 'vagrant.local'
     - sensu_host: 127.0.0.1
     - sensu_server: true
   roles:
@@ -321,7 +321,7 @@ Example Playbook
 - hosts: all
   become: true
   vars:
-    - pri_domain_name: 'vagrant.local'
+    - sensu_pri_domain_name: 'vagrant.local'
     - sensu_host: 127.0.0.1
     - sensu_server: true
   roles:

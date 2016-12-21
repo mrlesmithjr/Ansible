@@ -8,11 +8,8 @@
 
 - include: opensuse.yml
   when: ansible_os_family == "openSUSE Leap"
-  
+
 - include: config_dnsmasq.yml
   tags:
-    - config_dnsmasq
-  when: config_dnsmasq
-
-- include: sync_dnsmasq.yml
-  when: sync_dnsmasq
+    - dnsmasq_config
+  when: dnsmasq_config

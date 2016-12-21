@@ -15,7 +15,7 @@ sudo ansible-galaxy install -r requirements.yml
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-stackstorm
 stackstorm_db_info:
@@ -40,9 +40,17 @@ stackstorm_packs:
     installed: true
   - name: docker
     installed: true
+  - name: elasticsearch
+    installed: true
+  - name: github
+    installed: true
   - name: jenkins
     installed: true
+  - name: nest
+    installed: true
   - name: sensu
+    installed: true
+  - name: urbandict
     installed: true
 stackstorm_ssh_info:
   user: 'stanley'
@@ -54,7 +62,7 @@ stackstorm_webui_login_info:
   password: 'Ch@ngeMe'
   password_file: '/etc/st2/htpasswd'
   user: 'st2admin'
-````
+```
 
 Dependencies
 ------------

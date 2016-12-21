@@ -1,5 +1,5 @@
 ---
-- name: config_bind | configuring bind
+- name: bind_config | configuring bind
   template:
     src: "etc/bind/named.conf.options.j2"
     dest: "/etc/bind/named.conf.options"

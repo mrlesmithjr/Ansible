@@ -44,7 +44,9 @@
     src: "etc/mysql/conf.d/temp.galera.cnf.j2"
     dest: "/etc/mysql/conf.d/galera.cnf"
   when: >
-        ansible_os_family == "Debian" and
+        (ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
         inventory_hostname == mysql_master_node
 
@@ -62,8 +64,19 @@
     name: "mysql"
     state: "restarted"
   when: >
+        (ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
         inventory_hostname == mysql_master_node
+
+- name: setup_cluster | bootstrapping galera cluster
+  command: "/usr/bin/galera_new_cluster"
+  when: >
+        not galera_cluster_configured.stat.exists and
+        inventory_hostname == mysql_master_node and
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04')
 
 - name: setup_cluster | joining galera cluster
   service:
@@ -78,7 +91,9 @@
     src: "etc/mysql/conf.d/galera.cnf.j2"
     dest: "/etc/mysql/conf.d/galera.cnf"
   when: >
-        ansible_os_family == "Debian" and
+        (ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
         inventory_hostname == mysql_master_node
 
@@ -96,6 +111,9 @@
     name: "mysql"
     state: "restarted"
   when: >
+        (ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
         inventory_hostname == mysql_master_node
 

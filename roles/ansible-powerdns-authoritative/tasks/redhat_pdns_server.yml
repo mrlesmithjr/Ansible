@@ -3,17 +3,51 @@
   get_url:
     url: "{{ pdns_download_url }}/rpm/pdns-static-{{ pdns_server_version }}.x86_64.rpm"
     dest: "/opt/pdns-static-{{ pdns_server_version }}.x86_64.rpm"
+  when: pdns_server_version != "4.x"
 
 - name: redhat_pdns_server | installing powerdns
   yum:
     name: "/opt/pdns-static-{{ pdns_server_version }}.x86_64.rpm"
   notify: restart pdns
+  when: pdns_server_version != "4.x"
 
 - name: redhat_pdns_server | installing powerdns pre-reqs
   yum:
     name: "{{ item }}"
     state: present
   with_items:
+    - 'bind-utils'
     - 'git'
     - 'jq'
     - 'MySQL-python'
+
+- name: redhat_pdns_server | Installing PowerDNS 4.x Pre-Reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'epel-release'
+    - 'yum-plugin-priorities'
+  when: pdns_server_version == "4.x"
+
+- name: redhat_pdns_recursor | Adding PowerDNS Repo
+  yum_repository:
+    name: "powerdns-auth-40"
+    baseurl: "http://repo.powerdns.com/centos/$basearch/$releasever/auth-40"
+    description: "PDNS-Recursor"
+    gpgcheck: yes
+    gpgkey: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    enabled: yes
+    includepkgs: "pdns*"
+    priority: 90
+    state: "present"
+  when: pdns_server_version == "4.x"
+
+- name: redhat_pdns_server | Installing PowerDNS 4.x
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'pdns'
+    - 'pdns-backend-mysql'
+  when: pdns_server_version == "4.x"

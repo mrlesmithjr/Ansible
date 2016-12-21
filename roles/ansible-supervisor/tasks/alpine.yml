@@ -1,0 +1,16 @@
+---
+- name: alpine | Updating APK Cache
+  apk:
+    update_cache: yes
+
+- name: alpine | Installing Python Setuptools
+  apk:
+    name: "py-setuptools"
+    state: "present"
+  when: supervisor_python_install
+
+- name: alpine | Installing Supervisor
+  apk:
+    name: "supervisor"
+    state: "present"
+  when: not supervisor_python_install

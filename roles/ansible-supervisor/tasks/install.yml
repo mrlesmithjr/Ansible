@@ -1,0 +1,6 @@
+---
+- name: Installing Supervisor
+  easy_install:
+    name: "Supervisor"
+    state: "present"
+  when: supervisor_python_install

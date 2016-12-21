@@ -11,8 +11,16 @@ grails.serverURL=http://{{ ansible_fqdn }}:4440
 {% elif rundeck_vagrant_install is defined and rundeck_vagrant_install %}
 grails.serverURL=http://127.0.0.1:4440
 {% endif %}
+
 dataSource.dbCreate = update
+{% if rundeck_mysql_backend %}
+dataSource.url = jdbc:mysql://{{ rundeck_db_host }}/{{ rundeck_db_name }}?autoReconnect=true
+dataSource.username = {{ rundeck_db_user }}
+dataSource.password = {{ rundeck_db_pass }}
+{% else %}
 dataSource.url = jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true;TRACE_LEVEL_FILE=4
+{% endif %}
+
 {% if enable_rundeck_plugins is defined and enable_rundeck_plugins %}
 {%   if rundeck_enable_logstash_plugin is defined and rundeck_enable_logstash_plugin %}
 rundeck.execution.logs.streamingWriterPlugins=LogstashPlugin

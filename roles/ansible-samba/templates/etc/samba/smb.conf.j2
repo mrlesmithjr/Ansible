@@ -3,7 +3,7 @@
 [global]
         workgroup = {{ samba_ad_info.netbios_domain_name|upper }}
         realm = {{ samba_ad_info.kerberos_realm|upper }}
-        netbios name = {{ ansible_hostname|upper }}
+        netbios name = {{ ansible_hostname|upper|truncate(15, True, '') }}
         server role = {{ samba_server_role }}
         dns forwarder = {{ samba_ad_info.dns_forwarder }}
         server services = rpc, nbt, wrepl, ldap, cldap, kdc, drepl, winbind, ntp_signd, kcc, dnsupdate, dns, smb

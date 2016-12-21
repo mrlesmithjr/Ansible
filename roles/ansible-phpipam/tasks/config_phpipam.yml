@@ -19,6 +19,7 @@
   git:
     repo: "https://github.com/phpipam/phpipam.git"
     dest: "{{ phpipam_root }}"
+    version: "{{ phpipam_install_git_version|default ('HEAD') }}"
   when: phpipam_install_from_git
 
 - name: config_phpipam | creating phpipam web config
@@ -51,8 +52,8 @@
     state: present
   when: >
         phpipam_pre_load_db and
-        inventory_hostname == phpipam_primary and
-        phpipam_db_cluster
+        phpipam_db_cluster and
+        (inventory_hostname == phpipam_primary)
 
 - name: config_phpipam | creating phpipam db user
   mysql_user:
@@ -70,30 +71,26 @@
     priv: "{{ phpipam_db_name }}.*:ALL"
     state: present
   when: >
-        inventory_hostname == phpipam_primary and
-        phpipam_db_cluster
+        phpipam_db_cluster and
+        (inventory_hostname == phpipam_primary)
 
-- name: config_phpipam | checking if phpipam db already imported
-  stat:
-    path: "/var/log/phpipam_db_imported"
-  register: phpipam_db_imported
-  when: phpipam_pre_load_db
-
-# - name: config_phpipam | copying db schema
-#   template:
-#     src: "phpipam_schema-{{ phpipam_version }}.sql.j2"
-#     dest: "/tmp/phpipam_schema.sql"
-#   when: phpipam_pre_load_db
+- name: Checking If DB Tables Exist
+  command: >
+           mysql
+           -u {{ phpipam_db_user }}
+           --password={{ phpipam_db_pass }}
+           -h {{ phpipam_db_host }}
+           -e "show tables from {{ phpipam_db_name }};"
+  register: "phpipam_tables"
 
 - name: config_phpipam | importing phpipam database
   mysql_db:
     name: "{{ phpipam_db_name }}"
     state: import
-    # target: "/tmp/phpipam_schema.sql"
     target: "{{ phpipam_root }}/db/SCHEMA.sql"
   when: >
         phpipam_pre_load_db and
-        not phpipam_db_imported.stat.exists and
+        ('ipaddresses' not in phpipam_tables.stdout_lines) and
         not phpipam_db_cluster
 
 - name: config_phpipam | importing phpipam database
@@ -104,17 +101,9 @@
     target: "{{ phpipam_root }}/db/SCHEMA.sql"
   when: >
         phpipam_pre_load_db and
-        inventory_hostname == phpipam_primary and
-        not phpipam_db_imported.stat.exists and
-        phpipam_db_cluster
-
-- name: config_phpipam | setting phpipam db imported
-  file:
-    path: "/var/log/phpipam_db_imported"
-    state: touch
-  when: >
-        phpipam_pre_load_db and
-        not phpipam_db_imported.stat.exists
+        ('ipaddresses' not in phpipam_tables.stdout_lines) and
+        phpipam_db_cluster and
+        (inventory_hostname == phpipam_primary)
 
 # need to validate this is still needed as versions change
 - name: config_phpipam | patching functions-network.php

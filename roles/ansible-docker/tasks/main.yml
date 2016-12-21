@@ -17,5 +17,5 @@
 
 - include: images.yml
   when: >
-        manage_docker_images and
+        docker_manage_images and
         docker_images is defined

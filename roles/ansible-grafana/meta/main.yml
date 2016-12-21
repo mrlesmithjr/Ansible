@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs grafana role
+  description: An Ansible role to install/configure Grafana
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -87,8 +87,9 @@ galaxy_info:
   #  - raring
   #  - saucy
     - trusty
-  #  - utopic
-  #  - vivid
+    - utopic
+    - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all
@@ -102,11 +103,11 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  #- name: Debian
-  #  versions:
+  - name: Debian
+    versions:
   #  - all
   #  - etch
-  #  - jessie
+    - jessie
   #  - lenny
   #  - squeeze
   #  - wheezy
@@ -134,6 +135,3 @@ dependencies: []
   # dependencies available via galaxy should be listed here.
   # Be sure to remove the '[]' above if you add dependencies
   # to this list.
-  #- { role: mrlesmithjr.snmpd }
-  #- { role: mrlesmithjr.timezone }
-  #- { role: mrlesmithjr.graphite }

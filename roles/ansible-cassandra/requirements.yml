@@ -1,0 +1,3 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-cassandra.git
+- src: https://github.com/mrlesmithjr/ansible-oracle-java8.git

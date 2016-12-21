@@ -14,7 +14,7 @@ Role Variables
 ````
 ---
 # defaults file for ansible-shorewall
-config_shorewall: true
+shorewall_config: true
 shorewall_config_options:  # http://shorewall.net/manpages/shorewall.conf.html
   accounting: 'Yes'  # [Yes|No]
   ip_forwarding: 'On' # [On|Off|Keep]

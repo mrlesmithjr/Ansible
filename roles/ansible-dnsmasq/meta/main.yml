@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs and configures dnsmasq
+  description: An [Ansible] role to install/configure [DNSMasq]
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -92,6 +92,7 @@ galaxy_info:
   #  - utopic
     - vivid
     - wily
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

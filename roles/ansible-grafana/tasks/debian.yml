@@ -2,98 +2,26 @@
 - name: debian | adding grafana apt key
   apt_key:
     url: "{{ grafana_apt_key }}"
-    state: present
+    state: "present"
 
 - name: debian | adding grafana apt repo
   apt_repository:
     repo: "{{ grafana_apt_repo }}"
-    state: present
+    state: "present"
 
-- name: debian | installing packages
+- name: debian | installing pre-req packages
   apt:
     name: "{{ item }}"
-    state: present
-  with_items:
-    - git
-    - grafana
-    - python-pip
-    - unzip
-    - openjdk-7-jdk
-    - maven
+    state: "present"
+  with_items: '{{ grafana_debian_pre_reqs }}'
+
+- name: debian | Installing Grafana
+  apt:
+    name: "grafana"
+    state: "present"
 
 - name: debian | ensuring grafana started and enabled on boot
   service:
     name: "grafana-server"
     enabled: yes
-
-- name: debian | installing python pip module pysphere
-  pip:
-    name: "pysphere"
-    state: present
-
-- name: debian | create /opt/statsfeeder if not present
-  file:
-    path: "/opt/statsfeeder"
-    state: directory
-
-- name: debian | downloading statsfeeder
-  get_url:
-    url: "http://download3.vmware.com/software/vmw-tools/statsfeeder/StatsFeeder-4.1.697.zip"
-    dest: "/opt/statsfeeder/statsfeeder.zip"
-    mode: 0644
-
-- name: debian | extracting statsfeeder
-  command: "unzip /opt/statsfeeder/statsfeeder.zip -d /opt/statsfeeder"
-  args:
-    creates: "/opt/statsfeeder/StatsFeeder.sh"
-
-- name: debian | pulling graphitereceiver from github
-  sudo: no
-  git:
-    repo: "https://github.com/SYNAXON/GraphiteReceiver"
-    dest: "~/GraphiteReceiver"
-
-- name: debian | creating build folders
-  sudo: no
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - '~/.m2/repository/com/vmware/tools/statsfeeder-common/4.1'
-    - '~/.m2/repository/com/vmware/tools/statsfeeder-core/4.1'
-    - '~/.m2/repository/com/vmware/tools/vsphere-sdk/4.1'
-
-- name: debian | copying build files
-  sudo: no
-  shell: "cp {{ item.src }} {{ item.dest }}"
-  with_items:
-    - src: '/opt/statsfeeder/lib/statsfeeder-common-4.1.jar'
-      dest: '~/.m2/repository/com/vmware/tools/statsfeeder-common/4.1'
-    - src: '/opt/statsfeeder/lib/statsfeeder-core-4.1.jar'
-      dest: '~/.m2/repository/com/vmware/tools/statsfeeder-core/4.1'
-    - src: '/opt/statsfeeder/lib/vsphere-sdk-4.1.jar'
-      dest: '~/.m2/repository/com/vmware/tools/vsphere-sdk/4.1'
-
-- name: debian | building GraphiteReceiver maven package
-  sudo: no
-  shell: "mvn package"
-  args:
-    chdir: "~/GraphiteReceiver"
-    creates: "~/GraphiteReceiver/target/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar"
-
-- name: debian | copying files to tmp
-  sudo: no
-  shell: "cp {{ item }} /tmp"
-  with_items:
-    - '~/GraphiteReceiver/target/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar'
-
-- name: debian | moving files to statsfeeder
-  shell: "mv {{ item.src }} {{ item.dest }}"
-  with_items:
-    - src: '/tmp/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar'
-      dest: '/opt/statsfeeder/lib'
-
-- name: debian | creating sampleConfig.xml
-  template:
-    src: "opt/statsfeeder/sampleConfig.xml.j2"
-    dest: "/opt/statsfeeder/sampleConfig.xml"
+    state: "started"

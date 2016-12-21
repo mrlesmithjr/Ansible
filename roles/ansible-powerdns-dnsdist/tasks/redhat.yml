@@ -1,0 +1,49 @@
+---
+- name: redhat | Installing Pre-Reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ pdns_dnsdist_redhat_pre_reqs }}'
+  when: >
+        ansible_distribution == "CentOS" or
+        ansible_distribution == "RedHat"
+
+- name: redhat | Adding DNSDist Repo
+  yum_repository:
+    name: "powerdns-dnsdist-10"
+    baseurl: "http://repo.powerdns.com/centos/$basearch/$releasever/dnsdist-10"
+    description: "PDNS-DNSDist"
+    gpgcheck: yes
+    gpgkey: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    enabled: yes
+    includepkgs: "dnsdist*"
+    priority: 90
+    state: "present"
+  when: >
+        (ansible_distribution == "CentOS" or
+        ansible_distribution == "RedHat") and
+        pdns_dnsdist_ver == "1.0.x"
+
+- name: redhat | Adding DNSDist Repo
+  yum_repository:
+    name: "powerdns-dnsdist-11"
+    baseurl: "http://repo.powerdns.com/centos/$basearch/$releasever/dnsdist-11"
+    description: "PDNS-DNSDist"
+    gpgcheck: yes
+    gpgkey: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    enabled: yes
+    includepkgs: "dnsdist*"
+    priority: 90
+    state: "present"
+  when: >
+        (ansible_distribution == "CentOS" or
+        ansible_distribution == "RedHat") and
+        pdns_dnsdist_ver == "1.1.x"
+
+- name: redhat | Installing DNSDist
+  yum:
+    name: "dnsdist"
+    state: "present"
+  when: >
+        ansible_distribution == "CentOS" or
+        ansible_distribution == "RedHat"

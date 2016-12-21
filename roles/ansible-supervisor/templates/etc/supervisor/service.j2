@@ -1,0 +1,5 @@
+[program:{{ item.name }}]
+command={{ item.command }}
+autostart={{ item.autostart|lower }}
+autorestart={{ item.autorestart|lower }}
+username={{ item.username|default (omit) }}

@@ -1,0 +1,17 @@
+---
+- name: debian | Updating Apt-Cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: debian | Installing Python Setuptools
+  apt:
+    name: "python-setuptools"
+    state: "present"
+  when: supervisor_python_install
+
+- name: debian | Installing Supervisor
+  apt:
+    name: "supervisor"
+    state: "present"
+  when: not supervisor_python_install

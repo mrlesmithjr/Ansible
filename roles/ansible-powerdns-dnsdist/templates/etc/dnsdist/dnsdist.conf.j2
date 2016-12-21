@@ -1,0 +1,43 @@
+{% if enable_pdns_dnsdist_control_socket %}
+controlSocket("0.0.0.0")
+{% endif %}
+{% if enable_pdns_dnsdist_acls and pdns_dnsdist_acls is defined %}
+setACL("127.0.0.0/8")
+{%   for item in pdns_dnsdist_acls %}
+addACL("{{ item }}")
+{%   endfor %}
+{% endif %}
+setKey("{{ pdns_dnsdist_setkey }}")
+{% for item in pdns_dnsdist_downstream_servers %}
+newServer{address="{{ item.address }}:{{ item.port|default ('53')}}"{% if item.name is defined %}, name="{{ item.name }}"{% endif %}{% if item.order is defined %}, order={{ item.order }}{% endif %}{% if item.qps is defined %}, qps={{ item.qps }}{% endif %}{% if item.pool is defined %}, pool="{{ item.pool }}"{% endif %}{% if item.recv_timeout is defined %}, tcpRecvTimeout={{ item.recv_timeout }}{% endif %}{% if item.send_timeout is defined %}, tcpSendTimeout={{ item.send_timeout }}{% endif %}{% if item.source is defined %}, {{ item.source }}{% endif %}}
+{% endfor %}
+setServerPolicy({{ pdns_dnsdist_server_policy }})
+
+setLocal('{{ pdns_dnsdist_local_address }}')
+
+{% if enable_pdns_dnsdist_webserver %}
+webserver("{{ pdns_dnsdist_webserver_info.address }}:{{ pdns_dnsdist_webserver_info.port }}", "{{ pdns_dnsdist_webserver_info.password }}", "{{ pdns_dnsdist_webserver_info.api_key }}")
+{% endif %}
+
+{% if enable_pdns_dnsdist_cache %}
+{%   for item in pdns_dnsdist_cache %}
+{{ item.name }} = newPacketCache({{ item.max_entries}}{% if item.max_lifetime is defined %}, {{ item.max_lifetime }}{% endif %}{% if item.min_ttl is defined %}, {{ item.min_ttl }}{% endif %}{% if item.ttl_server_failure_response is defined %}, {{ item.ttl_server_failure_response }}{% endif %}{% if item.ttl_stale_cache is defined %}, {{ item.ttl_stale_cache }}{% endif %})
+getPool("{{ item.pool }}"):setCache({{ item.name }})
+{%   endfor %}
+{% endif %}
+
+{% if enable_pdns_dnsdist_carbon_metrics %}
+carbonServer('{{ pdns_dnsdist_carbon_metrics_info.server }}', '{{ pdns_dnsdist_carbon_metrics_info.reporting_hostname }}', {{ pdns_dnsdist_carbon_metrics_info.interval }})
+{% endif %}
+
+{% if enable_pdns_dnsdist_domain_blocks %}
+{%   for item in pdns_dnsdist_domain_blocks %}
+addDomainBlock("{{ item }}")
+{%   endfor %}
+{% endif %}
+
+{% if enable_pdns_dnsdist_pool_rules %}
+{%  for item in pdns_dnsdist_pool_rules %}
+addPoolRule({"{{ item.query| join ('", "') }}"}, "{{ item.pool }}")
+{%  endfor %}
+{% endif %}

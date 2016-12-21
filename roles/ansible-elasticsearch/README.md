@@ -14,7 +14,7 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-elasticsearch
 es_allow_remote_connections: false  #defines if remote connections should be allowed....version 2.x
@@ -27,9 +27,13 @@ es_config_path_data: false  #defines if elasticsearch should be configured to st
 es_config_unicast: false  #defines if unicast discovery should be configured...ES 2.x
 es_config_unicast_group: 'es-cluster-nodes'  #define inventory group to configure unicast discovery.
 es_curator_close_after_days: 14  #defines the number of days before closing indexes
+es_curator_debian_repo: 'deb http://packages.elastic.co/curator/{{ es_curator_version }}/debian stable main'
+es_curator_elasticsearch_hosts: # Define the host(s) to run curator against
+  - 'localhost'
 es_curator_max_keep_days: 30  #defines the max number of days to keep indexes
+es_curator_version: 4
 es_data_node: true  #defines if node should be a data node in the cluster...default is true...define here or in group_vars/group
-es_debian_repo: 'deb http://packages.elastic.co/elasticsearch/{{ es_version }}/debian stable main'
+es_debian_repo: 'deb http://packages.elastic.co/elasticsearch/{{ es_major_version }}/debian stable main'
 es_disks:  #define disk device names to add to LVM VG if using
   - '/dev/sdb'
 #  - '/dev/sdc'
@@ -41,7 +45,9 @@ es_heap_size: '{{ (ansible_memtotal_mb | int * es_heap_size_multiplier) | round 
 es_heap_size_multiplier: 0.5  #defines multiplier for determining the amount of memory to allocate to ES
 es_lvextend_options: '-l +100%FREE'  #define options to pass to lvextend for extending LVM if used
 es_lvname: elasticsearch-lv  #define LVM Logical Volume to create in VG Name if using
+es_major_version: '2.x'  # (1.7|2.x)
 es_master_node: true  #defines if node should be a master node in the cluster...default is true...define here or in group_vars/group
+es_minor_version: '2.4.1'
 es_memory_tuning:  #these settings help eliminate OOM conditions (More memory should be used in most cases but these settings can help) #define here or in group_vars/group
   - name: indices.breaker.fielddata.limit
     set: false
@@ -109,15 +115,13 @@ es_resize_lvm: false  #defines if lvm should be resized
 es_shards: 5  #defines the number of primary shards per index...default is 5...define here or in group_vars/group
 es_uninstall_plugins: false  #defines if installed plugins should be uninstalled...pass as cli var or other
 es_vagrant_install: false  #defines if installing within a Vagrant environment
-#es_version: 1.7
-es_version: 2.x  #ready for 2.x release of Elasticsearch
 es_vgname: elasticsearch-vg  #define LVM VG name if setting up lvm for elasticsearch data
 install_bigdesk: true
 install_curator: true
 install_eshq: true
 install_head: true
 install_marvel: true
-````
+```
 
 Dependencies
 ------------

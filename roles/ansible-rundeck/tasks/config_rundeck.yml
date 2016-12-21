@@ -10,3 +10,30 @@
   when: >
         config_rundeck is defined and
         config_rundeck
+
+- name: config_rundeck | configuring authentication
+  template:
+    src: "etc/rundeck/jaas-auth.conf.j2"
+    dest: "{{ rundeck_root_dir }}/jaas-auth.conf"
+    owner: "rundeck"
+    group: "rundeck"
+    mode: 0640
+  notify: restart rundeck
+  when: rundeck_auth_ldap_config
+
+- name: config_rundeck | generate user password hashes for PropertyFileLoginModule
+  shell: echo -n {{ item.password }} | md5sum | cut -d' ' -f1
+  register: rundeck_userhashes
+  changed_when: false
+  when: rundeck_users
+  with_items: "{{ rundeck_users }}"
+
+- name: config_rundeck | add users to realm.properties
+  lineinfile:
+    dest: "{{ rundeck_root_dir }}/realm.properties"
+    regexp: "^{{ item.item.name }}"
+    line: "{{ item.item.name }}: MD5:{{ item.stdout }},{{ item.item.roles }}"
+    state: "{{ item.item.state | default('present') }}"
+  with_items: "{{ rundeck_userhashes.results }}"
+  when: rundeck_userhashes|success
+  notify: restart rundeck

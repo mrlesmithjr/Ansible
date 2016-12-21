@@ -4,7 +4,7 @@
   when: ansible_os_family == "Debian"
 
 - include: config_bind.yml
-  when: config_bind
+  when: bind_config
 
 - include: manage_zones.yml
-  when: manage_bind_zones
+  when: bind_manage_zones

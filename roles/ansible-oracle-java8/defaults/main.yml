@@ -1,3 +1,6 @@
 ---
 # defaults file for ansible-oracle-java8
-oracle_java8_debian_repo: 'ppa:webupd8team/java'
+oracle_java8_debian_repo_info:
+  id: 'EEA14886'
+  keyserver: 'hkp://keyserver.ubuntu.com:80'
+  repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main'

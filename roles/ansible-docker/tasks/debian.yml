@@ -14,15 +14,13 @@
 
 - name: debian | adding docker apt-key
   apt_key:
-    keyserver: "{{ item.keyserver }}"
-    id: "{{ item.id }}"
-  with_items: docker_ubuntu_repo_info
+    keyserver: "{{ docker_ubuntu_repo_info.keyserver }}"
+    id: "{{ docker_ubuntu_repo_info.id }}"
 
 - name: debian | adding docker repo
   apt_repository:
-    repo: "{{ item.repo }}"
+    repo: "{{ docker_ubuntu_repo_info.repo }}"
     state: present
-  with_items: docker_ubuntu_repo_info
 
 - name: debian | uninstalling old docker package (if exists)
   apt:

@@ -1,6 +1,7 @@
 ---
 - name: debian | adding nodejs repo key
   apt_key:
+    id: "{{ nodejs_debian_repo_info.id }}"
     url: "{{ nodejs_debian_repo_info.repo_key }}"
     state: present
 

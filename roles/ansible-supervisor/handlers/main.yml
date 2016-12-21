@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-supervisor
+- name: "reload supervisor"
+  service:
+    name: "supervisor"
+    state: "reloaded"

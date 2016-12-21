@@ -9,22 +9,28 @@
     src: elasticsearch_repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
 
-- name: redhat | installing elasticsearch
+- name: redhat_elasticsearch | installing java
   yum:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - elasticsearch
-    - java-1.7.0-openjdk
+    name: "java-1.7.0-openjdk"
+    state: "present"
   when: ansible_distribution != "Fedora"
 
 - name: redhat_elasticsearch | installing elasticsearch
+  yum:
+    name: "elasticsearch-{{ es_minor_version }}"
+    state: "present"
+  when: ansible_distribution != "Fedora"
+
+- name: redhat_elasticsearch | installing java
   dnf:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - elasticsearch
-    - java
+    name: "java"
+    state: "present"
+  when: ansible_distribution == "Fedora"
+
+- name: redhat_elasticsearch | installing elasticsearch
+  dnf:
+    name: "elasticsearch-{{ es_minor_version }}"
+    state: "present"
   when: ansible_distribution == "Fedora"
 
 - name: redhat_elasticsearch | ensuring elasticsearch is running and enabled

@@ -58,11 +58,12 @@ the following:
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-consul
 consul_bin_path: '/usr/local/bin'
-consul_bind_address: '{{ ansible_eth1.ipv4.address }}'  #defines the bind address...change to whatever ansible var desired..(ansible_default.ipv4.address, ansible_ssh_host and etc.)
+consul_bind_address: "{{ hostvars[inventory_hostname]['ansible_' + consul_bind_interface]['ipv4']['address'] }}"
+consul_bind_interface: 'enp0s8' # Define interface to bind to...(eth0|eth1|enp0s8)
 consul_client_address: '0.0.0.0'  #defines client address to listen on...either set to 0.0.0.0 (default) or consul_bind_address var.
 consul_clients_group: 'consul-clients'  #defines Ansible group that nodes belong to which are clients (agents or services running on)
 consul_config_dir: '/etc/consul.d'
@@ -118,7 +119,7 @@ consul_services:  #define services to register and checks to ensure those servic
 consul_ui_dl_file: 'consul_{{ consul_version }}_web_ui.zip'
 consul_user: 'consul'
 consul_version: '0.6.3'
-````
+```
 
 Dependencies
 ------------

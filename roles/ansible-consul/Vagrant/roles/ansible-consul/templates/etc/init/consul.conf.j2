@@ -1,0 +1,23 @@
+description "Consul"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+console log
+
+script
+  if [ -f "/etc/service/consul" ]; then
+    . /etc/service/consul
+  fi
+
+  # Make sure to use all our CPUs, because Consul can block a scheduler thread
+  export GOMAXPROCS=`nproc`
+
+  exec {{ consul_bin_path }}/consul agent \
+    -config-file={{ consul_config_dir }}/config.json \
+    -config-dir={{ consul_config_dir }}/client \
+    \$${CONSUL_FLAGS} \
+    >>/var/log/consul.log 2>&1
+end script

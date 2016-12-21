@@ -7,8 +7,8 @@
   when: ansible_hostname != "{{ inventory_hostname_short }}"
 
 - name: main | restarting machine
-  command: shutdown -r now "rebooting to complete hostname change"
-  async: 0
+  shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+  async: 1
   poll: 0
   ignore_errors: true
   when: >

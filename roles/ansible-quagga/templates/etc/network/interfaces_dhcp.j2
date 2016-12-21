@@ -1,5 +1,3 @@
-# {{ ansible_managed }}
-
 {% for item in quagga_interfaces_lo %}
 auto {{ item.int }}
 iface {{ item.int }} inet {{ item.method }}
@@ -21,10 +19,8 @@ iface {{ quagga_mgmt_int }} inet dhcp
 
 #{% endfor %}
 
-# Allowing for interfaces to be created by file and written to GlusterFS mountpoint for /etc/network/interfaces.d
 #### NOTE !!!!!!!!! #######
 # If creating new VLAN interfaces create them in individual .cfg files in the below folder...Only non VLAN interfaces should be contained within this $
 # Meaning....only interfaces that should not be shared (IP interfaces) on both nodes should be in this file...
 
 source /etc/network/interfaces.d/*
-

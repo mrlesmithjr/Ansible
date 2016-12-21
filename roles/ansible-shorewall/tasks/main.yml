@@ -4,4 +4,4 @@
   when: ansible_os_family == "Debian"
 
 - include: config_shorewall.yml
-  when: config_shorewall
+  when: shorewall_config

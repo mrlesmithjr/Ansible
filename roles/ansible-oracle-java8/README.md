@@ -11,11 +11,15 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-oracle-java8
-oracle_java8_debian_repo: 'ppa:webupd8team/java'
-````
+oracle_java8_debian_repo_info:
+  id: 'EEA14886'
+  keyserver: 'hkp://keyserver.ubuntu.com:80'
+  repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main'
+```
+
 Dependencies
 ------------
 
@@ -24,8 +28,7 @@ None
 Example Playbook
 ----------------
 
-#### GitHub
-````
+```
 ---
 - hosts: all
   become: true
@@ -33,17 +36,7 @@ Example Playbook
   roles:
     - role: ansible-oracle-java8
   tasks:
-````
-#### Galaxy
-````
----
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: mrlesmithjr.oracle-java8
-  tasks:
-````
+```
 
 License
 -------

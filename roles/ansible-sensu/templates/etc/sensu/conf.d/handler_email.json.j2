@@ -2,7 +2,7 @@
   "handlers": {
     "email": {
       "type": "pipe",
-      "command": "mail -s 'sensu event' {{ notification_email_to }}"
+      "command": "mail -s 'sensu event' {{ sensu_notification_email_to }}"
     }
   }
 }

@@ -8,5 +8,5 @@
   mysql_user:
     name: "{{ rundeck_db_user }}"
     password: "{{ rundeck_db_pass }}"
-    priv: "{{ rundeck_db_name }}:ALL"
+    priv: "{{ rundeck_db_name }}.*:ALL"
     state: "present"

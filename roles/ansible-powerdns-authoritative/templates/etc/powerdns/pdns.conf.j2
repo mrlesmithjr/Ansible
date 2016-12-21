@@ -7,6 +7,14 @@ allow-dnsupdate-from={{ allow_ddns_updates_from }}
 {% if pdns_also_notify.configure %}
 also-notify={{ pdns_also_notify.notify_ips|join (', ') }}
 {% endif %}
+{% if enable_pdns_api and pdns_server_version == "4.x" %}
+api=yes
+{% endif %}
+{% if enable_pdns_carbon_metrics %}
+carbon-interval={{ pdns_carbon_info.interval }}
+carbon-ourname={{ pdns_carbon_info.ourname }}
+carbon-server={{ pdns_carbon_info.server }}
+{% endif %}
 {% if pdns_default_soa_mail is defined %}
 default-soa-mail={{ pdns_default_soa_mail }}
 {% endif %}
@@ -19,12 +27,20 @@ disable-axfr=no
 disable-axfr=yes
 {% endif %}
 {% if pdns_api_key is defined %}
+{%   if pdns_server_version != "4.x" %}
 experimental-api-key={{ pdns_api_key }}
+{%   elif pdns_server_version == "4.x" %}
+api={{ pdns_api_key }}
+{%   endif %}
 {% endif %}
 {% if allow_ddns_updates %}
+{%   if pdns_server_version != "4.x" %}
 experimental-dnsupdate=yes
+{%   elif pdns_server_version == "4.x" %}
+dnsupdate=yes
+{%   endif %}
 {% endif %}
-{% if pdns_json_interface %}
+{% if pdns_json_interface and pdns_server_version != "4.x" %}
 experimental-json-interface=yes
 {% endif %}
 gmysql-host={{ pdns_db_host }}
@@ -78,7 +94,7 @@ webserver-address={{ pdns_webserver_address }}
 webserver-allow-from={{ pdns_webserver_allow }}
 {% endif %}
 {% if enable_pdns_web_server and pdns_webserver_password is defined %}
-webserver-password={{pdns_webserver_password}}
+webserver-password={{ pdns_webserver_password }}
 {% endif %}
 {% if enable_pdns_web_server and pdns_webserver_port is defined %}
 webserver-port={{ pdns_webserver_port }}

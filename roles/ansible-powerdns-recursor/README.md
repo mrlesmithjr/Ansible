@@ -7,15 +7,18 @@ Requirements
 ------------
 
 Install required Ansible roles..  
-````
+```
 sudo ansible-galaxy install -r requirements.yml
-````
+```
 
 Role Variables
 --------------
+If you would like to install PDNS 4.x version change `pdns_recursor_version` to
+`4.x`.
 
-````
+```
 ---
+# defaults file for ansible-powerdns-recursor
 enable_pdns_recursor_fwd_zones: false  #defines if specific forward zones should be defined
 install_pdns_recursor: true   #defines if recursive caching server is to be installed
 pdns_download_url: 'https://downloads.powerdns.com/releases'
@@ -31,11 +34,11 @@ pdns_recursor_fwd_zones:  #define forward lookup zone(s) along with DNS servers 
       - '192.168.2.6'
 pdns_local_address: '0.0.0.0'
 pdns_recursor_port: '5300'  #port pdns_recursor should listen on...default is 53 but needs to be changed to run both pdns services on same host
-pdns_recursor_version: '3.7.3-1'
+pdns_recursor_version: '3.7.3-1' # Defines version to install...To install 4.x change to 4.x
 pri_dns: []  #defines primary dns server on network...define here or globally in group_vars/all
 pri_domain_name: 'example.org'  #define here or globally in group_vars/all
 sec_dns: []  #defines secondary dns server on network...define here or globally in group_vars/all
-````
+```
 
 Dependencies
 ------------

@@ -1,0 +1,11 @@
+---
+# tasks file for ansible-ntp
+- include: debian.yml
+  tags:
+    - config_ntp
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  tags:
+    - config_ntp
+  when: ansible_os_family == "RedHat"

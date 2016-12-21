@@ -11,7 +11,23 @@
     dest: "/etc/powerdns/pdns.conf"
     owner: "root"
     group: "root"
-  register: "pdns_configured"
+  register: "pdns_configured_1"
+  when: >
+        ansible_os_family == "Debian" or
+        (ansible_os_family == "RedHat" and
+        pdns_server_version != "4.x")
+
+- name: pdns_server | Configuring PowerDNS
+  template:
+    src: "etc/powerdns/pdns.conf.j2"
+    dest: "/etc/pdns/pdns.conf"
+    owner: "root"
+    group: "root"
+  notify: restart pdns
+  register: "pdns_configured_2"
+  when: >
+        (ansible_os_family == "RedHat" and
+        pdns_server_version == "4.x")
 
 - name: pdns_server | ensuring pdns service is enabled
   service:
@@ -23,7 +39,9 @@
     name: "pdns"
     state: "restarted"
     sleep: 10
-  when: pdns_configured.changed
+  when: >
+        pdns_configured_1.changed or
+        pdns_configured_2.changed
 
 - name: pdns_server | creating powerdns db
   mysql_db:
@@ -43,7 +61,9 @@
     name: "{{ pdns_db_user }}"
     password: "{{ pdns_db_pass }}"
     priv: "{{ pdns_db_name }}.*:ALL"
+    host: "{{ item }}"
     state: present
+  with_items: '{{ pdns_db_allow_access_from_hosts }}'
   when: not pdns_db_cluster
 
 - name: pdns_server | creating powerdns user
@@ -51,8 +71,10 @@
     name: "{{ pdns_db_user }}"
     password: "{{ pdns_db_pass }}"
     priv: "{{ pdns_db_name }}.*:ALL"
+    host: "{{ item }}"
     state: present
   run_once: true
+  with_items: '{{ pdns_db_allow_access_from_hosts }}'
   when: pdns_db_cluster
 
 - name: pdns_server | copying db schema file
@@ -60,37 +82,43 @@
     src: "db_schema"
     dest: "/tmp"
 
-- name: pdns_server | checking for existing db schema import
-  stat:
-    path: "/var/log/db_schema_imported"
-  register: "db_schema_imported"
+- name: pdns_server | Checking If DB Tables Exist
+  command: >
+           mysql
+           -u {{ pdns_db_user }}
+           --password={{ pdns_db_pass }}
+           -h {{ pdns_db_host }}
+           -e "show tables from {{ pdns_db_name }};"
+  changed_when: false
+  register: "pdns_tables"
 
 - name: pdns_server | importing db schema
   mysql_db:
+    login_host: "{{ pdns_db_host }}"
+    login_password: "{{ pdns_db_pass }}"
+    login_user: "{{ pdns_db_user }}"
     name: "{{ pdns_db_name }}"
     state: "import"
     target: "/tmp/db_schema"
   when: >
         not pdns_db_cluster and
-        not db_schema_imported.stat.exists
+        ('domains' not in pdns_tables.stdout_lines)
 
 - name: pdns_server | importing db schema
   mysql_db:
+    login_host: "{{ pdns_db_host }}"
+    login_password: "{{ pdns_db_pass }}"
+    login_user: "{{ pdns_db_user }}"
     name: "{{ pdns_db_name }}"
     state: "import"
     target: "/tmp/db_schema"
   run_once: true
   when: >
         pdns_db_cluster and
-        not db_schema_imported.stat.exists
-
-- name: pdns_server | marking db schema as imported
-  file:
-    path: "/var/log/db_schema_imported"
-    state: "touch"
-  when: not db_schema_imported.stat.exists
+        ('domains' not in pdns_tables.stdout_lines)
 
 - name: pdns_server | ensuring pdns server is running and enabled on boot
   service:
     name: "pdns"
     state: "started"
+    enabled: yes

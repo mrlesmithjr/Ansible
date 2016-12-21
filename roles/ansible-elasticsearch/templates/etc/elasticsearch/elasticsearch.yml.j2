@@ -126,7 +126,7 @@ discovery.zen.minimum_master_nodes: {{ ( groups[es_config_master_group]|count /2
 {%     endif %}
 {%   endfor %}
 {% endif %}
-{% if (es_allow_remote_connections is defined and es_allow_remote_connections) and es_version == "2.x" %}
+{% if (es_allow_remote_connections is defined and es_allow_remote_connections) and es_major_version == "2.x" %}
 network.host: 0.0.0.0
 {% endif %}
 {% if es_config_unicast is defined and es_config_unicast %}

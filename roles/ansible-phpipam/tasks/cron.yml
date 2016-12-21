@@ -39,7 +39,7 @@
     state: present
   when: >
         phpipam_define_cron_jobs and
-        inventory_hostname == phpipam_primary and
+        (inventory_hostname == phpipam_primary) and
         phpipam_db_cluster
 
 - name: cron | adding cron job for pingCheck

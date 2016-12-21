@@ -1,0 +1,35 @@
+---
+- name: debian | adding RabbitMQ public GPG key to the apt repo
+  apt_key:
+    url: "{{ rabbitmq_debian_repo_key }}"
+    state: present
+
+- name: debian | adding RabbitMQ repo
+  apt_repository:
+    repo: "{{ rabbitmq_debian_repo }}"
+    state: present
+  register: "rabbitmq_repo_added"
+
+- name: debian | updating apt cache
+  apt:
+    update_cache: yes
+  when: rabbitmq_repo_added.changed
+
+- name: debian | installing RabbitMQ server
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rabbitmq-server
+
+- name: debian | enabling the RabbitMQ Management Console
+  rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+  notify: restart rabbitmq-server
+
+- name: debian | ensuring that the RabbitMQ service is running
+  service:
+    name: rabbitmq-server
+    state: started
+    enabled: yes

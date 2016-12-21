@@ -1,5 +1,5 @@
 ---
-- name: config_shorewall | Configuring Shorewall startup
+- name: shorewall_config | Configuring Shorewall startup
   template:
     src: "etc/default/shorewall.j2"
     dest: "/etc/default/shorewall"
@@ -9,17 +9,18 @@
   notify:
     - 'restart shorewall'
 
-- name: config_shorewall | Configuring Shorewall
+- name: shorewall_config | Configuring Shorewall
   template:
-    src: "etc/shorewall/shorewall.conf.j2"
+    src: "etc/shorewall/shorewallv{{shorewall_version}}.conf.j2"
     dest: "/etc/shorewall/shorewall.conf"
     owner: "root"
     group: "root"
     mode: 0640
   notify:
     - 'restart shorewall'
+  when: shorewall_main_configuration
 
-- name: config_shorewall | Configuring Shorewall interfaces
+- name: shorewall_config | Configuring Shorewall interfaces
   template:
     src: "etc/shorewall/interfaces.j2"
     dest: "/etc/shorewall/interfaces"
@@ -29,7 +30,7 @@
   notify:
     - 'restart shorewall'
 
-- name: config_shorewall | Configuring Shorewall zones
+- name: shorewall_config | Configuring Shorewall zones
   template:
     src: "etc/shorewall/zones.j2"
     dest: "/etc/shorewall/zones"
@@ -39,7 +40,7 @@
   notify:
     - 'restart shorewall'
 
-- name: config_shorewall | Configuring Shorewall policies
+- name: shorewall_config | Configuring Shorewall policies
   template:
     src: "etc/shorewall/policy.j2"
     dest: "/etc/shorewall/policy"
@@ -49,7 +50,7 @@
   notify:
     - 'restart shorewall'
 
-- name: config_shorewall | Configuring Shorewall rules
+- name: shorewall_config | Configuring Shorewall rules
   template:
     src: "etc/shorewall/rules.j2"
     dest: "/etc/shorewall/rules"
@@ -59,7 +60,7 @@
   notify:
     - 'restart shorewall'
 
-- name: config_shorewall | Configuring Shorewall masquerading
+- name: shorewall_config | Configuring Shorewall masquerading
   template:
     src: "etc/shorewall/masq.j2"
     dest: "/etc/shorewall/masq"

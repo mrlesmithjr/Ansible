@@ -11,7 +11,7 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-bind
 bind_acls:  #define acls for defining ip addresses or networks allowed to query bind
@@ -27,6 +27,7 @@ bind_acls:  #define acls for defining ip addresses or networks allowed to query 
     networks:
       - '192.168.0.0/16'
 bind_caching_server: true  #defines if bind should query root-hints servers for unknown queries...set bind_forwarding_server: false
+bind_config: true
 bind_forward_zones:
   - zone: '{{ pri_domain_name }}'
     expire: 2419200
@@ -74,6 +75,7 @@ bind_forwarding_server: false  #defines if bind should forward unknown queries t
 bind_forwarders:  #Define forwarding addresses to be used if bind_forwarding_server: true
   - 8.8.8.8
   - 8.8.4.4
+bind_manage_zones: false
 bind_masters_group: 'bind-masters'
 bind_reverse_zones:
   - zone: '192.168'
@@ -108,10 +110,8 @@ bind_reverse_zones:
     ttl: 604800
 bind_slaves_group: 'bind-slaves'
 bind_zones_dir: '/etc/bind/zones'
-config_bind: true
-manage_bind_zones: false
 pri_domain_name: 'vagrant.local'
-````
+```
 
 Dependencies
 ------------

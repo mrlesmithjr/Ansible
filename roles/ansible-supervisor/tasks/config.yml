@@ -1,0 +1,19 @@
+---
+- name: config | Configuring Services
+  template:
+    src: "etc/supervisor/service.j2"
+    dest: "{{ supervisor_conf_dir }}/{{ item.name }}.{{ supervisor_conf_ext }}"
+  register: "supervisor_configured"
+  with_items: '{{ supervisor_services }}'
+
+- name: config | Restarting Supervisor
+  service:
+    name: "{{ supervisor_service_name }}"
+    state: "restarted"
+  when: supervisor_configured.changed
+
+- name: config | Managing Services
+  supervisorctl:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: '{{ supervisor_services }}'

@@ -5,30 +5,67 @@
     state: "present"
     force: "yes"
   with_items:
+    - 'dnsutils'
     - 'git'
     - 'jq'
     - 'python-mysqldb'
+    # - 'mysql-client' # Causing MariaDB to be uninstalled
 
 - name: debian_pdns_server | downloading powerdns
   get_url:
     url: "{{ pdns_download_url }}/deb/pdns-static_{{ pdns_server_version }}_amd64.deb"
     dest: "/opt/pdns-static_{{ pdns_server_version }}_amd64.deb"
-  when: ansible_architecture == "x86_64"
+  when: >
+        ansible_architecture == "x86_64" and
+        pdns_server_version != "4.x"
 
 - name: debian_pdns_server | installing powerdns
   apt:
     deb: "/opt/pdns-static_{{ pdns_server_version }}_amd64.deb"
   notify: restart pdns
-  when: ansible_architecture == "x86_64"
+  when: >
+        ansible_architecture == "x86_64" and
+        pdns_server_version != "4.x"
 
 - name: debian_pdns_server | downloading powerdns
   get_url:
     url: "{{ pdns_download_url }}/deb/pdns-static_{{ pdns_server_version }}_i386.deb"
     dest: "/opt/pdns-static_{{ pdns_server_version }}_i386.deb"
-  when: ansible_architecture == "i386"
+  when: >
+        ansible_architecture == "i386" and
+        pdns_server_version != "4.x"
 
 - name: debian_pdns_server | installing powerdns
   apt:
     deb: "/opt/pdns-static_{{ pdns_server_version }}_i386.deb"
   notify: restart pdns
-  when: ansible_architecture == "i386"
+  when: >
+        ansible_architecture == "i386" and
+        pdns_server_version != "4.x"
+
+- name: debian_pdns_server | Adding PowerDNS Repo Key
+  apt_key:
+    url: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    state: "present"
+  when: pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Pinning PowerDNS Repo
+  template:
+    src: "pdns_repo.j2"
+    dest: "/etc/apt/preferences.d/pdns"
+  when: pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Adding PowerDNS Repo
+  apt_repository:
+    repo: "deb [arch=amd64] http://repo.powerdns.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-auth-40 main"
+    state: "present"
+  when: pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Installing PowerDNS Authoritative 4.x
+  apt:
+    name: "{{ item }}"
+    state: "latest"
+  with_items:
+    - 'pdns-server'
+    - 'pdns-backend-mysql'
+  when: pdns_server_version == "4.x"

@@ -1,0 +1,21 @@
+---
+- name: set_facts | Defining Alpine Facts
+  set_fact:
+    supervisor_conf_dir: '/etc/supervisor.d'
+    supervisor_conf_ext: 'ini'
+    supervisor_service_name: 'supervisor'
+  when: ansible_os_family == "Alpine"
+
+- name: set_facts | Defining Debian Facts
+  set_fact:
+    supervisor_conf_dir: '/etc/supervisor/conf.d'
+    supervisor_conf_ext: 'conf'
+    supervisor_service_name: 'supervisor'
+  when: ansible_os_family == "Debian"
+
+- name: set_facts | Defining RedHat Facts
+  set_fact:
+    supervisor_conf_dir: '/etc/supervisord.d'
+    supervisor_conf_ext: 'ini'
+    supervisor_service_name: 'supervisord'
+  when: ansible_os_family == "RedHat"

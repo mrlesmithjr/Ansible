@@ -17,8 +17,8 @@
         ((ansible_distribution == "Debian" or
         ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04') and
-        (config_docker_service is defined and
-        config_docker_service))
+        (docker_config_service is defined and
+        docker_config_service))
 
 - name: config_docker | ensuring /etc/systemd/system/docker.service.d directory exists
   file:
@@ -28,8 +28,8 @@
         ((ansible_distribution == "RedHat" or
         ansible_distribution == "Ubuntu" and
         ansible_distribution_version >= '16.04') and
-        (config_docker_service is defined and
-        config_docker_service))
+        (docker_config_service is defined and
+        docker_config_service))
 
 - name: config_docker | creating Docker systemd override
   template:
@@ -44,8 +44,8 @@
         ((ansible_distribution == "RedHat" or
         ansible_distribution == "Ubuntu" and
         ansible_distribution_version >= '16.04') and
-        (config_docker_service is defined and
-        config_docker_service))
+        (docker_config_service is defined and
+        docker_config_service))
 
 # Moved the following into docker.conf above
 # - name: config_docker | configuring Docker service options

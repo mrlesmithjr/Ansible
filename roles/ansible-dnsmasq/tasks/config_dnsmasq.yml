@@ -1,5 +1,5 @@
 ---
-- name: config_dnsmasq | configuring dnsmasq
+- name: dnsmasq_config | configuring dnsmasq
   template:
     src: etc/dnsmasq.conf.j2
     dest: /etc/dnsmasq.conf
@@ -8,10 +8,10 @@
     mode: 0644
   notify: restart dnsmasq
 
-- name: config_dnsmasq | creating tftpboot_dir
+- name: dnsmasq_config | creating dnsmasq_tftpboot_dir
   file:
-    path: "{{ tftpboot_dir }}"
+    path: "{{ dnsmasq_tftpboot_dir }}"
     state: directory
   when: >
-        (enable_tftp is defined and enable_tftp) or
-        (enable_dnsmasq_dhcp_tftp is defined and enable_dnsmasq_dhcp_tftp)
+        (dnsmasq_enable_tftp is defined and dnsmasq_enable_tftp) or
+        (dnsmasq_enable_dhcp_tftp is defined and dnsmasq_enable_dhcp_tftp)

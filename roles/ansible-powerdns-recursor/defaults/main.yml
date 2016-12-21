@@ -15,7 +15,7 @@ pdns_recursor_fwd_zones:  #define forward lookup zone(s) along with DNS servers 
       - '192.168.2.6'
 pdns_local_address: '0.0.0.0'
 pdns_recursor_port: '5300'  #port pdns_recursor should listen on...default is 53 but needs to be changed to run both pdns services on same host
-pdns_recursor_version: '3.7.3-1'
+pdns_recursor_version: '3.7.3-1' # Defines version to install...To install 4.x change to 4.x
 pri_dns: []  #defines primary dns server on network...define here or globally in group_vars/all
 pri_domain_name: 'example.org'  #define here or globally in group_vars/all
 sec_dns: []  #defines secondary dns server on network...define here or globally in group_vars/all

@@ -1,0 +1,34 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'apt-transport-https'
+    - 'ca-certificates'
+    - 'python-pip'
+
+- name: debian | Installing Python Modules
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'urllib3'
+    - 'pyopenssl'
+    - 'ndg-httpsclient'
+    - 'pyasn1'
+
+- name: debian | Adding Cassandra Debian Repo Key
+  apt_key:
+    url: "{{ cassandra_debian_repo_info.repo_key }}"
+    state: "present"
+
+- name: debian | Adding Cassandra Debian Repo
+  apt_repository:
+    repo: "{{ cassandra_debian_repo_info.repo }}"
+    state: "present"
+
+- name: debian | Installing Cassandra
+  apt:
+    name: "cassandra"
+    state: "present"

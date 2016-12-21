@@ -22,9 +22,17 @@ stackstorm_packs:
     installed: true
   - name: docker
     installed: true
+  - name: elasticsearch
+    installed: true
+  - name: github
+    installed: true
   - name: jenkins
     installed: true
+  - name: nest
+    installed: true
   - name: sensu
+    installed: true
+  - name: urbandict
     installed: true
 stackstorm_ssh_info:
   user: 'stanley'

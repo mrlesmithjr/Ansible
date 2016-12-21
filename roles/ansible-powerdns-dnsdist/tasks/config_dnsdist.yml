@@ -1,0 +1,20 @@
+---
+- name: config_dnsdist | Configuring DNSDist
+  template:
+    src: "etc/dnsdist/dnsdist.conf.j2"
+    dest: "/etc/dnsdist/dnsdist.conf"
+  register: "dnsdist_configured"
+  notify: "restart dnsdist"
+
+# - name: config_dnsdist | Restarting DNSDist
+#   service:
+#     name: "dnsdist"
+#     state: "restarted"
+#   when: dnsdist_configured.changed
+
+# - name: config_dnsdist | Generating New setKey
+#   shell: dnsdist -e "makeKey()" > /etc/dnsdist/setKey
+#
+# - name: config_dnsdist | Generating New setKey
+#   shell: dnsdist -e "makeKey()"
+#   register: "setKey"

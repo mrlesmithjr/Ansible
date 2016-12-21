@@ -1,0 +1,24 @@
+---
+- name: redhat | Installing Python Setuptools
+  yum:
+    name: "python-setuptools"
+    state: "present"
+  when: >
+        supervisor_python_install and
+        ansible_distribution != "Fedora"
+
+- name: redhat | Installing Supervisor
+  yum:
+    name: "supervisor"
+    state: "present"
+  when: >
+        ansible_distribution != "Fedora" and
+        not supervisor_python_install
+
+- name: redhat | Installing Supervisor
+  dnf:
+    name: "supervisor"
+    state: "present"
+  when: >
+        ansible_distribution == "Fedora" and
+        not supervisor_python_install

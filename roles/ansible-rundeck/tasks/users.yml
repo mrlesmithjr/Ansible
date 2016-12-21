@@ -10,12 +10,16 @@
 - name: users | generating rundeck ssh key
   user:
     name: "{{ rundeck_framework_ssh_user }}"
-    generate_ssh_key: yes
+    generate_ssh_key: "{{ rundeck_ssh_generate_key }}"
+    ssh_key_bits: "{{ rundeck_ssh_key_bits | default(omit) }}"
+    ssh_key_comment: "{{ rundeck_ssh_key_comment | default(omit) }}"
     ssh_key_file: "{{ rundeck_framework_ssh_keypath_file }}"
-    ssh_key_type: rsa
+    ssh_key_passphrase: "{{ rundeck_ssh_key_passphrase | default(omit) }}"
+    ssh_key_type: "{{ rundeck_ssh_key_type | default(omit) }}"
 
 - name: users | downloading rundeck users ssh public key
   fetch:
     src: "{{ rundeck_framework_ssh_keypath_file }}.pub"
     dest: "{{ rundeck_ssh_keydir }}/{{ rundeck_framework_ssh_user }}@{{ ansible_hostname }}.pub"
     flat: yes
+  when: rundeck_ssh_generate_key

@@ -18,7 +18,7 @@
   with_items: es_plugins_installed.stdout
   when: >
         (es_uninstall_plugins is defined and es_uninstall_plugins) and
-        es_version|int == 1.7
+        es_major_version|int == 1.7
 
 - name: installing plugins
   command: '{{ es_plugin_bin }} {{ es_plugin_install }} {{ item.plugin }}{{ item.name }}'

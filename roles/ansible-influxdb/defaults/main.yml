@@ -1,0 +1,23 @@
+---
+# defaults file for ansible-influxdb
+influxdb_config_databases: true
+influxdb_databases:
+  - host: 'localhost'
+    name: 'site'
+    state: 'present'
+    retention_policy: # Defines the retention policy
+      enabled: true
+      name: 'test-1w'
+      duration: '1w' # Define in hour(h), days(d), weeks(w) or Infinite(INF)
+      replication: '1'
+influxdb_debian_pre_reqs:
+  - 'apt-transport-https'
+  - 'python-pip'
+influxdb_debian_repo: 'deb https://repos.influxdata.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} stable'
+influxdb_debian_repo_key: 'https://repos.influxdata.com/influxdb.key'
+influxdb_python_modules:
+  - 'influxdb'
+influxdb_redhat_pre_reqs:
+  - 'python-pip'
+influxdb_redhat_repo: 'https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable'
+influxdb_redhat_repo_key: 'https://repos.influxdata.com/influxdb.key'

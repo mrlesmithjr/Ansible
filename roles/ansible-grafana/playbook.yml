@@ -7,6 +7,7 @@
     - role: ansible-collectd
     - role: ansible-snmpd
     - role: ansible-timezone
+    - role: ansible-influxdb
     - role: ansible-grafana
     - role: ansible-graphite
   tasks:

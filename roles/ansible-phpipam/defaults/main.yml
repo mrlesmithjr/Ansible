@@ -14,6 +14,19 @@ phpipam_define_cron_jobs: false  #defines if cron jobs for scanning and etc. sho
 phpipam_download: 'https://sourceforge.net/projects/phpipam/files/{{ phpipam_download_file }}'
 phpipam_download_file: 'phpipam-{{ phpipam_version }}.tar'
 phpipam_install_from_git: true  #defines if phpIPAM is pulled from https://github.com/phpipam/phpipam to install
+
+ # Defines commit to checkout to install from..Helps keep consistent installs
+ # Note - If not checking out master then the branch will be in a detached state
+ # but will still allow changes to be made to configurations and such. Should not
+ # cause any issues.
+ # Examples
+ # 9cbf625 Removed DHCP from settings
+ # 861f98c Merge branch 'master' of https://github.com/phpipam/phpipam
+ # 419aba5 Suppressed KEA arrors if cannot read leases file + shown error #777
+# phpipam_install_git_version: '9cbf625'
+phpipam_install_git_version: 'HEAD'
+ # Change to HEAD to always checkout the latest
+
 phpipam_patch_discovery: false  #defines if current discovery functionality should be patched
 phpipam_patch_email: false  #defines if current email test functionality should be patched
 phpipam_pre_load_db: true
@@ -23,6 +36,6 @@ phpipam_root: '{{ web_root }}/phpipam'  #defines the root folder of where phpipa
 phpipam_timezone: 'America/New_York'
 phpipam_upgrade: false  #defines if phpipam is to be upgraded
 phpipam_url: 'ipam.{{ pri_domain_name }}'  #defines the phpipam url to configure apache2 for if configured for url rewrite
-phpipam_version: 1.2.1
+phpipam_version: 1.2.1 # Only used when not installing via GIT.
 pri_domain_name: example.org  #defines the primary domain name...define here or globally in group_vars/all
 web_root: /var/www/html

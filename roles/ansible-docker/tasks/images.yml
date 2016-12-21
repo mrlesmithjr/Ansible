@@ -3,4 +3,4 @@
   docker:
     image: "{{ item.image }}"
     state: "{{ item.state }}"
-  with_items: docker_images
+  with_items: '{{ docker_images }}'

@@ -1,0 +1,10 @@
+---
+# defaults file for ansible-supervisor
+supervisor_python_install: false
+supervisor_services:
+  - name: 'nginx'
+    autorestart: true
+    autostart: true
+    command: '/usr/sbin/nginx -g "daemon off;"'
+    state: 'started'
+    username: 'www-data' # Defines a username to launch proces...not required

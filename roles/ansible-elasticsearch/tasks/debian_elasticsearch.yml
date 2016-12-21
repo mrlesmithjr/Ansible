@@ -9,15 +9,15 @@
     repo: "{{ es_debian_repo }}"
     state: present
 
-- name: debian_elasticsearch | installing elasticsearch and java
+- name: debian_elasticsearch | installing java
   apt:
-    name: "{{ item }}"
-    state: latest
-    force: yes
-#  notify: init elasticsearch
-  with_items:
-    - default-jre-headless
-    - elasticsearch
+    name: "default-jre-headless"
+    state: "present"
+
+- name: debian_elasticsearch | installing elasticsearch
+  apt:
+    name: "elasticsearch={{ es_minor_version }}"
+    state: "present"
 
 - name: debian_elasticsearch | ensuring elasticsearch service is started and enabled on boot
   service:

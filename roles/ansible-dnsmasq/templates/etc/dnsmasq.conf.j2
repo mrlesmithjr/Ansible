@@ -627,14 +627,14 @@
 #conf-dir=/etc/dnsmasq.d
 
 #
-{% if not enable_dnsmasq_dhcp and not enable_tftp and not enable_dnsmasq_dhcp_tftp %}
+{% if not dnsmasq_enable_dhcp and not dnsmasq_enable_tftp and not dnsmasq_enable_dhcp_tftp %}
 bind-interfaces
 bogus-priv
 {%   if dnsmasq_add_custom_domain %}
-address=/{{ pri_domain_name }}/{{ pri_bind_address }}
-domain={{ pri_domain_name }}
-local=/{{ pri_domain_name }}/
-server=/{{ pri_domain_name }}/{{ pri_bind_address }}
+address=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
+domain={{ dnsmasq_pri_domain_name }}
+local=/{{ dnsmasq_pri_domain_name }}/
+server=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
 {%   endif %}
 {%   if dnsmasq_enable_forwarders %}
 {%     for item in dnsmasq_nameservers %}
@@ -642,63 +642,63 @@ server={{ item }}
 {%     endfor %}
 {%   endif %}
 {% endif %}
-{% if enable_dnsmasq_dhcp %}
+{% if dnsmasq_enable_dhcp %}
 bind-interfaces
 bogus-priv
 dhcp-client-update
-dhcp-boot={{ dhcp_boot }}
-{%   if ntp_servers is defined %}
-dhcp-option=option:ntp-server,{% for server in ntp_servers %}{{ server }}{% if not loop.last %},{% endif %}{% endfor %}{{ '\n' }}
+dhcp-boot={{ dnsmasq_dhcp_boot }}
+{%   if dnsmasq_ntp_servers is defined %}
+dhcp-option=option:ntp-server,{% for server in dnsmasq_ntp_servers %}{{ server }}{% if not loop.last %},{% endif %}{% endfor %}{{ '\n' }}
 {%   endif %}
-dhcp-option=option:domain-name,{{ pri_domain_name }}
-{%   if dns_search is defined %}
-dhcp-option=option:domain-search,{{ dns_search }}
+dhcp-option=option:domain-name,{{ dnsmasq_pri_domain_name }}
+{%   if dnsmasq_dns_search is defined %}
+dhcp-option=option:domain-search,{{ dnsmasq_dns_search }}
 {%   endif %}
-{%   for item in dhcp_scopes %}
+{%   for item in dnsmasq_dhcp_scopes %}
 dhcp-range={{ item.start }},{{ item.end }},{{ item.netmask }}
 {%   endfor %}
 {%   if dnsmasq_add_custom_domain %}
-address=/{{ pri_domain_name }}/{{ pri_bind_address }}
-domain={{ pri_domain_name }}
-local=/{{ pri_domain_name }}/
-server=/{{ pri_domain_name }}/{{ pri_bind_address }}
+address=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
+domain={{ dnsmasq_pri_domain_name }}
+local=/{{ dnsmasq_pri_domain_name }}/
+server=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
 {%   endif %}
 {%   for item in dnsmasq_nameservers %}
 server={{ item }}
 {%   endfor %}
 {% endif %}
-{% if enable_tftp %}
+{% if dnsmasq_enable_tftp %}
 bind-interfaces
 bogus-priv
 enable-tftp
-interface={{ pri_bind_interface }}
-tftp-root={{ tftpboot_dir }}
+interface={{ dnsmasq_pri_bind_interface }}
+tftp-root={{ dnsmasq_tftpboot_dir }}
 {% endif %}
-{% if enable_dnsmasq_dhcp_tftp %}
-address=/{{ pri_domain_name }}/{{ pri_bind_address }}
+{% if dnsmasq_enable_dhcp_tftp %}
+address=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
 bind-interfaces
 bogus-priv
-dhcp-boot={{ dhcp_boot }}
+dhcp-boot={{ dnsmasq_dhcp_boot }}
 dhcp-client-update
-{%   if ntp_servers is defined %}
-dhcp-option=option:ntp-server,{% for server in ntp_servers %}{{ server }}{% if not loop.last %},{% endif %}{% endfor %}{{ '\n' }}
+{%   if dnsmasq_ntp_servers is defined %}
+dhcp-option=option:ntp-server,{% for server in dnsmasq_ntp_servers %}{{ server }}{% if not loop.last %},{% endif %}{% endfor %}{{ '\n' }}
 {%   endif %}
-dhcp-option=option:domain-name,{{ pri_domain_name }}
-{%   if dns_search is defined %}
-dhcp-option=option:domain-search,{{ dns_search }}
+dhcp-option=option:domain-name,{{ dnsmasq_pri_domain_name }}
+{%   if dnsmasq_dns_search is defined %}
+dhcp-option=option:domain-search,{{ dnsmasq_dns_search }}
 {%   endif %}
-{%   for item in dhcp_scopes %}
+{%   for item in dnsmasq_dhcp_scopes %}
 dhcp-range={{ item.start }},{{ item.end }},{{ item.netmask }}
 {%   endfor %}
 enable-tftp
 {%   if dnsmasq_add_custom_domain %}
-address=/{{ pri_domain_name }}/{{ pri_bind_address }}
-domain={{ pri_domain_name }}
-local=/{{ pri_domain_name }}/
-server=/{{ pri_domain_name }}/{{ pri_bind_address }}
+address=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
+domain={{ dnsmasq_pri_domain_name }}
+local=/{{ dnsmasq_pri_domain_name }}/
+server=/{{ dnsmasq_pri_domain_name }}/{{ dnsmasq_pri_bind_address }}
 {%   endif %}
 {%   for item in dnsmasq_nameservers %}
 server={{ item }}
 {%   endfor %}
-tftp-root={{ tftpboot_dir }}
+tftp-root={{ dnsmasq_tftpboot_dir }}
 {% endif %}

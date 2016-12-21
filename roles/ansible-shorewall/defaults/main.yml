@@ -1,6 +1,6 @@
 ---
 # defaults file for ansible-shorewall
-config_shorewall: true
+shorewall_config: true
 shorewall_config_options:  # http://shorewall.net/manpages/shorewall.conf.html
   accounting: 'Yes'  # [Yes|No]
   ip_forwarding: 'On' # [On|Off|Keep]
@@ -13,6 +13,7 @@ shorewall_config_options:  # http://shorewall.net/manpages/shorewall.conf.html
   startup_enabled: 'Yes'  # [Yes|No]
   startup_log: '/var/log/shorewall-init.log'  # [pathname]
   verbosity: '2'  # [0=Silent|1=Major|2=All]
+  docker: 'Yes'  # only valid for shorewall5, enables docker support
 shorewall_interfaces:
   - name: 'eth0'
     zone: 'net'
@@ -29,6 +30,7 @@ shorewall_interfaces:
       - 'nosmurfs'
       - 'routefilter=2'
       - 'tcpflags'
+shorewall_main_configuration: true
 shorewall_masquerade_info:
   enabled: true
   interface: 'eth0'
@@ -89,6 +91,7 @@ shorewall_rules:
           - '80'
           - '443'
 shorewall_startup: true
+shorewall_version: 4
 shorewall_zones:
   - name: 'fw'
     in_options:
