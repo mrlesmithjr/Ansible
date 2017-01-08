@@ -1,12 +1,13 @@
 ---
 # defaults file for ansible-zfs
-create_zfs_pools: false  #defines if ZFS pool(s) are created
-create_zfs_filesystems: false  #defines if ZFS filesystem(s) are created
-create_zfs_volumes: false  #defines if ZFS volumes(s) are created
-zfs_debian_package: 'zfsonlinux_{{ zfs_debian_package_version }}_all.deb'
+zfs_create_filesystems: false  #defines if ZFS filesystem(s) are created
+zfs_create_pools: false  #defines if ZFS pool(s) are created
+zfs_create_volumes: false  #defines if ZFS volumes(s) are created
 zfs_debian_package_key: 'http://zfsonlinux.org/4D5843EA.asc'
 zfs_debian_package_url: 'http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux'
 zfs_debian_package_version: 6
+zfs_debian_package: 'zfsonlinux_{{ zfs_debian_package_version }}_all.deb'
+zfs_enable_auto_snapshots: true
 zfs_enable_iscsi: false  #defines if iscsitarget is installed to server iSCSI volumes
 zfs_enable_nfs: false  #defines if NFS Kernel Server should be installed to serve NFS
 zfs_enable_performance_tuning: false  #defines if paramaters defined in zfs_performance_tuning are applied
@@ -23,6 +24,15 @@ zfs_filesystems:  #defines filesystems to manage
     sharenfs: 'on'
     sync: 'disabled'  # standard (default) | always | disabled
     state: 'present'
+  - name: 'Shares/Movies'
+    compression: 'lz4'
+    group: 'nogroup'
+    mountpoint: '/TANK/Shares/Movies'
+    owner: 'nobody'
+    pool: 'TANK'
+    quota: 'none'
+    state: 'present'
+    sync: 'disabled' #standard (default) | always | disabled
 zfs_iscsistarget_enable: '{{ zfs_enable_iscsi }}'  #defines if iscsitarget service is enabled
 zfs_iscsistarget_iqn: iqn.2001-04.org.example  #define your FQDN in reverse...(local.vagrant)
 zfs_iscsistarget_max_sleep: 3
@@ -43,14 +53,33 @@ zfs_performance_tuning:
   - param: 'zfs_arc_min'
     value: '{{ (ansible_memtotal_mb | int * 1024 * 1024 * 0.0625) | round | int }}'  # 1/2 zfs_arc_meta_limit
 zfs_pools:  #defines zpool(s) to manage
-  - name: tank
+  - name: 'SSD-TANK'
+    action: 'create'
 #    atime: 'on'
     compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
     devices:  #define devices to create pool with...can define multiple by | sdb sdc sdd sde sdf | all on one line w/spaces
-      - '/dev/sdb'
-      - '/dev/sdc'
-    type: basic  #define pool type... | basic (no-raid) | mirror | raidz | raidz2 | raidz3
-    state: present
+      - 'ata-INTEL_SSDSC2BW240A4_CVDA352100YL2403GN'
+      - 'ata-INTEL_SSDSC2BW240A4_BTDA329505KM2403GN'
+    type: 'mirror'  #define pool type... | basic (no-raid) | mirror | raidz | raidz2 | raidz3
+    state: 'present'
+  - name: 'SSD-TANK'
+    action: 'add'
+#    atime: 'on'
+    compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
+    devices:  #define devices to create pool with...can define multiple by | sdb sdc sdd sde sdf | all on one line w/spaces
+      - 'ata-INTEL_SSDSC2BW240A4_CVDA352100GP2403GN'
+      - 'ata-INTEL_SSDSC2BW240A4_CVDA401000Q02403GN'
+    type: 'mirror'  #define pool type... | basic (no-raid) | mirror | raidz | raidz2 | raidz3
+    state: 'present'
+  - name: 'SSD-TANK'
+    action: 'add'
+#    atime: 'on'
+    compression: 'lz4'  # on | off (default) | lzjb | gzip | gzip-1 | gzip-2 | gzip-3 | gzip-4 | gzip-5 | gzip-6 | gzip-7 | gzip-8 | gzip-9 | lz4 | zle
+    devices:  #define devices to create pool with...can define multiple by | sdb sdc sdd sde sdf | all on one line w/spaces
+      - 'ata-INTEL_SSDSC2BW240A4_CVDA4010045B2403GN'
+      - 'ata-INTEL_SSDSC2BW240A4_BTDA329501102403GN'
+    type: 'mirror'  #define pool type... | basic (no-raid) | mirror | raidz | raidz2 | raidz3
+    state: 'present'
 zfs_ubuntu_ppa: 'ppa:zfs-native/stable'
 zfs_volumes:  #defines block-device volumes to manage
   - name: 'backups'

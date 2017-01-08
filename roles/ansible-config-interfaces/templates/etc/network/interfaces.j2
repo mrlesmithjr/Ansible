@@ -53,7 +53,7 @@ iface {{ item.name }} inet {{ item.method }}
 auto {{ item.name }}
 iface {{ item.name }} inet {{ item.method }}
 {%       if item.slaves is defined and item.slaves != None %}
-  bond_slaves {{ item.slaves }}
+  bond_slaves {{ item.slaves|join (' ') }}
 {%       endif %}
 {%       if item.primary is defined and item.primary != None %}
   bond_primary {{ item.primary }}
@@ -142,7 +142,7 @@ iface {{ item.name }} inet {{ item.method }}
 {% endif %}
 
 {% if dns_nameservers is defined %}
-dns-nameservers {{ dns_nameservers }}
+dns-nameservers {{ dns_nameservers|join (' ') }}
 {% endif %}
 {% if dns_search is defined %}
 dns-search {{ dns_search }}

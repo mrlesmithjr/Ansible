@@ -60,6 +60,8 @@ pdns_db_user: 'powerdns'  #define here or globally in group_vars/all/accounts
 pdns_default_soa_mail: 'hostmaster.{{ pri_domain_name }}' #define here or globally in group_vars/group
 pdns_default_soa_name: '{{ ansible_hostname }}.{{ pri_domain_name }}' #define here or globally in group_vars/group
 pdns_download_url: 'https://downloads.powerdns.com/releases'
+pdns_repo_baseurl: 'http://repo.powerdns.com'
+pdns_repo_gpgkey: 'https://repo.powerdns.com/FD380FBB-pub.asc'
 pdns_json_interface: true
 pdns_listen_all_interfaces: true  #defines if PDSN will listen on all interfaces
 pdns_master: false  #Defines if node should perform as PDNS Master

@@ -5,7 +5,7 @@ auto lo
 iface lo inet loopback
 
 {% if dns_nameservers is defined %}
-dns-nameservers {{ dns_nameservers }}
+dns-nameservers {{ item.dns_nameservers|join (' ') }}
 {% endif %}
 {% if dns_search is defined %}
 dns-search {{ dns_search }}

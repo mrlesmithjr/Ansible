@@ -45,7 +45,7 @@
 
 - name: debian_pdns_server | Adding PowerDNS Repo Key
   apt_key:
-    url: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    url: "{{ pdns_repo_gpgkey }}"
     state: "present"
   when: pdns_server_version == "4.x"
 
@@ -57,7 +57,7 @@
 
 - name: debian_pdns_server | Adding PowerDNS Repo
   apt_repository:
-    repo: "deb [arch=amd64] http://repo.powerdns.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-auth-40 main"
+    repo: "deb [arch=amd64] {{ pdns_repo_baseurl }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-auth-40 main"
     state: "present"
   when: pdns_server_version == "4.x"
 

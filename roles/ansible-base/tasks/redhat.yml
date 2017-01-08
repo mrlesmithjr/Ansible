@@ -2,28 +2,28 @@
 - name: redhat | installing base packages
   yum:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - curl
-    - git
-    - nano
-    - net-tools
-    - ntp
-    - python-dnf  #preparing for switching over to dnf instead of yum
-    - sg3_utils
+    - 'curl'
+    - 'git'
+    - 'nano'
+    - 'net-tools'
+    - 'ntp'
+    - 'python-dnf'  #preparing for switching over to dnf instead of yum
+    - 'sg3_utils'
   when: >
         ansible_distribution != "Fedora"
 
 - name: redhat | installing base packages
   dnf:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - curl
-    - git
-    - nano
-    - net-tools
-    - ntp
-    - sg3_utils
+    - 'curl'
+    - 'git'
+    - 'nano'
+    - 'net-tools'
+    - 'ntp'
+    - 'sg3_utils'
   when: >
         ansible_distribution == "Fedora"

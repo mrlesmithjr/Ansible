@@ -106,3 +106,15 @@
     mode: 0644
   notify:
     - start zfs-share
+
+- name: ubuntu | Adding ZFS-Auto-Snapshot Repo
+  apt_repository:
+    repo: "ppa:bob-ziuchkovski/zfs-auto-snapshot"
+    state: "present"
+  when: zfs_enable_auto_snapshots
+
+- name: ubuntu | Installing ZFS-Auto-Snapshot
+  apt:
+    name: "zfs-auto-snapshot"
+    state: "present"
+  when: zfs_enable_auto_snapshots

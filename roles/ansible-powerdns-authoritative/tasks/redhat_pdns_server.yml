@@ -30,13 +30,13 @@
     - 'yum-plugin-priorities'
   when: pdns_server_version == "4.x"
 
-- name: redhat_pdns_recursor | Adding PowerDNS Repo
+- name: redhat_pdns_auth | Adding PowerDNS Repo
   yum_repository:
     name: "powerdns-auth-40"
-    baseurl: "http://repo.powerdns.com/centos/$basearch/$releasever/auth-40"
-    description: "PDNS-Recursor"
+    description: "PDNS-Auth"
+    baseurl: "{{ pdns_repo_baseurl }}/centos/$basearch/$releasever/auth-40"
     gpgcheck: yes
-    gpgkey: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    gpgkey: "{{ pdns_repo_gpgkey }}"
     enabled: yes
     includepkgs: "pdns*"
     priority: 90

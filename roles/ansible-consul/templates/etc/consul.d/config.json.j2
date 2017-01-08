@@ -14,7 +14,7 @@
 {% if inventory_hostname != consul_master and inventory_hostname in groups[consul_servers_group] %}
 {
     "bind_addr": "{{ consul_bind_address }}",
-    "bootstrap_expect": {{ ( groups[consul_servers_group]|count /2 ) | round (0, 'ceil') | int }},
+    "bootstrap_expect": {{ ( groups[consul_servers_group]|count ) | round (0, 'ceil') | int }},
     "client_addr": "{{ consul_client_address }}",
     "data_dir": "{{ consul_data_dir }}",
     "datacenter": "{{ consul_datacenter }}",

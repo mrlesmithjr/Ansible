@@ -1,26 +1,65 @@
 ---
 - name: manage_zfs | checking existing zpool(s)
-  command: 'zfs list'
+  shell: "zpool list | awk 'FNR >1' | awk '{print $1}'"
   changed_when: false
-  register: zpools
+  register: "zpools"
+  when: zfs_pools is defined
+
+- name: Gather ZPool Status
+  shell: "zpool status"
+  changed_when: false
+  register: "zpool_devices"
+  when: zfs_pools is defined
 
 - name: manage_zfs | creating basic zpool(s)
-  command: "zpool create -f {{ item.name }} {{ item.devices|join (' ') }}"
+  command: "zpool create {{ item.name }} {{ item.devices|join (' ') }}"
+  register: "zpool_created"
   with_items: '{{ zfs_pools }}'
   when: >
-        create_zfs_pools and
+        zfs_pools is defined and
+        zfs_create_pools and
         (item.type == "basic" and
         item.name not in zpools.stdout and
-        item.state == "present")
+        item.state == "present") and
+        item.devices[0] not in zpool_devices.stdout and
+        item.action|lower == "create"
 
-- name: manage_zfs | creating mirror/zraid zpool(s)
-  command: "zpool create -f {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
+- name: manage_zfs | adding basic zpool(s)
+  command: "zpool add {{ item.name }} {{ item.devices|join (' ') }}"
   with_items: '{{ zfs_pools }}'
   when: >
-        create_zfs_pools and
+        zfs_pools is defined and
+        zfs_create_pools and
+        (item.type == "basic" and
+        item.state == "present") and
+        item.devices[0] not in zpool_devices.stdout and
+        item.action|lower == "add" and
+        (zpool_created.changed or item.name in zpools.stdout)
+
+- name: manage_zfs | creating mirror/zraid zpool(s)
+  command: "zpool create {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
+  with_items: '{{ zfs_pools }}'
+  register: "zpool_created"
+  when: >
+        zfs_pools is defined and
+        zfs_create_pools and
         (item.type != "basic" and
         item.name not in zpools.stdout and
-        item.state == "present")
+        item.state == "present") and
+        item.devices[0] not in zpool_devices.stdout and
+        item.action|lower == "create"
+
+- name: manage_zfs | adding mirror/zraid zpool(s)
+  command: "zpool add {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
+  with_items: '{{ zfs_pools }}'
+  when: >
+        zfs_pools is defined and
+        zfs_create_pools and
+        (item.type != "basic" and
+        item.state == "present") and
+        item.devices[0] not in zpool_devices.stdout and
+        item.action|lower == "add" and
+        (zpool_created.changed or item.name in zpools.stdout)
 
 - name: manage_zfs | managing pools
   zfs:
@@ -35,7 +74,7 @@
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
   with_items: '{{ zfs_pools }}'
-  when: create_zfs_pools
+  when: zfs_create_pools
 
 - name: manage_zfs | managing filesystems
   zfs:
@@ -52,7 +91,7 @@
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
   with_items: '{{ zfs_filesystems }}'
-  when: create_zfs_filesystems
+  when: zfs_create_filesystems
 
 - name: manage_zfs | managing volumes
   zfs:
@@ -70,7 +109,15 @@
   notify:
     - restart iscsitarget
   with_items: '{{ zfs_volumes }}'
-  when: create_zfs_volumes
+  when: zfs_create_volumes
+
+- name: manage_zfs | Setting ZFS Filesystem Permissions
+  file:
+    path: "{{ item.mountpoint }}"
+    mode: "{{ item.mode|default(omit) }}"
+    owner: "{{ item.owner|default(omit) }}"
+    group: "{{ item.group|default(omit) }}"
+  with_items: '{{ zfs_filesystems }}'
 
 - name: manage_zfs | configuring iscsi devices
   template:
