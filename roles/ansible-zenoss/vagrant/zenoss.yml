@@ -1,0 +1,7 @@
+---
+- hosts: zenoss-master
+  become: true
+  vars:
+  roles:
+    - role: ansible-zenoss
+  tasks:

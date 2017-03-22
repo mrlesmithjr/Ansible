@@ -13,10 +13,10 @@
 
 # Storage directory for downloaded data and related maintenance activity.
 #
-{% if apt_cacher_ng_cachedir is defined %}
-CacheDir: {{ apt_cacher_ng_cachedir }}
+{% if tftpserver_apt_cacher_ng_cachedir is defined %}
+CacheDir: {{ tftpserver_apt_cacher_ng_cachedir }}
 {% endif %}
-{% if apt_cacher_ng_cachedir is not defined %}
+{% if tftpserver_apt_cacher_ng_cachedir is not defined %}
 CacheDir: /var/cache/apt-cacher-ng
 {% endif %}
 
@@ -32,10 +32,10 @@ LogDir: /var/log/apt-cacher-ng
 # TCP server port for incoming http (or HTTP proxy) connections.
 # Can be set to 9999 to emulate apt-proxy.
 #
-{% if apt_cacher_ng_port is defined %}
-Port:{{ apt_cacher_ng_port }}
+{% if tftpserver_apt_cacher_ng_port is defined %}
+Port:{{ tftpserver_apt_cacher_ng_port }}
 {% endif %}
-{% if apt_cacher_ng_port is not defined %}
+{% if tftpserver_apt_cacher_ng_port is not defined %}
 Port:3142
 {% endif %}
 
@@ -380,8 +380,8 @@ LocalDirs: acng-doc /usr/share/doc/apt-cacher-ng
 # Examples:
 # PassThroughPattern: private-ppa\.launchpad\.net:443$
 # PassThroughPattern: .* # this would allow CONNECT to everything
-{% if apt_cacher_passthrough_patterns is defined %}
-{%   for item in apt_cacher_passthrough_patterns %}
+{% if tftpserver_apt_cacher_passthrough_patterns is defined %}
+{%   for item in tftpserver_apt_cacher_passthrough_patterns %}
 PassThroughPattern: {{ item }}
 {%   endfor %}
 {% endif %}

@@ -1,0 +1,80 @@
+---
+- name: docker | adding Docker repo
+  template:
+    src: "etc/yum.repos.d/docker.repo.j2"
+    dest: "/etc/yum.repos.d/docker.repo"
+  register: docker_repo_added
+
+- name: docker | installing Docker
+  yum:
+    name: "docker-engine-1.9.0"
+    state: present
+  register: docker_installed
+
+- name: docker | disabling Docker repo (after Docker install)
+  lineinfile:
+    dest: "/etc/yum.repos.d/docker.repo"
+    regexp: "^enabled=1"
+    line: "enabled=0"
+
+- name: docker | ensuring /var/lib/docker directory exists
+  file:
+    path: "/var/lib/docker"
+    state: directory
+
+- name: docker | ensuring Docker temp directory is symlink
+  file:
+    src: "/tmp"
+    path: "/var/lib/docker/tmp"
+    state: link
+
+- name: docker | starting Docker (to capture docker0)
+  service:
+    name: "docker"
+    state: started
+
+- name: docker | ensuring /etc/systemd/system/docker.service.d directory exists
+  file:
+    path: "/etc/systemd/system/docker.service.d"
+    state: directory
+
+- name: docker | creating Docker systemd override
+  template:
+    src: "etc/systemd/system/docker.service.d/docker.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/docker.conf"
+  register: docker_systemd_override
+
+- name: docker | configuring Docker service options
+  template:
+    src: "etc/sysconfig/docker.j2"
+    dest: "/etc/sysconfig/docker"
+  register: docker_service_config
+
+- name: docker | configuring Docker storage options
+  template:
+    src: "etc/sysconfig/docker-storage.j2"
+    dest: "/etc/sysconfig/docker-storage"
+  register: docker_storage_config
+  when: enable_zenoss_docker_filesystems
+
+- name: docker | restarting systemd manager (when Docker systemd override is created)
+  shell: "systemctl daemon-reload"
+  when: >
+        docker_systemd_override.changed or
+        docker_service_config.changed or
+        docker_storage_config.changed
+
+- name: docker | restarting Docker
+  service:
+    name: "docker"
+    state: restarted
+    enabled: yes
+  when: >
+        docker_systemd_override.changed or
+        docker_service_config.changed or
+        docker_storage_config.changed
+        
+#- name: docker | ensuring /var/lib/docker is removed
+#  file:
+#    path: "/var/lib/docker"
+#    state: absent

@@ -1,6 +1,6 @@
 galaxy_info:
   author: Larry Smith Jr.
-  description: Configures /etc/hosts
+  description: An Ansible role that configures /etc/hosts
   #company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -142,7 +142,7 @@ galaxy_info:
     # NOTE: A tag is limited to a single word comprised of
     # alphanumeric characters. Maximum 20 tags per role.
     - system
-    
+
 dependencies: []
   # List your role dependencies here, one per line.
   # Be sure to remove the '[]' above if you add dependencies

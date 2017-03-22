@@ -1,19 +1,19 @@
 ---
-- name: elasticsearch_conf | ensuring elasticsearch folders exist
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: elasticsearch
-    group: elasticsearch
-    recurse: yes
-  with_items:
-    - /usr/share/elasticsearch/data
-    - /usr/share/elasticsearch/logs
-    - /usr/share/elasticsearch/config
-    - /usr/share/elasticsearch/config/scripts
-  when: >
-        es_docker_install is defined and
-        es_docker_install
+# - name: elasticsearch_conf | ensuring elasticsearch folders exist
+#   file:
+#     path: "{{ item }}"
+#     state: directory
+#     owner: elasticsearch
+#     group: elasticsearch
+#     recurse: yes
+#   with_items:
+#     - /usr/share/elasticsearch/data
+#     - /usr/share/elasticsearch/logs
+#     - /usr/share/elasticsearch/config
+#     - /usr/share/elasticsearch/config/scripts
+#   when: >
+#         es_docker_install is defined and
+#         es_docker_install
 
 - name: elasticsearch_conf | configuring elasticsearch
   template:
@@ -23,33 +23,33 @@
     group: elasticsearch
     mode: 0750
   notify: restart elasticsearch
-  when: >
-        (es_docker_install is defined and not es_docker_install) or
-        es_docker_install is not defined
+  # when: >
+  #       (es_docker_install is defined and not es_docker_install) or
+  #       es_docker_install is not defined
 
-- name: elasticsearch_conf | configuring elasticsearch
-  template:
-    src: etc/elasticsearch/elasticsearch.yml.j2
-    dest: /usr/share/elasticsearch/config/elasticsearch.yml
-    owner: elasticsearch
-    group: elasticsearch
-    mode: 0750
-  notify: restart elasticsearch
-  when: >
-        es_docker_install is defined and
-        es_docker_install
+# - name: elasticsearch_conf | configuring elasticsearch
+#   template:
+#     src: etc/elasticsearch/elasticsearch.yml.j2
+#     dest: /usr/share/elasticsearch/config/elasticsearch.yml
+#     owner: elasticsearch
+#     group: elasticsearch
+#     mode: 0750
+#   notify: restart elasticsearch
+#   when: >
+#         es_docker_install is defined and
+#         es_docker_install
 
-- name: elasticsearch_conf | configuring elasticsearch logging
-  template:
-    src: usr/share/elasticsearch/config/logging.yml.j2
-    dest: /usr/share/elasticsearch/config/logging.yml
-    owner: elasticsearch
-    group: elasticsearch
-    mode: 0750
-  notify: restart elasticsearch
-  when: >
-        es_docker_install is defined and
-        es_docker_install
+# - name: elasticsearch_conf | configuring elasticsearch logging
+#   template:
+#     src: usr/share/elasticsearch/config/logging.yml.j2
+#     dest: /usr/share/elasticsearch/config/logging.yml
+#     owner: elasticsearch
+#     group: elasticsearch
+#     mode: 0750
+#   notify: restart elasticsearch
+#   when: >
+#         es_docker_install is defined and
+#         es_docker_install
 
 - name: elasticsearch_conf | configuring elasticsearch service
   template:
@@ -68,3 +68,10 @@
     mode: 0775
     recurse: yes
     state: directory
+
+- name: elasticsearch_conf | Setting vm.max_map_count
+  sysctl:
+    name: "vm.max_map_count"
+    value: "262144"
+    state: "present"
+  notify: "restart elasticsearch"

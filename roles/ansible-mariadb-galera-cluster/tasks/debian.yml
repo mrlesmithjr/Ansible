@@ -6,6 +6,7 @@
     name: "{{ item }}"
     state: "present"
   with_items:
+    - 'apt-transport-https'
     - 'software-properties-common'
     - 'python-mysqldb'
     - 'rsync'
@@ -58,6 +59,6 @@
 - name: debian | adding debian-sys-maintenance permissions to mysql
   mysql_user:
     name: "debian-sys-maint"
-    password: "{{ deb_db_password }}"
+    password: "{{ galera_deb_db_password }}"
     priv: "*.*:ALL,GRANT"
     state: "present"

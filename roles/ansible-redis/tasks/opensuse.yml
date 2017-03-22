@@ -13,13 +13,4 @@
     state: "present"
   notify:
     - 'start redis'
-
-- name: opensuse | configuring redis-server to listen on all interfaces
-  replace:
-    dest: "/etc/redis.conf"
-    regexp: "^bind 127.0.0.1"
-    replace: "#bind 127.0.0.1"
-  notify: 'restart redis'
-  when: >
-        redis_allow_remote_connections is defined and
-        redis_allow_remote_connections
+  when: not redis_install_from_source

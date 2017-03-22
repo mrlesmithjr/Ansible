@@ -7,7 +7,7 @@ rdeck.base={{ rundeck_base }}
 rss.enabled=false
 # change hostname here
 {% if (rundeck_vagrant_install is defined and not rundeck_vagrant_install) or rundeck_vagrant_install is not defined %}
-grails.serverURL=http://{{ ansible_fqdn }}:4440
+grails.serverURL={{ rundeck_grails_protocol }}://{{ rundeck_grails_serverURL }}:{{ rundeck_grails_port }}
 {% elif rundeck_vagrant_install is defined and rundeck_vagrant_install %}
 grails.serverURL=http://127.0.0.1:4440
 {% endif %}

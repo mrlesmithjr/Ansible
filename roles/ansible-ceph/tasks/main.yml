@@ -1,0 +1,14 @@
+---
+# tasks file for ansible-ceph
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: users.yml
+
+- include: etc_hosts.yml
+
+- include: ssh_keys.yml
+
+- include: cluster.yml
+  tags:
+    - 'ceph_cluster'

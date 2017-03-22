@@ -17,8 +17,8 @@
   tags:
     - force-apt-update
   when: >
-        force_apt_update is defined and
-        force_apt_update
+        base_force_apt_update is defined and
+        base_force_apt_update
 
 - name: debian | installing base packages
   apt:
@@ -43,5 +43,5 @@
   tags:
     - update_dhcpclient_conf
   when: >
-        update_dhcpclient_conf is defined and
-        update_dhcpclient_conf
+        base_update_dhcpclient_conf is defined and
+        base_update_dhcpclient_conf

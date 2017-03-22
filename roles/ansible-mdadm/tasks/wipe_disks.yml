@@ -1,0 +1,13 @@
+---
+# Wiping out the disk devices which were part of the raid array
+- name: wipe_disks | Wiping Out Array Devices
+  command: "wipefs -af {{ item.1 }}"
+  register: "disks_wiped"
+  with_subelements:
+    - '{{ mdadm_arrays }}'
+    - devices
+
+# Updates initramfs archives in /boot
+- name: wipe_disks | Updating Initramfs
+  command: "update-initramfs -u"
+  when: disks_wiped.changed

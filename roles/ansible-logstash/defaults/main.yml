@@ -32,24 +32,49 @@ logstash_base_inputs:  #define inputs below to configure
 #    threads: '2'
 #  - type: 'syslog'
 #    port: '514'  #reminder....ports < 1024 require root access..
+
+logstash_custom_inputs: []
+  # - input: someinput
+  #   lines:
+  #     - 'somekey => "value"'
+
+logstash_custom_filters: []
+  # - lines:
+  #     - 'somekey => "value"'
+
 logstash_base_outputs:
   - output: 'redis'
     output_host: '{{ logstash_server_fqdn }}'
-logstash_deb_repo: 'deb https://packages.elastic.co/logstash/{{ logstash_major_ver }}/debian stable main'
+
+logstash_custom_outputs: []
+  # - output: someoutput
+  #   lines:
+  #     - 'somekey => "value"'
+
+logstash_deb_repo: 'deb https://artifacts.elastic.co/packages/{{ logstash_major_ver }}/apt stable main'
 logstash_folder: '/opt/logstash'
 logstash_log_dir: '/var/log/logstash'
-logstash_major_ver: '2.4'  # Define major version to install
-logstash_minor_ver: '1:2.4.0-1'  # Define minor version to install
+logstash_major_ver: '5.x'  # Define major version to install
+
+# Defines the miniumum amount of memory (in MB) required to effectively run Logstash
+logstash_min_memory_required: 1024
+
+logstash_minor_ver: '1:5.2.0-1'  # Define minor version to install
 logstash_plugins:
 #  - 'logstash-codec-nmap'
   - 'logstash-filter-elasticsearch'
   - 'logstash-filter-json_encode'
+  # - 'logstash-filter-multiline'
   - 'logstash-filter-translate'
 #  - 'logstash-filter-zeromq'
   - 'logstash-input-beats'
+  - 'logstash-output-email'
 #  - 'logstash-output-jira'
   - 'logstash-output-slack'
-logstash_repo_key: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
-logstash_repo_url: 'http://packages.elastic.co/logstash'
+logstash_repo_key: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
+logstash_repo_url: 'https://artifacts.elastic.co/packages/{{ logstash_major_ver }}/yum'
 logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server to send to...fqdn or localhost
 pri_domain_name: 'example.org'
+
+openjdk_version: 8
+logstash_install_java: true

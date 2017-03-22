@@ -1,37 +1,51 @@
 Role Name
 =========
 
-Installs snmpd
+An [Ansible] role to install/configure [SNMPD]
+
+Build Status
+------------
 
 [![Build Status](https://travis-ci.org/mrlesmithjr/ansible-snmpd.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-snmpd)
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
-````
-config_snmpd: true
-enable_snmpd: true
-snmpd_authorized_networks: []  #define read-only snmpd settings
+
+```
+---
+# defaults file for ansible-snmpd
+snmpd_config: true
+snmpd_enable: true
+
+# Define read-only snmpd settings
+snmpd_authorized_networks: []
 #  - network: 10.0.101.0/24
 #    community: example
-````
+
+snmpd_sysLocation: "Sitting on the Dock of the Bay"
+snmpd_sysContact: "Me <me@example.org>"
+```
+
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.snmpd }
+```
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-snmpd
+  tasks:
+```
 
 License
 -------
@@ -45,3 +59,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[SNMPD]: <http://net-snmp.sourceforge.net/>

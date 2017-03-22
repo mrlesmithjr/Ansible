@@ -3,19 +3,18 @@
 - include: pdns_accounts.yml
 
 - include: pdns_server.yml
-  when: install_pdns_server
 
 - include: pdns_zones.yml
   tags:
-    - create_pdns_zones
+    - pdns_create_pdns_zones
   when: >
-        create_pdns_zones is defined and
-        create_pdns_zones
+        pdns_create_pdns_zones is defined and
+        pdns_create_pdns_zones
 
 - include: pdns_records.yml
   tags:
-    - create_pdns_records
+    - pdns_create_pdns_records
   when: >
-        (create_pdns_records is defined and
-        create_pdns_records) and
+        (pdns_create_pdns_records is defined and
+        pdns_create_pdns_records) and
         pdns_records is defined

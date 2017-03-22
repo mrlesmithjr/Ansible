@@ -1,0 +1,22 @@
+---
+- name: redhat | installing snmpd
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  tags:
+    - snmpd
+  with_items:
+    - net-snmp
+    - net-snmp-utils
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing snmpd
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  tags:
+    - snmpd
+  with_items:
+    - net-snmp
+    - net-snmp-utils
+  when: ansible_distribution == "Fedora"

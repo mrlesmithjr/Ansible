@@ -19,6 +19,16 @@
     - '{{ php_sqlite_package }}'
     - 'wget'
 
+# mbstring package is not available on debian 8 or ubuntu 14.04 for php5 is embeded on libapache2-mod-php5
+# http://askubuntu.com/questions/491629/how-to-install-php-mbstring-extension-in-ubuntu/491631
+- name: debian | installing pre-req mbstring package
+  apt:
+    name: "{{ item }}"
+    state: present
+  when: not ansible_lsb.major_release|int <= 8 and not ansible_distribution_release == 'trusty'
+  with_items:
+    - 'php{{ php_ver }}-mbstring'
+
 - name: debian | Installing Git
   apt:
     name: "git"
@@ -27,6 +37,7 @@
 
 - name: debian | enabling php mcrypt module
   command: "{{ phpenmod_command }} mcrypt"
+  changed_when: false
 
 - name: debian | enabling apache mod_rewrite
   apache2_module:

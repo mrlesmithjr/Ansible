@@ -1,0 +1,14 @@
+---
+# handlers file for ansible-isc-dhcp-relay
+- name: "reload systemd"
+  command: "systemctl --system daemon-reload"
+
+- name: "restart dhcrelay"
+  service:
+    name: "dhcrelay"
+    state: "restarted"
+
+- name: "restart isc-dhcp-relay"
+  service:
+    name: "isc-dhcp-relay"
+    state: "restarted"

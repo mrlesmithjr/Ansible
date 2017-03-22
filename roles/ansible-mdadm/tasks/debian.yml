@@ -1,0 +1,5 @@
+---
+- name: debian | Installing mdadm
+  apt:
+    name: "mdadm"
+    state: "present"

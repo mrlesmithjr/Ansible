@@ -26,9 +26,6 @@ output {
       template => "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
       template_overwrite => true
 {%     endif %}
-{%     if item.workers is defined %}
-      workers => {{ item.workers }}
-{%     endif %}
 {%   endif %}
 {%   if item.output == "redis" %}
       data_type => "list"

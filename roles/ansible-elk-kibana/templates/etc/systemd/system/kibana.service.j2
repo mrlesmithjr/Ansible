@@ -4,9 +4,9 @@ Description=Kibana 4
 [Service]
 Type=simple
 User=kibana
-Environment=CONFIG_PATH={{ kibana_dir }}/kibana-{{ kibana_version }}-linux-x64/config/kibana.yml
+Environment=CONFIG_PATH={{ kibana_dir }}/kibana-{{ kibana_minor_version }}-linux-x64/config/kibana.yml
 Environment=NODE_ENV=production
-ExecStart={{ kibana_dir }}/kibana-{{ kibana_version }}-linux-x64/bin/kibana
+ExecStart={{ kibana_dir }}/kibana-{{ kibana_minor_version }}-linux-x64/bin/kibana
 
 [Install]
 WantedBy=multi-user.target

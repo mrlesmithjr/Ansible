@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs elasticsearch - Configurable (cluster ready)
+  description: An Ansible role to install/configure Elasticsearch
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -87,6 +87,7 @@ galaxy_info:
   #  - utopic
     - vivid
     - wily
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

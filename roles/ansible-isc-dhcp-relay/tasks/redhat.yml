@@ -1,0 +1,20 @@
+---
+- name: redhat | Installing ISC-DHCP-Relay
+  yum:
+    name: "dhcp"
+    state: "present"
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Pre-Reqs
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'libselinux-python'
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing ISC-DHCP-Relay
+  dnf:
+    name: "dhcp"
+    state: "present"
+  when: ansible_distribution == "Fedora"

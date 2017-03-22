@@ -47,15 +47,15 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  - name: opensuse
-    versions:
+  # - name: opensuse
+  #   versions:
   #  - all
   #  - 12.1
   #  - 12.2
   #  - 12.3
   #  - 13.1
   #  - 13.2
-    - 42.1
+    # - 42.1
   #- name: Amazon
   #  versions:
   #  - all

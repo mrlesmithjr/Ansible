@@ -39,7 +39,7 @@ Vagrant.configure(2) do |config|
       vb.memory = "2048"
     end
     couchbase03.vm.provision :shell, inline: 'ansible-playbook -i /vagrant/hosts -c local /vagrant/playbook.yml --limit "couchbase03"'
-  end 
+  end
   config.vm.provision :shell, path: "provision.sh", keep_color: "true"
   config.vm.provision :shell, inline: 'ansible-galaxy install -r /vagrant/requirements.yml -f'
 end

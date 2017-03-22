@@ -1,0 +1,27 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'apt-transport-https'
+    - 'parted'
+    - 'python-pip'
+    - 'python'
+
+- name: debian | Adding Ceph Repo Key
+  apt_key:
+    url: "{{ ceph_debian_repo_info.key }}"
+    state: "present"
+
+- name: debian | Adding Ceph Repo
+  apt_repository:
+    repo: "{{ ceph_debian_repo_info.repo }}"
+    state: "present"
+
+- name: debian | Installing Ceph Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'ceph-mds'

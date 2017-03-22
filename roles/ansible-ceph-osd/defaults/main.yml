@@ -1,0 +1,6 @@
+---
+# defaults file for ansible-ceph-osd
+ceph_osd_disks:
+  - '/dev/sdb'
+  - '/dev/sdc'
+ceph_osd_fstype: 'ext4'

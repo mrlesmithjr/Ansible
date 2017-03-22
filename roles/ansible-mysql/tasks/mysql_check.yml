@@ -34,9 +34,9 @@
     group: "root"
     mode: 0775
 
-- name: mysql_check | configuring mysqlchk_user permissions for MySQL
+- name: mysql_check | configuring {{ mysql_mysqlchk_user }} permissions for MySQL
   mysql_user:
-    name: "{{ mysqlchk_user }}"
-    password: "{{ mysqlchk_pass }}"
+    name: "{{ mysql_mysqlchk_user }}"
+    password: "{{ mysql_mysqlchk_pass }}"
     priv: "*.*:SELECT"
     state: "present"

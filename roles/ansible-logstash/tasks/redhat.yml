@@ -9,13 +9,20 @@
     src: "logstash_repo.j2"
     dest: "/etc/yum.repos.d/logstash.repo"
 
+- name: redhat | installing java
+  yum:
+    name: "{{ item }}"
+    state: "latest"
+  with_items:
+    - 'java-1.{{ openjdk_version }}.0-openjdk'
+  when: ansible_distribution != "Fedora" and logstash_install_java
+
 - name: redhat | installing logstash
   yum:
     name: "{{ item }}"
     state: "latest"
   with_items:
     - 'logstash'
-    - 'java-1.7.0-openjdk'
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing logstash

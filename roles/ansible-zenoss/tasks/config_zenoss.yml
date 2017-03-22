@@ -1,0 +1,17 @@
+---
+- name: config_zenoss | configuring control center
+  template:
+    src: "etc/default/serviced.j2"
+    dest: "/etc/default/serviced"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  register: control_center_configured
+
+- name: config_zenoss | enabling and restarting control center
+  service:
+    name: "serviced"
+    enabled: yes
+    state: restarted
+  when: control_center_configured.changed
+  

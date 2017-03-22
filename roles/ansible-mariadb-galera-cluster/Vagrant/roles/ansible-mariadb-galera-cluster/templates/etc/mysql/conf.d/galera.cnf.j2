@@ -17,6 +17,6 @@ wsrep_cluster_address="gcomm://{% for host in groups[galera_cluster_nodes_group]
 # To start failed cluster comment out above and uncomment below...Once cluster is started revert changes and restart mysql on main node where change was made
 #wsrep_cluster_address="gcomm://"
 wsrep_sst_method=rsync
-{% if enable_galera_monitoring_script %}
+{% if galera_enable_galera_monitoring_script %}
 wsrep_notify_cmd='{{ galera_monitor_script_path }}/{{ galera_monitor_script_name }}'
 {% endif %}

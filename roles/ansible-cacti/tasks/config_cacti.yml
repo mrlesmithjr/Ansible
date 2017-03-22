@@ -16,6 +16,7 @@
     src: "{{ cacti_web_root }}/cacti-{{ cacti_version }}"
     dest: "{{ cacti_site_dir }}"
     state: link
+
 - name: config_cacti | copying new cacti.sql
   template:
     src: "cacti.sql.j2"
@@ -31,11 +32,16 @@
 
 - name: config_cacti | populating cacti DB
   mysql_db:
-    name: "{{ cacti_db_info.db_name }}"
-    target: "{{ cacti_site_dir }}/cacti.sql"
+    name: "{{ item.name }}"
+    target: "{{ item.target }}"
     state: import
   register: cacti_db_populated
   ignore_errors: true  #defined to get around clustered setup...may remove at a later time
+  with_items:
+    - name: '{{ cacti_db_info.db_name }}'
+      target: '{{ cacti_site_dir }}/cacti.sql'
+    - name: 'mysql'
+      target: '/usr/share/mysql/mysql_test_data_timezone.sql'
   when: >
         not cacti_db_already_populated.stat.exists and
         not cacti_remote_db
@@ -98,3 +104,24 @@
     month: "{{ cacti_cron_schedule.month }}"
     job: "php {{ cacti_site_dir }}/poller.php 2>&1 >/dev/null"
     cron_file: "cacti_poller"
+
+- name: config_cacti | Configuring Apache2 Cacti Site
+  template:
+    src: "etc/apache2/conf-enabled/cacti.conf.j2"
+    dest: "/etc/apache2/conf-enabled/cacti.conf"
+  notify:
+    - "restart {{ cacti_webserver_handler }}"
+  when: cacti_webserver_type|lower == "apache2"
+
+- name: config_cacti | Populating MySQL TimeZone Info
+  shell: "mysql_tzinfo_to_sql  /usr/share/zoneinfo | mysql mysql"
+  when: >
+        not cacti_db_already_populated.stat.exists
+
+- name: config_cacti | assigning cacti permissions to mysql.time_zone_name
+  mysql_user:
+    name: "{{ cacti_db_info.user }}"
+    password: "{{ cacti_db_info.password }}"
+    priv: "mysql.time_zone_name:SELECT"
+    append_privs: yes
+    state: present

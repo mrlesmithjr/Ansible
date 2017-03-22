@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-stackstorm
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config_db.yml
+
+- include: users.yml
+
+- include: config_stackstorm.yml
+
+- include: config_webui.yml
+
+- include: packs.yml
+  when: stackstorm_install_packs

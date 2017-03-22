@@ -1,12 +1,12 @@
 Role Name
 =========
 
-An Ansible role that installs/configures [PowerDNS] Recursor
+An [Ansible] role that installs/configures [PowerDNS] Recursor
 
 Requirements
 ------------
 
-Install required Ansible roles..  
+Install required [Ansible] roles..  
 ```
 sudo ansible-galaxy install -r requirements.yml
 ```
@@ -19,11 +19,14 @@ If you would like to install PDNS 4.x version change `pdns_recursor_version` to
 ```
 ---
 # defaults file for ansible-powerdns-recursor
-enable_pdns_recursor_fwd_zones: false  #defines if specific forward zones should be defined
-install_pdns_recursor: true   #defines if recursive caching server is to be installed
-pdns_download_url: 'https://downloads.powerdns.com/releases'
-pdns_recursive_source_ip: false  #defines if source IP address should be defined for recursive queries...default is 0.0.0.0
-pdns_recursor_fwd_zones:  #define forward lookup zone(s) along with DNS servers to use
+
+pdns_recursor_download_url: 'https://downloads.powerdns.com/releases'
+
+# Defines if specific forward zones should be defined
+pdns_recursor_enable_fwd_zones: false
+
+# Define forward lookup zone(s) along with DNS servers to use
+pdns_recursor_fwd_zones:
   - name: 'blah.example.org'
     servers:
       - '192.168.1.5'
@@ -32,12 +35,19 @@ pdns_recursor_fwd_zones:  #define forward lookup zone(s) along with DNS servers 
     servers:
       - '192.168.2.5'
       - '192.168.2.6'
-pdns_local_address: '0.0.0.0'
-pdns_recursor_port: '5300'  #port pdns_recursor should listen on...default is 53 but needs to be changed to run both pdns services on same host
-pdns_recursor_version: '3.7.3-1' # Defines version to install...To install 4.x change to 4.x
-pri_dns: []  #defines primary dns server on network...define here or globally in group_vars/all
-pri_domain_name: 'example.org'  #define here or globally in group_vars/all
-sec_dns: []  #defines secondary dns server on network...define here or globally in group_vars/all
+pdns_recursor_local_address: '0.0.0.0'
+
+# Defines port pdns_recursor should listen on
+# default is 53 but needs to be changed to run both pdns services on same host
+pdns_recursor_port: '5300'
+
+# Defines if source IP address should be defined for recursive queries
+# default is 0.0.0.0
+pdns_recursor_source_ip: false
+
+# Defines version to install
+# To install 4.x change to 4.x
+pdns_recursor_version: '3.7.3-1'
 ```
 
 Dependencies
@@ -67,4 +77,5 @@ Larry Smith Jr.
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
 
+[Ansible]: <https://www.ansible.com>
 [PowerDNS]: <https://www.powerdns.com/>

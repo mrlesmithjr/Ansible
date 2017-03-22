@@ -1,0 +1,34 @@
+---
+- name: set_facts | Setting CentOS Facts
+  set_fact:
+    squid_package: "squid"
+    squid_root_dir: "/etc/squid"
+    squid_service: "squid"
+  when: >
+        ansible_distribution == "CentOS"
+
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    squid_package: "squid3"
+    squid_root_dir: "/etc/squid3"
+    squid_service: "squid3"
+  when: >
+        ansible_distribution == "Debian"
+
+- name: set_facts | Setting Ubuntu < 16.04 Facts
+  set_fact:
+    squid_package: "squid3"
+    squid_root_dir: "/etc/squid3"
+    squid_service: "squid3"
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version < '16.04'
+
+- name: set_facts | Setting Ubuntu >= 16.04 Facts
+  set_fact:
+    squid_package: "squid"
+    squid_root_dir: "/etc/squid"
+    squid_service: "squid"
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04'

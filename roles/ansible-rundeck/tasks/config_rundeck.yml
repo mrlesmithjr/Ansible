@@ -37,3 +37,23 @@
   with_items: "{{ rundeck_userhashes.results }}"
   when: rundeck_userhashes|success
   notify: restart rundeck
+
+- name: config_rundeck | deploy static authentication tokens file
+  template:
+    src: "etc/rundeck/tokens.properties.j2"
+    dest: "{{ rundeck_framework_tokens_path }}/{{ rundeck_framework_tokens_file }}"
+    owner: "rundeck"
+    group: "rundeck"
+    mode: '0640'
+  notify: restart rundeck
+  when: rundeck_framework_tokens is defined and rundeck_framework_tokens
+
+- name: config_rundeck | deploy acl files
+  template:
+    src: "etc/rundeck/custom_acls.aclpolicy.j2"
+    dest: "{{ rundeck_root_dir }}/{{ item.filename | default('custom_acls') }}.aclpolicy"
+    owner: "{{ item.owner | default('rundeck') }}"
+    group: "{{ item.group | default('rundeck') }}"
+    mode: "{{ item.mode | default('0640') }}"
+  with_items: "{{ rundeck_aclpolicies }}"
+  when: rundeck_aclpolicies is defined and rundeck_aclpolicies

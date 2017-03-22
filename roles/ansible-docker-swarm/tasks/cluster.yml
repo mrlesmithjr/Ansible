@@ -1,0 +1,81 @@
+---
+- name: cluster | Checking Swarm Mode Status
+  command: "docker info"
+  register: "docker_info"
+  changed_when: false
+
+- name: cluster | Init Docker Swarm Mode On First Manager
+  command: >
+          docker swarm init
+          --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
+          --advertise-addr {{ docker_swarm_addr }}
+  when: >
+        'Swarm: inactive' in docker_info.stdout and
+        inventory_hostname == docker_swarm_primary_manager
+
+- name: cluster | Capturing Docker Swarm Worker join-token
+  command: "docker swarm join-token -q worker"
+  changed_when: false
+  register: "docker_swarm_worker_token"
+  when: >
+        inventory_hostname == docker_swarm_primary_manager
+
+- name: cluster | Capturing Docker Swarm Manager join-token
+  command: "docker swarm join-token -q manager"
+  changed_when: false
+  register: "docker_swarm_manager_token"
+  when: >
+        inventory_hostname == docker_swarm_primary_manager
+
+- name: cluster | Defining Docker Swarm Manager Address
+  set_fact:
+    docker_swarm_manager_address: "{{ docker_swarm_addr }}:{{ docker_swarm_port }}"
+  changed_when: false
+  when: >
+        inventory_hostname == docker_swarm_primary_manager
+
+- name: cluster | Defining Docker Swarm Manager Address
+  set_fact:
+    docker_swarm_manager_address: "{{ hostvars[docker_swarm_primary_manager]['docker_swarm_manager_address'] }}"
+  changed_when: false
+  when: >
+        inventory_hostname != docker_swarm_primary_manager
+
+- name: cluster | Defining Docker Swarm Manager join-token
+  set_fact:
+    docker_swarm_manager_token: "{{ hostvars[docker_swarm_primary_manager]['docker_swarm_manager_token'] }}"
+  changed_when: false
+  when: >
+        inventory_hostname != docker_swarm_primary_manager
+
+- name: cluster | Defining Docker Swarm Worker join-token
+  set_fact:
+    docker_swarm_worker_token: "{{ hostvars[docker_swarm_primary_manager]['docker_swarm_worker_token'] }}"
+  changed_when: false
+  when: >
+        inventory_hostname != docker_swarm_primary_manager
+
+- name: cluster | Joining Additional Docker Swarm Managers To Cluster
+  command: >
+          docker swarm join
+          --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
+          --advertise-addr {{ docker_swarm_addr }}
+          --token {{ docker_swarm_manager_token.stdout }}
+          {{ docker_swarm_manager_address }}
+  when: >
+        inventory_hostname != docker_swarm_primary_manager and
+        inventory_hostname not in groups[docker_swarm_workers_ansible_group] and
+        'Swarm: active' not in docker_info.stdout and
+        'Swarm: pending' not in docker_info.stdout
+
+- name: cluster | Joining Docker Swarm Workers To Cluster
+  command: >
+         docker swarm join
+         --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
+         --advertise-addr {{ docker_swarm_addr }}
+         --token {{ docker_swarm_worker_token.stdout }}
+         {{ docker_swarm_manager_address }}
+  when: >
+        inventory_hostname in groups[docker_swarm_workers_ansible_group] and
+        'Swarm: active' not in docker_info.stdout and
+        'Swarm: pending' not in docker_info.stdout

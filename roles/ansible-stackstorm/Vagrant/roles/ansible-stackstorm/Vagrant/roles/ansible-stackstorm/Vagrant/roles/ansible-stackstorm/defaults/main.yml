@@ -1,0 +1,46 @@
+---
+# defaults file for ansible-stackstorm
+stackstorm_db_info:
+  user: 'mistral'
+  password: 'StackStorm'
+  db: 'mistral'
+stackstorm_debian_packages:
+  - 'apache2-utils'
+  - 'python-passlib'
+  - 'st2'
+  - 'st2chatops'
+  - 'st2mistral'
+  - 'st2web'
+stackstorm_debian_repo_info:
+  repo_key: 'https://packagecloud.io/StackStorm/staging-stable/gpgkey'
+  repos:
+    - 'deb https://packagecloud.io/StackStorm/staging-stable/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
+    - 'deb-src https://packagecloud.io/StackStorm/staging-stable/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
+stackstorm_install_packs: true  #defines if packs defined should be installed
+stackstorm_packs:
+  - name: ansible
+    installed: true
+  - name: docker
+    installed: true
+  - name: elasticsearch
+    installed: true
+  - name: github
+    installed: true
+  - name: jenkins
+    installed: true
+  - name: nest
+    installed: true
+  - name: sensu
+    installed: true
+  - name: urbandict
+    installed: true
+stackstorm_ssh_info:
+  user: 'stanley'
+stackstorm_ssl_info:
+  cert_days: 3650
+  cert_dir: '/etc/ssl/st2'
+  cert_info: '/C=US/ST=California/L=Palo Alto/O=StackStorm/OU=Information Technology/CN={{ ansible_hostname }}'
+stackstorm_webui_login_info:
+  password: 'Ch@ngeMe'
+  password_file: '/etc/st2/htpasswd'
+  user: 'st2admin'

@@ -1,0 +1,56 @@
+---
+# file roles/burp_server/tasks/cron.yml
+
+### CRON CONFIGURATION ###
+# Adding > /dev/null to commands to supress stdout normal emails to root.
+# it will send only emails to root if there is some stderr
+
+- name: ensure /etc/cron.d exists
+  file:
+    path: '/etc/cron.d'
+    state: directory
+
+# SHELL and PATH Variables are required to be added for lot of scripts that CRON runs:
+# Adds a variable to a file under /etc/cron.d
+- name: PATH added to crontab observium
+  cronvar:
+    name: PATH
+    value: "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+    user: root
+    cron_file: 'observium'
+
+- name: Schedule jobs for observium
+  cron: name='{{ item.name }}'
+        job='{{ item.job }}'
+        user='root'
+        cron_file='observium'
+        hour='{{ item.hour }}'
+        minute='{{ item.minute }}'
+        state=present
+  with_items:
+
+    - name: "Run a complete discovery of all devices once every 6 hours"
+      job: "/opt/observium/discovery.php -h all >> /dev/null 2>&1"
+      hour: "*/6"
+      minute: "33"
+
+    - name: "Run automated discovery of newly added devices every 5 minutes"
+      job: "/opt/observium/discovery.php -h new >> /dev/null 2>&1"
+      hour: "*"
+      minute: "*/5"
+
+    - name: "Run multithreaded poller wrapper every 5 minutes"
+      job: "/opt/observium/poller-wrapper.py 6 >> /dev/null 2>&1"
+      hour: "*"
+      minute: "*/5"
+
+    - name: "Run housekeeping script daily for syslog, eventlog and alert log"
+      job: "/opt/observium/housekeeping.php -ysel >> /dev/null 2>&1"
+      hour: "5"
+      minute: "13"
+
+    - name: "Run housekeeping script daily for rrds, ports, orphaned entries in the database and performance data"
+      job: "/opt/observium/housekeeping.php -yrptb >> /dev/null 2>&1"
+      hour: "4"
+      minute: "47"
+

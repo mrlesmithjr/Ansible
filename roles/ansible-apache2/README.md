@@ -1,9 +1,7 @@
 Role Name
 =========
 
-Installs apache2 http://httpd.apache.org/
-
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-apache2.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-apache2)
+An [Ansible] role to install [Apache]
 
 Requirements
 ------------
@@ -13,15 +11,35 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-apache2
-apache2_config_php: false  #defines if php.ini should be configured for Apache2
+
+# Defines if Apache2 should be configured
+apache2_config: false
+
+# Defines if php.ini should be configured for Apache2
+apache2_config_php: false
+
+# Defines if Apache2 virtual hosts should be configured
+apache2_config_virtual_hosts: false
+
+# Defines Apache2 default listen port
 apache2_default_port: 80
+
+# Defines if php-sqlite should be installed
 apache2_install_php_sqlite: false
+
+# Defines if php should be installed
 apache2_install_php: false
-apache2_php_max_memory: '128M'  #defines max memory for Apache php....default is 128M
+
+# Defines max memory for Apache php
+# default is 128M
+apache2_php_max_memory: '128M'
+
 apache2_server_admin: 'webmaster@localhost'
+
+# Define Apache2 virtual hosts
 apache2_virtual_hosts:
   - documentroot: '/var/www/example.com'
     default_site: false
@@ -38,10 +56,7 @@ apache2_virtual_hosts:
     port: 80
     serveradmin: '{{ apache2_server_admin }}'
     servername: ''
-config_apache2: false
-config_apache2_virtual_hosts: false
-pri_domain_name: 'example.org'
-````
+```
 
 Dependencies
 ------------
@@ -51,9 +66,14 @@ None
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.apache2 }
+```
+- hosts: apache_servers
+  become: true
+  vars:
+  roles:
+    - role: ansible-apache2
+  tasks:
+```
 
 License
 -------
@@ -67,3 +87,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[Apache]: <http://httpd.apache.org/>

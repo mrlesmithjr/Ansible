@@ -2,14 +2,14 @@
 - name: debian | adding haproxy ppa
   apt_repository:
     repo: "{{ debian_haproxy_repo }}"
-    state: present
+    state: "present"
     update_cache: yes
   when: ansible_distribution == "Ubuntu"
 
 - name: debian | installing haproxy and socat
   apt:
     name: "{{ item }}"
-    state: latest
+    state: "present"
   with_items:
     - haproxy
     - hatop

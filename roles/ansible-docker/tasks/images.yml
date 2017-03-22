@@ -1,6 +1,6 @@
 ---
 - name: images | ensuring docker images are present
-  docker:
-    image: "{{ item.image }}"
+  docker_image:
+    name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items: '{{ docker_images }}'

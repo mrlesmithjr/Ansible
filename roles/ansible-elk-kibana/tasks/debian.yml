@@ -1,15 +1,26 @@
 ---
+# Installing some Kibana pre-reqs
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'apt-transport-https'
+
+# Adding Elastic Repo Key
 - name: debian | Adding Elasticsearch Repo Key
   apt_key:
     url: "{{ kibana_debian_repo_info.key }}"
     state: "present"
 
+# Adding Kibana Repo
 - name: debian | Adding Kibana Repo
   apt_repository:
     repo: "{{ kibana_debian_repo_info.repo }}"
     state: "present"
 
-- name: debian | Installing Kibana
+# Installing Kibana version defined by kibana_minor_version
+- name: debian | Installing Kibana {{ kibana_minor_version }}
   apt:
-    name: "kibana={{ kibana_version }}"
+    name: "kibana={{ kibana_minor_version }}"
     state: "present"

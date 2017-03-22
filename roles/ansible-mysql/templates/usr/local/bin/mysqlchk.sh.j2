@@ -9,11 +9,11 @@
 # The purpose of this script is make haproxy capable of monitoring mysql properly
 #
 
-MYSQL_HOST="{{ mysqlchk_host }}"
+MYSQL_HOST="{{ mysql_mysqlchk_host }}"
 MYSQL_PORT="{{ mysql_port }}"
-MYSQL_USERNAME="{{ mysqlchk_user }}"
-MYSQL_PASSWORD="{{ mysqlchk_pass }}"
-MYSQL_OPTS="{{ mysqlchk_opts }}"
+MYSQL_USERNAME="{{ mysql_mysqlchk_user }}"
+MYSQL_PASSWORD="{{ mysql_mysqlchk_pass }}"
+MYSQL_OPTS="{{ mysql_mysqlchk_opts }}"
 TMP_FILE="/dev/shm/mysqlchk.$$.out"
 ERR_FILE="/dev/shm/mysqlchk.$$.err"
 FORCE_FAIL="/dev/shm/proxyoff"

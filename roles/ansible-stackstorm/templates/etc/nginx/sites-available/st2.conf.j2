@@ -83,7 +83,7 @@ server {
   }
 
   location / {
-    root      /opt/stackstorm/static/webui/;
+    root      {{ stackstorm_system.base_path }}/static/webui/;
     index     index.html index.htm index.php;
   }
 }

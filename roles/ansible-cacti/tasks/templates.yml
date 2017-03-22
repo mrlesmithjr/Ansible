@@ -18,7 +18,7 @@
 
 - name: templates | copying snmp informant templates
   template:
-    src: "templates/{{ item }}.j2"
+    src: "templates/templates/{{ item }}.j2"
     dest: "{{ cacti_site_dir }}/templates/{{ item }}"
     owner: "{{ cacti_web_owner }}"
     group: "{{ cacti_web_group }}"
@@ -27,7 +27,7 @@
   with_items: '{{ cacti_snmp_templates }}'
 
 - name: templates | importing snmp informant templates
-  command: php {{ cacti_cli }}/import_template.php --filename={{ cacti_site_dir }}/templates/{{ item }} --with-template-rras
+  command: php {{ cacti_cli }}/import_template.php --filename={{ cacti_site_dir }}/templates/{{ item }}
   with_items:
     - cacti_host_template_f5_big-ip.xml
     - cacti_host_template_snmp_informant_windows.xml

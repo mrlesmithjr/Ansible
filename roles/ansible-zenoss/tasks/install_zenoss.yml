@@ -1,0 +1,11 @@
+---
+- name: install_zenoss | adding zenoss repo
+  yum:
+    name: "{{ zenoss_package }}"
+    state: present
+
+- name: install_zenoss | installing Zenoss Core
+  yum:
+    name: "zenoss-core-service"
+    enablerepo: "zenoss-stable"
+    state: present

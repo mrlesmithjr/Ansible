@@ -1,5 +1,5 @@
 ---
-- name: debian | installing dnsmasq
+- name: debian | Installing DNSMasq
   apt:
-    name: dnsmasq
-    state: present
+    name: "dnsmasq"
+    state: "present"

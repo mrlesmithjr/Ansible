@@ -2,30 +2,31 @@
 filter {
   if "syslog" in [tags] and "pre-processed" not in [tags] {
     if [pre_syslog_program] == "ospfd" {
-      multiline {
-        pattern => "ip_"
-        what => "next"
-      }
-      multiline {
-        pattern => "src \["
-        what => "previous"
-      }
-      multiline {
-        pattern => "dst \["
-        what => "previous"
-      }
-      multiline {
-        pattern => "\[Hello:RECV]:"
-        what => "previous"
-      }
-      multiline {
-        pattern => "make_hello:"
-        what => "previous"
-      }
-      multiline {
-        pattern => "Hello sent to"
-        what => "previous"
-      }
+# This no longer works
+#      multiline {
+#        pattern => "ip_"
+#        what => "next"
+#      }
+#      multiline {
+#        pattern => "src \["
+#        what => "previous"
+#      }
+#      multiline {
+#        pattern => "dst \["
+#        what => "previous"
+#      }
+#      multiline {
+#        pattern => "\[Hello:RECV]:"
+#        what => "previous"
+#      }
+#      multiline {
+#        pattern => "make_hello:"
+#        what => "previous"
+#      }
+#      multiline {
+#        pattern => "Hello sent to"
+#        what => "previous"
+#      }
       mutate {
         add_tag => [ "Quagga", "pre-processed" ]
       }

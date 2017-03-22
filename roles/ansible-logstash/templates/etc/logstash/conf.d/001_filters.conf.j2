@@ -1,1 +1,10 @@
-#
+{% if logstash_custom_filters is defined %}
+{%   for item in logstash_custom_filters %}
+
+filter {
+  {% for line in item.lines %}
+      {{ line }}
+  {% endfor %}
+}
+{%   endfor %}
+{% endif %}

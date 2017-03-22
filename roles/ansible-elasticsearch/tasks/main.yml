@@ -1,5 +1,7 @@
 ---
 # tasks file for ansible-elasticsearch
+- include: set_facts.yml
+
 - include: config_data_paths.yml
   when: es_config_path_data
 
@@ -20,12 +22,16 @@
 - include: nfs.yml
   tags:
     - elasticsearch-nfs-mount
-  when: es_config_nfs is defined and es_config_nfs
+  when: >
+        es_config_nfs is defined and
+        es_config_nfs
 
 - include: resize_lvm.yml
   tags:
     - es_resize_lvm
-  when: es_resize_lvm is defined and es_resize_lvm
+  when: >
+        es_resize_lvm is defined and
+        es_resize_lvm
 
 - include: network_tweaks.yml
   when: es_enable_network_tweaks

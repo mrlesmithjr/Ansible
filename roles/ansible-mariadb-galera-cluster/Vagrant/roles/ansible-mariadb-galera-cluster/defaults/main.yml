@@ -1,31 +1,74 @@
 ---
 # defaults file for ansible-mariadb-galera-cluster
-cacti_db_password: 'cactiuser'  #defines the password for cacti db monitoring...define here or globally in group_vars/all/accounts
-cacti_db_user: 'cactiuser'  #defines the user for cacti db monitoring...define here or globally in group_vars/all/accounts
-deb_db_password: '{{ mysql_root_password }}'  #defines debian db password...generate using echo password | mkpasswd -s -m sha-512
-email_notifications: 'notifications@{{ smtp_domain_name }}'  #defines email address to receive notifications...define here or in group_vars/group
-enable_cacti_monitoring: false  #defines if cacti monitoring should be enabled for mysql
-enable_galera_monitoring_script: false
-enable_mariadb_repo: true  #defines if we should enable the MariaDB repo or use version within OS repos.
-galera_allow_root_from_any: false  #defines if root logins should be allowed from any host
-galera_cluster_name: 'vagrant-test' # Define the name of the cluster...define here or in group_vars/group
-galera_cluster_bind_address: 0.0.0.0  #define bind address for galera cluster...if running in Vagrant define this as...'{{ ansible_eth1.ipv4.address }}'
+
+# Define the cacti user info for cacti db monitoring - If used. May remove later.
+cacti_db_password: 'cactiuser'
+cacti_db_user: 'cactiuser'
+
+# Defines debian db password
+# generate using echo password | mkpasswd -s -m sha-512
+galera_deb_db_password: '{{ mariadb_mysql_root_password }}'
+
+# Defines email address to receive notifications
+galera_email_notifications: 'notifications@{{ mariadb_smtp_domain_name }}'
+
+# Defines if cacti monitoring should be enabled for mysql - If used. May remove later.
+galera_enable_cacti_monitoring: false
+
+galera_enable_galera_monitoring_script: false
+
+# Defines if we should enable the MariaDB repo or use version within OS repos.
+galera_enable_mariadb_repo: true
+
+# Defines if root logins should be allowed from any host
+galera_allow_root_from_any: false
+
+# Define the name of the cluster
+galera_cluster_name: 'vagrant-test'
+
+# Define bind address for galera cluster
+galera_cluster_bind_address: "{{ hostvars[inventory_hostname]['ansible_' + galera_cluster_bind_interface]['ipv4']['address'] }}"
+# Define interface in which to bind
+# ex. eth0|eth1|enp0s3|enp0s8
+galera_cluster_bind_interface: 'enp0s8'
+
 galera_cluster_nodes_group: 'galera-cluster-nodes'
 galera_monitor_script_name: 'galeranotify.py'
 galera_monitor_script_path: '/etc/mysql'
+
+# Defines the which node should be considered the master in the cluster
+# Used to bootstrap cluster
+galera_mysql_master_node: '{{ groups[galera_cluster_nodes_group][0] }}'
+
+# Define email address that cluster notifications will be sent from
+galera_notify_mail_from: 'galeranotify@{{ mariadb_smtp_domain_name }}'
+# Define email address that cluster notification will be sent to
+galera_notify_mail_to: '{{ galera_email_notifications }}'
+
+# Define smtp server to send notifications through
+galera_notify_smtp_server: '{{ mariadb_smtp_server }}'
+
+# Defines if the cluster should be reconfigured
+galera_reconfigure_galera: false
+
+# MariaDB Repo Info
 mariadb_debian_repo: 'deb [arch=amd64,i386,ppc64el] https://mirrors.evowise.com/mariadb/repo/{{ mariadb_version }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} main'
 mariadb_debian_repo_key: '0xF1656F24C74CD1D8'
 mariadb_debian_repo_keyserver: 'keyserver.ubuntu.com'
 mariadb_debian_repo_pin: 'mirrors.evowise.com'
 mariadb_redhat_repo: 'http://yum.mariadb.org/{{ mariadb_version }}/{{ ansible_distribution|lower }}{{ ansible_distribution_major_version|int}}-amd64'
 mariadb_redhat_repo_key: 'https://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
-mariadb_version: 10.1
-mysql_master_node: 'node0'
-mysql_root_password: 'root' #defines mysql root password...generate using echo password | mkpasswd -s -m sha-512
-notify_mail_from: 'galeranotify@{{ smtp_domain_name }}'  #defines email address that cluster notifications will be sent from
-notify_mail_to: '{{ email_notifications }}'
-notify_smtp_server: '{{ smtp_server }}'  #defines smtp server to send notifications through
-pri_domain_name: 'example.org'
-reconfigure_galera: false  #defines if the cluster should be reconfigured
-smtp_domain_name: '{{ pri_domain_name }}' #defines smtp domain for email...define here or globally in group_vars/all/email
-smtp_server: 'smtp.{{ pri_domain_name }}'  #defines smtp server to send email through...define here or globally in group_vars/all/servers
+mariadb_version: '10.1'
+
+# Define mysql root password
+# generate using echo password | mkpasswd -s -m sha-512
+mariadb_mysql_root_password: 'root'
+
+# Define the primary domain name of your environment
+mariadb_pri_domain_name: 'example.org'
+
+# Define smtp domain for email
+mariadb_smtp_domain_name: '{{ mariadb_pri_domain_name }}'
+
+# Define smtp server to send email through
+mariadb_smtp_server: 'smtp.{{ mariadb_pri_domain_name }}'

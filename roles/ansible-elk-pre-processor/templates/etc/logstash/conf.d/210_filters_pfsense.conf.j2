@@ -131,10 +131,11 @@ filter {
       mutate {
         add_tag => [ "packetfilter" ]
       }
-      multiline {
-        pattern => "^\s+|^\t\s+"
-        what => "previous"
-      }
+# This no longer works
+#      multiline {
+#        pattern => "^\s+|^\t\s+"
+#        what => "previous"
+#      }
       mutate {
         gsub => ['message', "\n", " "]
       }

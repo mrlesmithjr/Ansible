@@ -1,4 +1,9 @@
 ---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "apt-transport-https"
+    state: "present"
+    
 - include: debian_lvm.yml
   tags:
     - es_config_lvm

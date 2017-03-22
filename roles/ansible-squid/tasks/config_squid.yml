@@ -1,0 +1,9 @@
+---
+- name: config_squid | Configuring Squid
+  template:
+    src: "etc/squid/squid.conf.j2"
+    dest: "{{ squid_root_dir }}/squid.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: "restart {{ squid_service }}"

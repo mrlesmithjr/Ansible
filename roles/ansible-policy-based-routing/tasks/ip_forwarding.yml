@@ -1,0 +1,18 @@
+---
+- name: ip_forwarding | Enabling IP Forwarding
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+    state: "present"
+  when: policy_based_routing_enable_ip_forwarding
+
+- name: ip_forwarding | Disabling IP Forwarding
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: "0"
+    sysctl_set: yes
+    reload: yes
+    state: "absent"
+  when: not policy_based_routing_enable_ip_forwarding

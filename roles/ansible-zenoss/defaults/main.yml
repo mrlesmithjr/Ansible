@@ -1,0 +1,54 @@
+---
+# defaults file for ansible-zenoss
+enable_zenoss_docker_filesystems: false  #Defines if default filesystems should be changed
+zenoss_control_center_settings:
+  agent: false
+  allow_loopback_files: true
+  master: false
+  master_host: '127.0.0.1'
+zenoss_docker_file_system:
+  - name: 'docker'
+    devs:
+      - '/dev/sdd'
+    vg: 'docker'
+    lvols:
+      - name: 'data'
+        opts: '-T'  #thin pool
+        size: '95%VG'
+      - name: 'metadata'
+        opts: '-T'  #thin pool
+        size: '1%VG'
+zenoss_docker_storage_info:
+  vg: 'docker'
+  data: 'data'
+  metadata: 'metadata'  #not used
+zenoss_file_systems:
+  - name: 'backups'
+    dev: '/dev/sdb'
+    fstype: 'xfs'
+    mount: '/opt/serviced/var/backups'
+    opts: 'defaults'
+  - name: 'isvcs'
+    dev: '/dev/sdc'
+    fstype: 'xfs'
+    mount: '/opt/serviced/var/isvcs'
+    opts: 'defaults'
+zenoss_package: 'http://get.zenoss.io/yum/zenoss-repo-1-1.x86_64.rpm'
+zenoss_pre_req_packages:
+  - 'dnsmasq'
+  - 'lvm2'
+  - 'nfs-utils'
+  - 'nmap-ncat'
+  - 'ntp'
+  - 'xfsprogs'
+zenoss_services:
+  - 'dnsmasq'
+  - 'rpcbind'
+  - 'nfs-server'
+  - 'nfs-lock'
+  - 'nfs-idmap'
+  - 'ntpd'
+zenoss_users:
+  - name: 'administrator'
+    password: '$6$I.7NKW9uP$MPB.Gpisa.sfpb//pSSufZm03.kMkQ9YhAJVjvFtpBANKgXfmhV2YTySULVN9VDrfG1tvP3S2pVWaRLja6XeN/'
+    groups: 'wheel'

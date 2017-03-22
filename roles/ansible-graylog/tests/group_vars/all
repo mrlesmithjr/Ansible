@@ -1,4 +1,4 @@
 ---
-es_cluster_name: graylog
-es_replicas: 0 #set to the number of replicas to set for the elasticsearch cluster - this applies to graylog server settings and elasticsearch
-es_shards: 4 #set to the number of shards to set for the elasticsearch cluster - this applies to graylog server settings and elasticsearch
+graylog_es_cluster_name: graylog
+graylog_es_replicas: 0 #set to the number of replicas to set for the elasticsearch cluster - this applies to graylog server settings and elasticsearch
+graylog_es_shards: 4 #set to the number of shards to set for the elasticsearch cluster - this applies to graylog server settings and elasticsearch

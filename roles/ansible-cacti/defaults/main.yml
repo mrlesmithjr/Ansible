@@ -7,7 +7,10 @@ cacti_cron_schedule:
   hour: '*'
   day: '*'
   month: '*'
-cacti_db_allow_all_hosts: false  #Defines if the cacti user account should be able to login from anywhere vs. localhost
+
+# Defines if the cacti user account should be able to login from anywhere vs. localhost
+cacti_db_allow_all_hosts: false
+
 cacti_db_info:
   host: '127.0.0.1'
   port: '3306'
@@ -15,20 +18,29 @@ cacti_db_info:
   user: 'cactiuser'
   password: 'cacti'
 cacti_debian_packages:
-  - mysql-client
-  - php5-cli
-  - php5-gd
-  - php5-mysql
-  - php5-snmp
-  - python-mysqldb
-  - python-passlib
-  - rrdtool
-  - snmp
-  - zlib1g
-  - zlib1g-dev
+  # - 'mysql-client'
+  - 'php{{ cacti_php_version }}'
+  - 'php-cli'
+  - 'php{{ cacti_php_version }}-fpm'
+  - 'php{{ cacti_php_version }}-gd'
+  - 'php{{ cacti_php_version }}-json'
+  - 'php-ldap'
+  - 'php-mbstring'
+  - 'php{{ cacti_php_version }}-mysql'
+  - 'php{{ cacti_php_version }}-snmp'
+  - 'php{{ cacti_php_version }}-xml'
+  - 'php{{ cacti_php_version }}-gmp'
+  - 'python-mysqldb'
+  - 'python-passlib'
+  - 'rrdtool'
+  - 'snmp'
+  - 'zlib1g'
+  - 'zlib1g-dev'
 cacti_dl_file: 'cacti-{{ cacti_version }}.tar.gz'
 cacti_dl_url: 'http://www.cacti.net/downloads/'
-cacti_import_templates: true  #defines if Cacti templates included should be added and imported
+
+# Defines if Cacti templates included should be added and imported
+cacti_import_templates: true
 cacti_redhat_packages:
   - MySQL-python
   - net-snmp-libs
@@ -79,6 +91,6 @@ cacti_user_info:
   name: 'cactiuser'
   password: 'cacti'
   comment: 'Cacti User Account'
-cacti_version: '0.8.8g'
+cacti_version: '1.0.3'
 cacti_webserver_type: 'apache2'  #defines web server type (apache2|lighttpd|nginx)
 mysql_root_password: root

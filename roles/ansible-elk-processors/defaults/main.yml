@@ -49,15 +49,15 @@ logstash_configs:
   - processor_250_filters_snort
   - processor_255_filters_suricata
   - processor_260_filters_citrix_netscaler
-  - processor_270_filters_apache
-  - processor_280_filters_nginx
+  # - processor_270_filters_apache
+  # - processor_280_filters_nginx
   - processor_290_filters_windows_eventlog
   - processor_300_filters_windows_updates
   - processor_310_filters_windows_iis
   - processor_320_filters_exim4
   - processor_330_filters_postfix
   - processor_340_filters_redis
-  - processor_341_filters_rundeck
+  # - processor_341_filters_rundeck
   - processor_350_filters_zfs
   - processor_360_filters_powerdns
 #  - processor_361_filters_powerdns_blacklists
@@ -109,6 +109,7 @@ logstash_file_inputs:
 logstash_grok_patterns:
   - IPTABLES
   - NGINXERROR
+logstash_major_ver: '5.x' # Define major version installed (2.x|5.x)
 logstash_pre_processor_inputs:
   - prot: tcp
     port: 10514
@@ -155,9 +156,8 @@ logstash_processor_outputs:
     hosts: '127.0.0.1:9200'
     protocol: http  #node, transport or http....http is the only protocol supported in 2.x+
     flush_size: 5000
-    workers: 2
-#  - output: gelf
-#    host: 10.0.101.196
+  # - output: gelf
+  #   host: 10.0.101.196
 logstash_pre_tagging:
   - type: apache
     tags:
@@ -208,7 +208,7 @@ logstash_post_tagging:
   - type: vCenter
     tags:
       - VMware
-logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server...should be vip fqdn for elk-haproxy-nodes...define here or globally in group_vars/elk-nodes
+logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server...should be vip fqdn for elk-haproxy-nodes
 logstash_slack_api_webhook_url: [] #define the slack api webhook api url assigned when adding an incoming slack webhook.
 logstash_slack_channel: logstash  #defines the slack channel where logstash alerts should be sent to. Ensure enable_logstash_slack_output is set to true if slack output is required.
 logstash_slack_output_tags:  #define specific tags to look for to alert on and send to slack
@@ -218,6 +218,16 @@ powerdns_blacklists:
 #  - malware
   - social_networking
   - spyware
-pri_domain_name: example.org  #defines primary domain name...define here or globally in group_vars/all
+pri_domain_name: 'example.org'  #defines primary domain name
 skip_validation: true
-smtp_server: 'smtp.{{ pri_domain_name }}'  #defines smtp server to send emails through...define here or globally in group_vars/all
+smtp_server: 'smtp.{{ pri_domain_name }}'  #defines smtp server to send emails through
+syslog_servers: #defines remote syslog servers
+  # - name: 'graylog.{{ pri_domain_name }}'
+  #   proto: udp
+  #   port: 514
+  # - name: 'logstash.{{ pri_domain_name }}'
+  #   proto: tcp
+  #   port: 514
+  - name: localhost  #good for redirecting back itself..ex. logstash running on tcp/udp 10514...to get around logstash running on ports < 1024
+    proto: tcp
+    port: 10514

@@ -1,0 +1,13 @@
+---
+- name: etc_hosts | Updating /etc/hosts For All Hosts
+  lineinfile:
+    dest: "/etc/hosts"
+    regexp: ".*{{ item }}$"
+    line: "{{ hostvars[item]['ansible_' + ceph_management_interface]['ipv4']['address'] }} {{ item }}"
+    state: "present"
+  with_items: '{{ groups.all }}'
+
+# - name: etc_hosts | Ensuring Communications Work Between Hosts
+#   command: "ping -c 5 {{ item }}"
+#   changed_when: false
+#   with_items: '{{ groups.all }}'

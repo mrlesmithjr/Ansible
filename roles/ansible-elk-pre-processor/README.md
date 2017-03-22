@@ -6,9 +6,10 @@ Installs ELK Stack Role (ELK-Pre-Processor)
 Requirements
 ------------
 
-Prior to using this role you will want to add your nodes to the appropriate inventory group. You should create 2 elk-pre-processor nodes. Examples below.
-#####hosts inventory
-````
+Prior to using this role you will want to add your nodes to the appropriate
+inventory group. You should create 2 elk-pre-processor nodes. Examples below.
+`inventory`:
+```
 [elk-nodes]
 elk-pre-processor-1
 elk-pre-processor-2
@@ -16,12 +17,12 @@ elk-pre-processor-2
 [elk-pre-processor-nodes]
 elk-pre-processor-1
 elk-pre-processor-2
-````
+```
 
 Role Variables
 --------------
-defaults/main.yml
-````
+`defaults/main.yml`:
+```
 ---
 # defaults file for ansible-elk-pre-processor
 clear_logstash_config: false
@@ -46,6 +47,28 @@ logstash_configs_remove:  #define configs that were in logstash_configs but no l
   - 002_metrics  #comment out if metrics for logstash processing are not required..good for keeping track of throughput...removed because of incompatabilities w/ES 2.x
   - 250_filters_vmware_nsx  #not working
   - 260_filters_mysql  #not working
+logstash_custom_tagging:  #Define ESXi, Hadoop, vCenter, Netscaler and etc type specific...replaces old naming methods. Uses DNS naming to define.
+  - tag: 'ESXi'
+    naming:
+      - 'esxi'
+      - 'ESXi'
+#  - tag: 'Hadoop'
+#    naming:
+#      - 'hd-prod'
+#      - 'hd-dev'
+#  - tag: 'NSX'
+#    naming:
+#      - 'nsx-rt'
+#      - 'vShield-edge'
+  - tag: 'PFSense'
+    naming:
+      - 'pfsense'
+  - tag: 'vCenter'
+    naming:
+      - 'vcsa'
+      - 'atl-vc'
+      - 'ny-vc'
+logstash_custom_template: false  #defines if a custom elasticsearch template for logstash is desired.
 logstash_file_inputs:
   - path: /var/log/nginx/access.log
     type: nginx-access
@@ -62,30 +85,31 @@ logstash_inputs:
   - prot: tcp
     port: 10514
     type: syslog
-  - prot: tcp
-    port: 1514
-    type: VMware
-  - prot: tcp
-    port: 1515
-    type: vCenter
-  - prot: tcp
-    port: 1517
-    type: Netscaler
+  # - prot: tcp
+  #   port: 1514
+  #   type: VMware
+  # - prot: tcp
+  #   port: 1515
+  #   type: vCenter
+  # - prot: tcp
+  #   port: 1517
+  #   type: Netscaler
   - prot: tcp
     port: 28778
     type: elasticsearch-curator
   - prot: tcp
-    format: json
+    codec: json
     port: 3515
     type: eventlog
-  - prot: tcp
-    codec: json_lines
-    port: 3525
-    type: iis
-  - prot: tcp
-    codec: json
-    port: '{{ rundeck_logstash_port }}'
-    type: rundeck
+  # - prot: tcp
+  #   codec: json_lines
+  #   port: 3525
+  #   type: iis
+  # - prot: tcp
+  #   codec: json
+  #   port: '{{ rundeck_logstash_port }}'
+  #   type: rundeck
+logstash_major_ver: '5.x' # Define major version installed (2.x|5.x)
 logstash_outputs:
   - output: redis
     host: '{{ logstash_server_fqdn }}'
@@ -93,7 +117,7 @@ logstash_outputs:
 #    exchange: logstash
 #    exchange_type: fanout
 #    host: 10.0.101.128
-logstash_server_fqdn: []  #defines logstash server...should be vip fqdn for elk-haproxy-nodes...define here or globally in group_vars/elk-nodes
+logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server...should be vip fqdn for elk-haproxy-nodes.
 netscalernaming: [] #define your Citrix Netscaler naming standards if used...this should be set to host pattern...example - nsvpx01.everythingshouldbevirtual.local - define as nsvpx
 #  - nsvpx  #uncomment and remove '' above if setting
 nsxnaming: [] #define your VMware NSX naming standards if used...this should be set to host pattern...example - nsx-rt01.everythingshouldbevirtual.local - define as nsx-rt
@@ -101,41 +125,43 @@ nsxnaming: [] #define your VMware NSX naming standards if used...this should be 
 #  - nsx-rt  #uncomment and remove '' above if setting
 pfsensenaming:  #define your PFSense firewall naming standards if used...this should be set to host pattern...example - pfsense01.everythingshouldbevirtual.local - define as pfsense
   - pfsense
+pri_domain_name: 'example.org'  #defines primary domain name...define here or globally in group_vars/all
 reset_logstash_config: false
 rundeck_logstash_port: 9700
 vcenter_version: vcsa_6  #defines vcenter version...options- windows_5, windows_6, vcsa_5 or vcsa_6
-````
-vars/main.yml
-````
+```
+`vars/main.yml`:
+```
 syslog_servers:
   - name: localhost
     port: 10514
     proto: tcp
-````
+```
 
 Dependencies
 ------------
 
-````
-mrlesmithjr.ntp
-mrlesmithjr.rsyslog
-mrlesmithjr.snmpd
-mrlesmithjr.timezone
-mrlesmithjr.logstash
-mrlesmithjr.dnsmasq
-````
+Install all required Ansible roles from `requirements.yml`:
+```
+sudo ansible-galaxy install -r requirements.yml
+```
+
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-        - { role: mrlesmithjr.ntp }
-        - { role: mrlesmithjr.rsyslog }
-        - { role: mrlesmithjr.snmpd }
-        - { role: mrlesmithjr.timezone }
-        - { role: mrlesmithjr.logstash }
-        - { role: mrlesmithjr.dnsmasq }
-        - { role: mrlesmithjr.elk-pre-processor }
+```
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-ntp
+    - role: ansible-rsyslog
+    - role: ansible-snmpd
+    - role: ansible-timezone
+    - role: ansible-logstash
+    - role: ansible-dnsmasq
+    - role: ansible-elk-pre-processor
+```
 
 License
 -------

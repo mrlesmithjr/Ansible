@@ -1,0 +1,16 @@
+server.port: {{ kibana_port }}
+server.host: "{{ kibana_host }}"
+server.maxPayloadBytes: {{ kibana_maxpayloadbytes }}
+server.name: "{{ ansible_hostname }}"
+elasticsearch.url: "http://{{ kibana_elasticsearch_url }}:{{ kibana_elasticsearch_port }}"
+elasticsearch.preserveHost: {{ kibana_elasticsearch_preservehost|lower }}
+kibana.index: "{{ kibana_index }}"
+kibana.defaultAppId: "{{ kibana_default_app }}"
+
+{% if kibana_xpack_plugin_installed %}
+xpack.security.enabled: {{ kibana_xpack_security_enabled|lower }}
+xpack.monitoring.enabled: {{ kibana_xpack_monitoring_enabled|lower }}
+#xpack.graph.enabled: {{ kibana_xpack_graph_enabled|lower }}
+#xpack.watcher.enabled: {{ kibana_xpack_watcher_enabled|lower }}
+#xpack.reporting.enabled: {{ kibana_xpack_reporting_enabled|lower }}
+{% endif %}

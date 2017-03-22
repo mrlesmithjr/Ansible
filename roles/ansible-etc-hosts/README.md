@@ -1,9 +1,7 @@
 Role Name
 =========
 
-Configures /etc/hosts
-
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-etc-hosts.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-etc-hosts)
+An [Ansible] role that Configures /etc/hosts
 
 Requirements
 ------------
@@ -13,11 +11,21 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-etc-hosts
-etc_hosts_static_ip: false  #defines if node has static IP.
-````
+# Defines if all nodes in play should be added to each hosts /etc/hosts
+etc_hosts_add_all_hosts: false
+
+# Defines if node has static IP.
+etc_hosts_static_ip: false
+
+# Defines if ansible_default_ipv4.address is used for defining hosts
+etc_hosts_use_default_ip_address: false
+
+# Defines if ansible_ssh_host is used for defining hosts
+etc_hosts_use_ansible_ssh_host: true
+```
 
 Dependencies
 ------------
@@ -27,25 +35,13 @@ None
 Example Playbook
 ----------------
 
-#### GitHub
-````
+```
 - hosts: all
   become: true
   vars:
   roles:
     - role: ansible-etc-hosts
-  tasks:
-````
-
-#### Galaxy
-````
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: mrlesmithjr.etc-hosts
-  tasks:
-````
+```
 
 License
 -------
@@ -59,3 +55,5 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>

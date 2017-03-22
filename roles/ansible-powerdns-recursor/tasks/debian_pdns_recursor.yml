@@ -8,7 +8,7 @@
 
 - name: debian_pdns_recursor | downloading powerdns recursor
   get_url:
-    url: "{{ pdns_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
+    url: "{{ pdns_recursor_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
     dest: "/opt/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
   when: >
         ansible_architecture == "x86_64" and
@@ -24,7 +24,7 @@
 
 - name: debian_pdns_recursor | downloading powerdns recursor
   get_url:
-    url: "{{ pdns_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
+    url: "{{ pdns_recursor_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
     dest: "/opt/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
   when: >
         ansible_architecture == "i386" and

@@ -4,6 +4,7 @@
     fstype: ext4
     dev: "{{ item.disk }}"
   with_items: '{{ es_path_data_info }}'
+  when: es_path_data_info is defined
 
 - name: config_data_paths | mounting filesystem(s)
   mount:
@@ -12,3 +13,4 @@
     fstype: ext4
     state: mounted
   with_items: '{{ es_path_data_info }}'
+  when: es_path_data_info is defined

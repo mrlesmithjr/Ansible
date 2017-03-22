@@ -35,15 +35,15 @@ logstash_configs:
   - 241_filters_dhcp
   - 250_filters_snort
   - 260_filters_citrix_netscaler
-  - 270_filters_apache
-  - 280_filters_nginx
+  # - 270_filters_apache
+  # - 280_filters_nginx
   - 290_filters_windows_eventlog
   - 300_filters_windows_updates
   - 310_filters_windows_iis
   - 320_filters_exim4
   - 330_filters_postfix
   - 340_filters_redis
-  - 341_filters_rundeck
+  # - 341_filters_rundeck
   - 350_filters_zfs
   - 360_filters_powerdns
 #  - 361_filters_powerdns_blacklists
@@ -76,12 +76,12 @@ logstash_inputs:
     host: '{{ logstash_server_fqdn }}'
     threads: 2
 logstash_log_dir: /var/log/logstash
+logstash_major_ver: '5.x' # Define major version installed (2.x|5.x)
 logstash_outputs:
   - output: elasticsearch
     hosts: '{{ logstash_server_fqdn }}:9200'
     protocol: http  #node, transport or http....http is the only protocol supported in 2.x+
     flush_size: 5000
-    workers: 2
 #  - output: gelf
 #    host: 10.0.101.196
 logstash_pre_tagging:

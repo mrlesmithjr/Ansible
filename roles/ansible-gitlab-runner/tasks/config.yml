@@ -1,0 +1,9 @@
+---
+- name: config | Listing Registered GitLab Runners
+  command: "gitlab-runner list"
+  register: "gitlab_runners"
+  changed_when: false
+
+- name: config | Register GitLab Runner
+  command: "gitlab-runner register -n -u {{ gitlab_runner_config.url }} -r {{ gitlab_runner_config.token }} --executor {{ gitlab_runner_config.executor }}"
+  when: gitlab_runners.stderr.find('\n{{ ansible_hostname }}') == -1

@@ -1,0 +1,4 @@
+---
+# handlers file for ansible-zenoss
+- name: 'reload systemd'
+  shell: 'systemctl daemon-reload'

@@ -7,4 +7,4 @@
   when: ansible_os_family == "RedHat"
 
 - include: config.yml
-  when: config_dhcp
+  when: isc_dhcp_config_dhcp

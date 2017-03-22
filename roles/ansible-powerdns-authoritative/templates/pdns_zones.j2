@@ -2,8 +2,8 @@
   "name":"{{ item }}",
   "kind":"{{ pdns_zone_types }}",
   "masters": [],
-{% if config_soa_edit_api %}
-  "soa_edit_api": "{{ soa_edit_api }}",
+{% if pdns_config_soa_edit_api %}
+  "soa_edit_api": "{{ pdns_soa_edit_api }}",
 {% endif %}
   "nameservers": ["{{ pdns_nameservers|join (', ') }}"]
 }

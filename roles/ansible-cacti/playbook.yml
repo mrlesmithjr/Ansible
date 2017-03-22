@@ -1,19 +1,40 @@
 ---
-- hosts: all
+- hosts: cacti_nodes
   become: true
   vars:
-    - cacti_webserver_type: 'apache2'
-    - pri_domain_name: 'vagrant.local'
+    apache2_config_php: true
+    apache2_install_php: true
+    cacti_webserver_type: 'apache2'
+    mysql_settings:
+      collation_server: 'latin1_swedish_ci'
+      character_set_client: 'latin1'
+      expire_logs_days: '10'
+      # ON|OFF
+      innodb_doublewrite: 'OFF'
+      innodb_flush_log_at_timeout: '3'
+      innodb_read_io_threads: '32'
+      innodb_write_io_threads: '16'
+      join_buffer_size: '64M'
+      #Default is 16M
+      key_buffer_size: '{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M'
+      max_allowed_packet: '16M'
+      max_binlog_size: '100M'
+      max_connections: '150'
+      max_heap_table_size: '24M'
+      query_cache_limit: '1M'
+      query_cache_size: '16M'
+      thread_cache_size: '8'
+      thread_stack: '192K'
+      tmp_table_size: '64M'
   roles:
+    - role: ansible-ntp
+    - role: ansible-snmpd
+    - role: ansible-timezone
     - role: ansible-apache2
       when: cacti_webserver_type == "apache2"
     - role: ansible-lighttpd
       when: cacti_webserver_type == "lighttpd"
     - role: ansible-nginx
       when: cacti_webserver_type == "nginx"
-    - role: ansible-mariadb-mysql
-    - role: ansible-ntp
-    - role: ansible-snmpd
-    - role: ansible-timezone
+    - role: ansible-mysql
     - role: ansible-cacti
-  tasks:

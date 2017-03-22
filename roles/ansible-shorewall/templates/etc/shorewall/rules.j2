@@ -14,7 +14,7 @@
 #ACTION		SOURCE		DEST		PROTO	DEST	SOURCE		ORIGINAL	RATE		USER/	MARK	CONNLIMIT	TIME		HEADERS		SWITCH		HELPER
 #							PORT	PORT(S)		DEST		LIMIT		GROUP
 {% for item in shorewall_rules %}
-SECTION {{ item.section }}
+?SECTION {{ item.section }}
 {%   if item.rules is defined %}
 {%     for rule in item.rules %}
 {{ rule.action }}   {{ rule.source }}   {{ rule.dest }}   {{ rule.proto }}   {{ rule.dest_ports|join (',') }}

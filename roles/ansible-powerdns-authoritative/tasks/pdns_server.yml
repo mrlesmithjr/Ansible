@@ -34,11 +34,22 @@
     name: "pdns"
     enabled: yes
 
-- name: pdns_server | restarting powerdns
+- name: pdns_server | stopping pdns
   service:
     name: "pdns"
-    state: "restarted"
-    sleep: 10
+    state: "stopped"
+  when: >
+        pdns_configured_1.changed or
+        pdns_configured_2.changed
+
+- name: pdns_server | waiting to stop
+  pause:
+    seconds: 5
+
+- name: pdns_server | starting powerdns
+  service:
+    name: "pdns"
+    state: "started"
   when: >
         pdns_configured_1.changed or
         pdns_configured_2.changed

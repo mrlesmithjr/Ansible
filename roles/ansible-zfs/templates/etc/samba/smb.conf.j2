@@ -1,0 +1,48 @@
+#======================= Global Settings =======================
+
+[global]
+  workgroup = WORKGROUP
+	server string = %h server (Samba, Ubuntu)
+  dns proxy = no
+
+#### Networking ####
+
+#### Debugging/Accounting ####
+
+  log file = /var/log/samba/log.%m
+  max log size = 1000
+  syslog = 0
+  panic action = /usr/share/samba/panic-action %d
+
+####### Authentication #######
+
+  server role = standalone server
+  passdb backend = tdbsam
+  obey pam restrictions = yes
+  unix password sync = yes
+  passwd program = /usr/bin/passwd %u
+  passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+  pam password change = yes
+  map to guest = bad user
+
+########## Domains ###########
+
+############ Misc ############
+
+  usershare allow guests = yes
+
+#======================= Share Definitions =======================
+
+{% for item in zfs_filesystems %}
+{%   if item.state|lower == "present" and item.smb_options is defined %}
+[{{ item.smb_options.share_name }}]
+  browseable = {{ item.smb_options.browseable|default('no') }}
+  comment = {{ item.smb_options.comment|default('') }}
+  create directory mask = {{ item.smb_options.create_directory_mask|default('0755') }}
+  create mask = {{ item.smb_options.create_mask|default('0744') }}
+  guest ok = {{ item.smb_options.guest_ok|default('no') }}
+  path = {{ item.mountpoint }}
+  read only = {{ item.smb_options.read_only|default('yes') }}
+  writable = {{ item.smb_options.writable|default('no') }}
+{%   endif %}
+{% endfor %}

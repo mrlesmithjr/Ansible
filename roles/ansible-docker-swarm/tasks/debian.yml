@@ -1,0 +1,6 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "python-pip"
+    state: "present"
+  when: ansible_os_family == "Debian"

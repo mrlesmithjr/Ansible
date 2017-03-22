@@ -1,0 +1,74 @@
+---
+- name: nat_masquerade | Adding NAT Masquerade Rules
+  iptables:
+    table: "{{ item.table }}"
+    chain: "{{ item.chain }}"
+    source: "{{ item.source|default (omit) }}"
+    in_interface: "{{ item.in_int| default (omit) }}"
+    out_interface: "{{ item.out_int|default (omit) }}"
+    state: "present"
+  with_items:
+    - table: 'nat'
+      chain: 'POSTROUTING'
+      jump: 'MASQUERADE'
+      out_int: '{{ iptables_nat_masquerade.outbound_interface }}'
+    - table: 'filter'
+      chain: 'FORWARD'
+      jump: 'ACCEPT'
+      ctstate: 'RELATED,ESTABLISHED'
+      in_int: '{{ iptables_nat_masquerade.inbound_interface }}'
+      out_int: '{{ iptables_nat_masquerade.outbound_interface }}'
+      source: '{{ iptables_nat_masquerade.source|default (omit) }}'
+    - table: 'filter'
+      chain: 'FORWARD'
+      jump: 'ACCEPT'
+      in_int: '{{ iptables_nat_masquerade.inbound_interface }}'
+      out_int: '{{ iptables_nat_masquerade.outbound_interface }}'
+      source: '{{ iptables_nat_masquerade.source|default (omit) }}'
+  when: iptables_nat_masquerade.enabled
+
+- name: nat_masquerade | Enabling IP Forwarding
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+    state: "present"
+  when: iptables_nat_masquerade.enabled
+
+- name: nat_masquerade | Removing NAT Masquerade Rules
+  iptables:
+    table: "{{ item.table }}"
+    chain: "{{ item.chain }}"
+    source: "{{ item.source|default (omit) }}"
+    in_interface: "{{ item.in_int| default (omit) }}"
+    out_interface: "{{ item.out_int|default (omit) }}"
+    state: "absent"
+  with_items:
+    - table: 'nat'
+      chain: 'POSTROUTING'
+      jump: 'MASQUERADE'
+      out_int: '{{ iptables_nat_masquerade.outbound_interface }}'
+    - table: 'filter'
+      chain: 'FORWARD'
+      jump: 'ACCEPT'
+      ctstate: 'RELATED,ESTABLISHED'
+      in_int: '{{ iptables_nat_masquerade.inbound_interface }}'
+      out_int: '{{ iptables_nat_masquerade.outbound_interface }}'
+      source: '{{ iptables_nat_masquerade.source|default (omit) }}'
+    - table: 'filter'
+      chain: 'FORWARD'
+      jump: 'ACCEPT'
+      in_int: '{{ iptables_nat_masquerade.inbound_interface }}'
+      out_int: '{{ iptables_nat_masquerade.outbound_interface }}'
+      source: '{{ iptables_nat_masquerade.source|default (omit) }}'
+  when: not iptables_nat_masquerade.enabled
+
+- name: nat_masquerade | Enabling IP Forwarding
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: "0"
+    sysctl_set: yes
+    reload: yes
+    state: "absent"
+  when: not iptables_nat_masquerade.enabled

@@ -12,6 +12,8 @@
   with_items:
     - 'python-devel'
     - 'python-pip'
+    - 'ruby'
+    - 'rubygems-integration'
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing dependencies
@@ -19,8 +21,11 @@
     name: "{{ item }}"
     state: "present"
   with_items:
+    - 'libselinux-python'
     - 'python-devel'
     - 'python-pip'
+    - 'ruby'
+    # - 'rubygems-integration'
   when: ansible_distribution == "Fedora"
 
 - name: redhat | installing redis
@@ -29,7 +34,9 @@
     state: "present"
   notify:
     - 'start redis'
-  when: ansible_distribution != "Fedora"
+  when: >
+        ansible_distribution != "Fedora" and
+        not redis_install_from_source
 
 - name: redhat | installing redis
   dnf:
@@ -37,20 +44,6 @@
     state: "present"
   notify:
     - 'start redis'
-  when: ansible_distribution == "Fedora"
-
-- name: redhat | ensuring redis is enabled and started
-  service:
-    name: "redis"
-    state: "started"
-    enabled: yes
-
-- name: redhat | configuring redis-server to listen on all interfaces
-  replace:
-    dest: "/etc/redis.conf"
-    regexp: "^bind 127.0.0.1"
-    replace: "#bind 127.0.0.1"
-  notify: 'restart redis'
   when: >
-        redis_allow_remote_connections is defined and
-        redis_allow_remote_connections
+        ansible_distribution == "Fedora" and
+        not redis_install_from_source

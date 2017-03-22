@@ -8,7 +8,7 @@
   apt_repository:
     repo: "{{ item }}"
     state: present
-  with_items: opennms_debian_repos
+  with_items: "{{ opennms_debian_repos }}"
 
 - name: debian | installing opennms
   apt:

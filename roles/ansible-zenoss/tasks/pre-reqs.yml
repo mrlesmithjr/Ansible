@@ -1,0 +1,48 @@
+---
+- name: pre-reqs | stopping firewall and disabling firewall
+  service:
+    name: "firewalld"
+    state: "stopped"
+    enabled: false
+
+- name: pre-reqs | installing pre-req packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ zenoss_pre_req_packages }}'
+
+- name: pre-reqs | creating journal log
+  file:
+    path: "/var/log/journal"
+    state: directory
+  register: journal_log_created
+
+- name: pre-reqs | restarting journal
+  service:
+    name: "systemd-journald"
+    state: restarted
+  when: journal_log_created.changed
+
+- name: pre-reqs | starting services and enabling services
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items: '{{ zenoss_services }}'
+
+- name: pre-reqs | disabling selinux
+  selinux:
+    state: disabled
+  register: disabled_selinux
+
+- name: pre-reqs | restarting server to complete disabling selinux
+  command: shutdown -r now "rebooting to complete disabling selinux"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  when: disabled_selinux.changed
+
+- name: pre-reqs | waiting for server to come back
+  local_action: wait_for host="{{ ansible_ssh_host  | default(inventory_hostname) }}" state=started
+  sudo: false
+  when: disabled_selinux.changed

@@ -5,5 +5,11 @@
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
-  
+
 - include: config_packetbeat.yml
+
+- name: Ensuring Packetbeat Is Started And Enabled On Boot
+  service:
+    name: "packetbeat"
+    state: "started"
+    enabled: yes

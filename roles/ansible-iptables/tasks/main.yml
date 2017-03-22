@@ -5,5 +5,7 @@
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
-  
+
 - include: manage.yml
+
+- include: nat_masquerade.yml

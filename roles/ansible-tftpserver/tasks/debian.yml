@@ -1,5 +1,5 @@
 ---
-- name: debian | installing pre-reqs
-  apt: name={{ item }} state=absent
-  with_items:
-    - nfs-kernel-server
+- name: debian | Installing Apache2
+  apt:
+    name: "apache2"
+    state: "present"

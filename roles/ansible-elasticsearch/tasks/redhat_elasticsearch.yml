@@ -11,7 +11,7 @@
 
 - name: redhat_elasticsearch | installing java
   yum:
-    name: "java-1.7.0-openjdk"
+    name: "java-{{ es_java_version }}-openjdk-headless"
     state: "present"
   when: ansible_distribution != "Fedora"
 

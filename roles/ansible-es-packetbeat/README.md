@@ -1,7 +1,7 @@
 Role Name
 =========
 
-Installs and configured Elastic Packetbeat (https://www.elastic.co/products/beats/packetbeat)
+An [Ansible] role to install/configure [Packetbeat]
 
 Requirements
 ------------
@@ -15,14 +15,14 @@ Spins up 3 nodes to test with following:
 packetbeat  - client  
 es  - elasticsearch  
 logstash  - logstash server  
-````
+```
 vagrant up
-````
+```
 
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-es-packetbeat
 es_packetbeat_dashboard_dir: '/opt/beats-dashboards-{{ es_packetbeat_version }}'
@@ -30,40 +30,57 @@ es_packetbeat_dashboard_dl: 'http://download.elastic.co/beats/dashboards/{{ es_p
 es_packetbeat_dashboard_package: 'beats-dashboards-{{ es_packetbeat_version }}.zip'
 es_packetbeat_debian_package: 'packetbeat_{{ es_packetbeat_version }}_amd64.deb'
 es_packetbeat_dl_url: 'https://download.elastic.co/beats/packetbeat'
-es_packetbeat_elasticsearch_host: 'es.{{ pri_domain_name }}:9200'
-es_packetbeat_interface: 'any'  #defines interface to sniff on... (any, eth0, eth1, etc.)
+
+# Define the Elasticsearch host if using Elasticsearch as an output
+es_packetbeat_elasticsearch_host: 'es.{{ pri_domain_name }}'
+
+# Defines interface to sniff on... (any, eth0, eth1, etc.)
+es_packetbeat_interface: 'any'
+
+# Define the Logstash host if using Logstash as an output
+es_packetbeat_logstash_host: 'logstash.{{ pri_domain_name }}'
+
 es_packetbeat_outputs:
-  - name: elasticsearch
-    host: '{{ es_packetbeat_elasticsearch_host }}'
+  # - name: 'elasticsearch'
+  #   host: '{{ es_packetbeat_elasticsearch_host }}'
+  #   port: '9200'
+  #   workers: 1
+  - name: 'logstash'
+    host: '{{ es_packetbeat_logstash_host }}'
+    port: '5044'
     workers: 1
 es_packetbeat_protocols:
-  - name: dns
+  - name: 'dns'
     ports:
-      - 53
-    include_additionals: true  #whether or not the dns.additionals field (additional resource records) is added to messages
-    include_authorities: true  #whether or not the dns.authorities field (authority resource records) is added to messages
+      - '53'
+    # whether or not the dns.additionals field (additional resource records)
+    # is added to messages
+    include_additionals: true
+    # whether or not the dns.authorities field (authority resource records)
+    # is added to messages
+    include_authorities: true
     send_request: false
     send_response: false
-  - name: http
+  - name: 'http'
     ports:
-      - 80
-      - 8080
-  - name: memcache
+      - '80'
+      - '8080'
+  - name: 'memcache'
     ports:
-      - 11211
-  - name: mongodb
+      - '11211'
+  - name: 'mongodb'
     ports:
-      - 27017
-  - name: mysql
+      - '27017'
+  - name: 'mysql'
     ports:
-      - 3306
-  - name: redis
+      - '3306'
+  - name: 'redis'
     ports:
-      - 6379
+      - '6379'
 es_packetbeat_redhat_package: 'packetbeat-{{ es_packetbeat_version }}-x86_64.rpm'
-es_packetbeat_version: '1.2.3'
+es_packetbeat_version: '1.3.1'
 pri_domain_name: 'example.org'
-````
+```
 
 Dependencies
 ------------
@@ -73,24 +90,14 @@ None
 Example Playbook
 ----------------
 
-#### GitHub
-````
-- hosts: all
+```
+- hosts: packetbeat_clients
   become: true
   vars:
   roles:
     - role: ansible-es-packetbeat
   tasks:
-````
-#### Galaxy
-````
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: mrlesmithjr.packetbeat
-  tasks:
-````
+```
 
 License
 -------
@@ -104,3 +111,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[Packetbeat]: <https://www.elastic.co/products/beats/packetbeat>

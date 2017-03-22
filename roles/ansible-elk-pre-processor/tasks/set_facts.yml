@@ -1,0 +1,12 @@
+---
+- name: set_facts | Setting Logstash Facts
+  set_fact:
+    logstash_bin: '/opt/logstash/bin/logstash'
+    logstash_plugin_bin: '/opt/logstash/bin/plugin'
+  when: logstash_major_ver == '2.x'
+
+- name: set_facts | Setting Logstash Facts
+  set_fact:
+    logstash_bin: '/usr/share/logstash/bin/logstash'
+    logstash_plugin_bin: '/usr/share/logstash/bin/logstash-plugin'
+  when: logstash_major_ver == '5.x'

@@ -1,12 +1,19 @@
 ---
 # tasks file for ansible-elk-processor
+- include: set_facts.yml
+
 - include: config_hosts_file.yml
-  when: config_hosts_file is defined and config_hosts_file
+  when: >
+        config_hosts_file is defined and
+        config_hosts_file
 
 - include: config_logstash.yml
-  tags: [config_blacklists,config_logstash]
+  tags:
+    - 'config_blacklists'
+    - 'config_logstash'
   when: config_logstash
 
 - include: config_blacklists.yml
-  tags: [config_blacklists]
+  tags:
+    - 'config_blacklists'
   when: enable_dns_blacklist_filtering

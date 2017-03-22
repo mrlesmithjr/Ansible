@@ -1,0 +1,8 @@
+---
+- name: system_tweaks | Setting kvm_sysctl_settings
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: "{{ item.state }}"
+    reload: yes
+  with_items: '{{ kvm_sysctl_settings }}'

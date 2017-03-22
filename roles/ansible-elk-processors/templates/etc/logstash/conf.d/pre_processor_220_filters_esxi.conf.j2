@@ -4,14 +4,15 @@ filter {
     if "Section for VMware ESX" in [message] {
       drop {}
     }
-    multiline {
-      pattern => "-->"
-      what => "previous"
-    }
-    multiline {
-      pattern => "(^[a-zA-Z.]+(?:Error|Exception): .+)|(^\s+at .+)|(^\s+... \d+ more)|(^\s*Caused by:.+)"
-      what => "previous"
-    }
+# This no longer works
+#    multiline {
+#      pattern => "-->"
+#      what => "previous"
+#    }
+#    multiline {
+#      pattern => "(^[a-zA-Z.]+(?:Error|Exception): .+)|(^\s+at .+)|(^\s+... \d+ more)|(^\s*Caused by:.+)"
+#      what => "previous"
+#    }
     grok {
       break_on_match => true
       match => [
@@ -65,10 +66,11 @@ filter {
 }
 filter {
   if "ESXi" in [tags] and [syslog_program] == "prnxd" {
-    multiline {
-      pattern => "\|"
-      what => "previous"
-    }
+# This no longer works
+#    multiline {
+#      pattern => "\|"
+#      what => "previous"
+#    }
   }
 }
 filter {

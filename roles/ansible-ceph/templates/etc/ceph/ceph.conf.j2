@@ -1,0 +1,10 @@
+[global]
+fsid = {{ ceph_cluster_id.stdout }}
+mon initial members = {{ groups[ceph_mon_group]|join (',') }}
+mon host = {% for host in groups[ceph_mon_group] %}
+{{ hostvars[host]['ansible_' + ceph_management_interface]['ipv4']['address'] }}
+{% if not loop.last %},{% endif %}
+{% endfor %}
+
+public network = {{ ceph_management_network }}
+osd pool default size = {{ groups[ceph_osd_group]| length }}

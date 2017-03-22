@@ -1,9 +1,9 @@
 ---
 - name: config_elasticsearch | configuring elasticsearch
   template:
-    src: etc/elasticsearch/elasticsearch.yml.j2
-    dest: /etc/elasticsearch/elasticsearch.yml
+    src: "etc/elasticsearch/elasticsearch.yml.j2"
+    dest: "/etc/elasticsearch/elasticsearch.yml"
     mode: 0644
-    owner: root
-    group: root
-  notify: restart elasticsearch
+    owner: "root"
+    group: "root"
+  notify: "restart elasticsearch"

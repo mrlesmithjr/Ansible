@@ -14,9 +14,16 @@ wsrep_provider=/usr/lib/galera/libgalera_smm.so
 wsrep_cluster_name="{{ galera_cluster_name }}"
 wsrep_cluster_address="gcomm://{% for host in groups[galera_cluster_nodes_group] %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %}"
 
-# To start failed cluster comment out above and uncomment below...Once cluster is started revert changes and restart mysql on main node where change was made
+# To start failed cluster comment out above and uncomment below
+# Once cluster is started revert changes and restart mysql on main node where change was made
 #wsrep_cluster_address="gcomm://"
 wsrep_sst_method=rsync
-{% if enable_galera_monitoring_script %}
+{% if galera_enable_galera_monitoring_script %}
 wsrep_notify_cmd='{{ galera_monitor_script_path }}/{{ galera_monitor_script_name }}'
 {% endif %}
+
+
+wsrep_provider_options="gmcast.segment={{ galera_gmcast_segment }}"
+wsrep_provider_options="ist.recv_addr={{ galera_ist_recv_addr }}:{{ galera_ist_recv_addr_port }}"
+wsrep_provider_options="ist.recv_bind={{ galera_ist_recv_bind }}"
+wsrep_node_address="{{ galera_wsrep_node_address }}"

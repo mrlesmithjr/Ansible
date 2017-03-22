@@ -1,7 +1,7 @@
 ---
 - name: redhat_pdns_recursor | downloading powerdns recursor
   get_url:
-    url: "{{ pdns_download_url }}/rpm/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
+    url: "{{ pdns_recursor_download_url }}/rpm/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
     dest: "/opt/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
   when: pdns_recursor_version != "4.x"
 

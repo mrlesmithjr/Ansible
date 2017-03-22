@@ -48,7 +48,7 @@
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node
+        inventory_hostname == galera_mysql_master_node
 
 - name: setup_cluster | configuring temp galera config
   template:
@@ -57,7 +57,7 @@
   when: >
         ansible_os_family == "RedHat" and
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node
+        inventory_hostname == galera_mysql_master_node
 
 - name: setup_cluster | bootstrapping galera cluster
   service:
@@ -68,15 +68,16 @@
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node
+        inventory_hostname == galera_mysql_master_node
 
 - name: setup_cluster | bootstrapping galera cluster
   command: "/usr/bin/galera_new_cluster"
   when: >
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node and
-        (ansible_distribution == "Ubuntu" and
-        ansible_distribution_version >= '16.04')
+        inventory_hostname == galera_mysql_master_node and
+        ((ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04') or
+        ansible_distribution == "Debian")
 
 - name: setup_cluster | joining galera cluster
   service:
@@ -84,7 +85,7 @@
     state: "restarted"
   when: >
         not galera_cluster_configured.stat.exists and
-        inventory_hostname != mysql_master_node
+        inventory_hostname != galera_mysql_master_node
 
 - name: setup_cluster | configuring galera on mysql_master
   template:
@@ -95,7 +96,7 @@
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node
+        inventory_hostname == galera_mysql_master_node
 
 - name: setup_cluster | configuring galera on mysql_master
   template:
@@ -104,7 +105,7 @@
   when: >
         ansible_os_family == "RedHat" and
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node
+        inventory_hostname == galera_mysql_master_node
 
 - name: setup_cluster | restarting galera on mysql_master
   service:
@@ -115,7 +116,7 @@
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04')) and
         not galera_cluster_configured.stat.exists and
-        inventory_hostname == mysql_master_node
+        inventory_hostname == galera_mysql_master_node
 
 - name: setup_cluster | marking galera cluster as configured
   file:

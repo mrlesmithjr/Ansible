@@ -1,0 +1,1 @@
+DOCKER_OPTS="{% if ansible_docker0 is defined %}--bip={{ ansible_docker0.ipv4.address }}/16 --dns={{ ansible_docker0.ipv4.address }}{% endif %}"

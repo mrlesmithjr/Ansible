@@ -31,6 +31,7 @@
     state: "present"
   delegate_to: 'localhost'
   with_items: '{{ id_hosts.results }}'
+  when: id_hosts is defined
 
 - name: adding hosts to temporary hosts file
   lineinfile:
@@ -40,6 +41,7 @@
     state: "present"
   delegate_to: 'localhost'
   with_items: '{{ id_hosts.results }}'
+  when: id_hosts is defined
 
 - name: adding hosts to temporary hosts file
   lineinfile:
@@ -49,6 +51,7 @@
     state: "present"
   delegate_to: 'localhost'
   with_items: '{{ id_hosts.results }}'
+  when: id_hosts is defined
 
 - name: keyscan
   shell: "ssh-keyscan -H -f /tmp/hosts >> /tmp/hosts.ready"

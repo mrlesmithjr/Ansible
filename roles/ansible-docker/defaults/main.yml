@@ -1,32 +1,54 @@
 ---
 # defaults file for ansible-docker
 
-# Ensure this exists if setting docker to alternate data directory...We do not create this to ensure any add'l mounts do not overlay this path..Service may fail to start if not.
+# Ensure this exists if setting docker to alternate data directory
+# We do not create this to ensure any add'l mounts do not overlay this path
+# Service may fail to start if not.
 docker_alt_data_dir: '/mnt/docker'
-# Defines if docker should be configured to store data in alternate location..ensure to enable -g option in docker_opts if true
+
+# Defines if docker should be configured to store data in alternate location
+# ensure to enable -g option in docker_opts if true
 docker_config_alt_data_dir: false
-docker_config_service: false  # Defines if docker service should be configured
-docker_images:  #defines docker images to be installed
-  - image: 'centos'  #defines image name...ex. docker hub image name
-    state: 'present'  #defines state of container....present, started, reloaded, restarted, stopped, killed or absent
-#  - image: 'elasticsearch'
-#    state: 'present'
-#  - image: 'fedora'
-#    state: 'present'
-  - image: 'ubuntu'
+
+# Defines if docker service should be configured
+docker_config_service: false
+
+# Defines docker images to be installed
+docker_images:
+    # Defines image name
+    # ex. docker hub image name
+  - name: 'centos'
+    # Defines state of image
+    # present|absent
     state: 'present'
-docker_manage_images: false  #defines if images defined in docker_images are managed
-docker_opts:  #defines docker service options to be configured
+#  - name: 'elasticsearch'
+#    state: 'present'
+#  - name: 'fedora'
+#    state: 'present'
+  - name: 'ubuntu'
+    state: 'present'
+
+# Defines if images defined in docker_images are managed
+docker_manage_images: false
+
+# Defines docker service options to be configured
+docker_opts:
   - '-H fd://'
-  # - '--dns {{ docker_pri_dns }}'
-  # - '--dns {{ docker_sec_dns }}'
-  # - '-g {{ docker_alt_data_dir }}'  #example to change location of where Docker will store data...to change - change docker_data_dir var above.
-docker_pri_dns: '8.8.8.8'  #defines primary dns server for your site
-docker_sec_dns: '8.8.4.4'  #defines secondary dns server for your site
-docker_set_grub_memory_limit: true  #defines if docker memory limits should be added to grub boot loader
-docker_ubuntu_repo_info:  #defines docker ubuntu repo info for installing from
+  # - '--dns 8.8.8.8'
+  # - '--dns 8.8.4.4'
+  # Example to change location of where Docker will store data
+  # to change - change docker_data_dir var above.
+  # - '-g {{ docker_alt_data_dir }}'
+
+# Defines if docker memory limits should be added to grub boot loader
+docker_set_grub_memory_limit: true
+
+# Defines docker ubuntu repo info for installing from
+docker_ubuntu_repo_info:
   id: '58118E89F3A912897C070ADBF76221572C52609D'
   keyserver: 'hkp://p80.pool.sks-keyservers.net:80'
   repo: 'deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main'
-docker_users:  #defines users to be added to docker group to allow non sudo access to docker
+
+# Defines users to be added to docker group to allow non sudo access to docker
+docker_users:
   - 'vagrant'

@@ -1,6 +1,6 @@
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs and configured Elastic Packetbeat (https://www.elastic.co/products/beats/packetbeat)
+  description: An [Ansible] role to install/configure [Packetbeat]
   #company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -117,6 +117,7 @@ galaxy_info:
   #  - utopic
   #  - vivid
   #  - wily
+    - xenial
   #- name: SLES
   #  versions:
   #  - all
@@ -150,7 +151,7 @@ galaxy_info:
     - monitoring
     - system
     - network
-    
+
 dependencies: []
   # List your role dependencies here, one per line.
   # Be sure to remove the '[]' above if you add dependencies

@@ -1,4 +1,6 @@
 ---
 # handlers file for ansible-elk-kibana
 - name: restart kibana
-  service: name=kibana state=restarted
+  service:
+    name: "kibana"
+    state: "restarted"

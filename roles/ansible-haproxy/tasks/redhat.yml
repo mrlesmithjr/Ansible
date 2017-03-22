@@ -2,7 +2,7 @@
 - name: redhat | installing haproxy and socat
   yum:
     name: "{{ item }}"
-    state: latest
+    state: "present"
   with_items:
     - haproxy
     - hatop
@@ -12,7 +12,7 @@
 - name: redhat | installing haproxy and socat
   dnf:
     name: "{{ item }}"
-    state: latest
+    state: "present"
   with_items:
     - haproxy
     - hatop

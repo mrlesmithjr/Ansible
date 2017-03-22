@@ -1,13 +1,21 @@
 ---
 # handlers file for ansible-graylog
 - name: restart elasticsearch
-  service: name=elasticsearch state=restarted
+  service:
+    name: "elasticsearch"
+    state: "restarted"
 
 - name: restart graylog-server
-  service: name=graylog-server state=restarted
+  service:
+    name: "graylog-server"
+    state: "restarted"
 
 - name: restart graylog-web
-  service: name=graylog-web state=restarted
+  service:
+    name: "graylog-web"
+    state: "restarted"
 
 - name: restart rsyslog
-  service: name=rsyslog state=restarted
+  service:
+    name: "rsyslog"
+    state: "restarted"

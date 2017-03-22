@@ -1,0 +1,8 @@
+---
+# defaults file for ansible-ceph-mds
+ceph_debian_repo_info:
+  key: 'https://download.ceph.com/keys/release.asc'
+  repo: 'deb https://download.ceph.com/debian-{{ ceph_release }}/ {{ ansible_distribution_release|lower }} main'
+# Define release to install
+# kraken|jewel|hammer
+ceph_release: 'kraken'

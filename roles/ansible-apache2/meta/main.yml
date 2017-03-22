@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs apache2
+  description: An Ansible role to install Apache
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -91,6 +91,7 @@ galaxy_info:
     - trusty
   #  - utopic
   #  - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

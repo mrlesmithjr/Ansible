@@ -1,113 +1,119 @@
 ---
-- name: build_images | creating images folder if it does not exist
+# These are used for Apache symlinks for access to images using http
+- name: build_images | Ensuring Image Folders Exist For Apache
   file:
-    path: "{{ tftpboot_dir }}/{{ item }}"
-    state: directory
-  with_items: apache_tftp_links
+    path: "{{ tftpserver_tftpboot_dir }}/{{ item }}"
+    state: "directory"
+  with_items: '{{ tftpserver_apache_links }}'
+  when: tftpserver_apache_links is defined
 
-- name: build_images | downloading isos
+- name: build_images | Downloading ISOs
   get_url:
     url: "{{ item.url }}/{{ item.file }}"
-    dest: "{{ tftpboot_dir }}/images/{{ item.file }}"
+    dest: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
     force: no
-  with_items: tftp_iso_images
+  with_items: '{{ tftpserver_iso_images }}'
+  when: tftpserver_iso_images is defined
 
-- name: build_images | creating tftp_images_folders
+- name: build_images | Creating Image Folders
   file:
-    path: "{{ tftpboot_dir }}/images/{{ item }}"
-    state: directory
-  with_items: tftp_images_folders
-  when: tftp_images_folders is defined
+    path: "{{ tftpserver_tftpboot_dir }}/images/{{ item }}"
+    state: "directory"
+  with_items: '{{ tftpserver_images_folders }}'
+  when: tftpserver_images_folders is defined
 
-- name: build_images | unmounting iso images
+- name: build_images | Unmounting ISO Images
   mount:
-    name: "{{ tftpboot_dir }}/images/{{ item.folder }}"
-    src: "{{ tftpboot_dir }}/images/{{ item.file }}"
+    name: "{{ tftpserver_tftpboot_dir }}/images/{{ item.folder }}"
+    src: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
     fstype: "iso9660"
-    state: unmounted
-  with_items: tftp_iso_images
+    state: "unmounted"
+  with_items: '{{ tftpserver_iso_images }}'
+  when: tftpserver_iso_images is defined
 
-- name: build_images | unmounting VMware iso images
+- name: build_images | Unmounting VMware ISO Images
   mount:
-    name: "{{ tftpboot_dir }}/images/{{ item.folder }}"
-    src: "{{ tftpboot_dir }}/images/{{ item.file }}"
+    name: "{{ tftpserver_tftpboot_dir }}/images/{{ item.folder }}"
+    src: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
     fstype: "iso9660"
-    state: unmounted
-  with_items: vmware_iso_images
+    state: "unmounted"
+  with_items: '{{ tftpserver_vmware_iso_images }}'
+  when: tftpserver_vmware_iso_images is defined
 
-- name: build_images | setting tftpboot_dir folder permissions
+- name: build_images | Setting {{ tftpserver_tftpboot_dir }} Folder Permissions
   file:
-    path: "{{ tftpboot_dir }}"
-    state: directory
+    path: "{{ tftpserver_tftpboot_dir }}"
+    state: "directory"
     recurse: yes
-    owner: nobody
-    group: nogroup
+    owner: "nobody"
+    group: "nogroup"
 
-- name: build_images | mounting iso images
+- name: build_images | Mounting ISO Images
   mount:
-    name: "{{ tftpboot_dir }}/images/{{ item.folder }}"
-    src: "{{ tftpboot_dir }}/images/{{ item.file }}"
+    name: "{{ tftpserver_tftpboot_dir }}/images/{{ item.folder }}"
+    src: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
     fstype: "iso9660"
-    state: mounted
-  with_items: tftp_iso_images
+    state: "mounted"
+  with_items: '{{ tftpserver_iso_images }}'
+  when: tftpserver_iso_images is defined
 
-- name: build_images | checking that VMware iso images exist
+- name: build_images | Ensuring VMware ISO Images Exist
   stat:
-    path: "{{ tftpboot_dir }}/images/{{ item.file }}"
-  register: vmware_isos
-  with_items: vmware_iso_images
-  when: vmware_iso_images is defined
+    path: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
+  register: "vmware_isos"
+  with_items: '{{ tftpserver_vmware_iso_images }}'
+  when: tftpserver_vmware_iso_images is defined
 
-- name: build_images | mounting VMware iso images
+- name: build_images | Mounting VMware ISO Images
   mount:
-    name: "{{ tftpboot_dir }}/images/{{ item.folder }}"
-    src: "{{ tftpboot_dir}}/images/{{ item.file }}"
+    name: "{{ tftpserver_tftpboot_dir }}/images/{{ item.folder }}"
+    src: "{{ tftpserver_tftpboot_dir}}/images/{{ item.file }}"
     fstype: "iso9660"
-    state: mounted
-  with_items: vmware_iso_images
+    state: "mounted"
+  with_items: '{{ tftpserver_vmware_iso_images }}'
   when: >
-        vmware_iso_images is defined and
+        tftpserver_vmware_iso_images is defined and
         vmware_isos.results.0.stat.exists
 
-- name: build_images | configuring apache2
+- name: build_images | Configuring Apache2 Links
   file:
-    src: "{{ tftpboot_dir }}/{{ item }}"
-    dest: "{{ apache_root }}/{{ item }}"
-    owner: www-data
-    group: www-data
-    state: link
-  with_items: apache_tftp_links
+    src: "{{ tftpserver_tftpboot_dir }}/{{ item }}"
+    dest: "{{ tftpserver_apache_root }}/{{ item }}"
+    owner: "www-data"
+    group: "www-data"
+    state: "link"
+  with_items: '{{ tftpserver_apache_links }}'
+  when: tftpserver_apache_links is defined
 
-- name: build_images | configuring ESXi kickstart file(s)
+- name: build_images | Configuring ESXi Kickstart File(s)
   template:
     src: "var/lib/tftpboot/KS/ESX_KS.CFG.j2"
-    dest: "{{ tftpboot_dir }}/KS/ESX_KS.CFG"
+    dest: "{{ tftpserver_tftpboot_dir }}/KS/ESX_KS.CFG"
   when: >
-        (esxi_create_host_kickstart_configs is defined and
-        not esxi_create_host_kickstart_configs) or
-        esxi_create_host_kickstart_configs is not defined
+        (tftpserver_esxi_create_host_kickstart_configs is defined and
+        not tftpserver_esxi_create_host_kickstart_configs) or
+        tftpserver_esxi_create_host_kickstart_configs is not defined
 
-- name: build_images | configuring ESXi kickstart file(s)
+- name: build_images | Configuring ESXi Kickstart File(s)
   template:
     src: "var/lib/tftpboot/KS/ESX_KS.CFG.j2"
-    dest: "{{ tftpboot_dir }}/KS/ESX_KS_{{ item.name }}.CFG"
-  with_items:
-    - esxi_hosts
+    dest: "{{ tftpserver_tftpboot_dir }}/KS/ESX_KS_{{ item.name }}.CFG"
+  with_items: '{{ tftpserver_esxi_hosts }}'
   when: >
-        esxi_hosts is defined and
-        (esxi_create_host_kickstart_configs is defined and
-        esxi_create_host_kickstart_configs)
+        tftpserver_esxi_hosts is defined and
+        (tftpserver_esxi_create_host_kickstart_configs is defined and
+        tftpserver_esxi_create_host_kickstart_configs)
 
-- name: build_images | creating ESXi boot folders
+- name: build_images | Creating ESXi Boot Folders
   file:
-    path: "{{ tftpboot_dir }}/ESXi_boot/{{ item.version }}"
-    state: directory
-  with_items: vmware_iso_images
-  when: vmware_iso_images is defined
+    path: "{{ tftpserver_tftpboot_dir }}/ESXi_boot/{{ item.version }}"
+    state: "directory"
+  with_items: '{{ tftpserver_vmware_iso_images }}'
+  when: tftpserver_vmware_iso_images is defined
 
-- name: build_images | configuring ESXi boot.cfg
+- name: build_images | Configuring ESXi boot.cfg
   template:
     src: "var/lib/tftpboot/ESXi_boot/boot.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ESXi_boot/{{ item.version }}/boot.cfg"
-  with_items: vmware_iso_images
-  when: vmware_iso_images is defined
+    dest: "{{ tftpserver_tftpboot_dir }}/ESXi_boot/{{ item.version }}/boot.cfg"
+  with_items: '{{ tftpserver_vmware_iso_images }}'
+  when: tftpserver_vmware_iso_images is defined

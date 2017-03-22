@@ -1,12 +1,16 @@
 ---
-- name: provisions graylog
-  hosts: all
-  sudo: true
+- hosts: test-nodes
+  become: true
   vars:
-    - graylog_server_rest_listen_uri: 'http://192.168.202.201:12900/'
+    es_major_version: '2.x'
+    es_minor_version: '2.4.1'
+    graylog_rest_listen_uri: 'http://0.0.0.0:9000/api/'
+    graylog_web_listen_uri: 'http://0.0.0.0:9000/'
+    graylog_version: '2.2'
+    pri_domain_name: 'test.vagrant.local'
   roles:
-    - role: ansible-snmpd
     - role: ansible-timezone
+    - role: ansible-oracle-java8
     - role: ansible-elasticsearch
     - role: ansible-mongodb
     - role: ansible-graylog

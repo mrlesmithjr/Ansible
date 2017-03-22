@@ -1,0 +1,7 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-dnsmasq.git
+- src: https://github.com/mrlesmithjr/ansible-logstash.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-rsyslog.git
+- src: https://github.com/mrlesmithjr/ansible-snmpd.git
+- src: https://github.com/mrlesmithjr/ansible-timezone.git

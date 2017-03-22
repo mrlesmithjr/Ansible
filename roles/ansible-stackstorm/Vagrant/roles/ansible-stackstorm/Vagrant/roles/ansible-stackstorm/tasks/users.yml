@@ -1,0 +1,15 @@
+---
+- name: users | Creating SSH User {{ stackstorm_ssh_info.user }}
+  user:
+    name: "{{ stackstorm_ssh_info.user }}"
+    generate_ssh_key: yes
+    ssh_key_file: ".ssh/{{ stackstorm_ssh_info.user }}_rsa"
+    state: "present"
+
+- name: users | Configuring Sudoers For User {{ stackstorm_ssh_info.user }}
+  template:
+    src: "etc/sudoers.d/st2.j2"
+    dest: "/etc/sudoers.d/st2"
+    owner: "root"
+    group: "root"
+    mode: 0440

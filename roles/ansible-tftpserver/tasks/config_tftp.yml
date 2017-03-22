@@ -1,282 +1,88 @@
 ---
-- name: config_tftp | checking to see if tftpboot_dir exists
-  stat:
-    path: "{{ tftpboot_dir }}"
-  register: tftpboot_dir_stat
-
-- name: config_tftp | creating tftpboot_dir
+- name: config_tftp | Ensuring {{ tftpserver_tftpboot_dir }} Exists
   file:
-    path: "{{ tftpboot_dir }}"
-    state: directory
-  when: not tftpboot_dir_stat.stat.exists
+    path: "{{ tftpserver_tftpboot_dir }}"
+    state: "directory"
 
-- name: config_tftp | checking to see if tftpboot has already been moved
-  stat:
-    path: "{{ tftpboot_backup_dir }}"
-  register: tftpboot_backup_moved
-  when: >
-        (tftpboot_backup_dir is defined and
-        tftpboot_backup_dir != "None") and
-        (sync_tftp is defined and sync_tftp)
-
-- name: config_tftp | moving existing tftpboot
-  command: "mv {{ tftpboot_home }} {{ tftpboot_backup_dir }}"
-  when: >
-        (tftpboot_backup_dir is defined and
-        tftpboot_backup_dir != "None") and
-        not tftpboot_backup_moved.stat.exists and
-        (sync_tftp is defined and sync_tftp)
-
-- name: config_tftp | checking again if tftpboot has already been moved
-  stat:
-    path: "{{ tftpboot_backup_dir }}"
-  register: tftpboot_backup_stat
-  when: >
-        (tftpboot_backup_dir is defined and
-        tftpboot_backup_dir != "None") and
-        (sync_tftp is defined and sync_tftp)
-
-- name: config_tftp | touching file in tftpboot_backup_dir
-  file:
-    path: "{{ tftpboot_backup_dir }}/already_moved"
-    state: touch
-  when: >
-        (tftpboot_backup_dir is defined and
-        tftpboot_backup_dir != "None") and
-        tftpboot_backup_stat.stat.exists and
-        (sync_tftp is defined and sync_tftp)
-
-- name: config_tftp | mounting gluster volumes - tftpboot
-  mount:
-    name: "{{ item.mountpoint }}"
-    src: "{{ item.src }}"
-    fstype: "{{ item.fstype }}"
-    opts: "{{ item.options }}"
-    state: mounted
-  with_items:
-    - mountpoint: '{{ tftpboot_home }}'
-      src: '{{ primary_gfs_server }}:/{{ tftpboot_mnt }}'
-      fstype: 'glusterfs'
-      options: 'defaults,_netdev,backupvolfile-server={{ secondary_gfs_server }}'
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | check if netboot has already been downloaded
-  stat:
-    path: "{{ tftpboot_dir }}/netboot_present"
-  register: netboot_present
-
-- name: config_tftp | downloading netboot
+- name: config_tftp | Downloading Netboot
   get_url:
-    url: "{{ netboot_url }}{{ netboot_file }}"
-    dest: "{{ tftpboot_dir }}/{{ netboot_file }}"
-  when: >
-        not netboot_present.stat.exists and
-        ((sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined)
+    url: "{{ tftpserver_netboot_url }}/{{ tftpserver_netboot_file }}"
+    dest: "{{ tftpserver_tftpboot_dir }}/{{ tftpserver_netboot_file }}"
 
-- name: config_tftp | downloading netboot
-  get_url:
-    url: "{{ netboot_url }}{{ netboot_file }}"
-    dest: "{{ tftpboot_dir }}/{{ netboot_file }}"
-  run_once: true
-  when: >
-        not netboot_present.stat.exists and
-        (sync_tftp is defined and sync_tftp)
+- name: config_tftp | Extracting Netboot
+  unarchive:
+    src: "{{ tftpserver_tftpboot_dir }}/{{ tftpserver_netboot_file }}"
+    dest: "{{ tftpserver_tftpboot_dir }}"
+    copy: no
+  args:
+    creates: "{{ tftpserver_tftpboot_dir }}/pxelinux.0"
 
-- name: config_tftp | extracting netboot
-  shell: "tar zxvf {{ tftpboot_dir }}/{{ netboot_file }} -C {{ tftpboot_dir }}"
-  when: >
-        not netboot_present.stat.exists and
-        ((sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined)
-
-- name: config_tftp | extracting netboot
-  shell: "tar zxvf {{ tftpboot_dir }}/{{ netboot_file }} -C {{ tftpboot_dir }}"
-  run_once: true
-  when: >
-        not netboot_present.stat.exists and
-        (sync_tftp is defined and sync_tftp)
-
-- name: config_tftp | marking as netboot already downloaded
-  file:
-    path: "{{ tftpboot_dir }}/netboot_present"
-    state: touch
-  when: not netboot_present.stat.exists
-
-- name: config_tftp | creating grub.cfg for installs
+- name: config_tftp | Configuring grub.cfg
   template:
     src: "var/lib/tftpboot/grub.cfg.j2"
-    dest: "{{ tftpboot_dir }}/grub.cfg"
-    owner: root
-    group: root
-    mode: 0644
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
+    dest: "{{ tftpserver_tftpboot_dir }}/grub.cfg"
+    owner: "nobody"
+    group: "nogroup"
 
-- name: config_tftp | creating grub.cfg for installs
+- name: config_tftp | Generating Additional Distro Preseed Files
   template:
-    src: "var/lib/tftpboot/grub.cfg.j2"
-    dest: "{{ tftpboot_dir }}/grub.cfg"
-    owner: root
-    group: root
-    mode: 0644
-  run_once: true
-  when: sync_tftp is defined and sync_tftp
+    src: "var/lib/tftpboot/preseed.cfg.j2"
+    dest: "{{ tftpserver_tftpboot_dir }}/{{ item.distro }}_{{ item.version }}_preseed.cfg"
+    owner: "nobody"
+    group: "nogroup"
+  with_items: '{{ tftpserver_preseed_files }}'
 
-- name: config_tftp | creating preseed.cfg for auto-installs
-  template:
-    src: "var/lib/tftpboot/{{ item }}.cfg.j2"
-    dest: "{{ tftpboot_dir }}/{{ item }}.cfg"
-    owner: root
-    group: root
-    mode: 0644
-  with_items: '{{ tftp_preseed_files }}'
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
-
-- name: config_tftp | creating preseed.cfg for auto-installs
-  template:
-    src: "var/lib/tftpboot/{{ item }}.cfg.j2"
-    dest: "{{ tftpboot_dir }}/{{ item }}.cfg"
-    owner: root
-    group: root
-    mode: 0644
-  run_once: true
-  with_items: '{{ tftp_preseed_files }}'
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | reconfiguring txt.cfg
+- name: config_tftp | Configuring txt.cfg
   template:
     src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/txt.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/txt.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  notify: restart dnsmasq
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
+    dest: "{{ tftpserver_tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/txt.cfg"
+    owner: "nobody"
+    group: "nogroup"
+  notify: "restart dnsmasq"
 
-- name: config_tftp | reconfiguring txt.cfg
-  template:
-    src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/txt.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/txt.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  run_once: true
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | reconfigure menu.cfg
+- name: config_tftp | Configuring menu.cfg
   template:
     src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/menu.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/menu.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
+    dest: "{{ tftpserver_tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/menu.cfg"
+    owner: "nobody"
+    group: "nogroup"
 
-- name: config_tftp | reconfigure menu.cfg
-  template:
-    src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/menu.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/menu.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  run_once: true
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | reconfigure prompt.cfg
+- name: config_tftp | Configuring prompt.cfg
   template:
     src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/prompt.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/prompt.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
+    dest: "{{ tftpserver_tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/prompt.cfg"
+    owner: "nobody"
+    group: "nogroup"
 
-- name: config_tftp | reconfigure prompt.cfg
-  template:
-    src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/prompt.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/prompt.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  run_once: true
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | reconfigure syslinux.cfg
+- name: config_tftp | Configuring syslinux.cfg
   template:
     src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/syslinux.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/syslinux.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
+    dest: "{{ tftpserver_tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/syslinux.cfg"
+    owner: "nobody"
+    group: "nogroup"
 
-- name: config_tftp | reconfigure syslinux.cfg
-  template:
-    src: "var/lib/tftpboot/ubuntu-installer/amd64/boot-screens/syslinux.cfg.j2"
-    dest: "{{ tftpboot_dir }}/ubuntu-installer/amd64/boot-screens/syslinux.cfg"
-    owner: root
-    group: root
-    mode: 0664
-  run_once: true
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | unmounting iso images
+- name: config_tftp | Unmounting ISO Images
   mount:
-    name: "{{ tftpboot_dir }}/images/{{ item.folder }}"
-    src: "{{ tftpboot_dir }}/images/{{ item.file }}"
+    name: "{{ tftpserver_tftpboot_dir }}/images/{{ item.folder }}"
+    src: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
     fstype: "iso9660"
-    state: unmounted
-  with_items: tftp_iso_images
-  when: tftp_iso_images is defined
+    state: "unmounted"
+  with_items: '{{ tftpserver_iso_images }}'
+  when: tftpserver_iso_images is defined
 
-- name: config_tftp | unmounting vmware iso images
+- name: config_tftp | Unmounting VMware ISO Images
   mount:
-    name: "{{ tftpboot_dir }}/images/{{ item.folder }}"
-    src: "{{ tftpboot_dir }}/images/{{ item.file }}"
+    name: "{{ tftpserver_tftpboot_dir }}/images/{{ item.folder }}"
+    src: "{{ tftpserver_tftpboot_dir }}/images/{{ item.file }}"
     fstype: "iso9660"
-    state: unmounted
-  with_items: vmware_iso_images
-  when: vmware_iso_images is defined
+    state: "unmounted"
+  with_items: '{{ tftpserver_vmware_iso_images }}'
+  when: tftpserver_vmware_iso_images is defined
 
-- name: config_tftp | setting folder permissions on tftp_root_dir
+- name: config_tftp | Setting Folder Permissions on {{ tftpserver_tftpboot_dir }}
   file:
-    path: "{{ tftpboot_dir }}"
-    state: directory
+    path: "{{ tftpserver_tftpboot_dir }}"
+    state: "directory"
     recurse: yes
-    owner: nobody
-    group: nogroup
-
-- name: config_tftp | removing netboot_file
-  file:
-    path: "{{ tftpboot_dir }}/{{ netboot_file }}"
-    state: absent
-  when: >
-        (sync_tftp is defined and not sync_tftp) or
-        sync_tftp is not defined
-
-- name: config_tftp | removing netboot_file
-  file:
-    path: "{{ tftpboot_dir }}/{{ netboot_file }}"
-    state: absent
-  run_once: true
-  when: sync_tftp is defined and sync_tftp
-
-- name: config_tftp | enable IP Forwarding
-  sysctl:
-    name: "net.ipv4.ip_forward"
-    value: 1
-    sysctl_set: yes
-    state: present
-    reload: yes
+    owner: "nobody"
+    group: "nogroup"

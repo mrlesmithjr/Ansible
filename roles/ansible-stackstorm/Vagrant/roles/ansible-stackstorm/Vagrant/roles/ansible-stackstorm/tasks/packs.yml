@@ -1,0 +1,27 @@
+---
+- name: packs | Checking Status Of Packs
+  shell: "st2 action list --pack={{ item.name }} | grep 'No matching items found'"
+  changed_when: false
+  failed_when: pack_status.rc > 1
+  register: "pack_status"
+  tags:
+    - "stackstorm-packs"
+  with_items: '{{ stackstorm_packs }}'
+
+- name: packs | Installing Packs
+  command: "st2 run packs.install packs={{ item.item.name }}"
+  tags:
+    - "stackstorm-packs"
+  with_items: '{{ pack_status.results }}'
+  when: >
+        item.rc == 0 and
+        item.item.installed
+
+- name: packs | Uninstalling Packs
+  command: "st2 run packs.uninstall packs={{ item.item.name }}"
+  tags:
+    - "stackstorm-packs"
+  with_items: '{{ pack_status.results }}'
+  when: >
+        item.rc != 0 and
+        not item.item.installed

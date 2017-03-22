@@ -28,6 +28,7 @@
     name: "{{ cacti_db_info.user }}"
     password: "{{ cacti_db_info.password }}"
     priv: "{{ cacti_db_info.db_name }}.*:ALL,GRANT"
+    append_privs: yes
     state: present
   when: >
         not cacti_db_allow_all_hosts and
@@ -38,6 +39,7 @@
     name: "{{ cacti_db_info.user }}"
     password: "{{ cacti_db_info.password }}"
     priv: "{{ cacti_db_info.db_name }}.*:ALL,GRANT"
+    append_privs: yes
     state: present
     host: "%"
   when: >
@@ -49,6 +51,7 @@
     name: "{{ cacti_db_info.user }}"
     password: "{{ cacti_db_info.password }}"
     priv: "{{ cacti_db_info.db_name }}.*:ALL,GRANT"
+    append_privs: yes
     state: present
     host: "%"
     login_host: "{{ cacti_db_info.host }}"

@@ -1,7 +1,7 @@
 ---
 - name: config_cluster | waiting for api port
   wait_for:
-    port: 8091
+    port: "{{ couchbase_rest_http_port }}"
 
 - name: config_cluster | checking if cluster is already created
   stat:
@@ -10,9 +10,9 @@
   with_items: groups['couchbase-master']
   when: >
         inventory_hostname == item
-    
+
 - name: config_cluster | creating cluster
-  shell: "{{ couchbase_cli }} cluster-init -c 127.0.0.1:8091 --cluster-init-username={{ couchbase_admin_user }} --cluster-init-password={{ couchbase_admin_pass }} --cluster-init-port=8091 --cluster-init-ramsize={{ couchbase_cluster_ram_quota }} --service='data;index;query'"
+  shell: "{{ couchbase_cli }} cluster-init -c 127.0.0.1:{{ couchbase_rest_http_port }} --cluster-init-username={{ couchbase_admin_user }} --cluster-init-password={{ couchbase_admin_pass }} --cluster-init-port={{ couchbase_rest_http_port }} --cluster-init-ramsize={{ couchbase_cluster_ram_quota }} --service='data;index;query'"
   register: cluster_created
   with_items: groups['couchbase-master']
   when: >
@@ -34,10 +34,10 @@
   register: couchbase_joined_cluster
   with_items: groups['couchbase-master']
   when: >
-        inventory_hostname != item  
+        inventory_hostname != item
 
 - name: config_cluster | joining cluster
-  shell: "{{ couchbase_cli }} rebalance -c {{ hostvars[item].ansible_ssh_host }}:8091 -u {{ couchbase_admin_user }} -p {{ couchbase_admin_pass }} --server-add={{ ansible_ssh_host }}:8091 --server-add-username={{ couchbase_admin_user }} --server-add-password={{ couchbase_admin_pass }} --service='data;index;query'"
+  shell: "{{ couchbase_cli }} rebalance -c {{ hostvars[item].ansible_ssh_host }}:{{ couchbase_rest_http_port }} -u {{ couchbase_admin_user }} -p {{ couchbase_admin_pass }} --server-add={{ ansible_ssh_host }}:{{ couchbase_rest_http_port }} --server-add-username={{ couchbase_admin_user }} --server-add-password={{ couchbase_admin_pass }} --service='data;index;query'"
   register: joined_cluster
   with_items: groups['couchbase-master']
   when: >

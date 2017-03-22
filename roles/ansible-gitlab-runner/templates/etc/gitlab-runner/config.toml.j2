@@ -1,0 +1,9 @@
+concurrent = {{ gitlab_runner_concurrent_jobs }}
+check_interval = {{ gitlab_runner_check_interval }}
+
+[[runners]]
+  name = "{{ ansible_hostname }}"
+  url = "{{ gitlab_runner_config.url }}"
+  token = "{{ gitlab_runner_config.token }}"
+  executor = "{{ gitlab_runner_config.executor }}"
+  [runners.cache]

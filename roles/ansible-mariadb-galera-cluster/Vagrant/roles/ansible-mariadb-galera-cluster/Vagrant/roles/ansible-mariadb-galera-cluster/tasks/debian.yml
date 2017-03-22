@@ -10,11 +10,29 @@
     - 'python-mysqldb'
     - 'rsync'
 
-- name: debian | adding mariadb repo keys
+- name: debian | Adding MariaDB Repo Keys
   apt_key:
     keyserver: "{{ mariadb_debian_repo_keyserver }}"
-    id: "{{ mariadb_debian_repo_key }}"
+    id: "0xcbcb082a1bb943db"
     state: "present"
+  when: >
+        ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')
+
+- name: debian | Adding MariaDB Repo Keys
+  apt_key:
+    keyserver: "{{ mariadb_debian_repo_keyserver }}"
+    id: "0xF1656F24C74CD1D8"
+    state: "present"
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04')
+
+- name: debian | Pinning MariaDB Repo
+  template:
+    src: "mariadb_repo.j2"
+    dest: "/etc/apt/preferences.d/mariadb"
 
 - name: debian | adding mariadb repo
   apt_repository:
@@ -27,7 +45,7 @@
     state: "present"
   with_items:
     - 'mariadb-server'
-    - 'galera-3'
+    # - 'galera-3'
 
 - name: debian | configuring root my.cnf
   template:

@@ -1,0 +1,11 @@
+---
+- name: config | copying snmpd config
+  template:
+    src: "snmpd.conf.j2"
+    dest: "/etc/snmp/snmpd.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: "restart snmpd"
+  tags:
+    - snmpd_config,snmpd

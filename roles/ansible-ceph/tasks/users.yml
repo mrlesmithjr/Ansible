@@ -1,0 +1,19 @@
+---
+- name: users | Managing User Accounts
+  user:
+    name: "{{ ceph_user_info.name }}"
+    password: "{{ ceph_user_info.password }}"
+    shell: "{{ ceph_user_info.shell|default (omit) }}"
+    comment: "{{ ceph_user_info.comment|default (omit) }}"
+    generate_ssh_key: "{{ ceph_user_info.generate_keys|default (omit) }}"
+    system: "{{ ceph_user_info.system_account|default (omit) }}"
+    state: "{{ ceph_user_info.state }}"
+
+- name: users | Adding Users To Sudoers
+  lineinfile:
+    dest: "/etc/sudoers"
+    regexp: "^{{ ceph_user_info.name }} ALL"
+    line: "{{ ceph_user_info.name }} ALL=(ALL) NOPASSWD:ALL"
+    validate: "visudo -cf %s"
+    state: "{{ ceph_user_info.state }}"
+  when: ceph_user_info.sudo

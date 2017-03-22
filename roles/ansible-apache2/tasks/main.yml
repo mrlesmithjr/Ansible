@@ -16,7 +16,7 @@
   when: ansible_os_family == "openSUSE Leap"
 
 - include: config_apache2.yml
-  when: config_apache2
+  when: apache2_config
 
 - include: php.yml
   tags:

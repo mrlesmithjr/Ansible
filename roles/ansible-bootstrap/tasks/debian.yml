@@ -3,7 +3,7 @@
 - name: debian | removing vmware tools package repo
   apt_repository:
     repo: "deb http://packages.vmware.com/packages/ubuntu trusty main"
-    state: absent
+    state: "absent"
 
 - name: debian | running apt-get update
   apt:

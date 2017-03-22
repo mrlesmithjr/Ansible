@@ -12,9 +12,6 @@ service dnsmasq stop
 service haproxy stop
 
 # shutting down interfaces on standby node
-{% for item in vlan_config %}
-ifdown {{ item.vlan }}
-{% endfor %}
 
 ip addr del {{ quagga_ospf_routerid }}/32 dev lo
 

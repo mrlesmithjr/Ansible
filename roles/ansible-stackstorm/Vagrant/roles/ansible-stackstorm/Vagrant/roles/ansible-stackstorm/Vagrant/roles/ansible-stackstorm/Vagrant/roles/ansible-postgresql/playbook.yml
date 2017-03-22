@@ -1,0 +1,8 @@
+---
+- name: provisions postgresql
+  hosts: all
+  sudo: true
+  vars:
+  roles:
+    - role: ansible-postgresql
+  tasks:

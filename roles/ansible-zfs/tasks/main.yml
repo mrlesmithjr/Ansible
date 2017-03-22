@@ -8,6 +8,9 @@
 
 - include: manage_zfs.yml
 
+- include: samba.yml
+  when: zfs_enable_samba
+
 - include: tune_zfs.yml
   when: >
         zfs_enable_performance_tuning is defined and

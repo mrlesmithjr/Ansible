@@ -1,4 +1,11 @@
 ---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'apt-transport-https'
+
 - name: debian | installing logstash repo key
   apt_key:
     url: "{{ logstash_repo_key }}"
@@ -11,14 +18,16 @@
 
 - name: debian | installing java
   apt:
-    name: "default-jre-headless"
+    name: "openjdk-{{ openjdk_version }}-jre-headless"
     state: "present"
+  when: logstash_install_java
 
 - name: debian | Installing Logstash
   apt:
     name: "logstash={{ logstash_minor_ver }}"
     state: "present"
-  notify: "init logstash"
+  # notify: "init logstash"
+  # when: ansible_distribution !=
 
 - name: debian | checking for logstash-web
   stat:

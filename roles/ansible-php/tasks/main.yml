@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-php
+- include: set_facts.yml
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"

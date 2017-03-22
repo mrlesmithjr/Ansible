@@ -1,20 +1,20 @@
 ---
-- name: install dependencies
+- name: debian_curator | install dependencies
   apt:
     name: python-pip
     state: present
 
-- name: adding curator apt repo
+- name: debian_curator | adding curator apt repo
   apt_repository:
     repo: "{{ es_curator_debian_repo }}"
     state: "present"
 
-- name: installing elasticsearch curator
+- name: debian_curator | installing elasticsearch curator
   apt:
     name: "python-elasticsearch-curator"
     state: "latest"
 
-- name: install curator crontab
+- name: debian_curator | install curator crontab
   cron:
     name: es_curator_delete
     minute: 0
@@ -27,7 +27,7 @@
     - cron
   when: es_curator_version == "3"
 
-- name: install curator crontab
+- name: debian_curator | install curator crontab
   cron:
     name: es_curator_close
     minute: 45
@@ -40,7 +40,7 @@
     - cron
   when: es_curator_version == "3"
 
-- name: Remove Curator Cron
+- name: debian_curator | Remove Curator Cron
   cron:
     name: "es_curator_delete"
     minute: "0"
@@ -53,7 +53,7 @@
     - cron
   when: es_curator_version != "3"
 
-- name: Remove Curator Cron
+- name: debian_curator | Remove Curator Cron
   cron:
     name: "es_curator_close"
     minute: "45"
@@ -66,7 +66,7 @@
     - cron
   when: es_curator_version != "3"
 
-- name: Configuring Curator
+- name: debian_curator | Configuring Curator
   template:
     src: "curator/{{ item }}.j2"
     dest: "/opt/{{ item }}"
@@ -75,7 +75,7 @@
     - 'curator_config.yml'
   when: es_curator_version != "3"
 
-- name: install curator crontab
+- name: debian_curator | install curator crontab
   cron:
     name: "es_curator"
     special_time: "daily"

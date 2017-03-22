@@ -1,6 +1,10 @@
 [elasticsearch-{{ es_major_version }}]
 name=Elasticsearch repository for {{ es_major_version }}.x packages
-baseurl={{ es_repo_url }}/{{ es_major_version }}/centos
+{% if es_major_version == "1.7" or es_major_version == "2.x" %}
+baseurl={{ es_redhat_repo_url }}/{{ es_major_version }}/centos
+{% elif es_major_version == "5.x" %}
+baseurl={{ es_redhat_repo_url }}/{{ es_major_version }}/yum
+{% endif %}
 gpgcheck=1
 gpgkey={{ es_repo_key }}
 enabled=1

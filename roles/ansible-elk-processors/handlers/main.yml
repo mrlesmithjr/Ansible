@@ -9,7 +9,7 @@
   service:
     name: "logstash"
     state: "restarted"
-    sleep: 20
+    # sleep: 20
 
 - name: "restart rsyslog"
   service:

@@ -28,6 +28,13 @@
   when: >
         inventory_hostname not in groups[glusterfs_arbiter_group]
 
+- name: config_glusterfs_server | Capture Gluster Volumes
+  command: "gluster volume list"
+  register: "gluster_volumes"
+  # We do this to ensure this executes in --check mode
+  check_mode: no
+  changed_when: false
+
 - name: config_glusterfs_server | create gluster volume
   gluster_volume:
     state: present
@@ -36,4 +43,6 @@
     replicas: "{{ groups[glusterfs_server_group]|length }}"
     cluster: "{% for host in groups[glusterfs_server_group] %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %}"
   with_items: '{{ glusterfs_create_bricks }}'
-  when: inventory_hostname == glusterfs_server_master
+  when: >
+        inventory_hostname == glusterfs_server_master and
+        item.name not in gluster_volumes.stdout

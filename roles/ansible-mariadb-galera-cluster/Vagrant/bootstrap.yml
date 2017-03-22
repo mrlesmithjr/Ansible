@@ -5,7 +5,7 @@
   vars:
     - host_vars_directory: './host_vars'
     - host_vars_file: '{{ host_vars_directory }}/{{ inventory_hostname }}.yml'
-    - pri_domain_name: 'vagrant.local'
+    - mariadb_pri_domain_name: 'vagrant.local'
     - ssh_key_path: '.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key'
     - update_host_vars: true
   roles:

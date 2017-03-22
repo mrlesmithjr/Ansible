@@ -1,6 +1,7 @@
 ---
+- src: https://github.com/mrlesmithjr/ansible-elasticsearch
+- src: https://github.com/mrlesmithjr/ansible-graylog
+- src: https://github.com/mrlesmithjr/ansible-mongodb
+- src: https://github.com/mrlesmithjr/ansible-oracle-java8
 - src: https://github.com/mrlesmithjr/ansible-snmpd
 - src: https://github.com/mrlesmithjr/ansible-timezone
-- src: https://github.com/mrlesmithjr/ansible-elasticsearch
-- src: https://github.com/mrlesmithjr/ansible-mongodb
-- src: https://github.com/mrlesmithjr/ansible-graylog

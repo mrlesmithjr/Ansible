@@ -1,0 +1,1 @@
+DOCKER_STORAGE_OPTIONS="--storage-driver devicemapper --exec-opt native.cgroupdriver=cgroupfs --storage-opt dm.thinpooldev=/dev/mapper/{{ zenoss_docker_storage_info.vg }}/{{ zenoss_docker_storage_info.data }} --storage-opt dm.fs=xfs"

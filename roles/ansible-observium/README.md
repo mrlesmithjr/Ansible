@@ -38,6 +38,8 @@ Role Variables
 # defaults file for ansible-observium
 observium_admin_account_info:
   email: 'observium@{{ pri_domain_name }}'
+  email_to: 'root@localhost'
+  email_default_only: 'TRUE'
   level: 10
   password: 'observium'
   username: 'admin'
@@ -72,6 +74,8 @@ observium_dl_package: 'observium-community-latest.tar.gz'
 observium_dl_url: 'http://www.observium.org'
 observium_monitor_libvirt_vms: false  #Define if desired to monitor LibVirt VM's
 pri_domain_name: 'vagrant.local'
+observium_snmp_community_list:   # define a list of default communities to try when adding devices
+  - '"public"'    # requires that the quotes are inside single quotation marks to keep the quotes in the config.php
 ````
 
 Dependencies

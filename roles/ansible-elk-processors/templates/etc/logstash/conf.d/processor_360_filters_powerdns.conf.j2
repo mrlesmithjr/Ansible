@@ -17,7 +17,7 @@ filter {
           add_field => [ "tmp_record_lookup", "%{pdns_record_lookup}" ]
         }
         mutate {
-          remove => [ "pdns_request" ]
+          remove_field => [ "pdns_request" ]
         }
       }
       if [pdns_record_type] == "PTR" {
@@ -40,7 +40,7 @@ filter {
 #      }
       mutate {
         add_tag => [ "PowerDNS" ]
-        remove => [ "oct_1", "oct_2", "oct_3", "oct_4", "tmp_record_lookup" ]
+        remove_field => [ "oct_1", "oct_2", "oct_3", "oct_4", "tmp_record_lookup" ]
       }
     }
   }

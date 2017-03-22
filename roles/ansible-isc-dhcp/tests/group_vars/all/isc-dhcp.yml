@@ -29,6 +29,4 @@ dhcp_scopes:  #defines dhcp scopes to create...define here or in group_vars/grou
     dhcp_domain_name_servers: '{{ dhcp_name_servers }}'
     dhcp_default_lease_time: '{{ default_lease_time }}'
     dhcp_max_lease_time: '{{ isc_dhcp_max_lease_time }}'
-pri_dns: 192.168.240.70  #define primary dns server for environment...define here or in group_vars/all
 pxe_boot_server: 192.168.240.100  #defines tftp server to PXE/TFTP from......define here or in group_vars/group
-sec_dns: 192.168.240.71  #define secondary dns server for environment...define here or in group_vars/all

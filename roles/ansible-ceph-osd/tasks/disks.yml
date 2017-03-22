@@ -1,0 +1,6 @@
+---
+- name: disks | Partition Disk(s)
+  filesystem:
+    dev: "{{ item }}"
+    fstype: "{{ ceph_osd_fstype }}"
+  with_items: '{{ ceph_osd_disks }}'

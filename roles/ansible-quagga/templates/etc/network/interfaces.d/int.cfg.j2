@@ -1,0 +1,22 @@
+auto {{ item.int }}
+iface {{ item.int }} inet {{ item.method }}
+{% if item.address is defined %}
+  address {{ item.address }}
+{% endif %}
+{% if item.netmask is defined %}
+  netmask {{ item.netmask }}
+{% endif %}
+{% if item.gateway is defined %}
+  gateway {{ item.gateway }}
+{% endif %}
+{% if item.slaves is defined and item.slaves != None %}
+  bond_slaves {{ item.slaves|join (' ') }}
+{% endif %}
+{% if item.primary is defined and item.primary != None %}
+  bond_primary {{ item.primary }}
+{% endif %}
+{% if item.addl_settings is defined %}
+{%   for setting in item.addl_settings %}
+  {{ setting }}
+{%   endfor %}
+{% endif %}

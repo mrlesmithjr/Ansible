@@ -60,15 +60,15 @@ logstash_inputs:
   - prot: tcp
     port: 10514
     type: syslog
-  - prot: tcp
-    port: 1514
-    type: VMware
-  - prot: tcp
-    port: 1515
-    type: vCenter
-  - prot: tcp
-    port: 1517
-    type: Netscaler
+  # - prot: tcp
+  #   port: 1514
+  #   type: VMware
+  # - prot: tcp
+  #   port: 1515
+  #   type: vCenter
+  # - prot: tcp
+  #   port: 1517
+  #   type: Netscaler
   - prot: tcp
     port: 28778
     type: elasticsearch-curator
@@ -76,14 +76,15 @@ logstash_inputs:
     codec: json
     port: 3515
     type: eventlog
-  - prot: tcp
-    codec: json_lines
-    port: 3525
-    type: iis
-  - prot: tcp
-    codec: json
-    port: '{{ rundeck_logstash_port }}'
-    type: rundeck
+  # - prot: tcp
+  #   codec: json_lines
+  #   port: 3525
+  #   type: iis
+  # - prot: tcp
+  #   codec: json
+  #   port: '{{ rundeck_logstash_port }}'
+  #   type: rundeck
+logstash_major_ver: '5.x' # Define major version installed (2.x|5.x)
 logstash_outputs:
   - output: redis
     host: '{{ logstash_server_fqdn }}'
@@ -91,7 +92,7 @@ logstash_outputs:
 #    exchange: logstash
 #    exchange_type: fanout
 #    host: 10.0.101.128
-logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server...should be vip fqdn for elk-haproxy-nodes...define here or globally in group_vars/elk-nodes
+logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server...should be vip fqdn for elk-haproxy-nodes.
 netscalernaming: [] #define your Citrix Netscaler naming standards if used...this should be set to host pattern...example - nsvpx01.everythingshouldbevirtual.local - define as nsvpx
 #  - nsvpx  #uncomment and remove '' above if setting
 nsxnaming: [] #define your VMware NSX naming standards if used...this should be set to host pattern...example - nsx-rt01.everythingshouldbevirtual.local - define as nsx-rt
@@ -99,7 +100,7 @@ nsxnaming: [] #define your VMware NSX naming standards if used...this should be 
 #  - nsx-rt  #uncomment and remove '' above if setting
 pfsensenaming:  #define your PFSense firewall naming standards if used...this should be set to host pattern...example - pfsense01.everythingshouldbevirtual.local - define as pfsense
   - pfsense
-pri_domain_name: example.org  #defines primary domain name...define here or globally in group_vars/all
+pri_domain_name: 'example.org'  #defines primary domain name...define here or globally in group_vars/all
 reset_logstash_config: false
 rundeck_logstash_port: 9700
 vcenter_version: vcsa_6  #defines vcenter version...options- windows_5, windows_6, vcsa_5 or vcsa_6

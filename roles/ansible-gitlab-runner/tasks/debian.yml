@@ -1,0 +1,24 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'debian-archive-keyring'
+    - 'apt-transport-https'
+
+- name: debian | Adding GitLab Runner GPG Key
+  apt_key:
+    url: "{{ gitlab_runner_debian_package.key }}"
+    state: "present"
+
+- name: debian | Adding GitLab Repo(s)
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+  with_items: '{{ gitlab_runner_debian_package.repos }}'
+
+- name: debian | Installing GitLab Runner Package
+  apt:
+    name: "gitlab-ci-multi-runner={{ gitlab_runner_version }}"
+    state: "present"

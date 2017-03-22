@@ -1,6 +1,6 @@
 ---
 # vars file for ansible-elk-pre-processor
 syslog_servers:
-  - name: localhost
-    port: 10514
-    proto: tcp
+  - name: "localhost"
+    port: "10514"
+    proto: "tcp"

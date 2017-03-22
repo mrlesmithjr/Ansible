@@ -32,7 +32,7 @@
     owner: "logstash"
     group: "logstash"
     mode: 0644
-    validate: "/opt/logstash/bin/logstash -tf %s"
+    validate: "{{ logstash_bin }} -tf %s"
   notify:
     - "restart logstash"
   with_items: '{{ logstash_configs }}'
@@ -63,38 +63,43 @@
     - "restart logstash"
   with_items: '{{ logstash_configs_remove }}'
 
-- name: config_logstash | checking to ensure /opt/logstash/lib/logstash/outputs/elasticsearch folder exists
-  stat:
-    path: "/opt/logstash/lib/logstash/outputs/elasticsearch"
-  register: "ls_es_output_dir"
-  when: >
-        logstash_custom_template is defined and
-        logstash_custom_template
 
-- name: config_logstash | creating /opt/logstash/lib/logstash/outputs/elasticsearch folder if it is missing
-  file:
-    path: "/opt/logstash/lib/logstash/outputs/elasticsearch"
-    state: "directory"
-    owner: "logstash"
-    group: "logstash"
-    mode: 0644
-  when: >
-        not ls_es_output_dir.stat.exists and
-        (logstash_custom_template is defined and
-        logstash_custom_template)
 
-- name: config_logstash | copying elasticsearch-template.json
-  template:
-    src: "opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json.j2"
-    dest: "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
-    owner: "logstash"
-    group: "logstash"
-  notify:
-    - "restart logstash"
-  when: >
-        logstash_custom_template is defined and
-        logstash_custom_template
-
+#### I do not believe the following is any longer needed with the latest
+#### versions of Logstash... Leaving for historical reasons!
+####
+# - name: config_logstash | checking to ensure /opt/logstash/lib/logstash/outputs/elasticsearch folder exists
+#   stat:
+#     path: "/opt/logstash/lib/logstash/outputs/elasticsearch"
+#   register: "ls_es_output_dir"
+#   when: >
+#         logstash_custom_template is defined and
+#         logstash_custom_template
+#
+# - name: config_logstash | creating /opt/logstash/lib/logstash/outputs/elasticsearch folder if it is missing
+#   file:
+#     path: "/opt/logstash/lib/logstash/outputs/elasticsearch"
+#     state: "directory"
+#     owner: "logstash"
+#     group: "logstash"
+#     mode: 0644
+#   when: >
+#         not ls_es_output_dir.stat.exists and
+#         (logstash_custom_template is defined and
+#         logstash_custom_template)
+#
+# - name: config_logstash | copying elasticsearch-template.json
+#   template:
+#     src: "opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json.j2"
+#     dest: "/opt/logstash/lib/logstash/outputs/elasticsearch/elasticsearch-template.json"
+#     owner: "logstash"
+#     group: "logstash"
+#   notify:
+#     - "restart logstash"
+#   when: >
+#         logstash_custom_template is defined and
+#         logstash_custom_template
+#
 - name: config_logstash | checking to ensure /opt/logstash/patterns folder exists
   stat:
     path: "/opt/logstash/patterns"

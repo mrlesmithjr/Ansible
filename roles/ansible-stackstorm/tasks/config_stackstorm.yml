@@ -1,31 +1,32 @@
 ---
-- name: config_stackstorm | configuring stackstorm
+- name: config_stackstorm | Configuring Stackstorm
   template:
     src: "etc/st2/st2.conf.j2"
     dest: "/etc/st2/st2.conf"
-    owner: root
-    group: root
+    owner: "root"
+    group: "root"
     mode: 0644
   notify:
-    - restart stackstorm
-    - reload stackstorm
+    - "restart stackstorm"
+    - "reload stackstorm"
+  when: stackstorm_config_stackstorm
 
-- name: config_stackstorm | checking stackstorm services status
+- name: config_stackstorm | Checking Stackstorm Services Status
   command: "st2ctl status"
   register: "st2_status"
   changed_when: false
 
-- name: config_stackstorm | ensuring stackstorm is started
+- name: config_stackstorm | Ensuring Stackstorm Is Started
   command: "st2ctl restart"
   register: "stackstorm_started"
   when: "'not running' in st2_status.stdout"
 
 - name: config_stackstorm | waiting for services
   wait_for:
-    port: 9100
+    port: "{{ stackstorm_api.port }}"
     delay: 10
   when: stackstorm_started.changed
 
-- name: config_stackstorm | reloading stackstorm if first started
+- name: config_stackstorm | Reloading Stackstorm If First Started
   command: "st2ctl reload"
   when: stackstorm_started.changed

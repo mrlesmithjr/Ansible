@@ -1,0 +1,199 @@
+# This file content should conform to systemd, i.e. VARIABLE=value
+
+# Need to set $HOME so Docker client can find .dockercfg
+# HOME=/root
+
+# Need to set $TMP so backups can have a place to spool snapshots and images
+# for backup
+# TMP=/tmp
+
+# Set the number of processors used by serviced
+# GOMAXPROCS=4
+
+# Set enable/disable the agent role, set to 1/0, respectively
+# SERVICED_AGENT=0
+{% if zenoss_control_center_settings.agent %}
+SERVICED_AGENT=1
+{% endif %}
+
+# Set enable/disable the master role, set to 1/0, respectively
+# SERVICED_MASTER=0
+{% if zenoss_control_center_settings.master %}
+SERVICED_MASTER=1
+{% endif %}
+
+# Set the the zookeeper ensemble, multiple masters should be comma separated
+# SERVICED_ZK={{ zenoss_control_center_settings.master_host }}:2181
+
+# Set the local docker registry
+# SERVICED_DOCKER_REGISTRY={{ zenoss_control_center_settings.master_host }}:5000
+
+# Set the outbound IP that serviced will broadcast on
+# SERVICED_OUTBOUND_IP=10.0.0.29
+
+# Set the static IPs this host can advertize
+# SERVICED_STATIC_IPS=10.0.0.30,10.0.0.31
+
+# Set the default serviced RPC endpoint to dial
+# SERVICED_ENDPOINT={{ zenoss_control_center_settings.master_host }}:4979
+
+# Set the max number of rpc clients (pool) to an endpoint
+# SERVICED_MAX_RPC_CLIENTS=3
+
+# Set the RPC port to listen on
+# SERVICED_RPC_PORT=4979
+
+# Enable server certificate verifcation for TLS RPC request
+# SERVICED_RPC_CERT_VERIFY=false
+
+# Disable TLS for RPC connection, TLS is enabled by default
+# SERVICED_RPC_DISABLE_TLS=false
+
+# Set the UI port to use
+# SERVICED_UI_PORT=443
+
+# Set the frequency in seconds that the UI will poll serviced for updates
+# SERVICED_UI_POLL_FREQUENCY=3
+
+# Set the mux port to listen on
+# SERVICED_MUX_PORT=22250
+
+# DEPRECATED: Set the var path for serviced. Use options below to specify paths
+# to the isvcs, volumes, and backups directories.
+# SERVICED_VARPATH=/opt/serviced/var
+
+# Set the ISVCS path for serviced internal data
+# SERVICED_ISVCS_PATH=/opt/serviced/var/isvcs
+
+# Set the VOLUMES path for serviced application data
+# SERVICED_VOLUMES_PATH=/opt/serviced/var/volumes
+
+# Set the BACKUPS path for serviced backups
+# SERVICED_BACKUPS_PATH=/opt/serviced/var/backups
+
+# Set the TLS keyfile
+# SERVICED_KEY_FILE=/etc/....
+
+# Set the TLS certfile
+# SERVICED_CERT_FILE=/etc/....
+
+# Set the minimum supported TLS version, valid values VersionTLS10|VersionTLS11|VersionTLS12
+# SERVICED_TLS_MIN_VERSION=VersionTLS10
+
+# Set the supported TLS ciphers
+# SERVICED_TLS_CIPHERS=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_3DES_EDE_CBC_SHA
+
+# Set the driver type on the master for the distributed file system (rsync/btrfs/devicemapper)
+# SERVICED_FS_TYPE=devicemapper
+
+# Set to true to allow use of loopback files (instead of thin pools) with devicemapper for serviced storage.
+# NOTE: This is not recommended for production use.
+# SERVICED_ALLOW_LOOP_BACK=false
+SERVICED_ALLOW_LOOP_BACK={{ zenoss_control_center_settings.allow_loopback_files|lower }}
+
+# Set the aliases for this host (use in vhost muxing)
+# SERVICED_VHOST_ALIASES=foobar.com,example.com
+
+# Set the max stopped container age (in seconds) before serviced will remove it
+#    86400 = number of seconds in one day = 24 hr/day * 60 min/hr * 60 sec/min
+# SERVICED_MAX_CONTAINER_AGE=86400
+
+# Set the subnet that dynamic endpoints use, inside the containers
+# SERVICED_VIRTUAL_ADDRESS_SUBNET=10.3
+
+# Set the loglevel for serviced
+# SERVICED_LOG_LEVEL=0
+
+# Set the address to which to send logs
+# SERVICED_LOG_ADDRESS={{ zenoss_control_center_settings.master_host }}:5042
+
+# Set the address for the logstash elastic search
+# SERVICED_LOGSTASH_ES={{ zenoss_control_center_settings.master_host }}:9100
+
+# Set the age (in days) of logstash data to keep
+# SERVICED_LOGSTASH_MAX_DAYS=14
+
+# Max size of Logstash data to keep in gigabytes
+# SERVICED_LOGSTASH_MAX_SIZE=10
+
+# Logstash purging cycle time in hours
+# SERVICED_LOGSTASH_CYCLE_TIME=6
+
+# Set the default serviced stats endpoint to use
+# SERVICED_STATS_PORT={{ zenoss_control_center_settings.master_host }}:8443
+
+# Set the interval (in seconds) for host performance collection
+# SERVICED_STATS_PERIOD=10
+#
+# Set the length of time in seconds to cache stats on running services
+# for the UI
+# SERVICED_SVCSTATS_CACHE_TIMEOUT=5
+
+# Set the port on which to listen for profiler connections (-1 to disable)
+# SERVICED_DEBUG_PORT=6006
+
+# Set arguments to internal services.  Variables of the form
+#   SERVICED_ISVCS_ENV_%d (where %d is an integer from 0 to N, with
+#   no gaps) will be used to set the specified environment variable
+#   for the corresponding internal service.  The value of the variable
+#   is of the form SVC:KEY=VAL, where service is the name of the
+#   internal service, KEY is the environment variable to set for that
+#   service, and VAL is the value to which to set the variable.
+# SERVICED_ISVCS_ENV_0=elasticsearch-logstash:ES_JAVA_OPTS=-Xmx4g
+
+# Set the user group that can log in to control center
+#   wheel is the default on RHEL and sudo is the default on Ubuntu
+# SERVICED_ADMIN_GROUP=wheel
+
+# Set to 0 in order to disable root user control center login
+# SERVICED_ALLOW_ROOT_LOGIN=1
+
+# Max number tracked connections for iptables
+# SERVICED_IPTABLES_MAX_CONNECTIONS=655360
+
+# The number of hours a snapshot is retained before removal.
+# To disable snapshot removal, set the value to 0.
+# SERVICED_SNAPSHOT_TTL=12
+
+# The interval, in seconds, at which a serviced instance configured as agent
+# modifies its /opt/serviced/var/monitor/<IP-Address> file.
+# Default: 60     (1 minute)
+# SERVICED_MONITOR_DFS_REMOTE_UPDATE_INTERVAL=60
+
+# The interval, in seconds, at which a serviced instance configured as master
+# checks the modification times of the /opt/serviced/var/monitor/<IP-Address>
+# files of active serviced instances configured as agents. The value of this
+# variable must be a minimum of twice the value of the
+# SERVICED_MONITOR_DFS_REMOTE_UPDATE_INTERVAL variable.
+# Default: 180    (3 minutes)
+# SERVICED_MONITOR_DFS_MASTER_INTERVAL=180
+
+# Set to 0 in order to disable restarting nfs upon out of sync detection
+# Default: 1    (enable)
+# SERVICED_MONITOR_DFS_MASTER_RESTART=1
+
+# Overrides the default for the service migration image.
+# SERVICED_SERVICE_MIGRATION_TAG=1.0.2
+
+# Enables the following isvcs to run on the host (if not the master)
+# SERVICED_ISVCS_START=celery,elasticsearch,logstash,opentsdb,docker-registry,zookeeper
+
+# Specify the id no. of the zookeeper cluster node (must be unique amongst all
+# of the nodes in the cluster)
+# SERVICED_ISVCS_ZOOKEEPER_ID=
+
+# Specify nodes in the zookeeper quorum if this host is running as part of the
+# zookeeper quorum.  This takes the form of <ZKID#>@<IPAddress>:<PeerPort>:<LeaderPort>
+# SERVICED_ISVCS_ZOOKEEPER_QUORUM=1@host1:2888:3888,2@host2:2888:3888,3@host3:2888:3888
+
+# Arbitrary serviced daemon args
+# SERVICED_OPTS=
+
+# Specify the log driver for all docker containers logs, including isvc containers on the master node.
+# Direct port of Docker --log-driver option. Values include json-file, syslog, journald, gelf, fluentd, and none.
+# SERVICED_DOCKER_LOG_DRIVER=json-file
+
+# Comma-separated list of key=value options, corresponding to Docker --log-opt options.
+# For log drivers which do not need additional arguments (e.g. journald), use a single comma as the value
+# of SERVICED_DOCKER_LOG_CONFIG and the system will use the defaults for that type of log driver.
+# SERVICED_DOCKER_LOG_CONFIG=max-file=5,max-size=10m

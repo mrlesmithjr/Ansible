@@ -1,0 +1,6 @@
+---
+- name: debian | Installing PHP {{ php_version_debian }} Packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ php_debian_packages }}'

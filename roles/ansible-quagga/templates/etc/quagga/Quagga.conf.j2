@@ -1,0 +1,144 @@
+!
+hostname {{ quagga_hostname }}
+!
+password {{ quagga_password }}
+enable password {{ quagga_enable_password }}
+service password-encryption
+!
+{% if quagga_logging.facility.enabled %}
+log facility {{ quagga_logging.facility.facility }}
+{% endif %}
+{% if quagga_logging.file.enabled %}
+log file {{ quagga_logging.file.filename }} {{ quagga_logging.file.level }}
+{% endif %}
+{% if quagga_logging.monitor.enabled %}
+log monitor {{ quagga_logging.monitor.level }}
+{% endif %}
+{% if quagga_logging.record_priority %}
+log record-priority
+{% endif %}
+{% if quagga_logging.stdout.enabled %}
+log stdout {{ quagga_logging.stdout.level }}
+{% endif %}
+{% if quagga_logging.syslog.enabled %}
+log syslog {{ quagga_logging.syslog.level }}
+{% endif %}
+{% if quagga_logging.timestamp.enabled %}
+log timestamp precision {{ quagga_logging.timestamp.precision }}
+{% endif %}
+{% if quagga_logging.trap.enabled %}
+log trap {{ quagga_logging.trap.level }}
+{% endif %}
+!
+{% if quagga_debugging.bgp.enabled %}
+{%   for item in quagga_debugging.bgp.debug %}
+debug bgp {{ item }}
+{%   endfor %}
+{% endif %}
+!
+{% if quagga_debugging.ospf.enabled %}
+{%   for item in quagga_debugging.ospf.debug %}
+debug ospf {{ item }}
+{%   endfor %}
+{% endif %}
+!
+{% if quagga_debugging.zebra.enabled %}
+{%   for item in quagga_debugging.zebra.debug %}
+debug zebra {{ item }}
+{%   endfor %}
+{% endif %}
+!
+{% if quagga_interfaces is defined and quagga_defined_interfaces %}
+{%   for qdi in quagga_interfaces %}
+interface {{ qdi.int }}
+{%     if qdi.address is defined %}
+ ip address {{ qdi.address }}/{{ qdi.cidr }}
+ ipv6 nd suppress-ra
+{%     endif %}
+{%   endfor %}
+!
+{% endif %}
+!
+{% if quagga_ip_forwarding.ipv4 %}
+ip forwarding
+{% endif %}
+{% if quagga_ip_forwarding.ipv6 %}
+ipv6 forwarding
+{% endif %}
+!
+{% if quagga_static_routes is defined %}
+{%   for item in quagga_static_routes %}
+ip route {{ item.destination }} {{ item.next_hop }}
+{%   endfor %}
+{% endif %}
+!
+{% if quagga_config_bgpd is defined and quagga_config_bgpd %}
+{%   if quagga_bgp_router_configs is defined %}
+{%     for item in quagga_bgp_router_configs %}
+{%       if item.name == inventory_hostname %}
+{%         if item.prefix_lists is defined %}
+{%           for pl in item.prefix_lists %}
+ip prefix-list {{ pl.name }} seq {{ pl.sequence }} {{ pl.action }} {{ pl.network }}
+{%           endfor %}
+{%         endif %}
+router bgp {{ item.local_as }}
+ bgp router-id {{ item.router_id }}
+ bgp log-neighbor-changes
+{%         if item.network_advertisements is defined %}
+{%           for adv in item.network_advertisements %}
+ network {{ adv }}
+{%           endfor %}
+{%         endif %}
+{%         for nbr in item.neighbors %}
+ neighbor {{ nbr.neighbor }} remote-as {{ nbr.remote_as }}
+{%           if nbr.announce_default_route is defined and nbr.announce_default_route %}
+ neighbor {{ nbr.neighbor }} default-originate
+{%           endif %}
+{%           if nbr.description is defined %}
+ neighbor {{ nbr.neighbor }} description "{{ nbr.description }}"
+{%           endif %}
+ neighbor {{ nbr.neighbor }} next-hop-self
+ neighbor {{ nbr.neighbor }} soft-reconfiguration inbound
+{%           if nbr.prefix_lists is defined %}
+{%             for pl in nbr.prefix_lists %}
+ neighbor {{ nbr.neighbor }} capability orf prefix-list {{ pl.orf }}
+{%               if pl.orf|lower == "send" or pl.orf|lower == "both" %}
+ neighbor {{ nbr.neighbor }} prefix-list {{ pl.name }} {{ pl.direction }}
+{%               endif %}
+{%             endfor %}
+{%           endif %}
+{%         endfor %}
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+!
+{% if quagga_config_ospfd is defined and quagga_config_ospfd %}
+router ospf
+{%   if quagga_ospf_routerid is defined %}
+ ospf router-id {{ quagga_ospf_routerid }}
+{%   endif %}
+  log-adjacency-changes
+{%   if quagga_ospf_redistribute is defined %}
+{%     for item in quagga_ospf_redistribute %}
+ redistribute {{ item }}
+{%     endfor %}
+{%   endif %}
+{%   if quagga_passive_int is defined %}
+{%     for item in quagga_passive_int %}
+ passive-interface {{ item.int }}
+{%     endfor %}
+{%   endif %}
+{%   if quagga_no_passive_int is defined %}
+{%     for item in quagga_no_passive_int %}
+ no passive-interface {{ item.int }}
+{%     endfor %}
+{%   endif %}
+{%   if quagga_ospf_area_config is defined %}
+{%     for item in quagga_ospf_area_config %}
+ network {{ item.network }} area {{ item.area }}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+!
+line vty

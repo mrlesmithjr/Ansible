@@ -1,7 +1,7 @@
 Role Name
 =========
 
-An Ansible role to manage iptables firewall
+An [Ansible] role to manage [iptables] firewall
 
 Requirements
 ------------
@@ -11,7 +11,7 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-iptables
 iptables_chains:
@@ -84,7 +84,9 @@ iptables_chains:
         limit: '2/min'
         state: 'present'
         table: 'filter'
-iptables_custom_chains:  #Define custom user-defined chains
+
+# Define custom user-defined chains
+iptables_custom_chains:
   - name: 'DEFAULT-Allowed'
     state: 'present'
   - name: 'ELK-RELATED-Allowed'
@@ -93,6 +95,8 @@ iptables_custom_chains:  #Define custom user-defined chains
     state: 'present'
   - name: 'LOGGING-Dropped'
     state: 'present'
+
+# Define default policies
 iptables_default_policies:
   - name: 'INPUT'
     policy: 'ACCEPT'
@@ -100,14 +104,29 @@ iptables_default_policies:
     policy: 'ACCEPT'
   - name: 'OUTPUT'
     policy: 'ACCEPT'
-iptables_flush_chains: false  #Defines if user-defined chains should be flushed
-iptables_flush_rules: false  #Defines if rules should be flushed
-iptables_enabled_versions:  #Defines IP versions to define
+
+# Defines if user-defined chains should be flushed
+iptables_flush_chains: false
+
+# Defines if rules should be flushed
+iptables_flush_rules: false
+
+# Defines IP versions to define
+iptables_enabled_versions:
   - 'v4'
 #  - 'v6'
-iptables_persistent: true  #Defines if rules should be persistent across reboots
+
+# Enable NAT Masquerading in order to share internet connection
+iptables_nat_masquerade:
+  enabled: false
+  outbound_interface: 'eth0'
+  inbound_interface: 'eth1'
+  # source: ''
+
+# Defines if rules should be persistent across reboots
+iptables_persistent: true
 iptables_save_file: '/etc/iptables.rules'
-````
+```
 
 Dependencies
 ------------
@@ -138,3 +157,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[iptables]: <https://www.netfilter.org/>

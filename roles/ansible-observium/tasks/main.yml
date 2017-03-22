@@ -10,3 +10,5 @@
 - include: config.yml
 
 - include: users.yml
+
+- include: cron.yml

@@ -1,5 +1,2 @@
 ---
-# Install galaxy roles
-#- src: mrlesmithjr.openvswitch
-- src: mrlesmithjr.config-interfaces
-- src: mrlesmithjr.kvm
+- src: https://github.com/mrlesmithjr/ansible-config-interfaces.git

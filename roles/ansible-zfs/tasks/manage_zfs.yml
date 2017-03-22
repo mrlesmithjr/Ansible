@@ -5,7 +5,7 @@
   register: "zpools"
   when: zfs_pools is defined
 
-- name: Gather ZPool Status
+- name: manage_zfs | Gather ZPool Status
   shell: "zpool status"
   changed_when: false
   register: "zpool_devices"
@@ -118,6 +118,7 @@
     owner: "{{ item.owner|default(omit) }}"
     group: "{{ item.group|default(omit) }}"
   with_items: '{{ zfs_filesystems }}'
+  when: zfs_manage_filesystem_permissions
 
 - name: manage_zfs | configuring iscsi devices
   template:

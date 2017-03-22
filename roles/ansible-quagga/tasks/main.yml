@@ -7,20 +7,11 @@
   when: ansible_os_family == "RedHat"
 
 - include: config_interfaces.yml
-  when: >
-        quagga_config_interfaces is defined and
-        quagga_config_interfaces
+  when: quagga_config_interfaces
 
 - include: config_quagga.yml
   tags:
     - quagga_config
-  when: >
-        quagga_config is defined and
-        quagga_config
+  when: quagga_config
 
-- include: config_keepalived.yml
-  tags:
-    - quagga_config_keepalived
-  when: >
-        quagga_config_keepalived is defined and
-        quagga_config_keepalived
+- include: gateway.yml

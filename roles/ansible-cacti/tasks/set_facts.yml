@@ -58,3 +58,17 @@
   when: >
         ansible_os_family == "RedHat" and
         cacti_webserver_type == "nginx"
+
+- name: Setting PHP Version 5
+  set_fact:
+    cacti_php_version: '5'
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version < '16.04'
+
+- name: Setting PHP Version 7.0
+  set_fact:
+    cacti_php_version: '7.0'
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04'

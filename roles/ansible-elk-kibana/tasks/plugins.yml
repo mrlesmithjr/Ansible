@@ -1,0 +1,32 @@
+---
+- name: Setting Ansible Version
+  set_fact:
+    kibana_ansible_version_check: '{{ ansible_version.major }}.{{ ansible_version.minor }}'
+
+- debug: var=kibana_ansible_version_check
+
+## Below kibana_plugin does not work with Kibana 5.x
+# - name: plugins | Managing Kibana Plugins
+#   kibana_plugin:
+#     name: "{{ item.name }}"
+#     state: "{{ item.state }}"
+#     plugin_bin: "{{ kibana_plugins_bin }}"
+#     plugin_dir: "{{ kibana_plugins_dir }}"
+#   with_items: '{{ kibana_plugins }}'
+#   when: >
+#         kibana_ansible_version_check >= '2.2' and
+#         kibana_manage_plugins
+
+- name: plugins | Capturing Kibana Plugins
+  command: "{{ kibana_plugins_bin }} list"
+  register: "kibana_plugins_list"
+  changed_when: false
+
+- name: plugins | Installing Kibana Plugins
+  command: "{{ kibana_plugins_bin }} install {{ item.name }}"
+  with_items: '{{ kibana_plugins }}'
+  when: >
+        item.name not in kibana_plugins_list.stdout and
+        item.state|lower == "present"
+
+# - debug: var=kibana_plugins_list

@@ -1,0 +1,21 @@
+---
+# Manage IPTables rule for NAT masquerade
+# This is for internet access for other hosts to correctly
+# pass through when using host as default route to internet.
+- name: gateway | Enabing NAT Masquerade
+  iptables:
+    table: "nat"
+    chain: "POSTROUTING"
+    out_interface: "{{ quagga_internet_gateway_info.ext_int }}"
+    jump: "MASQUERADE"
+    state: "present"
+  when: quagga_internet_gateway
+
+- name: gateway | Disabling NAT Masquerade
+  iptables:
+    table: "nat"
+    chain: "POSTROUTING"
+    out_interface: "{{ quagga_internet_gateway_info.ext_int }}"
+    jump: "MASQUERADE"
+    state: "absent"
+  when: not quagga_internet_gateway

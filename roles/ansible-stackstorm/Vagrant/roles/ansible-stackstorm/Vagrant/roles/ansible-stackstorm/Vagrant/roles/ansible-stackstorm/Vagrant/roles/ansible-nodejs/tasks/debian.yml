@@ -1,0 +1,17 @@
+---
+- name: debian | adding nodejs repo key
+  apt_key:
+    url: "{{ nodejs_debian_repo_info.repo_key }}"
+    state: present
+
+- name: debian | adding nodejs repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: '{{ nodejs_debian_repo_info.repos }}'
+
+- name: debian | installing nodejs packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: '{{ nodejs_debian_packages }}'

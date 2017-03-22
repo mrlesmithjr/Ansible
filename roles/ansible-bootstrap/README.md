@@ -3,7 +3,6 @@ Role Name
 
 Initial host configurations (Bootstrap)...Security, SSH, etc.
 
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-bootstrap.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-bootstrap)
 Requirements
 ------------
 
@@ -12,12 +11,21 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
-debian_set_root_pw: false  #Only set to true if desired to set root password...for Debian/Ubuntu systems
-reboot: true  # reboot after changing hostname to match inventory_hostname - set to false if you do not want to reboot
-root_password: []  #define root password for hosts....define here or in group_vars/all...If Ubuntu/Debian choose wisely if you want to do this
-````
+# Only set to true if desired to set root password...for Debian/Ubuntu systems
+bootstrap_debian_set_root_pw: false
+# Defines if fail2ban should be installed
+bootstrap_install_fail2ban: false
+# Define root password for hosts
+# If Ubuntu/Debian choose wisely if you want to do this
+# Generate password (echo password | mkpasswd -s -m sha-512)
+# The password below is 'P@55w0rd'
+bootstrap_root_password: '$6$8tMUxKP33/$Fb/hZBaYvyzGubO9nrlRJMjUnt3aajXZwxCifH9NYqrhjMlC9COWmNNFiMpnyNGsgmDeNCCn2wKNh0G1E1BBV0'
+# Defines if root password should be set
+# This only applies to non Debian/Ubuntu systems
+bootstrap_set_root_pw: false
+```
 
 Dependencies
 ------------
@@ -27,20 +35,14 @@ None
 Example Playbook
 ----------------
 
-Example Playbook
-----------------
-#### Galaxy
------------
-    - hosts: servers
-      roles:
-         - mrlesmithjr.bootstrap
-         - mrlesmithjr.users
-#### GitHub
------------
-    - hosts: servers
-      roles:
-        - ansible-bootstrap
-        - ansible-users
+```
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-bootstrap
+  tasks:
+```
 
 License
 -------

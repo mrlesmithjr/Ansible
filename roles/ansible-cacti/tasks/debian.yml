@@ -1,13 +1,14 @@
 ---
-- name: debian | installing php5
-  apt:
-    name: "php5"
-    state: present
-  notify:
-    - 'restart {{ cacti_webserver_handler }}'
-
 - name: debian | installing dependencies
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  notify:
+    - 'restart {{ cacti_webserver_handler }}'
   with_items: '{{ cacti_debian_packages }}'
+
+- name: debian | Installing Apache PHP
+  apt:
+    name: "libapache2-mod-php"
+    state: "present"
+  when: cacti_webserver_type|lower == "apache2"

@@ -1,0 +1,29 @@
+---
+- name: cluster | Generating Cluster Unique ID
+  command: "uuidgen"
+  register: "ceph_cluster_id"
+  args:
+    creates: "{{ ceph_cluster_id_file }}"
+  run_once: true
+
+- name: cluster | Creating Cluster Unique ID File
+  file:
+    path: "{{ ceph_cluster_id_file }}"
+    state: "touch"
+  when: ceph_cluster_id.changed
+
+- name: cluster | Adding Cluster Unique ID To All Hosts
+  lineinfile:
+    dest: "{{ ceph_cluster_id_file }}"
+    line: "{{ ceph_cluster_id.stdout }}"
+  when: ceph_cluster_id.changed
+
+- name: cluster | Reading Existing Cluster Unique ID From File
+  command: "cat {{ ceph_cluster_id_file }}"
+  register: "ceph_cluster_id"
+  changed_when: false
+
+- name: cluster | Configuring Ceph
+  template:
+    src: "etc/ceph/ceph.conf.j2"
+    dest: "{{ ceph_config }}"

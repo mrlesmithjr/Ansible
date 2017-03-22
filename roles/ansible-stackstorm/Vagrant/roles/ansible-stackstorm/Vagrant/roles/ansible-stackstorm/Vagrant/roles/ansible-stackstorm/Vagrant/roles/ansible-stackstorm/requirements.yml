@@ -1,0 +1,6 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-mongodb.git
+- src: https://github.com/mrlesmithjr/ansible-nginx.git
+- src: https://github.com/mrlesmithjr/ansible-postgresql.git
+- src: https://github.com/mrlesmithjr/ansible-rabbitmq.git
+- src: https://github.com/mrlesmithjr/ansible-stackstorm.git

@@ -1,60 +1,112 @@
 ---
 # defaults file for ansible-powerdns-authoritative
-allow_ddns_updates: false  #define here or globally in group_vars/group
-allow_ddns_updates_from: '0.0.0.0/0'  #defines subnet to allow DDNS updates from if allowed...define here or globally in group_vars/group
-config_soa_edit_api: false  #set to true if setting up Master/Slave...Otherwise Master zones will not update their SOA in order to transfer
-create_pdns_records: false   #defines if dns records should be created/updated
-create_pdns_zones: false  #defines if dns zones should be created...pdns_fwd_zones and pdns_fwd_zones
-dns_hostmaster: 'hostmaster.{{ pri_domain_name }}'  #define here or globally in group_vars/group
-enable_pdns_anycast: false  #define here or globally in group_vars/group
-enable_pdns_api: true  # Defines if API should be enabled
-enable_pdns_carbon_metrics: false
-enable_pdns_recursive_lookups: false  #define here or globally in group_vars/group
-enable_pdns_server_logging: false  #define here or globally in group_vars/group
-enable_pdns_web_server: false  #define here or globally in group_vars/group
-install_pdns_server: true  #defines if authoriative dns server is to be installed
-pdns_also_notify:  #Defines if additional nameservers should be notified of zone updates.
-  configure: false  #Set to true to enable.
+
+# Defines if Dynamic DNS is allowed
+pdns_allow_ddns_updates: false
+
+# Defines subnet to allow DDNS updates from if allowed
+pdns_allow_ddns_updates_from: '0.0.0.0/0'
+
+#Defines if additional nameservers should be notified of zone updates.
+pdns_also_notify:
+  configure: false
   notify_ips:
     - '192.168.200.201'
     - '192.168.200.202'
-pdns_api_key: 'changeme'  #define here or globally in group_vars/all/accounts
+
+# Defines the API Key
+pdns_api_key: 'changeme'
+
+# Defines the API URL
 pdns_api_url: 'http://127.0.0.1:{{ pdns_webserver_port }}/servers/localhost/zones'
+
+# Defines the listen port
 pdns_auth_port: '53'
+
+# Defines the Carbon server info for metrics
 pdns_carbon_info:
   interval: '30'
   ourname: '{{ ansible_hostname }}'
   server: '192.168.200.201' # Must be defined as IP otherwise will not work
+
+# Set to true if setting up Master/Slave
+# Otherwise Master zones will not update their SOA in order to transfer
+pdns_config_soa_edit_api: false
+
+# Defines if dns records should be created/updated
+pdns_create_pdns_records: false
+
+# Defines if dns zones should be created...pdns_fwd_zones and pdns_fwd_zones
+pdns_create_pdns_zones: false
+
+# Defines the curl header for managing records via API URL
 pdns_curl_header: "-H 'X-API-Key: {{ pdns_api_key }}'"
-pdns_db_allow_access_from_hosts:  #defines hosts where {{ pdns_db_user }} can login from
+
+# Defines hosts where {{ pdns_db_user }} can login from
+pdns_db_allow_access_from_hosts:
   - '{{ ansible_hostname }}'
   - '127.0.0.1'
   - '::1'
   - 'localhost'
-  - '%' # Allows from everywhere
-pdns_db_cluster: false  #defines if backend db for pdns is clustered...define here or in group_vars/group
+ # Allows from everywhere
+  - '%'
+
+# Defines if backend db for pdns is clustered
+pdns_db_cluster: false
+
+# Defines the host where the MySQL DB resides
 pdns_db_host: 'localhost'
-pdns_db_name: 'powerdns'  #define here or globally in group_vars/group
-pdns_db_pass: 'powerdns'  #define here or globally in group_vars/all/accounts
-pdns_db_user: 'powerdns'  #define here or globally in group_vars/all/accounts
-pdns_default_soa_mail: 'hostmaster.{{ pri_domain_name }}' #define here or globally in group_vars/group
-pdns_default_soa_name: '{{ ansible_hostname }}.{{ pri_domain_name }}' #define here or globally in group_vars/group
+pdns_db_name: 'powerdns'
+pdns_db_pass: 'powerdns'
+pdns_db_user: 'powerdns'
+pdns_default_soa_mail: 'hostmaster.{{ pri_domain_name }}'
+pdns_default_soa_name: '{{ ansible_hostname }}.{{ pri_domain_name }}'
 pdns_download_url: 'https://downloads.powerdns.com/releases'
-pdns_repo_baseurl: 'http://repo.powerdns.com'
-pdns_repo_gpgkey: 'https://repo.powerdns.com/FD380FBB-pub.asc'
-pdns_json_interface: true
-pdns_listen_all_interfaces: true  #defines if PDSN will listen on all interfaces
-pdns_master: false  #Defines if node should perform as PDNS Master
-pdns_nameservers:  #define nameservers to use when creating zones..
-  - 'ns1.{{ pri_domain_name }}'
-  - 'ns2.{{ pri_domain_name }}'
-pdns_fwd_zones:  #defines the DNS forward zones to create if create_pdns_zones is true
+
+
+# Defines if Anycast networking should be enabled
+pdns_enable_pdns_anycast: false
+
+# Defines if API should be enabled
+pdns_enable_pdns_api: true
+
+# Defines is Carbon metrics are enabled for monitoring statistics
+pdns_enable_pdns_carbon_metrics: false
+
+# Defines if recursive lookups should be enabled
+pdns_enable_pdns_recursive_lookups: false
+
+# Defines if DNS logging should be enabled
+pdns_enable_pdns_server_logging: false
+
+# Defines if web server should be enabled
+pdns_enable_pdns_web_server: false
+
+# Defines the DNS forward zones to create if pdns_create_pdns_zones is true
+pdns_fwd_zones:
   - '_msdcs.{{ pri_domain_name }}'
   - '_sites.{{ pri_domain_name }}'
   - '_tcp.{{ pri_domain_name }}'
   - '_udp.{{ pri_domain_name }}'
   - '{{ pri_domain_name }}'
-pdns_records:  #define DNS records to create/update...to keep this file small...define in group_vars/all/pdns_records.yml or other...
+
+pdns_repo_baseurl: 'http://repo.powerdns.com'
+pdns_repo_gpgkey: 'https://repo.powerdns.com/FD380FBB-pub.asc'
+pdns_json_interface: true
+
+# Defines if PDNS will listen on all interfaces
+pdns_listen_all_interfaces: true
+
+# Defines if node should perform as PDNS Master
+pdns_master: false
+
+# Define nameservers to use when creating zones..
+pdns_nameservers:
+  - 'ns1.{{ pri_domain_name }}'
+  - 'ns2.{{ pri_domain_name }}'
+
+# Define DNS records to create/update
+pdns_records:
   - name: 'vcsa'
     zone: '{{ pri_domain_name }}'
     type: 'A'
@@ -87,9 +139,15 @@ pdns_records:  #define DNS records to create/update...to keep this file small...
     disabled: false
     ttl: '3600'
     priority: '0'
-pdns_recursor_host: '127.0.0.1'  #should be 127.0.0.1 unless recursor is running on a separate host
-pdns_recursor_port: '5300'  #port pdns_recursor should listen on...default is 53 but needs to be changed to run both pdns services on same host
-pdns_rev_zones:  #defines the DNS reverse zones to create if create_pdns_zones is true
+
+# Defines PDNS recursor host
+pdns_recursor_host: '127.0.0.1'
+
+# Defines PDNS recursor port
+pdns_recursor_port: '5300'
+
+# Defines the DNS reverse zones to create if pdns_create_pdns_zones is true
+pdns_rev_zones:
   - '0.0.10.in-addr.arpa'
   - '2.0.10.in-addr.arpa'
   - '101.0.10.in-addr.arpa'
@@ -102,18 +160,33 @@ pdns_rev_zones:  #defines the DNS reverse zones to create if create_pdns_zones i
   - '1.168.192.in-addr.arpa'
   - '70.168.192.in-addr.arpa'
   - '200.168.192.in-addr.arpa'
-pdns_server_version: '3.4.10-1' # Defines version to install...To install 4.x change to 4.x
-pdns_slave: false  #Defines if node should perform as PDNS Slave
+
+# Defines version to install
+# To install 4.x change to 4.x
+pdns_server_version: '3.4.10-1'
+
+# Defines if node should perform as PDNS Slave
+pdns_slave: false
 pdns_slaves:
   - '172.28.128.4/32'
   - '172.28.128.6/32'
 pdns_webserver_address: '0.0.0.0'
 pdns_webserver_allow: '0.0.0.0/0,::/0'
-pdns_webserver_password: 'changeme'  #define here or globally in group_vars/all/accounts
-pdns_webserver_port: '8081'  #API Webserver port
-pdns_zone_types: 'Native'  #defines zone types to create using API..Native,Master,Slave...Native should be used by default...
-pdns_zones_dir: 'pdns_zones'  #defines the folder to create locally that will contain the records and zones to be created by pdns_records.yml and pdns_zones.yml
-pri_dns: []  #defines primary dns server on network...define here or globally in group_vars/all
-pri_domain_name: 'example.org'  #define here or globally in group_vars/all
-sec_dns: []  #defines secondary dns server on network...define here or globally in group_vars/all
-soa_edit_api: 'INCEPTION-INCREMENT'
+pdns_webserver_password: 'changeme'
+
+# Defines API Webserver port
+pdns_webserver_port: '8081'
+
+# Defines zone types to create using API
+# Native,Master,Slave
+# Native should be used by default...
+pdns_zone_types: 'Native'
+
+# Defines the folder to create locally that will contain the records and
+# zones to be created by pdns_records.yml and pdns_zones.yml
+pdns_zones_dir: 'pdns_zones'
+
+# Defines primary domain name of environment
+pri_domain_name: 'example.org'
+
+pdns_soa_edit_api: 'INCEPTION-INCREMENT'

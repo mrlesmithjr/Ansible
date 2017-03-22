@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs and configures Kibana for ELK Stack
+  description: An Ansible role to install/configure Kibana
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -89,6 +89,7 @@ galaxy_info:
     - trusty
     - utopic
     - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

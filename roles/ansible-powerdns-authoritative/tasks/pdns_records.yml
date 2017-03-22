@@ -23,7 +23,7 @@
   delegate_to: "localhost"
   run_once: true
   sudo: false
-  with_items: pdns_records
+  with_items: '{{ pdns_records }}'
 
 - name: pdns_records | creating pdns records in zones folders
   template:

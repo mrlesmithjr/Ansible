@@ -1,6 +1,10 @@
 ---
 # handlers file for ansible-shorewall
+# when restarting shorewall, first validate the config!
 - name: restart shorewall
+  shell: shorewall check
+  notify: restart shorewall after check
+- name: restart shorewall after check
   service:
     name: "shorewall"
     state: restarted

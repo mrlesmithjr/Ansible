@@ -1,0 +1,12 @@
+---
+- name: samba | Installing Samba
+  apt:
+    name: "samba"
+    state: "present"
+  when: ansible_os_family == "Debian"
+
+- name: samba | Configuring Samba
+  template:
+    src: "etc/samba/smb.conf.j2"
+    dest: "/etc/samba/smb.conf"
+  notify: "restart samba"

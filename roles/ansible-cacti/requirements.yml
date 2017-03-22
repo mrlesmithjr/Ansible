@@ -2,7 +2,7 @@
 - src: https://github.com/mrlesmithjr/ansible-apache2.git
 - src: https://github.com/mrlesmithjr/ansible-cacti.git
 - src: https://github.com/mrlesmithjr/ansible-lighttpd.git
-- src: https://github.com/mrlesmithjr/ansible-mariadb-mysql.git
+- src: https://github.com/mrlesmithjr/ansible-mysql.git
 - src: https://github.com/mrlesmithjr/ansible-nginx.git
 - src: https://github.com/mrlesmithjr/ansible-ntp.git
 - src: https://github.com/mrlesmithjr/ansible-snmpd.git

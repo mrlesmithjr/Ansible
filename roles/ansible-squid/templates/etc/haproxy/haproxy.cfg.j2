@@ -1,4 +1,3 @@
-# {{ ansible_managed }}
 global
 	log /dev/log	local0
 	log /dev/log	local1 notice
@@ -49,7 +48,7 @@ defaults
           stats http-request auth realm admin_page unless AuthOkay_ReadOnly
 
 
-listen squid-TCP_{{ haproxy_squid_http_port }}-{{ squid_http_port }} {{ keepalived_vip }}:{{ haproxy_squid_http_port }}
+listen squid-TCP_{{ squid_haproxy_http_port }}-{{ squid_http_port }} {{ squid_keepalived_vip }}:{{ squid_haproxy_http_port }}
 	mode tcp
 	option tcpka
   option tcplog

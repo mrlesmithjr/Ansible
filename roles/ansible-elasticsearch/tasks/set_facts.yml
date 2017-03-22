@@ -1,0 +1,36 @@
+---
+- name: set_facts | Setting Facts (ES 1.7)
+  set_fact:
+    es_debian_repo: "deb http://packages.elastic.co/elasticsearch/{{ es_major_version }}/debian stable main"
+    es_java_version: "1.7.0"
+    es_plugin_bin: "/usr/share/elasticsearch/bin/plugin"
+    es_plugin_install: "-i"
+    es_plugin_list: "-l"
+    es_redhat_repo_url: "https://packages.elastic.co/elasticsearch"
+    es_repo_key: "https://packages.elastic.co/GPG-KEY-elasticsearch"
+  when: >
+        es_major_version == "1.7"
+
+- name: set_facts | Setting Facts (ES 2.x)
+  set_fact:
+    es_debian_repo: "deb http://packages.elastic.co/elasticsearch/{{ es_major_version }}/debian stable main"
+    es_java_version: "1.7.0"
+    es_plugin_bin: "/usr/share/elasticsearch/bin/plugin"
+    es_plugin_install: "install"
+    es_plugin_list: "list"
+    es_redhat_repo_url: "https://packages.elastic.co/elasticsearch"
+    es_repo_key: "https://packages.elastic.co/GPG-KEY-elasticsearch"
+  when: >
+        es_major_version == "2.x"
+
+- name: set_facts | Setting Facts (5.x)
+  set_fact:
+    es_debian_repo: "deb https://artifacts.elastic.co/packages/{{ es_major_version }}/apt stable main"
+    es_java_version: "1.8.0"
+    es_plugin_bin: "/usr/share/elasticsearch/bin/elasticsearch-plugin"
+    es_plugin_install: "install"
+    es_plugin_list: "list"
+    es_redhat_repo_url: "https://artifacts.elastic.co/packages"
+    es_repo_key: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+  when: >
+        es_major_version == "5.x"

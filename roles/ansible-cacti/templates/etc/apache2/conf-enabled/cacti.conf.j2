@@ -1,0 +1,27 @@
+Alias /cacti {{ cacti_web_root }}/cacti
+<Directory {{ cacti_web_root }}/cacti>
+        Options +FollowSymLinks
+        AllowOverride None
+        <IfVersion >= 2.3>
+                Require all granted
+        </IfVersion>
+        <IfVersion < 2.3>
+                Order Allow,Deny
+                Allow from all
+        </IfVersion>
+
+        AddType application/x-httpd-php .php
+
+        <IfModule mod_php.c>
+                php_flag magic_quotes_gpc Off
+                php_flag short_open_tag On
+                php_flag register_globals Off
+                php_flag register_argc_argv On
+                php_flag track_vars On
+                # this setting is necessary for some locales
+                php_value mbstring.func_overload 0
+                php_value include_path .
+        </IfModule>
+
+        DirectoryIndex index.php
+</Directory>

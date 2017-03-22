@@ -5,11 +5,20 @@
     state: present
   notify: restart apache2
   when: >
-        ansible_os_family == "Debian"
+        ansible_os_family == "Debian" and
+        apache2_php_version == "5"
 
-- name: php | installing php5-sqlite for apache2
+- name: php | Installing Apache PHP
   apt:
-    name: "php5-sqlite"
+    name: "libapache2-mod-php"
+    state: "present"
+  when: >
+        ansible_os_family == "Debian" and
+        apache2_php_version == "7.0"
+
+- name: php | Installing PHP{{ apache2_php_version }}-sqlite For Apache2
+  apt:
+    name: "php{{ apache2_php_version }}-sqlite"
     state: present
   notify: restart apache2
   when: >
@@ -17,10 +26,10 @@
         (apache2_install_php_sqlite is defined and
         apache2_install_php_sqlite)
 
-- name: php | configuring php
+- name: php | Configuring PHP{{ apache2_php_version }}
   template:
-    src: "etc/php5/apache2/php.ini.j2"
-    dest: "/etc/php5/apache2/php.ini"
+    src: "{{ apache2_php_path }}/apache2/php.ini.j2"
+    dest: "/{{ apache2_php_path }}/apache2/php.ini"
     owner: root
     group: root
     mode: 0644

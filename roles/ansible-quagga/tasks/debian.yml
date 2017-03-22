@@ -4,8 +4,9 @@
     name: "{{ item }}"
     state: "present"
   with_items:
-    - lldpd
-    - vlan
+    - 'ifenslave'
+    - 'lldpd'
+    - 'vlan'
 
 - name: debian | installing quagga
   apt:
@@ -17,3 +18,13 @@
     name: "quagga"
     state: "started"
     enabled: yes
+
+# Quagga vtysh shell (END) problem
+# http://www.brianlinkletter.com/quagga-vtysh-shell-end-problem/
+- name: debian | Fixing vtysh shell (END) problem
+  template:
+    src: "etc/{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+  with_items:
+    - 'bash.bashrc'
+    - 'environment'

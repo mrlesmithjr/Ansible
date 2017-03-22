@@ -1,45 +1,94 @@
 Role Name
 =========
 
-Installs and configures Kibana for ELK Stack https://www.elastic.co/products/kibana
+An [Ansible] role to install and configure Kibana for ELK Stack
 
 Requirements
 ------------
 
-Requires Elasticsearch 2.2+
-
-If setting up a scaled out HA ELK deployment ensure that your kibana node is either running elasticsearch or change the variable for kibana_elasticsearch_url in defaults/main.yml ...Another option (recommended) is to define this variable in your group_vars/group for your ELK group for consistency.
+None
 
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-elk-kibana
-config_kibana: true  #Defines if Kibana should be configured
-kibana_dir: '/opt/kibana'
-kibana_debian_repo_info:
-  key: 'https://packages.elastic.co/GPG-KEY-elasticsearch'
-  repo: 'deb http://packages.elastic.co/kibana/{{ kibana_major_version }}/debian stable main'
-kibana_docker_elasticsearch_container_name: elasticsearch  #defines the Docker container name to link to for elasticsearch
-kibana_docker_install: false  #defines if Kibana is being installed as a Docker container
-kibana_elasticsearch_url: localhost  #defines where to connect to elasticsearch for kibana...default is localhost...change to fit environment requirements...define here or in group_vars/group
-kibana_fix_babelcache_perms: false   #defines if babelcache permissions need to be fixed...not always needed.
-kibana_host: 0.0.0.0  #defines Kibana host...should remain as 0.0.0.0 unless other requirements are required...research before changing
-kibana_port: 5601
-kibana_major_version: '4.6'
-kibana_version: '4.6.1'
-remove_legacy_kibana_install: true
 
-## Below are legacy settings prior to package installer method...will be removed..
-# kibana_dl_dir: /opt
-# kibana_dl_file: "kibana-{{ kibana_version }}-linux-x86_64"
-# kibana_dl_url: "https://download.elastic.co/kibana/kibana"
-# kibana_index: .kibana
-# kibana_log: /var/log/kibana.log
-# kibana_log_rotate_count: 5
-# kibana_log_rotate_interval: daily
-````
+kibana_bin_dir: '/usr/share/kibana/bin'
+
+# Defines if Kibana should be configured
+kibana_config: true
+kibana_dir: '/etc/kibana'
+kibana_debian_repo_info:
+  key: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
+  repo: 'deb https://artifacts.elastic.co/packages/{{ kibana_major_version }}/apt stable main'
+
+# The default application to load.
+kibana_default_app: 'discover'
+
+# Defines the port of the kibana_elasticsearch_url host
+kibana_elasticsearch_port: '9200'
+
+# When this setting's value is true Kibana uses the hostname specified in the server.host
+# setting. When the value of this setting is false, Kibana uses the hostname of the host
+# that connects to this Kibana instance.
+kibana_elasticsearch_preservehost: true
+
+# Defines where to connect to elasticsearch for kibana
+# default is localhost
+# change to fit environment requirements
+kibana_elasticsearch_url: 'localhost'
+
+# Defines if babelcache permissions need to be fixed
+# not always needed.
+kibana_fix_babelcache_perms: false
+
+# Defines Kibana host
+# should remain as 0.0.0.0 unless other requirements are required
+# research before changing
+kibana_host: '0.0.0.0'
+
+# Kibana uses an index in Elasticsearch to store saved searches, visualizations and
+# dashboards. Kibana creates a new index if the index doesn't already exist.
+kibana_index: '.kibana'
+
+kibana_manage_plugins: true
+
+# Define Kibana Major Release
+kibana_major_version: '5.x'
+
+# The maximum payload size in bytes for incoming server requests.
+kibana_maxpayloadbytes: '1048576'
+
+# Define Kibana Minor Release
+kibana_minor_version: '5.2.2'
+
+# Define Kibana plugins
+kibana_plugins:
+  - name: 'x-pack'
+    state: "absent"
+
+kibana_plugins_bin: '{{ kibana_bin_dir }}/kibana-plugin'
+kibana_plugins_dir: '/usr/share/kibana/plugins/'
+
+# Define Kibana listen port
+kibana_port: '5601'
+
+# Defines if legacy install should be removed
+# This will cleanup previous non package installs that used this role previously
+kibana_remove_legacy_install: true
+
+# Kibana x-pack plugin settings
+kibana_xpack_graph_enabled: true
+kibana_xpack_monitoring_enabled: true
+kibana_xpack_reporting_enabled: true
+
+# https://github.com/elastic/kibana/issues/9369
+kibana_xpack_security_enabled: false
+
+kibana_xpack_watcher_enabled: true
+```
 
 Dependencies
 ------------
@@ -49,24 +98,14 @@ None
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.elk-kibana }
-
-Docker Info
------------
-
-In order to run as a Docker container you will need to link to an elasticsearch container by default called elasticsearch.
-Ex.
-````
-docker run -d --name elasticsearch -p 9200:9200 mrlesmithjr/elasticsearch
-docker run -d --name kibana -p 5601:5601 --link elasticsearch mrlesmithjr/elk-kibana
-````
-You can change the name of the elasticsearch url after the container is spun up if desired. By executing the following:
-````
-docker exec -it kibana-test ansible-playbook -i "localhost," -c local /opt/ansible-playbooks/playbook.yml --extra-vars="kibana_docker_elasticsearch_container_name=10.0.101.60" && docker restart kibana-test
-````
-The above will change the configuration for Kibana and point to the new location after the container is restarted.
+```
+- hosts: kibana_hosts
+  become: true
+  vars:
+  roles:
+    - role: ansible-elk-kibana
+  tasks:
+```
 
 License
 -------
@@ -80,3 +119,5 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Kibana]: <https://www.elastic.co/products/kibana>

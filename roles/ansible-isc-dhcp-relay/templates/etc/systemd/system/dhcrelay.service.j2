@@ -1,0 +1,16 @@
+[Unit]
+Description=DHCP Relay Agent Daemon
+Documentation=man:dhcrelay(8)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/dhcrelay -d --no-pid {% if isc_dhcp_relay_servers is defined %}
+{{ isc_dhcp_relay_servers|join (' ') }}{% endif %}
+{% if isc_dhcp_relay_interfaces is defined %}
+{% for item in isc_dhcp_relay_interfaces %} -i {{ item }}
+{% if not loop.last %} {% endif %}{% endfor %}{% endif %}
+
+[Install]
+WantedBy=multi-user.target

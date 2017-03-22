@@ -1,0 +1,26 @@
+---
+# defaults file for ansible-ceph
+ceph_cluster_id_file: '{{ ceph_config|dirname }}/.ceph_cluster_id'
+ceph_config: '/etc/ceph/ceph.conf'
+ceph_debian_repo_info:
+  key: 'https://download.ceph.com/keys/release.asc'
+  repo: 'deb https://download.ceph.com/debian-{{ ceph_release }}/ {{ ansible_distribution_release|lower }} main'
+ceph_enable_firewall: true
+ceph_firewall_rules:
+  - port: '22'
+    protocol: 'tcp'
+    action: 'allow'
+ceph_management_address: "{{ hostvars[inventory_hostname]['ansible_' + ceph_management_interface]['ipv4']['address'] }}"
+ceph_management_interface: 'enp0s8'
+ceph_management_network: "{{ hostvars[inventory_hostname]['ansible_' + ceph_management_interface]['ipv4']['network'] }}"
+ceph_mon_group: 'ceph-mon'
+ceph_osd_group: 'ceph-osd'
+# Define release to install
+# kraken|jewel|hammer
+ceph_release: 'kraken'
+ceph_user_info:
+  name: 'cephuser'
+  generate_keys: true
+  password: 'cephuser'
+  state: 'present'
+  sudo: true

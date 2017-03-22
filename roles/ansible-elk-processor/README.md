@@ -6,9 +6,10 @@ Installs ELK Stack Role (ELK-Processor)
 Requirements
 ------------
 
-Prior to using this role you will want to add your nodes to the appropriate inventory group. You should create 2 elk-processor nodes. Examples below.
-#####hosts inventory
-````
+Prior to using this role you will want to add your nodes to the appropriate
+inventory group. You should create 2 elk-processor nodes. Examples below.
+`Inventory`:
+```
 [elk-nodes]
 elk-processor-1
 elk-processor-2
@@ -16,12 +17,12 @@ elk-processor-2
 [elk-processor-nodes]
 elk-processor-1
 elk-processor-2
-````
+```
 
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-elk-processor
 alert_throttles:
@@ -59,15 +60,15 @@ logstash_configs:
   - 241_filters_dhcp
   - 250_filters_snort
   - 260_filters_citrix_netscaler
-  - 270_filters_apache
-  - 280_filters_nginx
+  # - 270_filters_apache
+  # - 280_filters_nginx
   - 290_filters_windows_eventlog
   - 300_filters_windows_updates
   - 310_filters_windows_iis
   - 320_filters_exim4
   - 330_filters_postfix
   - 340_filters_redis
-  - 341_filters_rundeck
+  # - 341_filters_rundeck
   - 350_filters_zfs
   - 360_filters_powerdns
 #  - 361_filters_powerdns_blacklists
@@ -100,11 +101,12 @@ logstash_inputs:
     host: '{{ logstash_server_fqdn }}'
     threads: 2
 logstash_log_dir: /var/log/logstash
+logstash_major_ver: '5.x' # Define major version installed (2.x|5.x)
 logstash_outputs:
   - output: elasticsearch
-    hosts: 'logstash.{{ pri_domain_name }}:9200'
+    hosts: '{{ logstash_server_fqdn }}:9200'
+    protocol: http  #node, transport or http....http is the only protocol supported in 2.x+
     flush_size: 5000
-    workers: 2
 #  - output: gelf
 #    host: 10.0.101.196
 logstash_pre_tagging:
@@ -157,7 +159,7 @@ logstash_post_tagging:
   - type: vCenter
     tags:
       - VMware
-logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines FQDN of logstash vip or etc.
+logstash_server_fqdn: 'logstash.{{ pri_domain_name }}'  #defines logstash server...should be vip fqdn for elk-haproxy-nodes...define here or globally in group_vars/elk-nodes
 logstash_slack_api_webhook_url: [] #define the slack api webhook api url assigned when adding an incoming slack webhook.
 logstash_slack_channel: logstash  #defines the slack channel where logstash alerts should be sent to. Ensure enable_logstash_slack_output is set to true if slack output is required.
 logstash_slack_output_tags:  #define specific tags to look for to alert on and send to slack
@@ -169,34 +171,32 @@ powerdns_blacklists:
   - spyware
 pri_domain_name: example.org  #defines primary domain name...define here or globally in group_vars/all
 smtp_server: 'smtp.{{ pri_domain_name }}'  #defines smtp server to send emails through...define here or globally in group_vars/all
-````
+```
 
 Dependencies
 ------------
 
-````
-mrlesmithjr.ntp
-mrlesmithjr.rsyslog
-mrlesmithjr.snmpd
-mrlesmithjr.timezone
-mrlesmithjr.elasticsearch
-mrlesmithjr.logstash
-mrlesmithjr.dnsmasq
-````
+Install all required Ansible roles from `requirements.yml`:
+```
+sudo ansible-galaxy install -r requirements.yml
+```
 
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-        - { role: mrlesmithjr.ntp }
-        - { role: mrlesmithjr.rsyslog }
-        - { role: mrlesmithjr.snmpd }
-        - { role: mrlesmithjr.timezone }
-        - { role: mrlesmithjr.elasticsearch }
-        - { role: mrlesmithjr.logstash }
-        - { role: mrlesmithjr.dnsmasq }
-        - { role: mrlesmithjr.elk-processor }
+```
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-ntp
+    - role: ansible-rsyslog
+    - role: ansible-snmpd
+    - role: ansible-timezone
+    - role: ansible-logstash
+    - role: ansible-dnsmasq
+    - role: ansible-elk-processor
+```
 
 License
 -------

@@ -1,0 +1,11 @@
+---
+- name: ssh_keys | Scan And Register
+  command: "ssh-keyscan {{ item }}"
+  register: "host_keys"
+  changed_when: false
+  with_items: '{{ groups.all }}'
+
+- name: ssh_keys | Write Keys
+  template:
+    src: "ssh-hosts.j2"
+    dest: "/etc/ssh/ssh_known_hosts"

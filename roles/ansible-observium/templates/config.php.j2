@@ -13,7 +13,7 @@ $config['db_name']      = '{{ observium_db_info.db }}';
 #$config['install_dir'] = "{{ observium_base_dir }}";
 
 // Default community list to use when adding/discovering
-$config['snmp']['community'] = array("public");
+$config['snmp']['community'] = array({{ observium_snmp_community_list | join(',') }});
 
 // Authentication Model
 $config['auth_mechanism'] = "mysql";    // default, other options: ldap, http-auth, please see documentation for config help
@@ -22,8 +22,8 @@ $config['auth_mechanism'] = "mysql";    // default, other options: ldap, http-au
 // $config['poller-wrapper']['alerter'] = TRUE;
 
 // Set up a default alerter (email to a single address)
-$config['email']['default']        = "user@your-domain";
-$config['email']['from']           = "Observium <observium@your-domain>";
-$config['email']['default_only']   = TRUE;
+$config['email']['default']        = "{{ observium_admin_account_info.email_to | default('root@localhost') }}";
+$config['email']['from']           = "{{ observium_admin_account_info.email | default('root@localhost') }}";
+$config['email']['default_only']   = {{ observium_admin_account_info.email_default_only | default('TRUE') }};
 
 // End config.php

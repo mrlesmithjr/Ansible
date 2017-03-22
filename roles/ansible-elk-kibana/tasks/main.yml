@@ -1,7 +1,7 @@
 ---
 # tasks file for ansible-elk-kibana
 - include: remove_legacy_install.yml
-  when: remove_legacy_kibana_install
+  when: kibana_remove_legacy_install
 
 - include: debian.yml
   tags:
@@ -19,4 +19,13 @@
   tags:
     - kibana
     - upgrade_kibana
-  when: config_kibana
+  when: kibana_config
+
+- include: plugins.yml
+  when: kibana_manage_plugins
+
+- name: Ensuring Kibana Service Is Started And Enabled On Boot
+  service:
+    name: "kibana"
+    enabled: yes
+    state: "started"

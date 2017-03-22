@@ -21,7 +21,7 @@ authoritative;
 
 log-facility local7;
 
-{% if enable_dhcp_failover %}
+{% if isc_dhcp_enable_dhcp_failover %}
 {%   if inventory_hostname == isc_dhcp_failover_info.primary %}
 failover peer "failover" {
   primary;
@@ -59,7 +59,7 @@ failover peer "failover" {
 {%   for item in isc_dhcp_scopes %}
 subnet {{ item.subnet }} netmask {{ item.netmask }} {
   pool {
-{%     if enable_dhcp_failover %}
+{%     if isc_dhcp_enable_dhcp_failover %}
     failover peer "failover";
 {%     endif %}
     range {{ item.range }};
@@ -67,9 +67,9 @@ subnet {{ item.subnet }} netmask {{ item.netmask }} {
 {%     for option in item.options %}
     option {{ option.name }} {{ option.value }};
 {%     endfor %}
-{%     if enable_pxe_boot %}
+{%     if isc_dhcp_enable_pxe_boot %}
     option bootfile-name "{{ isc_dhcp_pxe_boot_file }}";
-    next-server {{ pxe_boot_server }};
+    next-server {{ isc_dhcp_pxe_boot_server }};
 {%     endif %}
 
     default-lease-time {{ item.default_lease_time }};

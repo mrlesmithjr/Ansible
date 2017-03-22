@@ -1,0 +1,5 @@
+{{ ansible_managed }}
+
+{% for pair in rundeck_framework_tokens %}
+{{ pair.user }}: {{ pair.key }}
+{% endfor %}

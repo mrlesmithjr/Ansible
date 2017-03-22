@@ -1,0 +1,8 @@
+---
+- name: redhat | Installing EPEL Repo (RedHat)
+  yum:
+    name: "epel-release"
+    state: "present"
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"

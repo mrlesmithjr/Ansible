@@ -1,0 +1,5 @@
+---
+- name: users | Generate SSH Keys For gitlab-runner user
+  user:
+    name: "gitlab-runner"
+    generate_ssh_key: true

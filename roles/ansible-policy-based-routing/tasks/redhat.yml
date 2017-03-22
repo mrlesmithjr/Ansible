@@ -1,0 +1,18 @@
+---
+- name: redhat | Installing EPEL Repo
+  yum:
+    name: "epel-release"
+    state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing IPRoute2 Package
+  yum:
+    name: "iproute"
+    state: "present"
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing IPRoute2 Package
+  dnf:
+    name: "iproute"
+    state: "present"
+  when: ansible_distribution == "Fedora"

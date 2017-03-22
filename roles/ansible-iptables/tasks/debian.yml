@@ -18,13 +18,15 @@
     dest: "/etc/network/interfaces"
     regexp: "^pre-up iptables-restore < {{ iptables_save_file }}"
     line: "pre-up iptables-restore < {{ iptables_save_file }}"
+    state: "present"
   when: iptables_persistent
 
 - name: debian | disabling iptables restore on boot (if not enabled)
   lineinfile:
     dest: "/etc/network/interfaces"
     regexp: "^pre-up iptables-restore < {{ iptables_save_file }}"
-    line: ""
+    line: "pre-up iptables-restore < {{ iptables_save_file }}"
+    state: "absent"
   when: not iptables_persistent
 
 - name: debian | enabling iptables save on shutdown (if enabled)
@@ -32,11 +34,13 @@
     dest: "/etc/network/interfaces"
     regexp: "^post-down iptables-save -c > {{ iptables_save_file }}"
     line: "post-down iptables-save -c > {{ iptables_save_file }}"
+    state: "present"
   when: iptables_persistent
 
 - name: debian | disabling iptables save on shutdown (if not enabled)
   lineinfile:
     dest: "/etc/network/interfaces"
     regexp: "^post-down iptables-save -c > {{ iptables_save_file }}"
-    line: ""
+    line: "post-down iptables-save -c > {{ iptables_save_file }}"
+    state: "absent"
   when: not iptables_persistent

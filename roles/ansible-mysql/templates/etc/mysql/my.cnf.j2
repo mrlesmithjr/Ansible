@@ -17,12 +17,20 @@ bind-address = 127.0.0.1
 {% if mysql_allow_remote_connections is defined and not mysql_allow_remote_connections %}
 bind-address = 127.0.0.1
 {% endif %}
+#character_set_client = {{ mysql_settings.character_set_client }}
+#collation_server = {{ mysql_settings.collation_server }}
 datadir = /var/lib/mysql
+innodb_doublewrite = {{ mysql_settings.innodb_doublewrite|upper }}
+innodb_flush_log_at_timeout = {{ mysql_settings.innodb_flush_log_at_timeout }}
+innodb_read_io_threads = {{ mysql_settings.innodb_read_io_threads }}
+innodb_write_io_threads = {{ mysql_settings.innodb_write_io_threads }}
+join_buffer_size = {{ mysql_settings.join_buffer_size }}
 key_buffer_size = {{ mysql_settings.key_buffer_size }}
 lc-messages-dir	= /usr/share/mysql
 log_error = /var/log/mysql/error.log
 max_allowed_packet = {{ mysql_settings.max_allowed_packet }}
 max_connections = {{ mysql_settings.max_connections }}
+max_heap_table_size = {{ mysql_settings.max_heap_table_size }}
 myisam-recover = BACKUP
 pid-file = /var/run/mysqld/mysqld.pid
 port = {{ mysql_port }}
@@ -33,8 +41,9 @@ socket = /var/run/mysqld/mysqld.sock
 thread_cache_size = {{ mysql_settings.thread_cache_size }}
 thread_stack = {{ mysql_settings.thread_stack }}
 tmpdir = /tmp
+tmp_table_size = {{ mysql_settings.tmp_table_size }}
 user = mysql
-{% if config_mysql_replication %}
+{% if mysql_config_replication %}
 # Replication
 {%   for item in mysql_replication_nodes %}
 {%     if inventory_hostname == item.name %}

@@ -1,9 +1,17 @@
 ---
-- hosts: test-nodes
+- hosts: all
   become: true
   vars:
-    - pri_domain_name: 'test.vagrant.local'
-    - stackstorm_install_packs: false
+    etc_hosts_add_all_hosts: true
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-etc-hosts
+
+- hosts: stackstorm_server
+  become: true
+  vars:
+    pri_domain_name: 'test.vagrant.local'
+    stackstorm_install_packs: true
   roles:
     - role: ansible-mongodb
     - role: ansible-nginx
@@ -11,4 +19,36 @@
     - role: ansible-rabbitmq
     - role: ansible-nodejs
     - role: ansible-stackstorm
+  tasks:
+
+- hosts: stackstorm_client
+  become: true
+  vars:
+    create_users:
+      - user: '{{ stackstorm_user }}'
+        comment: 'Stackstorm SSH User'
+        generate_keys: true
+        # P@55w0rd
+        pass: '$6$8tMUxKP33/$Fb/hZBaYvyzGubO9nrlRJMjUnt3aajXZwxCifH9NYqrhjMlC9COWmNNFiMpnyNGsgmDeNCCn2wKNh0G1E1BBV0'
+        preseed_user: false
+        state: 'present'
+        sudo: true
+        system_account: false
+    enable_manage_ssh_keys: true
+    manage_ssh_keys:
+      - remote_user: '{{ stackstorm_user }}'
+        state: present
+        keys:
+          - ./{{ stackstorm_user }}@node0.pub
+    pri_domain_name: 'test.vagrant.local'
+    stackstorm_user: 'stanley'
+  roles:
+    - role: ansible-users
+      tags:
+        - "stackstorm-ssh-keys"
+        - "stackstorm-user"
+    - role: ansible-manage-ssh-keys
+      tags:
+        - "stackstorm-ssh-keys"
+        - "stackstorm-user"
   tasks:

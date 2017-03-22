@@ -2,9 +2,6 @@
 # {{ ansible_managed }}
 
 # Brings interfaces back up on primary node
-{% for item in vlan_config %}
-ifup {{ item.vlan }}
-{% endfor %}
 
 # Starts all services which should be running primary node
 #/etc/init.d/quagga restart
@@ -20,9 +17,7 @@ service haproxy restart
 #/sbin/route del default gw {{ quagga_mgmt_gateway }}
 
 iptables -t nat -F POSTROUTING
-{% for item in vlan_config %}
-iptables -t nat -A POSTROUTING -s {{ item.network }} -o {{ keepalived_vip_int }} -j SNAT --to {{ keepalived_vip }}
-{% endfor %}
+# iptables -t nat -A POSTROUTING -s {{ item.network }} -o {{ keepalived_vip_int }} -j SNAT --to {{ keepalived_vip }}
 
 /opt/scripts/primary-backup.sh primary
 

@@ -67,6 +67,7 @@ zfs_enable_auto_snapshots: true
 zfs_enable_iscsi: false  #defines if iscsitarget is installed to server iSCSI volumes
 zfs_enable_nfs: false  #defines if NFS Kernel Server should be installed to serve NFS
 zfs_enable_performance_tuning: false  #defines if paramaters defined in zfs_performance_tuning are applied
+zfs_enable_samba: false # Defines if Samba is installed and configured
 zfs_filesystems:  #defines filesystems to manage
   - name: 'nfs'
     pool: 'tank'
@@ -87,6 +88,16 @@ zfs_filesystems:  #defines filesystems to manage
     owner: 'nobody'
     pool: 'TANK'
     quota: 'none'
+    sharesmb: true
+    smb_options:
+      browseable: 'yes'
+      comment: ''
+      create_directory_mask: '0755'
+      create_mask: '0777'
+      guest_ok: 'yes'
+      read_only: 'no'
+      share_name: 'Movies'
+      writable: 'yes'
     state: 'present'
     sync: 'disabled' #standard (default) | always | disabled
 zfs_iscsistarget_enable: '{{ zfs_enable_iscsi }}'  #defines if iscsitarget service is enabled
@@ -97,6 +108,7 @@ zfs_iscsitarget_target_portals:
   - ALL  #define IP address to listen for iSCSI connections | ALL (default) | cidr (x.x.x.x/xx) | disable ALL if defining cidr
 #  - 10.0.2.0/24
 #  - 192.168.2.0/24
+zfs_manage_filesystem_permissions: false # Defines if ZFS Filesystem mountpoint permissions are managed
 zfs_performance_tuning:
   - param: 'zfs_prefetch_disable'
     value: '1'

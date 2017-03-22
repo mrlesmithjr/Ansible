@@ -18,7 +18,7 @@
 # escpecially if they contain "#" chars...
 # Remember to edit /etc/mysql/debian.cnf when changing the socket location.
 [client]
-port		= {{ mysql_port }}
+port		= {{ mariadb_mysql_port }}
 socket		= /var/run/mysqld/mysqld.sock
 
 # Here is entries for some specific programs
@@ -36,7 +36,7 @@ nice		= 0
 user		= mysql
 pid-file	= /var/run/mysqld/mysqld.pid
 socket		= /var/run/mysqld/mysqld.sock
-port		= {{ mysql_port }}
+port		= {{ mariadb_mysql_port }}
 basedir		= /usr
 datadir		= /var/lib/mysql
 tmpdir		= /tmp
@@ -45,13 +45,13 @@ skip-external-locking
 #
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-{% if mysql_allow_remote_connections is not defined %}
+{% if mariadb_mysql_allow_remote_connections is not defined %}
 bind-address    = 127.0.0.1
 {% endif %}
-{% if mysql_allow_remote_connections is defined and not mysql_allow_remote_connections %}
+{% if mariadb_mysql_allow_remote_connections is defined and not mariadb_mysql_allow_remote_connections %}
 bind-address		= 127.0.0.1
 {% endif %}
-{% if mysql_allow_remote_connections is defined and mysql_allow_remote_connections %}
+{% if mariadb_mysql_allow_remote_connections is defined and mariadb_mysql_allow_remote_connections %}
 #bind-address   = 127.0.0.1
 {% endif %}
 #

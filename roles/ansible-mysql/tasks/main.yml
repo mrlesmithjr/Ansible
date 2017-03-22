@@ -9,7 +9,7 @@
 - include: configure_root_access.yml
 
 - include: mysql_check.yml
-  when: config_mysqlchk
+  when: mysql_config_mysqlchk
 
 - include: setup_replication.yml
-  when: config_mysql_replication
+  when: mysql_config_replication

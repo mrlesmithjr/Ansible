@@ -11,15 +11,40 @@ output {
 {%   for item in logstash_base_outputs %}
 output {
   {{ item.output }} {
+
   {%     if item.output == "elasticsearch" %}
     hosts => ["{{ item.output_host }}"]
 {%     endif %}
+
 {%     if item.output == "redis" %}
   host => "{{ item.output_host }}"
   data_type => "list"
   key => "logstash"
 {%     endif %}
+
   }
 }
+{%   endfor %}
+{% endif %}
+
+{% if logstash_custom_outputs is defined %}
+{%   for item in logstash_custom_outputs %}
+
+output {
+  {% if item.if_condition is defined %}
+  if {{ item.if_condition }} {
+  {% endif %}
+
+  {{ item.output }} {
+  {% for line in item.lines %}
+      {{ line }}
+  {% endfor %}
+  }
+
+  {% if item.if_condition is defined %}
+  }
+  {% endif %}
+}
+
 {%   endfor %}
 {% endif %}

@@ -26,3 +26,4 @@
   with_items:
     - json
   when: ansible_os_family == "Debian"
+  changed_when: false

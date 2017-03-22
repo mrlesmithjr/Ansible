@@ -1,18 +1,19 @@
 # Setting up VMware vCenter parsing
 filter {
   if "vCenter" in [tags] {
-    multiline {
-      pattern => "-->"
-      what => "previous"
-    }
-    multiline {
-      pattern => "StackTrace:"
-      what => "previous"
-    }
-    multiline {
-      pattern => "(^[a-zA-Z.]+(?:Error|Exception): .+)|(^\s+at .+)|(^\s+... \d+ more)|(^\s*Caused by:.+)"
-      what => "previous"
-    }
+# This no longer works
+#    multiline {
+#      pattern => "-->"
+#      what => "previous"
+#    }
+#    multiline {
+#      pattern => "StackTrace:"
+#      what => "previous"
+#    }
+#    multiline {
+#      pattern => "(^[a-zA-Z.]+(?:Error|Exception): .+)|(^\s+at .+)|(^\s+... \d+ more)|(^\s*Caused by:.+)"
+#      what => "previous"
+#    }
     grok {
       break_on_match => true
       match => [

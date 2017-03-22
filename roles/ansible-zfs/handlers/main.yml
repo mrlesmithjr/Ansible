@@ -4,11 +4,16 @@
   service:
     name: "iscsitarget"
     state: restarted
-    
+
 - name: restart nfs-kernel-server
   service:
     name: "nfs-kernel-server"
     state: restarted
+
+- name: restart samba
+  service:
+    name: "smbd"
+    state: "restarted"
 
 - name: start zfs-share
   service:

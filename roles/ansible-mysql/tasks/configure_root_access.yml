@@ -5,10 +5,7 @@
     state: "started"
     enabled: yes
   when: >
-        mariadb_server_installed is not defined and
-        (mysql_docker_install is defined and
-        not mysql_docker_install) or
-        mysql_docker_install is not defined
+        mariadb_server_installed is not defined
 
 - name: configure_root_access | ensuring MySQL service is running (Non Docker install)
   service:
@@ -17,16 +14,7 @@
     enabled: yes
   when: >
         (mariadb_server_installed is defined and
-        ansible_os_family == "RedHat") and
-        (mysql_docker_install is defined and
-        not mysql_docker_install) or
-        mysql_docker_install is not defined
-
-- name: configure_root_access | ensuring MySQL service is running (Docker install)
-  shell: "/usr/bin/mysqld_safe > /dev/null 2>&1 &"
-  when: >
-        mysql_docker_install is defined and
-        mysql_docker_install
+        ansible_os_family == "RedHat")
 
 - name: configure_root_access | waiting for MySQL service
   wait_for:

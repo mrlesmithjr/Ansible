@@ -1,0 +1,12 @@
+---
+- name: service | Ensuring DHCP Relay Service Is Enabled And Started
+  service: "isc-dhcp-relay"
+    enabled: true
+    state: "started"
+  when: ansible_os_family == "Debian"
+
+- name: service | Ensuring DHCP Relay Service Is Enabled And Started
+  service: "dhcrelay"
+    enabled: true
+    state: "started"
+  when: ansible_os_family == "RedHat"

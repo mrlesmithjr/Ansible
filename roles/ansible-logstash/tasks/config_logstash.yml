@@ -7,16 +7,14 @@
         clear_logstash_config is defined and
         clear_logstash_config
 
-- name: config_logstash | recreating logstash config directory if previously cleared
+- name: config_logstash | setup logstash config directory and set permissions
   file:
     path: "{{ logstash_config_dir }}"
     state: "directory"
-    owner: "root"
-    group: "root"
+    owner: "logstash"
+    group: "logstash"
+    recurse: no
     mode: 0775
-  when: >
-        clear_logstash_config is defined and
-        clear_logstash_config
 
 - name: config_logstash | removing original logstash config if it exists
   file:
@@ -31,7 +29,7 @@
     owner: "logstash"
     group: "logstash"
     mode: 0644
-    validate: "/opt/logstash/bin/logstash -tf %s"
+    #validate: "/opt/logstash/bin/logstash -tf %s" # commented due to error during tests with file not found.
   notify: "restart logstash"
   with_items: '{{ logstash_base_configs }}'
 
@@ -46,3 +44,8 @@
   with_items:
     - '/opt/logstash/lib/logstash/outputs/elasticsearch'
     - '/opt/logstash/patterns'
+
+- name: config_logstash | test logstash configuration
+  shell: "{{ logstash_bin }} -t -f {{ logstash_config_dir }} --path.settings /etc/logstash/"
+  changed_when: false
+  when: logstash_major_ver == '5.x'

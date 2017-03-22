@@ -1,15 +1,16 @@
 Role Name
 =========
 
-An Ansible role that installs/configures phpIPAM http://phpipam.net/  
-Options are in place for HA DB setup if desired.
+An [Ansible] role that installs/configures [phpIPAM]
+
+- Options are in place for HA DB setup if desired.
 
 Requirements
 ------------
 Install required Ansible role dependencies...  
-````
+```
 sudo ansible-galaxy install -r requirements.yml
-````
+```
 
 Usage
 -----
@@ -18,30 +19,49 @@ Logging into phpIPAM...
 http://iporhostname/phpipam/?page=login  
 
 Default phpIPAM login is
-````
-Admin/ipamadmin
-````
+```
+admin/ipamadmin
+```
 
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-phpipam
 date: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
 enable_phpipam_db_backups: true
-phpipam_base: /phpipam/  #defines root of phpipam web...if using http url headers...change this to '/'
-phpipam_db_backup_name_prefix: phpipam_bkp
-phpipam_db_backup_root: /backups/db/phpipam
-phpipam_db_cluster: false #defines if backend db for pdns is clustered...define here or in group_vars/group
-phpipam_db_host: localhost  #define db host
-phpipam_db_name: phpipam  #define db name
-phpipam_db_pass: phpipam  #define db password or define in group_vars/group
-phpipam_db_user: phpipam  #define db user or define in group_vars/group
-phpipam_define_cron_jobs: false  #defines if cron jobs for scanning and etc. should be defined.
+
+# Defines root of phpipam web
+# If using http url headers...change this to '/'
+phpipam_base: '/phpipam/'
+
+phpipam_db_backup_name_prefix: 'phpipam_bkp'
+phpipam_db_backup_root: '/backups/db/phpipam'
+
+# Defines if backend db for pdns is clustered
+phpipam_db_cluster: false
+
+# Define db host
+phpipam_db_host: 'localhost'
+
+# Define db name
+phpipam_db_name: 'phpipam'
+
+# Define db password
+phpipam_db_pass: phpipam
+
+# Define db user
+phpipam_db_user: phpipam
+
+# Defines if cron jobs for scanning and etc. should be defined.
+phpipam_define_cron_jobs: false
+
 phpipam_download: 'https://sourceforge.net/projects/phpipam/files/{{ phpipam_download_file }}'
 phpipam_download_file: 'phpipam-{{ phpipam_version }}.tar'
-phpipam_install_from_git: true  #defines if phpIPAM is pulled from https://github.com/phpipam/phpipam to install
+
+# Defines if phpIPAM is pulled from https://github.com/phpipam/phpipam to install
+phpipam_install_from_git: true
 
  # Defines commit to checkout to install from..Helps keep consistent installs
  # Note - If not checking out master then the branch will be in a detached state
@@ -55,19 +75,40 @@ phpipam_install_from_git: true  #defines if phpIPAM is pulled from https://githu
 phpipam_install_git_version: 'HEAD'
  # Change to HEAD to always checkout the latest
 
-phpipam_patch_discovery: false  #defines if current discovery functionality should be patched
-phpipam_patch_email: false  #defines if current email test functionality should be patched
+# Defines if current discovery functionality should be patched
+phpipam_patch_discovery: false
+
+# Defines if current email test functionality should be patched
+phpipam_patch_email: false
+
 phpipam_pre_load_db: true
-phpipam_prettify_links: true  #defines if Apache2 should be configured in order to enable prettify links
-phpipam_primary: 'node0'  #define if using a clustered mariadb mysql and define a single node as primary
-phpipam_root: '{{ web_root }}/phpipam'  #defines the root folder of where phpipam is to be installed
+
+# Defines if Apache2 should be configured in order to enable prettify links
+phpipam_prettify_links: true
+
+# Define if using a clustered mariadb mysql and define a single node as primary
+phpipam_primary: 'node0'
+
+# Defines the root folder of where phpipam is to be installed
+phpipam_root: '{{ web_root }}/phpipam'
 phpipam_timezone: 'America/New_York'
-phpipam_upgrade: false  #defines if phpipam is to be upgraded
-phpipam_url: 'ipam.{{ pri_domain_name }}'  #defines the phpipam url to configure apache2 for if configured for url rewrite
-phpipam_version: 1.2.1 # Only used when not installing via GIT.
-pri_domain_name: example.org  #defines the primary domain name...define here or globally in group_vars/all
-web_root: /var/www/html
-````
+
+# Defines if phpipam is to be upgraded
+phpipam_upgrade: false
+
+# Defines the phpipam url to configure apache2 for if configured for url rewrite
+phpipam_url: 'ipam.{{ pri_domain_name }}'
+
+# Define phpipam version
+# Only used when not installing via GIT.
+# uses github .tar.gz file from https://github.com/phpipam/phpipam/releases
+phpipam_version: '1.2'
+
+# Defines the primary domain name
+pri_domain_name: 'example.org'
+
+web_root: '/var/www/html'
+```
 
 Dependencies
 ------------
@@ -99,3 +140,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[phpIPAM]: <http://phpipam.net/>

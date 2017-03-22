@@ -102,3 +102,18 @@
   file:
     path: /tmp/pdns_zones.sh
     state: absent
+
+- name: pdns_zones | stopping service
+  run_once: true
+  service:
+    name: pdns
+    state: stopped
+
+- name: pdns_server | waiting to stop
+  pause:
+    seconds: 5
+
+- name: pdns_zones | starting service
+  service:
+    name: pdns
+    state: started

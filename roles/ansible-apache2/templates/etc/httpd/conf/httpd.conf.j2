@@ -78,7 +78,7 @@ AddDefaultCharset UTF-8
     MIMEMagicFile conf/magic
 </IfModule>
 
-{% if config_apache2_virtual_hosts %}
+{% if apache2_config_virtual_hosts %}
 {%   for item in apache2_virtual_hosts %}
 <VirtualHost *:{{ item.port }}>
 	ServerAdmin {{ item.serveradmin }}

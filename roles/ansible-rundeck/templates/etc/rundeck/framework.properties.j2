@@ -42,3 +42,7 @@ framework.plugin.StreamingLogWriter.LogstashPlugin.port={{ rundeck_logstash_port
 framework.plugin.StreamingLogWriter.LogstashPlugin.host={{ rundeck_logstash_host }}
 {%   endif %}
 {% endif %}
+
+{% if rundeck_framework_tokens is defined and rundeck_framework_tokens %}
+rundeck.tokens.file={{ rundeck_framework_tokens_path }}/{{ rundeck_framework_tokens_file }}
+{% endif %}

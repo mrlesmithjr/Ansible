@@ -3,16 +3,20 @@
   hosts: all
   become: true
   vars:
-    - enable_haproxy: false
-    - enable_keepalived: false
-    - squid_acl_localnet:
-        - 10.0.0.0/8
-        - 172.16.0.0/16
-        - 192.168.0.0/16
+    squid_acl_localnet:
+      - 10.0.0.0/8
+      - 172.16.0.0/16
+      - 192.168.0.0/16
+    squid_enable_haproxy: false
+    squid_enable_keepalived: false
   roles:
     - role: ansible-haproxy
-      when: enable_haproxy is defined and enable_haproxy
+      when: >
+            squid_enable_haproxy is defined and
+            squid_enable_haproxy
     - role: ansible-keepalived
-      when: enable_keepalived is defined and enable_keepalived
+      when: >
+            squid_enable_keepalived is defined and
+            squid_enable_keepalived
     - role: ansible-squid
   tasks:

@@ -13,68 +13,12 @@
   with_items: '{{ quagga_sysctl_network_settings }}'
   when: quagga_sysctl_network_settings is defined
 
-- name: quagga_config | configuring quagga
+- name: quagga_config | Configuring Quagga
   template:
-    src: "etc/quagga/{{ item }}.j2"
-    dest: "{{ quagga_root_dir }}/{{ item }}"
-    owner: "root"
-    group: "root"
-    mode: 0644
+    src: "etc/quagga/{{ item.name }}.j2"
+    dest: "{{ quagga_root_dir }}/{{ item.name }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: '{{ item.mode }}'
   notify: "restart quagga"
   with_items: '{{ quagga_configs }}'
-
-- name: quagga_config | configuring ospf
-  template:
-    src: "etc/quagga/ospfd.conf.j2"
-    dest: "{{ quagga_root_dir }}/ospfd.conf"
-    owner: "root"
-    group: "root"
-    mode: 0644
-  notify: "restart quagga"
-  when: >
-        quagga_enable_ospfd is defined and
-        quagga_enable_ospfd
-
-- name: quagga_config | configuring bgp
-  template:
-    src: "etc/quagga/bgpd.conf.j2"
-    dest: "{{ quagga_root_dir }}/bgpd.conf"
-    owner: "root"
-    group: "root"
-    mode: 0644
-  notify: "restart quagga"
-  when: >
-        quagga_bgp_router_configs is not defined and
-        (quagga_enable_bgpd is defined and quagga_enable_bgpd)
-
-- name: quagga_config | configuring bgp
-  template:
-    src: "etc/quagga/bgpd.conf.j2"
-    dest: "{{ quagga_root_dir }}/bgpd.conf"
-    owner: "root"
-    group: "root"
-    mode: 0644
-  notify: "restart quagga"
-  with_items: '{{ quagga_bgp_router_configs }}'
-  when: >
-        (quagga_bgp_router_configs is defined and
-        (item.name == inventory_hostname)) and
-        (quagga_enable_bgpd is defined and
-        quagga_enable_bgpd)
-
-- name: quagga_config | setting permissions on files within '{{ quagga_root_dir }}'
-  file:
-    path: "{{ quagga_root_dir }}"
-    owner: "quagga"
-    group: "quagga"
-    mode: 0644
-    state: "directory"
-    recurse: yes
-
-- name: quagga_config | setting permissions on folder '{{ quagga_root_dir }}'
-  file:
-    path: "{{ quagga_root_dir }}"
-    owner: "quagga"
-    group: "quaggavty"
-    mode: 0775
-    state: "directory"

@@ -1,9 +1,5 @@
-# {{ ansible_managed }}
-
-!
-! Sample configuration file for vtysh.
 !
 service integrated-vtysh-config
-!hostname quagga-router
+hostname {{ quagga_hostname }}
 username root nopassword
 !

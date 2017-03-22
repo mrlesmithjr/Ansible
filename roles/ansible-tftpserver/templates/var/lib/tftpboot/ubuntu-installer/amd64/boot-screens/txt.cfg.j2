@@ -1,7 +1,7 @@
 # Managed By Ansible
 default vesamenu.c32
-{% if tftp_boot_menu is defined %}
-{%   for item in tftp_boot_menu %}
+{% if tftpserver_boot_menu is defined %}
+{%   for item in tftpserver_boot_menu %}
 label {{ item.label }}
   menu label ^{{ item.menu_label }}
 {%     if item.menu_default is defined and item.menu_default %}

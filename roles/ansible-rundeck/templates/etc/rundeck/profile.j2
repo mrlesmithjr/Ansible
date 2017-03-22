@@ -39,11 +39,14 @@ export RDECK_JVM="-Drdeck.config=/etc/rundeck \
     -Djava.security.auth.login.config=/etc/rundeck/jaas-loginmodule.conf \
     -Dloginmodule.name=RDpropertyfilelogin \
 {% endif %}
+{% if rundeck_jetty_connector_forwarded is defined and rundeck_jetty_connector_forwarded %}
+    -Drundeck.jetty.connector.forwarded=true \
+{% endif %}
     -Djava.io.tmpdir=$RUNDECK_TEMPDIR"
 #
 # Set min/max heap size
 #
-RDECK_JVM="$RDECK_JVM -Xmx1024m -Xms256m -XX:MaxPermSize=256m -server"
+RDECK_JVM="{{ rundeck_rdeck_jvm }}"
 #
 # SSL Configuration - Uncomment the following to enable.  Check SSL.properties for details.
 #

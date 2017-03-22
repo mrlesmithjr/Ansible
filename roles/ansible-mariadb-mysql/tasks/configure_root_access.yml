@@ -1,19 +1,21 @@
 ---
 - name: configure_root_access | updating root passwords
   mysql_user:
-    name: root
+    name: "root"
     host: "{{ item }}"
-    password: "{{ mysql_root_password }}"
+    password: "{{ mariadb_mysql_root_password }}"
+    login_user: "{{ mariadb_mysql_user }}"
+    login_password: "{{ mariadb_mysql_root_password }}"
   with_items:
     - '{{ ansible_hostname }}'
     - '127.0.0.1'
     - '::1'
-    - localhost
+    - 'localhost'
 
 - name: configure_root | configuring root my.cnf
   template:
-    src: root/my.cnf.j2
-    dest: /root/.my.cnf
-    owner: root
-    group: root
+    src: "root/my.cnf.j2"
+    dest: "/root/.my.cnf"
+    owner: "root"
+    group: "root"
     mode: 0600

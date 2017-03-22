@@ -1,7 +1,12 @@
 ---
 # defaults file for ansible-snmpd
-config_snmpd: true
-enable_snmpd: true
-snmpd_authorized_networks: []  #define read-only snmpd settings
+snmpd_config: true
+snmpd_enable: true
+
+# Define read-only snmpd settings
+snmpd_authorized_networks: []
 #  - network: 10.0.101.0/24
 #    community: example
+
+snmpd_sysLocation: "Sitting on the Dock of the Bay"
+snmpd_sysContact: "Me <me@example.org>"

@@ -1,0 +1,24 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    php_root_path: '/etc/php5'
+    php_version_debian: '5'
+  when: >
+        ansible_distribution == "Debian" and
+        ansible_distribution_major_version <= '8'
+
+- name: set_facts | Setting Ubuntu < 16.04 Facts
+  set_fact:
+    php_root_path: '/etc/php5'
+    php_version_debian: '5'
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version < '16.04'
+
+- name: set_facts | Setting Ubuntu >= 16.04 Facts
+  set_fact:
+    php_root_path: '/etc/php/7.0'
+    php_version_debian: '7.0'
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04'

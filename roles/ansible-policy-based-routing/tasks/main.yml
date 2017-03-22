@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-policy-based-routing
+#
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: pbr_rules.yml
+
+- include: ip_forwarding.yml

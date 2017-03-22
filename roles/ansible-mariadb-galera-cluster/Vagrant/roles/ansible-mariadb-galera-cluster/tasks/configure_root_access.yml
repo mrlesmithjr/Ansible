@@ -3,7 +3,7 @@
   mysql_user:
     name: root
     host: "{{ item }}"
-    password: "{{ mysql_root_password }}"
+    password: "{{ mariadb_mysql_root_password }}"
   run_once: true
   with_items:
     - '{{ ansible_hostname }}'
@@ -24,7 +24,7 @@
   mysql_user:
     name: root
     host: "{{ item }}"
-    password: "{{ mysql_root_password }}"
+    password: "{{ mariadb_mysql_root_password }}"
   with_items:
     - '{{ ansible_hostname }}'
     - '127.0.0.1'
@@ -35,7 +35,7 @@
   mysql_user:
     name: root
     host: "{{ item }}"
-    password: "{{ mysql_root_password }}"
+    password: "{{ mariadb_mysql_root_password }}"
     priv: "*.*:ALL,GRANT"
   with_items:
     - '%'

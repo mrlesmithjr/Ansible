@@ -1,0 +1,16 @@
+---
+- name: config | Configuring ISC-DHCP-Relay (Debian)
+  template:
+    src: "etc/default/isc-dhcp-relay.j2"
+    dest: "/etc/default/isc-dhcp-relay"
+  notify: "restart isc-dhcp-relay"
+  when: ansible_os_family == "Debian"
+
+- name: config | Configuring ISC-DHCP-Relay (RedHat)
+  template:
+    src: "etc/systemd/system/dhcrelay.service.j2"
+    dest: "/etc/systemd/system/dhcrelay.service"
+  notify:
+    - "reload systemd"
+    - "restart dhcrelay"
+  when: ansible_os_family == "RedHat"

@@ -1,49 +1,109 @@
 ---
-- name: quagga_config_interfaces | configuring interfaces and vlans with dhcp mgmt
+- name: config_interfaces | Configuring Loopback Interfaces
   template:
-    src: "etc/network/interfaces_dhcp.j2"
-    dest: "/etc/network/interfaces"
-    owner: "root"
-    group: "root"
-    mode: 0644
-    backup: yes
-  with_items: '{{ vlan_config }}'
+    src: "etc/network/interfaces.d/int.cfg.j2"
+    dest: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+  register: "loopback_interfaces_configured"
+  with_items: '{{ quagga_interfaces_lo }}'
   when: >
-        (vlan_config is defined and
-        vlan_config) and
-        quagga_mgmt_method == "dhcp"
+        quagga_interfaces_lo is defined and
+        item.configure
 
-- name: quagga_config_interfaces | configuring interfaces and vlans with static mgmt
-  template:
-    src: "etc/network/interfaces_static.j2"
-    dest: "/etc/network/interfaces"
-    owner: "root"
-    group: "root"
-    mode: 0644
-    backup: yes
-  with_items: '{{ vlan_config }}'
+- name: config_interfaces | Restarting Loopback Interfaces
+  shell: bash -c "ifdown {{ item.int }} && ifup {{ item.int }}"
+  with_items: '{{ quagga_interfaces_lo }}'
   when: >
-        (vlan_config is defined and
-        vlan_config) and
-        quagga_mgmt_method == "static"
+        quagga_interfaces_lo is defined and
+        item.configure and
+        loopback_interfaces_configured.changed
 
-- name: quagga_config_interfaces | Create the directory for interface cfg files
+- name: config_interfaces | Shutting Down Loopback Interfaces (Un-Configured)
+  shell: bash -c "ifdown {{ item.int }}"
+  register: "loopback_interfaces_shutdown"
+  with_items: '{{ quagga_interfaces_lo }}'
+  when: not item.configure
+
+- name: config_interfaces | Removing Loopback Interfaces (Un-Configured)
   file:
-    path: "{{ quagga_net_config_dir }}"
-    state: "directory"
-  when: ansible_os_family == "Debian"
+    path: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    state: "absent"
+  with_items: '{{ quagga_interfaces_lo }}'
+  when: loopback_interfaces_shutdown.changed
 
-- name: quagga_config_interfaces | Create the network configuration file for ethernet devices
+- name: config_interfaces | Configuring Interfaces
   template:
-    src: "etc/network/interfaces_split.j2"
-    dest: "{{ quagga_net_config_dir }}/ifcfg-{{ item.vlan }}"
-  with_items: '{{ vlan_config }}'
-  when: vlan_config is defined
-  register: "ether_result"
-
-- name: quagga_config_interfaces | reinitializing interfaces
-  shell: "ifdown {{ item.item.vlan }}; ifup {{ item.item.vlan }}"
-  with_items: '{{ ether_result.results }}'
+    src: "etc/network/interfaces.d/int.cfg.j2"
+    dest: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+  register: "interfaces_configured"
+  with_items: '{{ quagga_interfaces }}'
   when: >
-        vlan_config is defined and
-        item.changed
+        quagga_interfaces is defined and
+        item.configure and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Restarting Interfaces
+  shell: bash -c "ifdown {{ item.int }} && ifup {{ item.int }}"
+  with_items: '{{ quagga_interfaces }}'
+  when: >
+        quagga_interfaces is defined and
+        item.configure and
+        interfaces_configured.changed and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Shutting Down Interfaces (Un-Configured)
+  shell: bash -c "ifdown {{ item.int }}"
+  register: "interfaces_shutdown"
+  with_items: '{{ quagga_interfaces }}'
+  when: >
+        quagga_interfaces is defined and
+        not item.configure and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Removing Interfaces (Un-Configured)
+  file:
+    path: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    state: "absent"
+  with_items: '{{ quagga_interfaces }}'
+  when: >
+        quagga_interfaces is defined and
+        interfaces_shutdown.changed and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Configuring Bonded Interfaces
+  template:
+    src: "etc/network/interfaces.d/int.cfg.j2"
+    dest: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+  register: "bonded_interfaces_configured"
+  with_items: '{{ quagga_interfaces_bonds }}'
+  when: >
+        quagga_interfaces_bonds is defined and
+        item.configure and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Restarting Bonded Interfaces
+  shell: bash -c "ifdown {{ item.int }} && ifup {{ item.int }}"
+  with_items: '{{ quagga_interfaces_bonds }}'
+  when: >
+        quagga_interfaces_bonds is defined and
+        item.configure and
+        bonded_interfaces_configured.changed and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Shutting Down Bonded Interfaces (Un-Configured)
+  shell: bash -c "ifdown {{ item.int }}"
+  register: "bonded_interfaces_shutdown"
+  with_items: '{{ quagga_interfaces_bonds }}'
+  when: >
+        quagga_interfaces_bonds is defined and
+        not item.configure and
+        not quagga_defined_interfaces
+
+- name: config_interfaces | Removing Bonded Interfaces (Un-Configured)
+  file:
+    path: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    state: "absent"
+  with_items: '{{ quagga_interfaces_bonds }}'
+  when: >
+        quagga_interfaces_bonds is defined and
+        bonded_interfaces_shutdown.changed and
+        not quagga_defined_interfaces
