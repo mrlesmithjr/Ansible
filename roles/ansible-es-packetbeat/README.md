@@ -45,6 +45,10 @@ es_packetbeat_outputs:
   #   host: '{{ es_packetbeat_elasticsearch_host }}'
   #   port: '9200'
   #   workers: 1
+  #   # Optional protocol and basic auth credentials.
+  #   protocol: 'https'
+  #   username: 'elastic'
+  #   password: 'changeme'
   - name: 'logstash'
     host: '{{ es_packetbeat_logstash_host }}'
     port: '5044'

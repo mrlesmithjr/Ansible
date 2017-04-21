@@ -15,6 +15,7 @@
 
 - name: setting PHP version
   set_fact:
+    nginx_php_fpm_socket: '/var/run'
     nginx_php_path: 'etc/php5'  #no leading / for template path
     nginx_php_ver: 5
   when: >
@@ -24,6 +25,7 @@
 
 - name: setting PHP version
   set_fact:
+    nginx_php_fpm_socket: '/var/run/php'
     nginx_php_path: 'etc/php/7.0'  #no leading / for template path
     nginx_php_ver: 7.0
   when: >

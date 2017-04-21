@@ -125,8 +125,8 @@ galaxy_info:
   #  - 9.1
   #  - 9.2
   #  - 9.3
-    - name: Ubuntu
-      versions:
+  - name: Ubuntu
+    versions:
   #  - all
   #  - lucid
   #  - maverick
@@ -136,17 +136,17 @@ galaxy_info:
   #  - quantal
   #  - raring
   #  - saucy
-  #  - trusty
+    - trusty
   #  - utopic
   #  - vivid
   #  - wily
-      - xenial
+    - xenial
   #  - yakkety
-  #- name: Debian
-  #  versions:
+  - name: Debian
+    versions:
   #  - all
   #  - etch
-  #  - jessie
+    - jessie
   #  - lenny
   #  - sid
   #  - squeeze
@@ -156,12 +156,12 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  #- name: EL
-  #  versions:
+  - name: EL
+    versions:
   #  - all
   #  - 5
   #  - 6
-  #  - 7
+    - 7
   #- name: Windows
   #  versions:
   #  - all
@@ -207,7 +207,7 @@ galaxy_info:
   #  - all
   #  - Any
 
-  galaxy_tags: []
+  galaxy_tags:
     # List tags for your role here, one per line. A tag is
     # a keyword that describes and categorizes the role.
     # Users find roles by searching for tags. Be sure to
@@ -215,6 +215,7 @@ galaxy_info:
     #
     # NOTE: A tag is limited to a single word comprised of
     # alphanumeric characters. Maximum 20 tags per role.
+    - cloud
 
 dependencies: []
   # List your role dependencies here, one per line.

@@ -1,37 +1,54 @@
 Role Name
 =========
 
-Configures network interfaces for either static, dhcp or manual.
-Ability to create VLAN, Bond and Bridge interfaces as well.
+An [Ansible] role to configure network interfaces
+- Static, DHCP or Manual.
+- Ability to create VLAN, Bond and Bridge interfaces as well.
 
 Requirements
 ------------
 
-All Interfaces, vlans, Bridges and Bond information must be defined either in
-group_vars/group or host_vars/host...Ensure that you do not define IP addresses
-in group_vars otherwise duplicate IP addresses will be present.
+None
 
 Role Variables
 --------------
-These variables for most occasions should remain as they are. The actual
-variables should be defined within host_vars/host for each host requiring
-configurations.
+
 ```
 ---
 # defaults file for ansible-config-interfaces
-config_network_bonds: false  #defines if kvm_network_bonds should be configured as defined...define in host_vars/host
-config_network_bridges: false  #defines if kvm_network_bridges should be configured as defined...define in host_vars/host
-config_network_interfaces: false  #defines if kvm_network_interfaces should be configured as defined...define in host_vars/host
-config_network_vlans: false  #defines if kvm_network_vlans should be configured as defined...define in host_vars/host
-dns_nameservers: #defines all dns servers to configure...define here or globally in group_vars/all
+
+config_interfaces_debian_packages:
+  - 'bridge-utils'
+  - 'lldpd'
+  - 'vlan'
+
+# Defines if network bonds should be configured as defined
+config_network_bonds: false
+
+# Defines if network bridges should be configured as defined
+config_network_bridges: false
+
+# Defines if interfaces should be configured as defined
+config_network_interfaces: false
+
+# Defines if vlans should be configured as defined
+config_network_vlans: false
+
+# Defines all dns servers to configure
+dns_nameservers:
   - '8.8.8.8'
   - '8.8.4.4'
-dns_search: '{{ pri_domain_name }}'  #defines your global dns suffix search...define here or globally in group_vars/all
-enable_configured_interfaces_after_defining: false  #defines if interfaces, bonds, bridges and vlans should be brought up after defining.
-kvm_mgmt_ip: '0.0.0.0'  #defines management IP for var on network_bridges....This is for demo purposes only
-kvm_mgmt_gateway: '0.0.0.0'  #defines management gateway for var on network_bridges....This is for demo purposes only
-kvm_nfs1_ip: '0.0.0.0'  #defines IP address to define on Storage interface.....This is for demo purposes only
-network_bonds:  #define network bonds and settings if desired (Define separately for each node in host_vars) - https://help.ubuntu.com/community/UbuntuBonding
+
+# Defines your global dns suffix search
+dns_search: '{{ pri_domain_name }}'
+
+# Defines if interfaces, bonds, bridges and vlans should be brought up after defining.
+enable_configured_interfaces_after_defining: false
+
+# Define network bonds and settings if desired
+# (Define separately for each node in host_vars)
+# https://help.ubuntu.com/community/UbuntuBonding
+network_bonds:
   - name: 'bond0'
     configure: true
     comment: 'Management Networks'
@@ -65,25 +82,29 @@ network_bonds:  #define network bonds and settings if desired (Define separately
     addl_settings:
       - 'bond_mode balance-alb'
       - 'bond_miimon 100'
-network_bridges:  #define network bridges and settings if desired (Define separately for each node in host_vars) - https://help.ubuntu.com/community/NetworkConnectionBridge
+
+# Define network bridges and settings if desired
+# (Define separately for each node in host_vars)
+# https://help.ubuntu.com/community/NetworkConnectionBridge
+network_bridges:
   - name: 'br0'
     configure: true
     comment: 'Management - VLAN106'
     method: 'static'
-    address: '{{ kvm_mgmt_ip }}'
+    address: '10.0.106.50'
     netmask: '255.255.255.0'
     netmask_cidr: '24'
-    gateway: '{{ kvm_mgmt_gateway }}'
+    gateway: '10.0.106.1'
     ports: 'bond0.106'
     addl_settings:
-      - 'up route add default gw {{ kvm_mgmt_gateway }}'
+      - 'up route add default gw 10.0.106.1'
       - 'bridge_stp off'
       - 'bridge_fd 0'
   - name: 'br1'
     configure: true
     comment: 'NFS-1 - VLAN127'
     method: 'static'
-    address: '{{ kvm_nfs1_ip }}'
+    address: '10.0.127.50'
     netmask: '255.255.255.0'
     netmask_cidr: '24'
     gateway:
@@ -115,7 +136,11 @@ network_bridges:  #define network bridges and settings if desired (Define separa
     addl_settings:
       - 'bridge_stp off'
       - 'bridge_fd 0'
-network_interfaces:  #define interfaces and settings. (Define separately for each node in host_vars) - Anything not defined can be added to addl_settings.
+
+# Define interfaces and settings.
+# (Define separately for each node in host_vars)
+# Anything not defined can be added to addl_settings.
+network_interfaces:
   - name: 'eth0'
     configure: true
     comment:
@@ -124,7 +149,9 @@ network_interfaces:  #define interfaces and settings. (Define separately for eac
     netmask:
     netmask_cidr:
     gateway:
-#    wireless_network: false  #defines if the interface is a wireless interface...not working so keep false or not defined
+    # Defines if the interface is a wireless interface
+    # not working so keep false or not defined
+#    wireless_network: false
 #    wpa_ssid: wireless  #defines the wireless SSID to connect to
 #    wpa_psk: wpapassword  #defines the wireless key
     addl_settings:
@@ -179,7 +206,10 @@ network_interfaces:  #define interfaces and settings. (Define separately for eac
     gateway:
     addl_settings:
       - 'bond_master bond2'
-network_vlans:  #define vlans and settings if desired. (Define separately for each node in host_vars)
+
+# Define vlans and settings if desired.
+# (Define separately for each node in host_vars)
+network_vlans:
   - name: 'bond2.100'
     configure: true
     comment: 'Orange-DMZ'
@@ -232,121 +262,96 @@ SSID and key.
 Example Playbook
 ----------------
 
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.config-interfaces }
+```
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-config-interfaces
+  tasks:
+```
 
-Example /etc/network/interfaces generated from the example variables
---------------------------------------------------------------------
-````
-# Ansible managed: /etc/ansible/roles/mrlesmithjr.config-interfaces/templates/etc/network/interfaces.j2 modified on 2015-10-16 21:21:14 by root on node-1
+Example `/etc/network/interfaces`:
+----------------------------------
+
+```
+# Ansible managed
 # Any changes made here will be lost
 
 auto lo
 iface lo inet loopback
 
 ########## Network Interfaces
-auto eth0
-iface eth0 inet manual
+auto enp4s0
+iface enp4s0 inet manual
   bond_master bond0
 
-auto eth1
-iface eth1 inet manual
+auto enp6s0
+iface enp6s0 inet manual
   bond_master bond0
-
-auto eth2
-iface eth2 inet manual
-  bond_master bond2
-
-auto eth3
-iface eth3 inet manual
-  bond_master bond1
-
-auto eth4
-iface eth4 inet manual
-  bond_master bond1
-
-auto eth5
-iface eth5 inet manual
-  bond_master bond2
 
 ########## End of Network Interfaces
 
 ########## Network Bonds
-# Management
+# Primary Network Bond
 auto bond0
 iface bond0 inet manual
-  bond_slaves eth0 eth1
-  bond_primary eth0
-  bond_miimon 100
-
-# Storage
-auto bond1
-iface bond1 inet manual
-  bond_slaves eth3 eth4
-  bond_primary eth3
-  bond_mode balance-alb
-  bond_miimon 100
-
-# VMs
-auto bond2
-iface bond2 inet manual
-  bond_slaves eth2 eth5
-  bond_primary eth2
-  bond_mode balance-alb
+  bond_slaves enp4s0 enp6s0
+  bond_primary enp4s0
+  bond_mode 4
   bond_miimon 100
 
 ########## End of Network Bonds
 
 ########## Network VLANS
-# Orange-DMZ
-auto vlan100
-iface vlan100 inet manual
-  vlan_raw_device bond2
-
-# Green-Servers
-auto vlan101
-iface vlan101 inet manual
-  vlan_raw_device bond2
-
-# Management
-auto vlan106
-iface vlan106 inet static
-  address 10.0.106.51
-  netmask 255.255.255.0
-  gateway 10.0.106.51
-  up route add default gw 10.0.106.1
+# LAB-101
+auto bond0.101
+iface bond0.101 inet manual
   vlan_raw_device bond0
 
-# NFS-1
-auto vlan127
-iface vlan127 inet static
-  address 10.0.127.151
-  netmask 255.255.255.0
-  vlan_raw_device bond1
+# MAAS-102
+auto bond0.102
+iface bond0.102 inet manual
+  vlan_raw_device bond0
+
+# DMZ-201
+auto bond0.201
+iface bond0.201 inet manual
+  vlan_raw_device bond0
 
 ########## End of Network VLANS
 
 ########## Network Bridges
-# Orange-DMZ - Virtual Networking
-auto vmbr100
-iface vmbr100 inet manual
-  bridge_stp off
-  bridge_fd 0
-  bridge_ports vlan100
-
-# Green-Servers - Virtual Networking
+# LAB-101
 auto vmbr101
-iface vmbr101 inet manual
+iface vmbr101 inet static
+  address 10.0.101.51
+  netmask 255.255.255.0
+  gateway 10.0.101.1
   bridge_stp off
   bridge_fd 0
-  bridge_ports vlan101
+  bridge_ports bond0.101
+
+# MAAS-Deployments
+auto vmbr102
+iface vmbr102 inet manual
+  bridge_stp off
+  bridge_fd 0
+  bridge_ports bond0.102
+
+# DMZ-201
+auto vmbr201
+iface vmbr201 inet manual
+  bridge_stp off
+  bridge_fd 0
+  bridge_ports bond0.201
 
 ########## End of Network Bridges
 
-dns-nameservers 192.168.70.240 192.168.70.241
-dns-search example.org
-````
+dns-nameservers 10.10.10.1 172.16.24.1
+dns-search etsbv.internal
+```
 
 License
 -------
@@ -360,3 +365,5 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>

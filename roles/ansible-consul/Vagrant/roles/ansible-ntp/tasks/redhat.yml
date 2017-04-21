@@ -5,7 +5,6 @@
     state: present
   with_items:
     - ntp
-#    - python-dnf  #preparing for dnf instead of yum
   when: >
         ansible_distribution != "Fedora"
 

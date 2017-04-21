@@ -1,44 +1,56 @@
 Role Name
 =========
 
-Installs apt-cacher-ng https://www.unix-ag.uni-kl.de/~bloch/acng/ (Client/server configurations)
+An [Ansible] role to install/configure [apt-cacher-ng]
+- (Client/server configurations)
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
 
-````
+```
+---
+# defaults file for ansible-apt-cacher-ng
 apt_cacher_configs:
-  - acng.conf
-  - security.conf
+  - 'acng.conf'
+  - 'security.conf'
 apt_cacher_ng_account:
-  - name: admin
-    password: admin
-apt_cacher_ng_cachedir: /var/cache/apt-cacher-ng
-apt_cacher_ng_port: 3142
-apt_cacher_server: []  #defines hostname of server...define here or gloabally group_vars/all/servers
+  - name: 'admin'
+    password: 'admin'
+apt_cacher_ng_cachedir: '/var/cache/apt-cacher-ng'
+apt_cacher_ng_port: '3142'
+
+# Defines hostname of server
+apt_cacher_server: []
+
 apt_cacher_passthrough_patterns:
-  - .*  #allowing everything to be cached and connected to
-enable_apt_caching: false  #defines if apt-caching should be used for clients...define here or globally group_vars/all/configs
-````
+  # Allowing everything to be cached and connected to
+  - '.*'
+
+# Defines if apt-caching should be used for clients
+enable_apt_caching: false
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.apt-cacher-ng }
+```
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-apt-cacher-ng
+  tasks:
+```
 
 License
 -------
@@ -52,3 +64,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[apt-cacher-ng]: <https://www.unix-ag.uni-kl.de/~bloch/acng/>

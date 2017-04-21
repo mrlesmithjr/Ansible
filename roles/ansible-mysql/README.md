@@ -5,6 +5,11 @@ An [Ansible] role to install/configure [MySQL]
 
 - Configurable options and cacti monitoring ready.
 
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-mysql.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-mysql)
+
 Requirements
 ------------
 
@@ -87,7 +92,7 @@ mysql_settings:
   innodb_flush_log_at_timeout: '1'
   innodb_read_io_threads: '4'
   innodb_write_io_threads: '4'
-  join_buffer_size: '0.25M'
+  join_buffer_size: '1M'
   #Default is 16M
   key_buffer_size: '{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M'
   max_allowed_packet: '16M'

@@ -1,6 +1,10 @@
 ---
 - include: debian_client.yml
-  when: apt_cacher_server is defined and inventory_hostname != apt_cacher_server
+  when: >
+        apt_cacher_server is defined and
+        inventory_hostname != apt_cacher_server
 
 - include: debian_server.yml
-  when: apt_cacher_server is defined and inventory_hostname == apt_cacher_server
+  when: >
+        apt_cacher_server is defined and
+        inventory_hostname == apt_cacher_server

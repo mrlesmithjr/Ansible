@@ -17,4 +17,6 @@
   tags:
     - config_haproxy
     - haproxy
-  when: config_haproxy is defined and config_haproxy
+  when: >
+        haproxy_config is defined and
+        haproxy_config

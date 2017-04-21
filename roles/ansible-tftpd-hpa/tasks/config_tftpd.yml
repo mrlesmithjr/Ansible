@@ -23,3 +23,16 @@
     group: root
     mode: 0644
   notify: restart tftpd-hpa
+
+- name: config_tftpd | Downloading Netboot
+  get_url:
+    url: "{{ tftp_netboot_url }}/{{ tftp_netboot_file }}"
+    dest: "{{ tftp_directory }}/{{ tftp_netboot_file }}"
+
+- name: config_tftpd | Extracting Netboot
+  unarchive:
+    src: "{{ tftp_directory }}/{{ tftp_netboot_file }}"
+    dest: "{{ tftp_directory }}"
+    copy: no
+  args:
+    creates: "{{ tftp_directory }}/pxelinux.0"

@@ -1,5 +1,5 @@
 ---
-- name: configure_root_access | ensuring MySQL service is running (Non Docker install)
+- name: configure_root_access | ensuring MySQL service is running
   service:
     name: "mysql"
     state: "started"
@@ -7,7 +7,7 @@
   when: >
         mariadb_server_installed is not defined
 
-- name: configure_root_access | ensuring MySQL service is running (Non Docker install)
+- name: configure_root_access | ensuring MySQL service is running
   service:
     name: "mariadb"
     state: "started"
@@ -36,6 +36,7 @@
     host: "{{ item }}"
     password: "{{ mysql_root_password }}"
   with_items: '{{ mysql_allow_root_access_from_hosts }}'
+  when: not ansible_check_mode
 
 - name: configure_root | configuring root my.cnf
   template:

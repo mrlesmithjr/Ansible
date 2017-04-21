@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs, configures and build a Consul cluster. https://www.consul.io/
+  description: An [Ansible] role to install, configure and build a [Consul] cluster.
   #company: your company (optional)
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
@@ -91,8 +91,9 @@ galaxy_info:
   #  - raring
   #  - saucy
     - trusty
-  #  - utopic
-  #  - vivid
+    - utopic
+    - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

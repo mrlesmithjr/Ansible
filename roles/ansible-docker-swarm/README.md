@@ -6,26 +6,70 @@ An [Ansible] role to provision a [Docker] swarm cluster.
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Install [Ansible] roles required:
+```
+sudo ansible-galaxy install -r requirements.yml
+```
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+```
+---
+# defaults file for ansible-docker-swarm
+docker_swarm_addr: "{{ hostvars[inventory_hostname]['ansible_' + docker_swarm_interface]['ipv4']['address'] }}"
+
+# Validity period for node certificates (default 2160h0m0s)
+docker_swarm_cert_expiry: '2160h0m0s'
+
+# Dispatcher heartbeat period (default 5s)
+docker_swarm_dispatcher_heartbeat_duration: '5s'
+
+docker_swarm_interface: "enp0s8"
+# docker_swarm_managers_ansible_group: 'docker-swarm-managers'
+
+docker_swarm_config_networks: false
+docker_swarm_config_settings: false
+
+# Define Ansible group which contains your Docker swarm managers
+docker_swarm_managers_ansible_group: 'docker-swarm-managers'
+
+docker_swarm_networks: []
+  # - name: 'my_net'
+  #   driver: 'overlay'
+  #   state: 'present'
+  # - name: 'test'
+  #   driver: 'overlay'
+  #   state: 'absent'
+docker_swarm_port: "2377"
+
+# Defines first node in docker_swarm_managers_ansible_group as primary
+docker_swarm_primary_manager: '{{ groups[docker_swarm_managers_ansible_group][0] }}'
+
+# Task history retention limit (default 5)
+docker_swarm_task_history_limit: '5'
+
+# Define Ansible group which contains you Docker swarm workers
+docker_swarm_workers_ansible_group: 'docker-swarm-workers'
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```
+- hosts: docker_hosts
+  become: true
+  vars:
+  roles:
+    - role: ansible-docker
+    - role: ansible-docker-swarm
+  tasks:
+```
 
 License
 -------
@@ -35,4 +79,11 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+
+Larry Smith Jr.
+- @mrlesmithjr
+- http://everythingshouldbevirtual.com
+- mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[Docker]: <https://www.docker.com>

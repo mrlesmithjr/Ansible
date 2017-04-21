@@ -1,0 +1,16 @@
+---
+# handlers file for ansible-redis
+- name: restart redis-server
+  service:
+    name: "redis-server"
+    state: restarted
+
+- name: start redis
+  service:
+    name: "redis"
+    state: started
+
+- name: restart redis
+  service:
+    name: "redis"
+    state: restarted

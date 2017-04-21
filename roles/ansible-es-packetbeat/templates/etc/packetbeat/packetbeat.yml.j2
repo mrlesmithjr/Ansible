@@ -16,6 +16,15 @@ output:
   {{ item.name }}:
     hosts: ["{{ item.host }}:{{ item.port }}"]
     worker: {{ item.workers }}
+{%    if item.protocol is defined %}
+    protocol: "{{ item.protocol }}"
+{%    endif %}
+{%    if item.username is defined %}
+    username: "{{ item.username }}"
+{%    endif %}
+{%    if item.password is defined %}
+    password: "{{ item.password }}"
+{%    endif %}
 {% endfor %}
 shipper:
 logging:

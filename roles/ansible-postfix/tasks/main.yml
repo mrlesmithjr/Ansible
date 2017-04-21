@@ -1,59 +1,90 @@
 ---
 # tasks file for ansible-postfix
 - name: Checking to make sure postfix is installed
-  apt: name={{ item }} state=installed
+  apt:
+    name: "{{ item }}"
+    state: "present"
   tags: [postfix]
   with_items:
-    - postfix
-    - mailutils
+    - 'postfix'
+    - 'mailutils'
   when: ansible_os_family == 'Debian'
 
 - name: Checking to make sure postfix is installed
-  yum: name={{ item }} state=installed
+  yum:
+    name: "{{ item }}"
+    state: "present"
   tags: [postfix]
   with_items:
-    - postfix
-    - mailx
+    - 'postfix'
+    - 'mailx'
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution != "Fedora"
 
 - name: Checking to make sure postfix is installed
-  dnf: name={{ item }} state=installed
+  dnf:
+    name: "{{ item }}"
+    state: "present"
   tags: [postfix]
   with_items:
-    - postfix
-    - mailx
+    - 'postfix'
+    - 'mailx'
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution == "Fedora"
 
 - name: Create canonical maps if enabled
-  template: src=templates/canonical.j2 dest={{ postfix_conf_dir }}/canonical mode=0644 owner=root group=root backup=yes
+  template:
+    src: "canonical.j2"
+    dest: "{{ postfix_conf_dir }}/canonical"
+    mode: 0644
+    owner: "root"
+    group: "root"
   tags: [postfix]
   notify: restart postfix
   when: enable_sender_canonical
 
 - name: Create postfix configuration main.cf
-  template: src=templates/main.cf.j2 dest={{ postfix_conf_dir }}/main.cf mode=0644 owner=root group=root backup=yes
+  template:
+    src: "main.cf.j2"
+    dest: "{{ postfix_conf_dir }}/main.cf"
+    mode: 0644
+    owner: "root"
+    group: "root"
   tags: [postfix]
   register: postfix
   notify: restart postfix
-  when: configure_postfix is defined and configure_postfix
+  when: >
+        configure_postfix is defined and
+        configure_postfix
 
 - name: Create postfix configuration 'generic'
-  template: src=templates/{{ postfix_generic_template }} dest={{ postfix_conf_dir }}/generic mode=0644 owner=root group=root backup=yes
+  template:
+    src: "{{ postfix_generic_template }}"
+    dest: "{{ postfix_conf_dir }}/generic"
+    mode: 0644
+    owner: "root"
+    group: "root"
   tags: [postfix]
   register: postfix
   notify: restart postfix
-  when: configure_postfix is defined and configure_postfix
+  when: >
+        configure_postfix is defined and
+        configure_postfix
 
-- name: Checking to make sure postfix is running
-  service: name=postfix state=running enabled=yes
+- name: Checking to make sure postfix is running and enabled on boot
+  service:
+    name: "postfix"
+    state: "running"
+    enabled: yes
   tags: [postfix]
+  when: not ansible_check_mode
 
 - name: rebuilding generic.db
-  command: postmap /etc/postfix/generic
+  command: "postmap /etc/postfix/generic"
   tags: [postfix]
   notify: restart postfix
-  when: postfix.changed and postfix_domain_rewrite_filetype == 'hash'
+  when: >
+        postfix.changed and
+        postfix_domain_rewrite_filetype == 'hash'

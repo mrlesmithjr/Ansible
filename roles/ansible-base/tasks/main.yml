@@ -24,11 +24,6 @@
     - base
   when: ansible_os_family == "RedHat"
 
-# - include: manage_ssh_known_hosts.yml
-#   tags:
-#     - manage_ssh_known_hosts
-#   when: base_ssh_manage_ssh_known_hosts
-
 # - include: generate_rundeck_resources.yml
 #   tags:
 #     - generate_rundeck_resources

@@ -1,66 +1,90 @@
 Role Name
 =========
 
-Installs postfix http://www.postfix.org/
+An [Ansible] role to install/configure [Postfix]
+
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-postfix.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-postfix)
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
-
+None
 Role Variables
 --------------
 
-````
+```
+---
 # defaults file for ansible-postfix
-configure_postfix: false  #defines if postfix should be configured
-enable_postfix_domain_rewrite: false  #defines if outgoing email domain should be changed
-enable_postfix_relayhost: false  #defines if a relay host should be used
-postfix_conf_dir: /etc/postfix
-postfix_mynetworks:  #defines which networks are allowed to relay through postfix server...this is defined for all nodes which have roles/postfix applied
-  - 127.0.0.0/8
-#  - 10.0.101.0/24
-#  - 172.16.0.0/16
-#  - 192.168.0.0/16
-postfix_relayhost: '[smtp.example.org]'  #define smtp relay server...define here or globally in group_vars/all
-postfix_rewrite_domain: example.org  #defines what domain all outgoing email should be set to for @domain.example...should be the same as smtp_domain_name
-postfix_use_tls: true  #defines if tls should be used or not
 
-# enable 'sender_canonical_maps = regexp:/etc/postfix/sender_canonical' in main.cf
+# Defines if postfix should be configured
+configure_postfix: false
+
+# Defines if outgoing email domain should be changed
+enable_postfix_domain_rewrite: false
+
+# Defines if a relay host should be used
+enable_postfix_relayhost: false
+postfix_conf_dir: '/etc/postfix'
+
+# Defines which networks are allowed to relay through postfix server
+# this is defined for all nodes which have roles/postfix applied
+postfix_mynetworks:
+  - '127.0.0.0/8'
+#  - '10.0.101.0/24'
+#  - '172.16.0.0/16'
+#  - '192.168.0.0/16'
+
+# Define smtp relay server
+postfix_relayhost: '[smtp.example.org]'
+
+# Defines what domain all outgoing email should be set to for @domain.example
+postfix_rewrite_domain: 'example.org'
+
+# Defines if tls should be used or not
+postfix_use_tls: true
+
+postfix_tls_cert_file: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+
+postfix_tls_cert_key: '/etc/ssl/private/ssl-cert-snakeoil.key'
 enable_sender_canonical: false
-# if enable_sender_canonical == true, use mappings set in...
 postfix_sender_canonical_maps:
   - "/^(.*@)example.com$/     ${1}example.co.uk"
 
 # Can be set to 'hash' or 'regexp' filetype
-postfix_domain_rewrite_filetype: hash
+postfix_domain_rewrite_filetype: 'hash'
 
 # set which template to use for generic maps file
-# values are currently the original 'generic.j2' or
-# the more flexible 'altgeneric.j2'
-postfix_generic_template: generic.j2
-
-# when using the 'altgeneric.j2' template, use mappings set in...
+postfix_generic_template: 'generic.j2'
 postfix_altgeneric_maps:
   - "/^(.*@)something.com$/     ${1}somethingelse.co.uk"
+enable_postifx_dkim: false
 
-# when SMTP relay, if true force it to always add missing headers such as message-id
+# Support the setting of the helo name
+enable_smtp_helo_name: false
+postfix_smtp_helo_name: '{{ ansible_fqdn }}'
 enable_always_add_missing_headers: false
-````
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.postfix }
+```
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-postfix
+  tasks:
+```
 
 License
 -------
@@ -74,3 +98,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[Postfix]: <http://www.postfix.org/>

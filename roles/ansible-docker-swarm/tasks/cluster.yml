@@ -3,6 +3,7 @@
   command: "docker info"
   register: "docker_info"
   changed_when: false
+  check_mode: no
 
 - name: cluster | Init Docker Swarm Mode On First Manager
   command: >

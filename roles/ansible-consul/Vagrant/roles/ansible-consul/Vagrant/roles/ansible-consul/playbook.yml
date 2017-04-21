@@ -1,0 +1,83 @@
+---
+- hosts: all
+  become: true
+  vars:
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+  tasks:
+    - name: pre-reqs (RedHat)
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnf
+        - python-dnf
+      when: >
+            (ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora")
+
+    - name: pre-reqs
+      dnf:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - libselinux-python
+      when: ansible_os_family == "RedHat"
+
+    - name: updating /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
+        line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
+        state: present
+      with_items: groups['all']
+
+- hosts: all
+  become: true
+  vars:
+#    - consul_bind_address: '{{ ansible_enp0s8.ipv4.address }}'
+    - consul_master: 'node0'
+    - install_nginx: true
+    - install_redis: true
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+    # - role: ansible-apf-firewall
+    # - role: ansible-bootstrap
+    # - role: ansible-base
+    # - role: ansible-bashrc
+    # - role: ansible-etc-hosts
+    # - role: ansible-hashicorp-toolbox
+    - role: ansible-nginx
+      when: >
+            inventory_hostname in groups[consul_clients_group] and
+            (install_nginx is defined and
+            install_nginx)
+    - role: ansible-ntp
+    # - role: ansible-rabbitmq
+    - role: ansible-redis
+      when: >
+            inventory_hostname in groups[consul_clients_group] and
+            (install_redis is defined and
+            install_redis)
+    # - role: ansible-rsyslog
+    # - role: ansible-timezone
+    # - role: ansible-users
+    - role: ansible-consul
+  tasks:
+    - name: uninstalling nginx (if not install_nginx)
+      apt:
+        name: "nginx"
+        state: absent
+      when: >
+            inventory_hostname in groups[consul_clients_group] and
+            (install_nginx is defined and
+            not install_nginx)
+
+    - name: uninstalling redis (if not install_redis)
+      apt:
+        name: "redis"
+        state: absent
+      when: >
+            inventory_hostname in groups[consul_clients_group] and
+            (install_redis is defined and
+            not install_redis)

@@ -1,2 +1,10 @@
 ---
 # defaults file for ansible-memcached
+memcached_config: false
+memcached_connections_in_limit: '1024'
+memcached_listen_address: '127.0.0.1'
+memcached_log_file: '/var/log/memcached.log'
+memcached_memory_cap: '64'
+memcached_port: '11211'
+memcached_verbose: false
+memcached_verbose_verbose: false

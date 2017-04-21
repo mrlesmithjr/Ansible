@@ -2,7 +2,7 @@
 - name: config_app_services | installing pre-reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
     - 'python-dev'
     - 'python-pip'
@@ -11,10 +11,11 @@
 - name: config_app_services | installing python modules
   pip:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
     - 'python-consul'
 
+# The below will eventually replace the app services by template lower down
 #- name: config_app_services | configuring consul app services
 #  consul:
 #    check_id: "{{ item.check_id|default (omit) }}"
@@ -31,22 +32,26 @@
   template:
     src: "etc/consul.d/client/service.json.j2"
     dest: "{{ consul_config_dir }}/client/{{ item.service_name }}.json"
-    owner: root
-    group: root
-    mode: 0644
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
   notify:
-    - restart consul
-  with_items: consul_services
-  when: item.state == "present"
+    - "restart consul"
+  with_items: '{{ consul_services }}'
+  when: >
+        item['state'] == "present" and
+        not ansible_check_mode
 
 - name: config_app_services | disabling consul app services
   file:
     path: "{{ consul_config_dir }}/client/{{ item.service_name }}.json"
-    state: absent
+    state: "absent"
   notify:
-    - restart consul
-  with_items: consul_services
-  when: item.state == "absent"
+    - "restart consul"
+  with_items: '{{ consul_services }}'
+  when: >
+        item['state'] == "absent" and
+        not ansible_check_mode
 
 #- name: checking if mysql is installed
 #  shell: dpkg -l mysql-server

@@ -1,7 +1,7 @@
 Role Name
 =========
 
-Installs and configures NGINX (http://nginx.org/)  
+An [Ansible] role to install and configure [NGINX]
 
 Requirements
 ------------
@@ -11,13 +11,13 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-nginx
 config_nginx: false
 nginx_access_log: '/var/log/nginx/access.log'
 nginx_enable_ipv6: false
-nginx_enable_php5: true
+nginx_enable_php: true
 nginx_error_log: '/var/log/nginx/error.log'
 nginx_events_block:
 #  - 'multi_accept on'
@@ -50,7 +50,11 @@ nginx_http_block:
     - 'include /etc/nginx/conf.d/*.conf'
     - 'include /etc/nginx/sites-enabled/*'
 nginx_listen_port: 80
-nginx_server_block:  #defines settings added to /etc/nginx/sites-enabled/default
+nginx_php_set_timezone: false
+nginx_php_timezone: 'America/New_York'
+
+# Defines settings added to /etc/nginx/sites-enabled/default
+nginx_server_block:
   - server_name: 'localhost'
     default_server: true
     enable_php: true
@@ -58,12 +62,16 @@ nginx_server_block:  #defines settings added to /etc/nginx/sites-enabled/default
       - 'index.php'
       - 'index.html'
       - 'index.htm'
-    listen: '{{ nginx_listen_port }}'
+    listen_address:
+      - '*'
+#      - '127.0.1.1'
+    listen_port: '{{ nginx_listen_port }}'
     location: '/'
     root: '{{ nginx_web_root }}'
     try_files: '$uri $uri/ =404'
 nginx_worker_processes: 4
-````
+```
+
 Dependencies
 ------------
 
@@ -72,14 +80,14 @@ None
 Example Playbook
 ----------------
 
-````
+```
 - hosts: all
   become: true
   vars:
   roles:
     - role: ansible-nginx
   tasks:
-````
+```
 
 License
 -------
@@ -93,3 +101,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[NGINX]: <http://nginx.org/>

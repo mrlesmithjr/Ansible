@@ -26,3 +26,9 @@ dataSource.url = jdbc:h2:file:/var/lib/rundeck/data/rundeckdb;MVCC=true;TRACE_LE
 rundeck.execution.logs.streamingWriterPlugins=LogstashPlugin
 {%   endif %}
 {% endif %}
+
+{% if rundeck_gui_customization is defined and rundeck_gui_customization %}
+{% for pair in rundeck_gui_customization %}
+{{ pair.name }} = {{ pair.value }}
+{% endfor %}
+{% endif %}

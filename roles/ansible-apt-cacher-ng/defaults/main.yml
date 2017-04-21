@@ -1,14 +1,20 @@
 ---
 # defaults file for ansible-apt-cacher-ng
 apt_cacher_configs:
-  - acng.conf
-  - security.conf
+  - 'acng.conf'
+  - 'security.conf'
 apt_cacher_ng_account:
-  - name: admin
-    password: admin
-apt_cacher_ng_cachedir: /var/cache/apt-cacher-ng
-apt_cacher_ng_port: 3142
-apt_cacher_server: []  #defines hostname of server...define here or gloabally group_vars/all/servers
+  - name: 'admin'
+    password: 'admin'
+apt_cacher_ng_cachedir: '/var/cache/apt-cacher-ng'
+apt_cacher_ng_port: '3142'
+
+# Defines hostname of server
+apt_cacher_server: []
+
 apt_cacher_passthrough_patterns:
-  - .*  #allowing everything to be cached and connected to
-enable_apt_caching: false  #defines if apt-caching should be used for clients...define here or globally group_vars/all/configs
+  # Allowing everything to be cached and connected to
+  - '.*'
+
+# Defines if apt-caching should be used for clients
+enable_apt_caching: false

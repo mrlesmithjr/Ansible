@@ -1,0 +1,13 @@
+-d
+logfile {{ memcached_log_file }}
+{% if memcached_verbose %}
+-v
+{% endif %}
+{% if memcached_verbose_verbose %}
+-vv
+{% endif %}
+-m {{ memcached_memory_cap }}
+-p {{ memcached_port }}
+-u memcache
+-l {{ memcached_listen_address }}
+-c {{ memcached_connections_in_limit }}

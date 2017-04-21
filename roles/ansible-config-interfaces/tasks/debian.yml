@@ -1,19 +1,39 @@
 ---
-- name: debian | installing pre-req packages
-  apt: name={{ item }} state=present
-  with_items:
-    - bridge-utils
-    - ifenslave
-    - lldpd
-    - vlan
+- name: debian | Installing Pre-Req Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ config_interfaces_debian_packages }}'
+
+- name: debian | Installing ifenslave
+  apt:
+    name: "ifenslave"
+    state: "present"
+  # when: >
+  #       ansible_distribution == "Ubuntu" and
+  #       ansible_distribution_version < '16.04'
+
+# Disabled as this causes issues
+# - name: debian | Installing ifupdown2
+#   apt:
+#     name: "ifupdown2"
+#     state: "present"
+#   when: >
+#         ansible_distribution == "Ubuntu" and
+#         ansible_distribution_version >= '16.04'
 
 #- name: debian | grabbing interfaces
 #  shell: ifconfig -a | sed 's/[ \t].*//;/^\(lo\|\)$/d'
 #  register: show_interfaces
 
-- name: debian | configuring defined interfaces
-  template: src=etc/network/interfaces.j2 dest=/etc/network/interfaces owner=root group=root mode=0644
-  register: config_interface
+- name: debian | Configuring Defined Interfaces
+  template:
+    src: "etc/network/interfaces.j2"
+    dest: "/etc/network/interfaces"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "config_interface"
   when: >
         config_network_interfaces is defined and
         config_network_interfaces
@@ -27,7 +47,7 @@
 #  with_items: interfaces
 #  when: config_network_interfaces is defined and config_network_interfaces
 
-- name: debian | restarting network interfaces
+- name: debian | Restarting Network Interfaces
   shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
   with_items: '{{ network_interfaces }}'
   when: >
@@ -38,7 +58,7 @@
           (enable_configured_interfaces_after_defining is defined and
             enable_configured_interfaces_after_defining)
 
-- name: debian | restarting network interfaces
+- name: debian | Restarting Network Interfaces
   shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
   with_items: '{{ network_vlans }}'
   when: >

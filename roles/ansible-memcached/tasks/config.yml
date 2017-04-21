@@ -1,0 +1,6 @@
+---
+- name: config | Configuring memcached
+  template:
+    src: "etc/memcached.conf.j2"
+    dest: "/etc/memcached.conf"
+  notify: "restart memcached"

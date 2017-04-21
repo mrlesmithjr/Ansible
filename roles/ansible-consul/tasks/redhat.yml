@@ -2,25 +2,34 @@
 - name: redhat | installing epel repo (RedHat)
   yum:
     name: "epel-release"
-    state: present
+    state: "present"
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing dependencies
   yum:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
-    - 'dnf'
     - 'python-devel'
-    - 'python-dnf'
     - 'python-pip'
   when: ansible_distribution != "Fedora"
 
-- name: redhat | installing add'l dependencies
+- name: redhat | installing add'l dependencies (Fedora)
   dnf:
     name: "{{ item }}"
-    state: present
+    state: "present"
   with_items:
     - 'jq'
     - 'tree'
     - 'unzip'
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | installing add'l dependencies (Not Fedora)
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'jq'
+    - 'tree'
+    - 'unzip'
+  when: ansible_distribution == "Fedora"

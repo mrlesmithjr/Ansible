@@ -1,11 +1,15 @@
 ---
 # tasks file for ansible-consul
+- include: set_facts.yml
+  tags:
+    - consul_facts
+
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
-  
+
 - include: config_consul.yml
 
 - include: config_app_services.yml

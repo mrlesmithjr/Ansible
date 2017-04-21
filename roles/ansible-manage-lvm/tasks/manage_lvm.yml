@@ -46,7 +46,7 @@
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: lvm.changed and item.1.filesystem != "swap" and item.1.filesystem != "xfs"
+  when: lvm.changed and item.1.filesystem != "swap" and item.1.filesystem != "xfs" and item.1.filesystem != "btrfs"
 
 - name: manage_lvm | resizing xfs
   command: xfs_growfs -d /dev/{{ item.0.vgname }}/{{ item.1.lvname }}
@@ -61,6 +61,13 @@
     - "{{ lvm_groups }}"
     - lvnames
   when: lvm.changed and item.1.filesystem == "swap"
+
+- name: manage_lvm | resizing btrfs
+  shell: "btrfs filesystem resize max {{ item.1.mntp }}""
+  with_subelements:
+    - "{{ lvm_groups }}"
+    - lvnames
+  when: lvm.changed and item.1.filesystem == "btrfs"
 
 - name: manage_lvm | unmounting filesystem(s)
   mount:

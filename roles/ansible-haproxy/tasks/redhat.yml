@@ -4,9 +4,9 @@
     name: "{{ item }}"
     state: "present"
   with_items:
-    - haproxy
-    - hatop
-    - socat
+    - 'haproxy'
+    - 'hatop'
+    - 'socat'
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing haproxy and socat
@@ -14,12 +14,13 @@
     name: "{{ item }}"
     state: "present"
   with_items:
-    - haproxy
-    - hatop
-    - socat
+    - 'haproxy'
+    - 'hatop'
+    - 'socat'
   when: ansible_distribution == "Fedora"
 
 - name: redhat | ensuring haproxy is enabled
   service:
-    name: haproxy
+    name: "haproxy"
     enabled: yes
+  when: not ansible_check_mode

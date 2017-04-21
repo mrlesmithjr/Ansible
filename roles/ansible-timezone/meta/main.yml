@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Configures timezone settings
+  description: An [Ansible] role to configure timezone settings
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -20,17 +20,17 @@ galaxy_info:
   platforms:
   - name: EL
     versions:
-  #  - all
+    - all
   #  - 5
-    - 6
-    - 7
+  #  - 6
+  #  - 7
   #- name: GenericUNIX
   #  versions:
   #  - all
   #  - any
-  #- name: Fedora
-  #  versions:
-  #  - all
+  - name: Fedora
+    versions:
+    - all
   #  - 16
   #  - 17
   #  - 18
@@ -73,18 +73,19 @@ galaxy_info:
   #  - 9.2
   - name: Ubuntu
     versions:
-  #  - all
+    - all
   #  - lucid
   #  - maverick
   #  - natty
   #  - oneiric
-    - precise
+  #  - precise
   #  - quantal
   #  - raring
   #  - saucy
-    - trusty
+  #  - trusty
   #  - utopic
   #  - vivid
+  #  - xenial
   #- name: SLES
   #  versions:
   #  - all
@@ -98,9 +99,9 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  #- name: Debian
-  #  versions:
-  #  - all
+  - name: Debian
+    versions:
+    - all
   #  - etch
   #  - jessie
   #  - lenny
