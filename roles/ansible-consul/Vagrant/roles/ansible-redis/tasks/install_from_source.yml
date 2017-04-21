@@ -1,0 +1,112 @@
+---
+- name: install_from_source | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'build-essential'
+  when: ansible_os_family == "Debian"
+
+- name: install_from_source | Downloading Redis {{ redis_version }} Source
+  get_url:
+    dest: "{{ redis_dl_info.dest_dir }}/{{ redis_dl_info.file }}"
+    url: "{{ redis_dl_info.url }}/{{ redis_dl_info.file }}"
+
+- name: install_from_source | Extracting Redis {{ redis_version }}
+  unarchive:
+    copy: no
+    creates: "{{ redis_dl_info.dest_dir }}/redis-{{ redis_version }}/Makefile"
+    dest: "{{ redis_dl_info.dest_dir }}/"
+    src: "{{ redis_dl_info.dest_dir }}/{{ redis_dl_info.file }}"
+
+- name: install_from_source | Creating {{ redis_conf|dirname }}
+  file:
+    name: "{{ redis_conf|dirname }}"
+    state: "directory"
+
+- name: install_from_source | Creating Redis User
+  user:
+    name: "{{ redis_user_info.name }}"
+    home: "{{ redis_user_info.home }}"
+    shell: "/bin/false"
+    system: yes
+
+- name: install_from_source | Creating {{ redis_pid_file|dirname }}
+  file:
+    name: "{{ redis_pid_file|dirname }}"
+    owner: "{{ redis_user_info.name }}"
+    group: "{{ redis_user_info.name }}"
+    state: "directory"
+
+- name: install_from_source | Checking If Redis Has Already Been Compiled
+  stat:
+    path: "{{ redis_dl_info.dest_dir }}/redis-{{ redis_version }}/src/redis-server"
+  register: "redis_compiled"
+
+- name: install_from_source | Compiling Redis
+  make:
+    chdir: "{{ redis_dl_info.dest_dir }}/redis-{{ redis_version }}"
+  when: not redis_compiled.stat.exists
+
+- name: install_from_source | Checking If Redis Has Already Been Installed
+  stat:
+    path: "{{ redis_bin_path }}/redis-server"
+  register: "redis_installed"
+
+- name: install_from_source | Installing Redis
+  make:
+    chdir: "{{ redis_dl_info.dest_dir }}/redis-{{ redis_version }}"
+    params:
+      PREFIX: "{{ redis_install_dir }}"
+    target: "install"
+  when: not redis_installed.stat.exists
+
+- name: install_from_source | Configuring Redis Service (initd)
+  template:
+    src: "etc/init.d/redis.j2"
+    dest: "/etc/init.d/{{ redis_service }}"
+    mode: "u=rwx,g=rx,o=rx"
+  when: ansible_service_mgr != "systemd"
+
+- name: install_from_source | Configuring Redis Service (systemd)
+  template:
+    src: "etc/systemd/system/redis.service.j2"
+    dest: "/etc/systemd/system/{{ redis_service }}.service"
+  register: "redis_systemd_service_configured"
+  when: ansible_service_mgr == "systemd"
+
+- name: install_from_source | Reloading Systemctl
+  command: "systemctl daemon-reload"
+  when: redis_systemd_service_configured.changed
+
+- name: install_from_source | Creating {{ redis_log_file|dirname }}
+  file:
+    path: "{{ redis_log_file|dirname }}"
+    state: "directory"
+
+- name: install_from_source | Checking If {{ redis_log_file }} Exists
+  stat:
+    path: "{{ redis_log_file }}"
+  register: "redis_log"
+
+- name: install_from_source | Creating {{ redis_log_file }}
+  file:
+    path: "{{ redis_log_file }}"
+    owner: "{{ redis_user_info.name }}"
+    group: "{{ redis_user_info.name }}"
+    state: "touch"
+  when: not redis_log.stat.exists
+
+- name: install_from_source | Capturing Environment Path
+  shell: "grep PATH /etc/environment | sed 's|\"||g' | sed 's|PATH=||g'"
+  register: "env_path"
+  changed_when: false
+
+- name: install_from_source | Setting Environment Path
+  lineinfile:
+    backrefs: yes
+    dest: "/etc/environment"
+    line: "PATH=\"{{ env_path.stdout }}{{ ':' }}{{ redis_bin_path }}\""
+    regexp: "^PATH="
+    state: "present"
+  when: redis_bin_path not in env_path.stdout

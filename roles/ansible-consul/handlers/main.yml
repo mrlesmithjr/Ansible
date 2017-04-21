@@ -3,30 +3,36 @@
 - name: restart consul
   service:
     name: "consul"
-    state: restarted
+    state: "restarted"
     sleep: 10
+  when: not ansible_check_mode
 
 - name: start consul
   service:
     name: "consul"
-    state: started
+    state: "started"
+  when: not ansible_check_mode
 
 - name: stop consul
   service:
     name: "consul"
-    state: stopped
+    state: "stopped"
+  when: not ansible_check_mode
 
 - name: restart dnsmasq
   service:
     name: "dnsmasq"
-    state: restarted
+    state: "restarted"
+  when: not ansible_check_mode
 
 - name: restart haproxy
   service:
     name: "haproxy"
-    state: restarted
+    state: "restarted"
+  when: not ansible_check_mode
 
 - name: restart keepalived
   service:
     name: "keepalived"
-    state: restarted
+    state: "restarted"
+  when: not ansible_check_mode

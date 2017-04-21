@@ -22,7 +22,7 @@
 #
 # This is enabled by default, uncomment this to disable it
 # listen_tls = 0
-{% if enable_kvm_tls is defined and not enable_kvm_tls %}
+{% if kvm_enable_tls is defined and not kvm_enable_tls %}
 listen_tls = 0
 {% endif %}
 # Listen for unencrypted TCP connections on the public TCP/IP port.
@@ -35,7 +35,7 @@ listen_tls = 0
 #
 # This is disabled by default, uncomment this to enable it.
 # listen_tcp = 1
-{% if enable_kvm_tcp is defined and enable_kvm_tcp %}
+{% if kvm_enable_tcp is defined and kvm_enable_tcp %}
 listen_tcp = 1
 {% endif %}
 
@@ -48,7 +48,7 @@ listen_tcp = 1
 # This can be a port number, or service name
 #
 #tcp_port = "16509"
-{% if enable_kvm_tcp is defined and enable_kvm_tcp %}
+{% if kvm_enable_tcp is defined and kvm_enable_tcp %}
 tcp_port = "16509"
 {% endif %}
 
@@ -65,7 +65,7 @@ tcp_port = "16509"
 #
 # This is disabled by default, uncomment this to enable it
 #mdns_adv = 1
-{% if enable_kvm_mdns is defined and enable_kvm_mdns %}
+{% if kvm_enable_mdns is defined and kvm_enable_mdns %}
 mdns_adv = 1
 {% endif %}
 
@@ -154,7 +154,7 @@ auth_unix_rw = "none"
 # use, always enable SASL and use the GSSAPI or DIGEST-MD5
 # mechanism in /etc/sasl2/libvirt.conf
 #auth_tcp = "sasl"
-{% if enable_kvm_tcp is defined and enable_kvm_tcp %}
+{% if kvm_enable_tcp is defined and kvm_enable_tcp %}
 auth_tcp = "none"
 {% endif %}
 # Change the authentication scheme for TLS sockets.
@@ -355,7 +355,7 @@ auth_tcp = "none"
 # Multiple outputs can be defined, they just need to be separated by spaces.
 # e.g. to log all warnings and errors to syslog under the libvirtd ident:
 #log_outputs="3:syslog:libvirtd"
-{% if enable_libvirtd_syslog is defined and enable_libvirtd_syslog %}
+{% if kvm_enable_libvirtd_syslog is defined and kvm_enable_libvirtd_syslog %}
 log_outputs="3:syslog:libvirtd"
 {% endif %}
 #

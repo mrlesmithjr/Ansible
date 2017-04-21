@@ -1,43 +1,62 @@
 Role Name
 =========
 
-Installs ntp
+An [Ansible] role to install/configure NTP
+
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-ntp.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-ntp)
 
 Requirements
 ------------
 
-Define ntp_master for your group of servers which should be used for your internal ntp servers for clients to connect to.
+Define ntp_master for your group of servers which should be used for your
+internal ntp servers for clients to connect to.
 ex. group_vars/ntp_masters
 
 Role Variables
 --------------
 
-````
-ntp_master: false  #defines if host is ntp_master....set ntp_master to true on specific group_vars/group
-ntp_master_servers:  #define your ntp_master_servers....set in group_vars/all/configs
+```
+---
+# defaults file for ansible-ntp
+# Defines if host is ntp_master
+# set ntp_master to true on specific group_vars/group
+ntp_master: false
+
+# Define your ntp_master_servers
+ntp_master_servers:
   - 0.ubuntu.pool.ntp.org
   - 1.ubuntu.pool.ntp.org
   - 2.ubuntu.pool.ntp.org
   - 3.ubuntu.pool.ntp.org
-#ntp_servers:  #defines internal ntp servers for clients to poll
-#  - 'ntp1.{{ pri_domain_name }}'
-#  - 'ntp2.{{ pri_domain_name }}'
-pri_domain_name: example.org  #defines your primary domain name...define here or globally in group_vars/all
-````
+
+# Defines your primary domain name (FQDN)
+ntp_pri_domain_name: 'example.org'
+
+# Defines internal ntp servers for clients to poll
+# ntp_servers:
+#  - 'ntp1.{{ ntp_pri_domain_name }}'
+#  - 'ntp2.{{ ntp_pri_domain_name }}'
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.ntp }
+```
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-ntp
+  tasks:
+```
 
 License
 -------
@@ -51,3 +70,5 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>

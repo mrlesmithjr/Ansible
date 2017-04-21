@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith jr.
-  description: Installs various Hashicorp utilities https://hashicorp.com/
+  description: An [Ansible] role to install various [Hashicorp] utilities
   #company: your company (optional)
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

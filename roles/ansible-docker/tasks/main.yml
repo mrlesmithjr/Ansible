@@ -7,11 +7,12 @@
   when: ansible_os_family == "RedHat"
 
 - include: config_docker.yml
+  when: docker_config_service
 
 - include: users.yml
   when: >
-        config_docker_users is defined and
-        config_docker_users
+        docker_config_users is defined and
+        docker_config_users
 
 - include: manage_python_modules.yml
 

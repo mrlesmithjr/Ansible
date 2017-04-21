@@ -1,18 +1,38 @@
 ---
 # defaults file for ansible-config-interfaces
-config_network_bonds: false  #defines if kvm_network_bonds should be configured as defined...define in host_vars/host
-config_network_bridges: false  #defines if kvm_network_bridges should be configured as defined...define in host_vars/host
-config_network_interfaces: false  #defines if kvm_network_interfaces should be configured as defined...define in host_vars/host
-config_network_vlans: false  #defines if kvm_network_vlans should be configured as defined...define in host_vars/host
-dns_nameservers: #defines all dns servers to configure...define here or globally in group_vars/all
+
+config_interfaces_debian_packages:
+  - 'bridge-utils'
+  - 'lldpd'
+  - 'vlan'
+
+# Defines if network bonds should be configured as defined
+config_network_bonds: false
+
+# Defines if network bridges should be configured as defined
+config_network_bridges: false
+
+# Defines if interfaces should be configured as defined
+config_network_interfaces: false
+
+# Defines if vlans should be configured as defined
+config_network_vlans: false
+
+# Defines all dns servers to configure
+dns_nameservers:
   - '8.8.8.8'
   - '8.8.4.4'
-dns_search: '{{ pri_domain_name }}'  #defines your global dns suffix search...define here or globally in group_vars/all
-enable_configured_interfaces_after_defining: false  #defines if interfaces, bonds, bridges and vlans should be brought up after defining.
-kvm_mgmt_ip: '0.0.0.0'  #defines management IP for var on network_bridges....This is for demo purposes only
-kvm_mgmt_gateway: '0.0.0.0'  #defines management gateway for var on network_bridges....This is for demo purposes only
-kvm_nfs1_ip: '0.0.0.0'  #defines IP address to define on Storage interface.....This is for demo purposes only
-network_bonds:  #define network bonds and settings if desired (Define separately for each node in host_vars) - https://help.ubuntu.com/community/UbuntuBonding
+
+# Defines your global dns suffix search
+dns_search: '{{ pri_domain_name }}'
+
+# Defines if interfaces, bonds, bridges and vlans should be brought up after defining.
+enable_configured_interfaces_after_defining: false
+
+# Define network bonds and settings if desired
+# (Define separately for each node in host_vars)
+# https://help.ubuntu.com/community/UbuntuBonding
+network_bonds:
   - name: 'bond0'
     configure: true
     comment: 'Management Networks'
@@ -46,25 +66,29 @@ network_bonds:  #define network bonds and settings if desired (Define separately
     addl_settings:
       - 'bond_mode balance-alb'
       - 'bond_miimon 100'
-network_bridges:  #define network bridges and settings if desired (Define separately for each node in host_vars) - https://help.ubuntu.com/community/NetworkConnectionBridge
+
+# Define network bridges and settings if desired
+# (Define separately for each node in host_vars)
+# https://help.ubuntu.com/community/NetworkConnectionBridge
+network_bridges:
   - name: 'br0'
     configure: true
     comment: 'Management - VLAN106'
     method: 'static'
-    address: '{{ kvm_mgmt_ip }}'
+    address: '10.0.106.50'
     netmask: '255.255.255.0'
     netmask_cidr: '24'
-    gateway: '{{ kvm_mgmt_gateway }}'
+    gateway: '10.0.106.1'
     ports: 'bond0.106'
     addl_settings:
-      - 'up route add default gw {{ kvm_mgmt_gateway }}'
+      - 'up route add default gw 10.0.106.1'
       - 'bridge_stp off'
       - 'bridge_fd 0'
   - name: 'br1'
     configure: true
     comment: 'NFS-1 - VLAN127'
     method: 'static'
-    address: '{{ kvm_nfs1_ip }}'
+    address: '10.0.127.50'
     netmask: '255.255.255.0'
     netmask_cidr: '24'
     gateway:
@@ -96,7 +120,11 @@ network_bridges:  #define network bridges and settings if desired (Define separa
     addl_settings:
       - 'bridge_stp off'
       - 'bridge_fd 0'
-network_interfaces:  #define interfaces and settings. (Define separately for each node in host_vars) - Anything not defined can be added to addl_settings.
+
+# Define interfaces and settings.
+# (Define separately for each node in host_vars)
+# Anything not defined can be added to addl_settings.
+network_interfaces:
   - name: 'eth0'
     configure: true
     comment:
@@ -105,7 +133,9 @@ network_interfaces:  #define interfaces and settings. (Define separately for eac
     netmask:
     netmask_cidr:
     gateway:
-#    wireless_network: false  #defines if the interface is a wireless interface...not working so keep false or not defined
+    # Defines if the interface is a wireless interface
+    # not working so keep false or not defined
+#    wireless_network: false
 #    wpa_ssid: wireless  #defines the wireless SSID to connect to
 #    wpa_psk: wpapassword  #defines the wireless key
     addl_settings:
@@ -160,7 +190,10 @@ network_interfaces:  #define interfaces and settings. (Define separately for eac
     gateway:
     addl_settings:
       - 'bond_master bond2'
-network_vlans:  #define vlans and settings if desired. (Define separately for each node in host_vars)
+
+# Define vlans and settings if desired.
+# (Define separately for each node in host_vars)
+network_vlans:
   - name: 'bond2.100'
     configure: true
     comment: 'Orange-DMZ'

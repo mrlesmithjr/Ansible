@@ -1,12 +1,20 @@
 ---
 # defaults file for ansible-ntp
-ntp_master: false  #defines if host is ntp_master....set ntp_master to true on specific group_vars/group
-ntp_master_servers:  #define your ntp_master_servers....set in group_vars/all/configs
+# Defines if host is ntp_master
+# set ntp_master to true on specific group_vars/group
+ntp_master: false
+
+# Define your ntp_master_servers
+ntp_master_servers:
   - 0.ubuntu.pool.ntp.org
   - 1.ubuntu.pool.ntp.org
   - 2.ubuntu.pool.ntp.org
   - 3.ubuntu.pool.ntp.org
-#ntp_servers:  #defines internal ntp servers for clients to poll
-#  - 'ntp1.{{ pri_domain_name }}'
-#  - 'ntp2.{{ pri_domain_name }}'
-pri_domain_name: example.org  #defines your primary domain name...define here or globally in group_vars/all
+
+# Defines your primary domain name (FQDN)
+ntp_pri_domain_name: 'example.org'
+
+# Defines internal ntp servers for clients to poll
+# ntp_servers:
+#  - 'ntp1.{{ ntp_pri_domain_name }}'
+#  - 'ntp2.{{ ntp_pri_domain_name }}'

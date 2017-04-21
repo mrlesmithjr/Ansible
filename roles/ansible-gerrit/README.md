@@ -6,16 +6,16 @@ Installs and configures Gerrit Code Review...https://www.gerritcodereview.com/
 Requirements
 ------------
 Install all Ansible role requirements.
-````
+```
 sudo ansible-galaxy install -r requirements.yml -f
-````
+```
 
 Vagrant
 -------
 Spin up Environment under Vagrant to test.
-````
+```
 vagrant up
-````
+```
 
 Usage
 -----
@@ -30,7 +30,7 @@ Login to WebUI using defined owncloud_admin_user and owncloud_admin_pass vars (h
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-gerrit
 gerrit_account_info:
@@ -53,7 +53,7 @@ gerrit_db_info:
 #    user: gerrit
 #    pass: gerrit
 gerrit_dl_info:
-  - url: https://www.gerritcodereview.com/download
+  - url: https://gerrit-releases.storage.googleapis.com
     filename: 'gerrit-{{ gerrit_version }}.war'
     sha256sum: cb1794ccdf22da4e0ba5a431b832578017bbe53152ce028f46d2ebbb611705aa
 gerrit_gitweb_integration: false  #defines is gerrit should be integrated with gitweb...gitweb is not controlled via gerrit using this method...
@@ -112,10 +112,10 @@ gerrit_site_dir: /var/gerrit
 gerrit_smtp_server: 'smtp.{{ pri_domain_name }}'
 gerrit_sshd_listen_port: 29418
 gerrit_vagrant_install: false  #defines if deploying within a Vagrant environment
-gerrit_version: 2.11.4
+gerrit_version: 2.13.7
 gitweb_cgi_path: /usr/share/gitweb/gitweb.cgi
 pri_domain_name: example.org
-````
+```
 
 Dependencies
 ------------
@@ -124,7 +124,7 @@ None
 
 Example Playbook
 ----------------
-````
+```
 ---
 - name: Installs Gerrit Code Review
   hosts: gerrit-servers
@@ -147,7 +147,7 @@ Example Playbook
     - { role: ansible-mariadb-mysql, when: install_mysql is defined and install_mysql }
     - ansible-gerrit
   tasks:
-````
+```
 
 Notes
 -----

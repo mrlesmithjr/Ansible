@@ -1,9 +1,11 @@
 ---
 - name: rabbitmq_clustering | stopping rabbitmq app
   command: rabbitmqctl stop_app
+  when: inventory_hostname != "{{ rabbitmq_master }}"
 
 - name: rabbitmq_clustering | resetting rabbitmq app
   command: rabbitmqctl reset
+  when: inventory_hostname != "{{ rabbitmq_master }}"
 
 - name: rabbitmq_clustering | stopping rabbitmq-server
   service:
@@ -55,7 +57,7 @@
   when: inventory_hostname != "{{ rabbitmq_master }}"
 
 - name: rabbitmq_clustering | joining rabbitmq cluster
-  command: rabbitmqctl join_cluster 'rabbit@{{ rabbitmq_master }}'
+  command: rabbitmqctl join_cluster "rabbit@{{ hostvars[rabbitmq_master]['ansible_hostname'] }}"
   register: cluster_joined
   when: inventory_hostname != "{{ rabbitmq_master }}"
 

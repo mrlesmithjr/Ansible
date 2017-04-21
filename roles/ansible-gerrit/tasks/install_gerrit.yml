@@ -11,9 +11,9 @@
   get_url:
     url: "{{ item.url }}/{{ item.filename }}"
     dest: "{{ gerrit_install_dir }}/{{ item.filename }}"
-    sha256sum: "{{ item.sha256sum }}"
+    # sha256sum: "{{ item.sha256sum }}"
     validate_certs: false
-  with_items: gerrit_dl_info
+  with_items: '{{ gerrit_dl_info }}'
 
 - name: install_gerrit | creating gerrit symlink
   file:
@@ -22,7 +22,7 @@
     owner: root
     group: root
     state: link
-  with_items: gerrit_dl_info
+  with_items: '{{ gerrit_dl_info }}'
 
 - name: install_gerrit | creating gerrit group
   group:
@@ -44,7 +44,7 @@
   mysql_db:
     name: "{{ item.db }}"
     state: present
-  with_items: gerrit_db_info
+  with_items: '{{ gerrit_db_info }}'
   when: item.type is defined and item.type == "mysql"
 
 - name: install_gerrit | creating MySQL DB User(s) (if used)
@@ -53,7 +53,7 @@
     password: "{{ item.pass }}"
     priv: "{{ item.db }}.*:ALL"
     state: present
-  with_items: gerrit_db_info
+  with_items: '{{ gerrit_db_info }}'
   when: item.type is defined and item.type == "mysql"
 
 - name: install_gerrit | creating gerrit site directory
@@ -134,7 +134,7 @@
     url: "{{ item.url }}/{{ item.name }}"
     dest: "{{ gerrit_site_dir }}/plugins/{{ item.name }}"
   notify: restart gerrit
-  with_items: gerrit_plugins
+  with_items: '{{ gerrit_plugins }}'
   when: gerrit_install_plugins is defined and gerrit_install_plugins
 
 - name: install_gerrit | validating permissions on gerrit plugins

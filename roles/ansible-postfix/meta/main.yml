@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs postfix role (Includes ability to configure relayhost, domain rewrite)
+  description: An [Ansible] role to install/configure [Postfix]
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -39,6 +39,8 @@ galaxy_info:
   #  - 21
     - 22
     - 23
+    - 24
+    - 25
   #- name: Windows
   #  versions:
   #  - all
@@ -88,8 +90,9 @@ galaxy_info:
   #  - raring
   #  - saucy
     - trusty
-  #  - utopic
-  #  - vivid
+    - utopic
+    - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all
@@ -116,20 +119,7 @@ galaxy_info:
   # the platforms above, uncomment those that apply to your role.
   #
   categories:
-  #- cloud
-  #- cloud:ec2
-  #- cloud:gce
-  #- cloud:rax
-  #- clustering
-  #- database
-  #- database:nosql
-  #- database:sql
-  #- development
-  #- monitoring
-  #- networking
-  #- packaging
   - system
-  #- web
 dependencies: []
   # List your role dependencies here, one per line. Only
   # dependencies available via galaxy should be listed here.

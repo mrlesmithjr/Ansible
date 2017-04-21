@@ -1,2 +1,6 @@
 ---
 # handlers file for ansible-memcached
+- name: restart memcached
+  service:
+    name: "memcached"
+    state: "restarted"

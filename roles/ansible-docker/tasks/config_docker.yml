@@ -1,72 +1,27 @@
 ---
-- name: config_docker | ensuring Docker service is enabled and started
-  service:
-    name: "docker"
-    state: started
-    enabled: yes
-
-- name: config_docker | configuring docker service (Debian)
+- name: config_docker | Configuring Docker Service (Debian)
   template:
-    src: etc/default/docker.j2
-    dest: /etc/default/docker
-    owner: root
-    group: root
+    src: "etc/default/docker.j2"
+    dest: "/etc/default/docker"
+    owner: "root"
+    group: "root"
     mode: 0644
-  notify: restart docker
-  when: >
-        ((ansible_distribution == "Debian" or
-        ansible_distribution == "Ubuntu" and
-        ansible_distribution_version <= '14.04') and
-        (docker_config_service is defined and
-        docker_config_service))
+  notify: "restart docker"
+  when: ansible_os_family == "Debian"
 
-- name: config_docker | ensuring /etc/systemd/system/docker.service.d directory exists
+- name: config_docker | Ensuring /etc/docker Folder Exists
   file:
-    path: "/etc/systemd/system/docker.service.d"
-    state: directory
-  when: >
-        ((ansible_distribution == "RedHat" or
-        ansible_distribution == "Ubuntu" and
-        ansible_distribution_version >= '16.04') and
-        (docker_config_service is defined and
-        docker_config_service))
+    path: "/etc/docker"
+    state: "directory"
 
-- name: config_docker | creating Docker systemd override
+- name: config_docker | Configuring Docker
   template:
-    src: "etc/systemd/system/docker.service.j2"
-    dest: "/etc/systemd/system/docker.service"
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart docker
-  register: docker_systemd_override
-  when: >
-        ((ansible_distribution == "RedHat" or
-        ansible_distribution == "Ubuntu" and
-        ansible_distribution_version >= '16.04') and
-        (docker_config_service is defined and
-        docker_config_service))
+    src: "etc/docker/daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+  notify: "restart docker"
 
-# Moved the following into docker.conf above
-# - name: config_docker | configuring Docker service options
-#   template:
-#     src: "etc/sysconfig/docker.j2"
-#     dest: "/etc/sysconfig/docker"
-#     owner: root
-#     group: root
-#     mode: 0644
-#   register: docker_service_config
-#   notify: restart docker
-#   when: ansible_os_family == "RedHat"
-
-- name: config_docker | restarting systemd manager (when Docker systemd override is created)
-  shell: "systemctl daemon-reload"
-  when: >
-        docker_systemd_override.changed
-
-- name: config_docker | restarting docker service
+- name: config_docker | Ensuring Docker Service Is Started And Enabled On Boot
   service:
     name: "docker"
-    state: "restarted"
-  when: >
-        docker_systemd_override.changed
+    state: "started"
+    enabled: yes

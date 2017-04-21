@@ -1,0 +1,27 @@
+---
+- name: dnsmasq | installing dnsmasq (Debian)
+  apt:
+    name: "dnsmasq"
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: dnsmasq | installing dnsmasq (RedHat)
+  dnf:
+    name: "dnsmasq"
+    state: present
+  when: ansible_os_family == "RedHat"
+  
+- name: dnsmasq | ensuring dnsmasq service is enabled
+  service:
+    name: "dnsmasq"
+    enabled: yes
+
+- name: dnsmasq | configuring dnsmasq to resolv consul dns
+  template:
+    src: "etc/dnsmasq.d/10-consul.j2"
+    dest: "/etc/dnsmasq.d/10-consul"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart dnsmasq

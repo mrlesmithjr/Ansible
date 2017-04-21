@@ -1,0 +1,38 @@
+<domain type='{{ kvm_domain_type }}'>
+  <name>{{ item.name }}</name>
+  <memory unit='MB'>{{ item.memory }}</memory>
+  <vcpu>{{ item.vcpu }}</vcpu>
+  <os>
+    <type>hvm</type>
+{% for dev in item.boot_devices %}
+    <boot dev='{{ dev }}'/>
+{% endfor %}
+    <bootmenu enable='yes'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <devices>
+{% for hd in item.disks %}
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='{{ kvm_images_format_type }}'/>
+      <source file='{{ kvm_images_path }}/{{ hd.name }}.{{ kvm_images_format_type }}'/>
+{%   if hd.disk_driver|lower == 'virtio' %}
+      <target dev='vd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd.disk_driver }}'/>
+{%   elif hd.disk_driver|lower == 'sata' or hd.disk_driver|lower == 'scsi' or hd.disk_driver|lower == 'sd' %}
+      <target dev='sd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd.disk_driver }}'/>
+{%   endif %}
+    </disk>
+{% endfor %}
+{% for int in item.network_interfaces %}
+    <interface type='{{ int.type }}'>
+      <source {{ int.type }}='{{ int.source }}'/>
+      <model type='{{ int.network_driver }}'/>
+    </interface>
+{% endfor %}
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+  </devices>
+</domain>

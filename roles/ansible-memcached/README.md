@@ -1,31 +1,45 @@
 Role Name
 =========
 
-Installs memcached http://memcached.org/
+An [Ansible] role to install/configure [memcached]
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+```
+---
+# defaults file for ansible-memcached
+memcached_config: false
+memcached_connections_in_limit: '1024'
+memcached_listen_address: '127.0.0.1'
+memcached_log_file: '/var/log/memcached.log'
+memcached_memory_cap: '64'
+memcached_port: '11211'
+memcached_verbose: false
+memcached_verbose_verbose: false
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.memcached }
+```
+- hosts: memcached_hosts
+  become: true
+  vars:
+  roles:
+    - role: ansible-memcached
+  tasks:
+```
 
 License
 -------
@@ -39,3 +53,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[memcached]: <http://memcached.org/>

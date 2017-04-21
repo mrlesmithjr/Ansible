@@ -1,0 +1,64 @@
+---
+- name: config_app_services | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'python-dev'
+    - 'python-pip'
+  when: ansible_os_family == "Debian"
+
+- name: config_app_services | installing python modules
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'python-consul'
+
+#- name: config_app_services | configuring consul app services
+#  consul:
+#    check_id: "{{ item.check_id|default (omit) }}"
+#    check_name: "{{ item.check_name|default (omit) }}"
+#    interval: "{{ item.interval|default (omit) }}"
+#    script: "{{ item.script|default (omit) }}"
+#    service_name: "{{ item.service_name|default (omit) }}"
+#    service_port: "{{ item.service_port|default (omit) }}"
+#    state: "{{ item.state }}"
+#    tags: "{{ item.tags|default (omit) }}"
+#  with_items: consul_services
+
+- name: config_app_services | configuring consul app services
+  template:
+    src: "etc/consul.d/client/service.json.j2"
+    dest: "{{ consul_config_dir }}/client/{{ item.service_name }}.json"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart consul
+  with_items: consul_services
+  when: item.state == "present"
+
+- name: config_app_services | disabling consul app services
+  file:
+    path: "{{ consul_config_dir }}/client/{{ item.service_name }}.json"
+    state: absent
+  notify:
+    - restart consul
+  with_items: consul_services
+  when: item.state == "absent"
+
+#- name: checking if mysql is installed
+#  shell: dpkg -l mysql-server
+#  register: mysql_installed
+#  changed_when: no
+#  ignore_errors: true
+
+#- name: configuring consul mysql user for checks
+#  mysql_user:
+#    name: "{{ consul_mysql_user }}"
+#    password: "{{ consul_mysql_password }}"
+#    priv: "*.*:ALL"
+#    state: present
+#  when: >
+#        mysql_installed.rc == 0

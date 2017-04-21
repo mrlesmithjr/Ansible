@@ -1,9 +1,7 @@
 Role Name
 =========
 
-Installs and configures tftpd-hpa role.
-
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-tftpd-hpa.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-tftpd-hpa)
+An [Ansible] role to install/configure [tftpd-hpa]
 
 Requirements
 ------------
@@ -13,12 +11,19 @@ None
 Role Variables
 --------------
 
-````
+```
 ---
 # defaults file for ansible-tftpd-hpa
-tftp_directory: '/var/lib/tftpboot'  #defines tftp root directory
-tftp_options: '--secure -c'  #defines tftp options for daemon...(-c allow new files to be created)
-````
+
+# Defines tftp root directory
+tftp_directory: '/var/lib/tftpboot'
+
+# Defines tftp options for daemon...(-c allow new files to be created)
+tftp_options: '--secure -c'
+
+tftp_netboot_file: 'netboot.tar.gz'
+tftp_netboot_url: 'http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot'
+```
 
 Dependencies
 ------------
@@ -28,25 +33,15 @@ None
 Example Playbook
 ----------------
 
-#### GitHub
-````
-- hosts: all
+```
+---
+- hosts: tftp_servers
   become: true
   vars:
   roles:
     - role: ansible-tftpd-hpa
   tasks:
-````
-
-#### Galaxy
-````
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: mrlesmithjr.tftpd-hpa
-  tasks:
-````
+```
 
 License
 -------
@@ -56,4 +51,10 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Larry Smith Jr.
+- @mrlesmithjr
+- http://everythingshouldbevirtual.com
+- mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[tftpd-hpa]: <https://help.ubuntu.com/community/TFTP>

@@ -52,6 +52,22 @@ ansible_versions:
       - 'pyopenssl'
       - 'pysphere'
       - 'pyvmomi'
+  - ver: '2.1.2.0'
+    addl_modules: []
+  - ver: '2.1.3.0'
+    addl_modules: []
+  - ver: '2.1.4.0'
+    addl_modules: []
+  - ver: '2.1.5.0'
+    addl_modules: []
+  - ver: '2.2.0.0'
+    addl_modules: []
+  - ver: '2.2.1.0'
+    addl_modules: []
+  - ver: '2.2.2.0'
+    addl_modules: []
+  - ver: '2.3.0.0'
+    addl_modules: []
 ansible_virtualenv_dir: '/opt/ansible_virtualenvs'
 clone_ansible_roles: false
 easy_install_pip: false

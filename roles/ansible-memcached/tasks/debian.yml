@@ -1,3 +1,5 @@
 ---
 - name: debian | installing memcached
-  apt: name=memcached state=present
+  apt:
+    name: "memcached"
+    state: "present"

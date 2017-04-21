@@ -1,0 +1,5 @@
+---
+- name: pip | Installing Redis Python Module
+  pip:
+    name: "redis"
+    state: "present"

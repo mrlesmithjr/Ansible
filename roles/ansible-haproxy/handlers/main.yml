@@ -4,8 +4,10 @@
   service:
     name: haproxy
     state: restarted
+  when: not ansible_check_mode
 
 - name: restart rsyslog
   service:
     name: rsyslog
     state: restarted
+  when: not ansible_check_mode

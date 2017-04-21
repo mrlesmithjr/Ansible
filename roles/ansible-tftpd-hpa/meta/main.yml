@@ -1,6 +1,6 @@
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs and configures tftpd-hpa role.
+  description: An [Ansible] role to install/configure [tftpd-hpa]
   #company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -111,6 +111,7 @@ galaxy_info:
     - trusty
   #  - utopic
   #  - vivid
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

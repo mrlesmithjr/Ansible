@@ -9,7 +9,7 @@
   notify:
     - restart nmbd
     - restart smbd
-    - restart samba-ad-dc    
+    - restart samba-ad-dc
   with_items:
     - 'etc/krb5.conf'
     - 'etc/samba/smb.conf'
@@ -20,11 +20,12 @@
   register: samba_ad_created_check
 
 - name: config_samba | configuring Active Directory
-  shell: "samba-tool domain provision --realm={{ samba_ad_info.kerberos_realm|upper }} --domain={{ samba_ad_info.netbios_domain_name|upper }} --adminpass='{{ samba_ad_info.adminpass }}' --server-role='domain controller' --use-ntvfs"
+  shell: "samba-tool domain provision --realm={{ samba_ad_info['kerberos_realm']|upper }} --domain={{ samba_ad_info['netbios_domain_name']|upper }} --adminpass='{{ samba_ad_info['adminpass'] }}' --server-role='domain controller' --use-ntvfs"
   register: samba_ad_created
   when: >
-        not samba_ad_created_check.stat.exists and
-        (samba_create_domain_controller is defined and samba_create_domain_controller) and
+        not samba_ad_created_check['stat']['exists'] and
+        (samba_create_domain_controller is defined and
+          samba_create_domain_controller) and
         samba_server_role == "active directory domain controller"
 
 - name: config_samba | marking domain as created
@@ -32,5 +33,5 @@
     dest: "/var/log/.samba_ad_created"
     state: touch
   when: >
-        samba_ad_created.changed and
-        not samba_ad_created_check.stat.exists
+        samba_ad_created['changed'] and
+        not samba_ad_created_check['stat']['exists']

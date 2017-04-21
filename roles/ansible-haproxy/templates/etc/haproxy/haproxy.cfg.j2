@@ -1,20 +1,16 @@
 global
-{% if (enable_haproxy_remote_syslog is defined and not enable_haproxy_remote_syslog) or enable_haproxy_remote_syslog is not defined %}
-{%   if (haproxy_docker_install is defined and not haproxy_docker_install) or haproxy_docker_install is not defined %}
+{% if (haproxy_enable_remote_syslog is defined and not haproxy_enable_remote_syslog) or haproxy_enable_remote_syslog is not defined %}
     log /dev/log local0
     log /dev/log local1 notice
-{%   endif %}
 {% endif %}
-{% if (enable_haproxy_remote_syslog is defined and enable_haproxy_remote_syslog) and syslog_servers is defined %}
+{% if (haproxy_enable_remote_syslog is defined and haproxy_enable_remote_syslog) and haproxy_syslog_servers is defined %}
     # Remote syslog servers
-{%   for item in syslog_servers %}
+{%   for item in haproxy_syslog_servers %}
     log {{ item.name }}:{{ item.port }} local0
 {%   endfor %}
     #log-send-hostname
 {% endif %}
-{% if haproxy_docker_install is defined and not haproxy_docker_install %}
     daemon
-{% endif %}
 {% for item in haproxy_global %}
     {{ item }}
 {% endfor %}
@@ -32,7 +28,7 @@ defaults
     {{ item }}
 {% endfor %}
 
-{% if enable_haproxy_admin_page %}
+{% if haproxy_enable_admin_page %}
 userlist STATSUSERS
     group admin users admin
     user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
@@ -79,7 +75,7 @@ backend {{ item.backend_name }}-{{ item.backend_servers_bind_port }}
 
 {%       endif %}
 {%       for server in groups[item.backend_servers_group] %}
-    server {{ server }} {{ server }}:{{ item.backend_servers_bind_port }}{% if item.backend_checks %} check{% endif %}
+    server {{ server }} {{ hostvars[server]['ansible_host'] }}:{{ item.backend_servers_bind_port }}{% if item.backend_checks %} check{% endif %}
 
 {%       endfor %}
 

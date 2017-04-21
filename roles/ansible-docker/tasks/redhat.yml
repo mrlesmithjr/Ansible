@@ -8,3 +8,10 @@
   yum:
     name: "docker-engine"
     state: present
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing Docker
+  dnf:
+    name: "docker-engine"
+    state: present
+  when: ansible_distribution == "Fedora"

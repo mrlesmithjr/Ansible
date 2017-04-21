@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs and configures ntp role (Ability to configure internal master ntp servers and configure ntp clients to poll internally included.)
+  description: An [Ansible] role to install/configure NTP
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)

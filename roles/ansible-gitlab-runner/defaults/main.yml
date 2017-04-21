@@ -17,4 +17,4 @@ gitlab_runner_debian_package:
 
 gitlab_runner_uri: 'https://packages.gitlab.com/runner/gitlab-ci-multi-runner'
 
-gitlab_runner_version: '1.11.1'
+gitlab_runner_version: '9.0.2'

@@ -1,38 +1,50 @@
 Role Name
 =========
 
-Configures timezone settings
+An [Ansible] role to configure timezone settings
+
+Build Status
+------------
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-timezone.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-timezone)
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
 
-````
+```
+---
 # defaults file for ansible-timezone
-change_timezone: true
+
 # set your desired default timezone
-#timezone: 'UTC'
-#timezone: 'EST5EDT'
-timezone: 'America/New_York'
-````
+
+# timezone: 'EST5EDT'
+# timezone: 'America/New_York'
+timezone: 'UTC'
+
+timezone_update_hardware_clock: false
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.timezone }
+```
+---
+- hosts: all
+  become: true
+  vars:
+  roles:
+    - role: ansible-timezone
+  tasks:
+```
 
 License
 -------
@@ -46,3 +58,5 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>

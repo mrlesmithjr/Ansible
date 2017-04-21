@@ -3,6 +3,11 @@ Role Name
 
 Installs rabbitmq https://www.rabbitmq.com/ (Configurable...HA and Clustering ready)
 
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-rabbitmq.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-rabbitmq)
+
 Requirements
 ------------
 
@@ -90,7 +95,7 @@ Example Playbook
         regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         state: present
-      with_items: groups['all']
+      with_items: "{{ groups['all'] }}"
 
 - hosts: all
   become: true

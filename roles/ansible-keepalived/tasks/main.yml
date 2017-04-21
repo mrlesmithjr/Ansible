@@ -12,10 +12,3 @@
   when: >
         config_keepalived is defined and
         config_keepalived
-
-- include: sync_keepalived.yml
-  tags:
-    - sync_keepalived
-  when: >
-        sync_keepalived is defined and
-        sync_keepalived
