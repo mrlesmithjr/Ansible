@@ -1,0 +1,11 @@
+---
+- name: config | Configuring Landscape Client
+  template:
+    src: "etc/landscape/client.conf.j2"
+    dest: "/etc/landscape/client.conf"
+    owner: "landscape"
+    group: "root"
+    mode: "u=rw,g=,o="
+  become: true
+  notify:
+    - "restart landscape-client"

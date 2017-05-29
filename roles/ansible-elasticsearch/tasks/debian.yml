@@ -3,7 +3,8 @@
   apt:
     name: "apt-transport-https"
     state: "present"
-    
+  become: true
+
 - include: debian_lvm.yml
   tags:
     - es_config_lvm

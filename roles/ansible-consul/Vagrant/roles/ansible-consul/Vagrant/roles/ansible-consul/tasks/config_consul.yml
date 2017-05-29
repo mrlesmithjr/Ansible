@@ -10,6 +10,7 @@
     dest: "{{ consul_bin_path }}"
     copy: no
     creates: "{{ consul_bin_path }}/consul"
+  when: not ansible_check_mode
 
 - name: config_consul | creating consul group
   group:
@@ -25,9 +26,9 @@
 - name: config_consul | creating consul configuration folders
   file:
     path: "{{ item }}"
-    owner: root
-    group: root
-    state: directory
+    owner: "root"
+    group: "root"
+    state: "directory"
   with_items:
     - '{{ consul_config_dir }}'
 #    - '{{ consul_config_dir }}/bootstrap'
@@ -40,7 +41,7 @@
     path: "{{ consul_data_dir }}"
     owner: "{{ consul_user }}"
     group: "{{ consul_group }}"
-    state: directory
+    state: "directory"
 
 #- name: config_consul | generating consul encryption key
 #  command: "consul keygen"
@@ -91,12 +92,12 @@
   template:
     src: "etc/consul.d/config.json.j2"
     dest: "{{ consul_config_dir }}/config.json"
-    owner: root
-    group: root
-    mode: 0644
-  register: consul_reconfigured
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "consul_reconfigured"
   notify:
-    - restart consul
+    - "restart consul"
   when: >
         inventory_hostname in groups[consul_clients_group] or
         inventory_hostname in groups[consul_servers_group]
@@ -104,7 +105,7 @@
 - name: config_consul | creating consul client folders
   file:
     path: "{{ consul_home }}"
-    state: directory
+    state: "directory"
   when: >
         inventory_hostname in groups[consul_clients_group]
 
@@ -122,7 +123,8 @@
     copy: no
     creates: "{{ consul_home }}/index.html"
   when: >
-        inventory_hostname in groups[consul_clients_group]
+        inventory_hostname in groups[consul_clients_group] and
+        not ansible_check_mode
 
 - name: config_consul | setting permissions on consul home folder
   file:
@@ -130,7 +132,7 @@
     owner: "{{ consul_user }}"
     group: "{{ consul_group }}"
     recurse: yes
-    state: directory
+    state: "directory"
   when: >
         inventory_hostname in groups[consul_clients_group]
 
@@ -138,12 +140,13 @@
   template:
     src: "etc/init/consul.conf.j2"
     dest: "/etc/init/consul.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart consul
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  notify: "restart consul"
   when: >
-        ansible_distribution == "Ubuntu" and
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04') and
         (inventory_hostname in groups[consul_clients_group] or
         inventory_hostname in groups[consul_servers_group])
 
@@ -157,6 +160,8 @@
   notify: restart consul
   when: >
         (ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04') or
         ansible_os_family == "RedHat") and
         (inventory_hostname in groups[consul_clients_group] or
         inventory_hostname in groups[consul_servers_group])
@@ -165,15 +170,21 @@
   service:
     name: "consul"
     enabled: yes
+  when: not ansible_check_mode
 
-- name: config_consul | restarting consul if re-configured  #this ensures that configurations are in place prior to configuring app_services
+# This ensures that configurations are in place prior to configuring app_services
+- name: config_consul | restarting consul if re-configured
   service:
     name: "consul"
-    state: restarted
-  when: consul_reconfigured.changed
+    state: "restarted"
+  when: >
+        consul_reconfigured['changed'] and
+        not ansible_check_mode
 
 - name: config_consul | checking to ensure consul agent is listening
   wait_for:
     port: 8500
     delay: 10
-  when: consul_reconfigured.changed
+  when: >
+        consul_reconfigured['changed'] and
+        not ansible_check_mode

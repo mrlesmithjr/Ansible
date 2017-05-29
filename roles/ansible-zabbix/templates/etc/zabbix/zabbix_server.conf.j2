@@ -16,6 +16,8 @@ PidFile=/var/run/zabbix/zabbix_server.pid
 Timeout={{ zabbix_server_timeout }}
 
 ############ ADVANCED PARAMETERS ################
-{% for item in zabbix_advanced_parameters %}
+{% if zabbix_advanced_parameters is defined %}
+{%   for item in zabbix_advanced_parameters %}
 {{ item.name }}={{ item.value }}
-{% endfor %}
+{%   endfor %}
+{% endif %}

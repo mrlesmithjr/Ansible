@@ -6,4 +6,5 @@
     sysctl_set: yes
     state: "{{ item.state }}"
     reload: yes
+  become: true
   with_items: '{{ es_network_tweaks }}'

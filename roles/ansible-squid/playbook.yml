@@ -1,22 +1,52 @@
 ---
-- name: provisions Haproxy node(s)
-  hosts: all
-  become: true
+- hosts: squid_proxy
   vars:
-    squid_acl_localnet:
-      - 10.0.0.0/8
-      - 172.16.0.0/16
-      - 192.168.0.0/16
-    squid_enable_haproxy: false
-    squid_enable_keepalived: false
+    haproxy_config: true
+    haproxy_configs:
+      - name: 'squid-3128'
+        backend_checks: true
+        backend_name: 'squid-servers'
+        backend_servers_bind_port: '3128'
+        backend_servers_group: 'squid_proxy'
+        balance: 'roundrobin'
+        default_server_options:
+          - name: 'maxconn'
+            value: '256'
+          - name: 'maxqueue'
+            value: '128'
+          - name: 'weight'
+            value: '100'
+        enabled: true
+        frontend_bind_address: '{{ haproxy_lb_vip }}'
+        frontend_bind_port: '8080'
+        frontend_name: 'squid-in'
+        mode: 'tcp'
+        options:
+          - 'tcplog'
+          # - 'httpchk'
+    haproxy_lb_vip: '192.168.250.50'
+    keepalived_config: true
+    keepalived_router_info:
+      - name: 'vrrp_1'
+        check_script:
+          - name: 'chk_haproxy'
+            script: 'killall -0 haproxy'
+            interval: 2
+            weight: 2
+        master_node: "{{ groups['squid_proxy'][0] }}"
+        router_id: '50'
+        router_pri_backup: '100'
+        router_pri_master: '150'
+        vip_int: '{{ ansible_enp0s8.device }}'
+        vip_addresses:
+          - '{{ haproxy_lb_vip }}'
+    pri_domain_name: 'test.vagrant.local'
+    squid_enable_haproxy: true
+    squid_enable_keepalived: true
   roles:
-    - role: ansible-haproxy
-      when: >
-            squid_enable_haproxy is defined and
-            squid_enable_haproxy
     - role: ansible-keepalived
-      when: >
-            squid_enable_keepalived is defined and
-            squid_enable_keepalived
+      when: squid_enable_keepalived
     - role: ansible-squid
+    - role: ansible-haproxy
+      when: squid_enable_haproxy
   tasks:

@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs nginx role
+  description: An [Ansible] role to install and configure [NGINX]
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)

@@ -1,0 +1,101 @@
+---
+- name: redhat | Installing Pre-Reqs
+  yum:
+    name: "lldpd"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing bridge-utils
+  yum:
+    name: "bridge-utils"
+  become: true
+  when: >
+        config_network_bridges and
+        ansible_distribution != "Fedora"
+
+- name: redhat | Installing VLAN Packages
+  yum:
+    name: "vconfig"
+    state: "present"
+  become: true
+  when: >
+        config_network_vlans and
+        ansible_distribution != "Fedora"
+
+- name: redhat | Enabling Bonding
+  modprobe:
+    name: "bonding"
+    state: "present"
+  become: true
+  when: config_network_bonds
+
+- name: redhat | Enabling Bridging
+  modprobe:
+    name: "bridge"
+    state: "present"
+  become: true
+  when: config_network_bridges
+
+- name: redhat | Configuring Interfaces
+  template:
+    src: "etc/sysconfig/network-scripts/ifcfg.j2"
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ item['name'] }}"
+  register: "config_interface"
+  become: true
+  with_items: '{{ network_interfaces }}'
+  when: >
+        config_network_interfaces and
+        item['configure']
+
+- name: redhat | Configuring Bonds
+  template:
+    src: "etc/sysconfig/network-scripts/ifcfg.j2"
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ item['name'] }}"
+  register: "config_bond"
+  become: true
+  with_items: '{{ network_bonds }}'
+  when: >
+        config_network_bonds and
+        item['configure']
+
+- name: redhat | Configuring Bridges
+  template:
+    src: "etc/sysconfig/network-scripts/ifcfg.j2"
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ item['name'] }}"
+  register: "config_bridge"
+  become: true
+  with_items: '{{ network_bridges }}'
+  when: >
+        config_network_bridges and
+        item['configure']
+
+- name: redhat | Restarting Network Bonds
+  shell: bash -c "ifdown {{ item['item']['name'] }} && ifup {{ item['item']['name'] }}"
+  become: true
+  with_items: "{{ config_bond['results'] }}"
+  when: >
+        config_network_bonds and
+        enable_configured_interfaces_after_defining and
+        item['item']['configure'] and
+        item['changed']
+
+- name: redhat | Restarting Network Bridges
+  shell: bash -c "ifdown {{ item['item']['name'] }} && ifup {{ item['item']['name'] }}"
+  become: true
+  with_items: "{{ config_bridge['results'] }}"
+  when: >
+        config_network_bridges and
+        enable_configured_interfaces_after_defining and
+        item['item']['configure'] and
+        item['changed']
+
+- name: redhat | Restarting Network Interfaces
+  shell: bash -c "ifdown {{ item['item']['name'] }} && ifup {{ item['item']['name'] }}"
+  become: true
+  with_items: "{{ config_interface['results'] }}"
+  when: >
+        config_network_interfaces and
+        enable_configured_interfaces_after_defining and
+        item['item']['configure'] and
+        item['changed']

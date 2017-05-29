@@ -22,6 +22,7 @@
     owner: root
     group: elasticsearch
     mode: 0750
+  become: true
   notify: restart elasticsearch
   # when: >
   #       (es_docker_install is defined and not es_docker_install) or
@@ -58,6 +59,7 @@
     owner: root
     group: root
     mode: 0644
+  become: true
   notify: restart elasticsearch
 
 - name: elasticsearch_conf | setting permissions on directories (if using data paths)
@@ -68,6 +70,7 @@
     mode: 0775
     recurse: yes
     state: directory
+  become: true
 
 - name: elasticsearch_conf | Setting vm.max_map_count
   sysctl:
@@ -75,3 +78,4 @@
     value: "262144"
     state: "present"
   notify: "restart elasticsearch"
+  become: true

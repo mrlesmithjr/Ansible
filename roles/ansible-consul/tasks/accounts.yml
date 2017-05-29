@@ -1,0 +1,15 @@
+---
+# We create the consul group
+- name: accounts | creating consul group
+  group:
+    name: "{{ consul_group }}"
+    state: present
+  become: true
+
+# We create the consul user and add it to the consul group
+- name: accounts | creating consul user
+  user:
+    name: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    system: yes
+  become: true

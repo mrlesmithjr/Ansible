@@ -1,15 +1,18 @@
 ---
 - name: settings | Updating Docker Swarm Dispatch Heartbeat Duration
   command: "docker swarm update --dispatcher-heartbeat {{ docker_swarm_dispatcher_heartbeat_duration }}"
+  become: true
   when: >
         inventory_hostname == docker_swarm_primary_manager
 
 - name: settings | Updating Docker Swarm Certificate Expiry Duration
   command: "docker swarm update --cert-expiry {{ docker_swarm_cert_expiry }}"
+  become: true
   when: >
         inventory_hostname == docker_swarm_primary_manager
 
 - name: settings | Updating Docker Swarm Task History Limit
   command: "docker swarm update --task-history-limit {{ docker_swarm_task_history_limit }}"
+  become: true
   when: >
         inventory_hostname == docker_swarm_primary_manager

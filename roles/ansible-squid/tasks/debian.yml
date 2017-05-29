@@ -3,3 +3,4 @@
   apt:
     name: "{{ squid_package }}"
     state: "present"
+  become: true

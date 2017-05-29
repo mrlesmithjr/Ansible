@@ -1,34 +1,27 @@
 ---
-- name: configure_zabbix_server | installing zabbix
-  apt:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - zabbix-server-mysql
-    - zabbix-frontend-php
-
 - name: configure_zabbix_server | finding fping path
-  command: which fping
-  register: fping_path
+  command: "which fping"
+  register: "fping_path"
   changed_when: false
 
 - name: configure_zabbix_server | finding fping6 path
-  command: which fping6
-  register: fping6_path
+  command: "which fping6"
+  register: "fping6_path"
   changed_when: false
 
 - name: configure_zabbix_server | configuring zabbix server
   template:
     src: "etc/zabbix/zabbix_server.conf.j2"
     dest: "/etc/zabbix/zabbix_server.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - restart zabbix-server
+    owner: "root"
+    group: "root"
+    mode: "o=rw,g=r,o=r"
+  become: true
+  notify: "restart zabbix-server"
 
 - name: configure_zabbix_server | installing python-modules
   pip:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items: '{{ zabbix_python_modules }}'

@@ -1,0 +1,16 @@
+{% if _k8s_get_services_all is defined and k8s_reports['all_service_namespaces'] %}
+{%   set services = {} %}
+{%   set _services = [] %}
+{%   for item in (_k8s_get_services_all['stdout']|from_json)['items'] %}
+{%     set _service = {} %}
+{%     set _service_clusterip = item['spec']['clusterIP'] %}
+{%     set _service_labels = item['metadata']['labels'] %}
+{%     set _service_name = item['metadata']['name'] %}
+{%     set _service_namespace = item['metadata']['namespace'] %}
+{%     set _service_ports = item['spec']['ports'] %}
+{%     set _svc = _service.update({"clusterIP": _service_clusterip, "labels": _service_labels, "name": _service_name, "namespace": _service_namespace, "ports": _service_ports}) %}
+{%     set _svc = _services.append(_service) %}
+{%   endfor %}
+{%   set _svc = services.update({"services": _services}) %}
+{{ services|to_nice_json }}
+{% endif %}

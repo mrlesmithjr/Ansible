@@ -1,0 +1,3 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-rabbitmq.git
+- src: https://github.com/mrlesmithjr/ansible-redis.git

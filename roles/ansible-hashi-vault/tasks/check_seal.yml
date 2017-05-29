@@ -1,0 +1,10 @@
+---
+# We check the seal status of vault
+- name: check_seal | Checking Seal Status Of HashiCorp Vault
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/seal-status"
+  check_mode: no
+  register: "_hashi_vault_sealed"
+  tags:
+    - 'hashi_vault_seal'
+    - 'hashi_vault_unseal'

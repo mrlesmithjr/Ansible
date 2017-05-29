@@ -1,0 +1,9 @@
+{% set _rules = [] %}
+{% set rules = [] %}
+{% for item1 in _hashi_vault_sever_policies_read['results'] %}
+{%   if (item1['content']|from_json)['rules'] is defined %}
+{%     set _rules = _rules.append((item1['content']|from_json)['rules']) %}
+{%   endif %}
+{% set rules = rules.append(_rules) %}
+{% endfor %}
+{{ rules|to_nice_json }}

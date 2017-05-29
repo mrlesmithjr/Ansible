@@ -3,4 +3,5 @@
   yum:
     name: "{{ squid_package }}"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"

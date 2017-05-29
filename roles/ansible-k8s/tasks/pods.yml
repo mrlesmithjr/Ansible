@@ -1,0 +1,14 @@
+---
+- name: pods | Capture Pods In All Namespaces
+  command: >
+           kubectl --kubeconfig {{ k8s_admin_config }} \
+           get pods --all-namespaces -o json
+  register: "_k8s_pods_all_namespaces"
+  become: true
+  changed_when: false
+  when: k8s_reports['all_pod_namespaces']
+
+- name: pods | Displaying Pods In All Namespaces
+  debug:
+    msg: "{{lookup('template', 'k8s_pods.j2')}}"
+  when: k8s_reports['all_pod_namespaces']

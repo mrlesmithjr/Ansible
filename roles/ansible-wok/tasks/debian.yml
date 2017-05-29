@@ -1,0 +1,37 @@
+---
+- name: debian | Installing Build Dependencies
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ wok_debian_build_dependencies }}'
+
+- name: debian | Installing Runtime Dependencies
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ wok_debian_runtime_dependencies }}'
+
+- name: debian | Installing Wok
+  apt:
+    deb: "{{ wok_download }}"
+    state: "present"
+  become: true
+  notify:
+    - "enable wokd"
+    - "reload systemd"
+    - "start wokd"
+    - "restart nginx"
+
+- name: debian | Installing Wok Plugins
+  apt:
+    deb: "{{ item['dl'] }}"
+    state: "present"
+  become: true
+  notify:
+    - "enable wokd"
+    - "reload systemd"
+    - "restart wokd"
+    - "restart nginx"
+  with_items: '{{ wok_debian_plugins }}'

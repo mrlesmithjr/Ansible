@@ -1,0 +1,11 @@
+---
+- name: users | Managing Postgresql Users
+  postgresql_user:
+    name: "{{ item['name'] }}"
+    password: "{{ item['password'] }}"
+    role_attr_flags: "{{ item['role_attr_flags']|default(omit) }}"
+    state: "{{ item['state'] }}"
+  become: true
+  become_user: "postgres"
+  with_items: "{{ postgresql_users }}"
+  when: postgresql_users is defined

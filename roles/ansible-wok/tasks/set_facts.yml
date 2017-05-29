@@ -1,0 +1,12 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    wok_kimchi_kvm_service_name: 'libvirtd'
+  when: >
+        ansible_distribution == "Debian" or
+        ansible_distribution == "CentOS"
+
+- name: set_facts | Setting Ubuntu Facts
+  set_fact:
+    wok_kimchi_kvm_service_name: 'libvirt-bin'
+  when: ansible_distribution == "Ubuntu"

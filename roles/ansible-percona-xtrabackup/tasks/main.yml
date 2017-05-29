@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-percona-xtrabackup
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: users.yml
+
+- include: config.yml
+
+- include: backup.yml

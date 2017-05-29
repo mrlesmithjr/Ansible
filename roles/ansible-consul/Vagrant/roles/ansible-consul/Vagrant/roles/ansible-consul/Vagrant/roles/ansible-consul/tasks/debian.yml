@@ -1,0 +1,17 @@
+---
+- name: debian | installing dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'jq'
+    - 'tree'
+    - 'unzip'
+
+- name: debian | installing add'l dependencies (Debian)
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 'dnsutils'
+  when: ansible_distribution == "Debian"

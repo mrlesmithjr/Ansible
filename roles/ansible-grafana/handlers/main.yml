@@ -4,3 +4,4 @@
   service:
     name: "grafana-server"
     state: "restarted"
+  become: true

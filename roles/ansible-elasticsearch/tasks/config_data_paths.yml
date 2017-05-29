@@ -3,6 +3,7 @@
   filesystem:
     fstype: ext4
     dev: "{{ item.disk }}"
+  become: true
   with_items: '{{ es_path_data_info }}'
   when: es_path_data_info is defined
 
@@ -12,5 +13,6 @@
     src: "{{ item.disk }}"
     fstype: ext4
     state: mounted
+  become: true
   with_items: '{{ es_path_data_info }}'
   when: es_path_data_info is defined

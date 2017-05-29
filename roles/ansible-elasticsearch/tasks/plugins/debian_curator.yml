@@ -3,16 +3,19 @@
   apt:
     name: python-pip
     state: present
+  become: true
 
 - name: debian_curator | adding curator apt repo
   apt_repository:
     repo: "{{ es_curator_debian_repo }}"
     state: "present"
+  become: true
 
 - name: debian_curator | installing elasticsearch curator
   apt:
     name: "python-elasticsearch-curator"
     state: "latest"
+  become: true
 
 - name: debian_curator | install curator crontab
   cron:
@@ -23,6 +26,7 @@
     job: '/usr/local/bin/curator --host {{ es_fqdn }} delete indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_max_keep_days | default(360) }}'
     cron_file: es_curator_delete
     state: present
+  become: true
   tags:
     - cron
   when: es_curator_version == "3"
@@ -36,6 +40,7 @@
     job: '/usr/local/bin/curator --host {{ es_fqdn }} close indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_close_after_days | default(14) }}'
     cron_file: es_curator_close
     state: present
+  become: true
   tags:
     - cron
   when: es_curator_version == "3"
@@ -49,6 +54,7 @@
     job: '/usr/local/bin/curator --host {{ es_fqdn }} delete indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_max_keep_days | default(360) }}'
     cron_file: "es_curator_delete"
     state: "absent"
+  become: true
   tags:
     - cron
   when: es_curator_version != "3"
@@ -62,6 +68,7 @@
     job: '/usr/local/bin/curator --host {{ es_fqdn }} close indices --time-unit days --timestring "\%Y.\%m.\%d" --older-than {{ es_curator_close_after_days | default(14) }}'
     cron_file: "es_curator_close"
     state: "absent"
+  become: true
   tags:
     - cron
   when: es_curator_version != "3"
@@ -70,6 +77,7 @@
   template:
     src: "curator/{{ item }}.j2"
     dest: "/opt/{{ item }}"
+  become: true
   with_items:
     - 'curator_actions.yml'
     - 'curator_config.yml'
@@ -83,4 +91,5 @@
     job: '/usr/local/bin/curator --config /opt/curator_config.yml /opt/curator_actions.yml'
     cron_file: "es_curator"
     state: "present"
+  become: true
   when: es_curator_version != "3"

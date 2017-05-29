@@ -3,9 +3,11 @@
   yum:
     name: "memcached"
     state: "present"
+  become: true
 
 - name: centos | ensuring memcached starts on boot and is running
   service:
     name: "memcached"
     state: "started"
     enabled: yes
+  become: true

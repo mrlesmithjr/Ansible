@@ -1,0 +1,26 @@
+{{ logrotate_default_rotate }}
+{% if ansible_os_family == "Debian" %}
+su root syslog
+{% elif ansible_os_family == "RedHat" %}
+su root root
+{% endif %}
+rotate {{ logrotate_default_backlogs_rotate }}
+{% if logrotate_create_new %}
+create
+{% endif %}
+{% if logrotate_compress %}
+compress
+{% endif %}
+include {{ logrotate_conf_dir }}
+/var/log/wtmp {
+    missingok
+    monthly
+    create 0664 root utmp
+    rotate 1
+}
+/var/log/btmp {
+    missingok
+    monthly
+    create 0660 root utmp
+    rotate 1
+}

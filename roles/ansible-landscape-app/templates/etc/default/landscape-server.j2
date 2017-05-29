@@ -1,0 +1,26 @@
+RUN_ALL="{{ landscape_app_services['run_all'] }}"
+
+RUN_APPSERVER="{{ landscape_app_services['run_appserver'] }}"
+RUN_ASYNC_FRONTEND="{{ landscape_app_services['run_async_frontend'] }}"
+RUN_JOBHANDLER="{{ landscape_app_services['run_jobhandler'] }}"
+RUN_MSGSERVER="{{ landscape_app_services['run_msgserver'] }}"
+RUN_PINGSERVER="{{ landscape_app_services['run_pingserver'] }}"
+RUN_APISERVER="{{ landscape_app_services['run_apiserver'] }}"
+RUN_PACKAGEUPLOADSERVER="{{ landscape_app_services['run_packageuploadserver'] }}"
+RUN_JUJU_SYNC="{{ landscape_app_services['run_juju_sync'] }}"
+RUN_PACKAGESEARCH="{{ landscape_app_services['run_packagesearch'] }}"
+
+RUN_CRON="{{ landscape_app_services['run_cron'] }}"
+
+# Run the schema upgrade procedure during package upgrades or not.
+# NOTE: if a schema upgrade is necessary, but this is set to
+# "no", the Landscape service WON'T (RE)START until the schema is
+# upgraded. In that case, the schema will need to be upgraded
+# manually by calling the setup-landscape-server script as root
+# after the package was upgraded.
+#
+# Only if this is set to "yes" will landscape-server upgrade the database schema.
+# Note that if you install the landscape-server-quickstart package and have this
+# setting commented, or set to no value, that package will set it to "yes".
+# Otherwise it will be left alone.
+#UPGRADE_SCHEMA="no"

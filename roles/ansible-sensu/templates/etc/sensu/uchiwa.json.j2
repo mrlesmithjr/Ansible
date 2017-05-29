@@ -1,19 +1,18 @@
-{
-  "sensu": [
-    {
-      "name": "sensu",
-      "host": "127.0.0.1",
-      "port": 4567,
-      "ssl": false,
-      "path": "",
-      "user": "",
-      "pass": "",
-      "timeout": 5
-    }
-  ],
-  "uchiwa": {
-    "host": "0.0.0.0",
-    "port": 3000,
-    "interval": 5
-  }
-}
+{% set sensu = {} %}
+{% set uchiwa = {} %}
+{% set _sensu_host = {} %}
+{% set _sensu_hosts = [] %}
+{% set _uchiwa = {} %}
+{% for item in sensu_uchiwa_info['sensu_hosts'] %}
+{%   set _host = _sensu_host.update({"host": item['host']}) %}
+{%   if item['name'] is defined %}
+{%     set _host = _sensu_host.update({"name": item['name']}) %}
+{%   endif %}
+{%   set _host = _sensu_host.update({"port": item['port']|int}) %}
+{%   set _sensu_hosts = _sensu_hosts.append(_sensu_host) %}
+{% endfor %}
+{% set _sensu = uchiwa.update({"sensu": _sensu_hosts}) %}
+{% set _opts = _uchiwa.update({"host": sensu_uchiwa_info['host']}) %}
+{% set _opts = _uchiwa.update({"port": sensu_uchiwa_info['port']|int}) %}
+{% set __uchiwa = uchiwa.update({"uchiwa": _uchiwa}) %}
+{{ uchiwa|to_nice_json }}

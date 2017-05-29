@@ -3,6 +3,7 @@
   yum:
     name: "epel-release"
     state: "present"
+  become: true
   when: >
         ansible_distribution != "Fedora"
 
@@ -10,5 +11,5 @@
   yum:
     name: "kea"
     state: "present"
-  when: >
-        ansible_distribution != "Fedora"  
+  become: true
+  when: ansible_distribution != "Fedora"

@@ -3,14 +3,12 @@
 - name: restart apache2
   service:
     name: "apache2"
-    state: restarted
+    state: "restarted"
+  become: true
 
-- name: restart zabbix-agent
-  service:
-    name: "zabbix-agent"
-    state: restarted
-        
 - name: restart zabbix-server
   service:
     name: "zabbix-server"
-    state: restarted
+    state: "restarted"
+    enabled: true
+  become: true

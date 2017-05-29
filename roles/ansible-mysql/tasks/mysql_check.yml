@@ -3,6 +3,7 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'xinetd'
   when: >
@@ -12,6 +13,7 @@
   template:
     src: "etc/xinetd.d/mysqlchk.j2"
     dest: "/etc/xinetd.d/mysqlchk"
+  become: true
   when: >
         ansible_os_family == "Debian"
 
@@ -19,6 +21,7 @@
   service:
     name: "xinetd"
     enabled: true
+  become: true
   when: >
         ansible_os_family == "Debian"
 
@@ -33,6 +36,7 @@
     owner: "root"
     group: "root"
     mode: 0775
+  become: true
 
 - name: mysql_check | configuring {{ mysql_mysqlchk_user }} permissions for MySQL
   mysql_user:
@@ -40,3 +44,4 @@
     password: "{{ mysql_mysqlchk_pass }}"
     priv: "*.*:SELECT"
     state: "present"
+  become: true

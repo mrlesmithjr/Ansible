@@ -1,0 +1,49 @@
+---
+- name: services | configuring consul service (upstart)
+  template:
+    src: "etc/init/consul.conf.j2"
+    dest: "/etc/init/consul.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart consul"
+  when: ansible_service_mgr == "upstart"
+
+- name: services | configuring consul service (systemd)
+  template:
+    src: "etc/systemd/system/consul.service.j2"
+    dest: "/etc/systemd/system/consul.service"
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify:
+    - reload systemd
+    - restart consul
+  when: ansible_service_mgr == "systemd"
+
+- name: services | ensuring consul service is enabled
+  service:
+    name: "consul"
+    enabled: yes
+  become: true
+  when: not ansible_check_mode
+
+# This ensures that configurations are in place prior to configuring app_services
+- name: services | restarting consul if re-configured
+  service:
+    name: "consul"
+    state: "restarted"
+  become: true
+  when: >
+        consul_reconfigured['changed'] and
+        not ansible_check_mode
+
+- name: services | checking to ensure consul agent is listening
+  wait_for:
+    port: 8500
+    delay: 10
+  when: >
+        consul_reconfigured['changed'] and
+        not ansible_check_mode

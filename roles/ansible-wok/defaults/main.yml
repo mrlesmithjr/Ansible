@@ -1,0 +1,64 @@
+---
+# defaults file for ansible-wok
+
+# https://github.com/kimchi-project/wok/blob/master/docs/ubuntu-deps.md#build-dependencies
+wok_debian_build_dependencies:
+  - 'autoconf'
+  - 'automake'
+  - 'gcc'
+  - 'gettext'
+  - 'git'
+  - 'logrotate'
+  - 'make'
+  - 'pkgconf'
+  - 'xsltproc'
+
+# https://github.com/kimchi-project/wok/blob/master/docs/ubuntu-deps.md#runtime-dependencies
+wok_debian_runtime_dependencies:
+  - 'fonts-font-awesome'
+  - 'nginx'
+  - 'openssl'
+  - 'python-cheetah'
+  - 'python-cherrypy3'
+  - 'python-jsonschema'
+  - 'python-ldap'
+  - 'python-lxml'
+  - 'python-m2crypto'
+  - 'python-pam'
+  - 'python-psutil'
+  - 'websockify'
+
+wok_debian_plugins:
+    # Basic host management for WoK
+  - name: 'ginger-base'
+    dl: '{{ wok_download_url }}/gingerbase/downloads/latest/ginger-base.noarch.deb'
+  #   # Wok plugin for host managment
+  # - name: 'ginger'
+  #   dl: '{{ wok_download_url }}/ginger/downloads/latest/ginger.noarch.deb'
+    # Basic host management for WoK
+  - name: 'kimchi'
+    dl: '{{ wok_download_url }}/kimchi/downloads/latest/kimchi.noarch.deb'
+
+wok_download_url: 'http://kimchi-project.github.io'
+wok_download: '{{ wok_download_url }}/wok/downloads/latest/wok.noarch.deb'
+
+wok_kimchi_config:
+  # Memory in MB
+  current: 1024
+  disks:
+      # Disk size in GB
+    - size: 10
+      # Disk format
+      format: 'qcow2'
+      # Storage pool used to handle the guest disk
+      pool: 'default'
+  # Maximum value of memory to be assigned to guest in MB
+  maxmemory: 1024
+  # When specifying CPU topology, make sure maxvcpus value is equal to the
+  # product of sockets, cores, and threads.
+  maxvcpus: 1
+  # Represents the virtual network interfaces to be assigned to guest
+  networks:
+    - 'default'
+  # Number of vcpus
+  vcpus: 1

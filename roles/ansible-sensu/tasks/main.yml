@@ -8,6 +8,8 @@
 
 - include: config_server.yml
   when: sensu_server
+  tags:
+    - sensu_config
 
 - include: config_plugins.yml
 

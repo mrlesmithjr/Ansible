@@ -27,3 +27,8 @@ wsrep_provider_options="gmcast.segment={{ galera_gmcast_segment }}"
 wsrep_provider_options="ist.recv_addr={{ galera_ist_recv_addr }}:{{ galera_ist_recv_addr_port }}"
 wsrep_provider_options="ist.recv_bind={{ galera_ist_recv_bind }}"
 wsrep_node_address="{{ galera_wsrep_node_address }}"
+
+{% if galera_extra_wsrep_provider_options is defined %}
+wsrep_provider_options = "{% for item in galera_extra_wsrep_provider_options %}{% set _key = item.split(': ')[0] %}{% set _val = galera_extra_wsrep_provider_options[_key] %}{{ _key }} = {{ _val }}{% if not loop.last %}; {% endif %}{% endfor %}"
+
+{% endif %}

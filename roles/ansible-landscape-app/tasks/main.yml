@@ -1,0 +1,8 @@
+---
+# tasks file for ansible-landscape-app
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: rabbitmq.yml
+
+- include: config.yml

@@ -8,6 +8,7 @@
   tags:
     - "stackstorm-ssh-keys"
     - "stackstorm-user"
+  become: true
 
 - name: users | Configuring Sudoers For User {{ stackstorm_ssh_info.user }}
   template:
@@ -18,6 +19,7 @@
     mode: 0440
   tags:
     - "stackstorm-user"
+  become: true
 
 # Download SSH Pub Key for SSH User
 # We can then push this key out to remote hosts authorized_keys
@@ -29,3 +31,4 @@
   tags:
     - "stackstorm-ssh-keys"
     - "stackstorm-user"
+  become: true

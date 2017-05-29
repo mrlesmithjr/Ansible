@@ -1,6 +1,6 @@
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs and configures Zabbix agent monitoring (https://www.zabbix.com)
+  description: An [Ansible] role to install/configure [Zabbix] Agent
   #company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -129,7 +129,7 @@ galaxy_info:
   #  - utopic
   #  - vivid
   #  - wily
-  #  - xenial
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

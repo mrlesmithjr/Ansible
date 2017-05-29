@@ -3,12 +3,14 @@
   yum:
     name: "dnsmasq"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Installing DNSMasq
   dnf:
     name: "dnsmasq"
     state: "present"
+  become: true
   when: ansible_distribution == "Fedora"
 
 - name: redhat | Ensuring DNSMasq Service is Enabled and Started
@@ -16,3 +18,4 @@
     name: "dnsmasq"
     state: "started"
     enabled: yes
+  become: true

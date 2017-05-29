@@ -2,15 +2,16 @@
 - name: configure_zabbix_agent | installing agent package
   apt:
     name: "zabbix-agent"
-    state: latest
+    state: "present"
+  become: true
   when: ansible_os_family == "Debian"
 
 - name: configure_zabbix_agent | configuring agent
   template:
     src: "etc/zabbix/zabbix_agentd.conf.j2"
     dest: "/etc/zabbix/zabbix_agentd.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - restart zabbix-agent
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart zabbix-agent"

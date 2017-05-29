@@ -10,14 +10,23 @@
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include: config_consul.yml
+- include: install.yml
 
-- include: config_app_services.yml
+- include: config.yml
+
+- include: services.yml
+
+- include: clients.yml
+  when: >
+        ((groups[consul_clients_group] is defined and inventory_hostname
+        in groups[consul_clients_group]))
+
+- include: app_services.yml
   tags:
     - consul-app-services
   when: >
-        consul_services is defined and
-        inventory_hostname in groups[consul_clients_group]
+        ((groups[consul_clients_group] is defined and inventory_hostname
+        in groups[consul_clients_group])) and consul_services is defined
 
 - include: dnsmasq.yml
   when: >

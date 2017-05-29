@@ -1,0 +1,13 @@
+---
+# tasks file for ansible-redis
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: opensuse.yml
+  when: ansible_os_family == "openSUSE Leap"
+
+- include: tweaks.yml
+  when: redis_enable_tweaks

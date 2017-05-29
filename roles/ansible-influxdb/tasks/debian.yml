@@ -3,19 +3,23 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ influxdb_debian_pre_reqs }}'
 
 - name: debian | Adding InfluxDB Repo Key
   apt_key:
     url: "{{ influxdb_debian_repo_key }}"
     state: "present"
+  become: true
 
 - name: debian | Adding InfluxDB Repo
   apt_repository:
     repo: "{{ influxdb_debian_repo }}"
     state: "present"
+  become: true
 
 - name: debian | Installing InfluxDB
   apt:
     name: "influxdb"
     state: "present"
+  become: true

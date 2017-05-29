@@ -6,5 +6,6 @@
     owner: "root"
     group: "root"
     mode: "u=rw,g=r,o=r"
+  become: true
   notify:
     - restart keepalived

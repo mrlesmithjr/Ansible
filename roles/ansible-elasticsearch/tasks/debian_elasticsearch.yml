@@ -3,24 +3,29 @@
   apt_key:
     url: "{{ es_repo_key }}"
     state: present
+  become: true
 
 - name: debian_elasticsearch | adding elasticsearch repo
   apt_repository:
     repo: "{{ es_debian_repo }}"
     state: present
+  become: true
 
 - name: debian_elasticsearch | installing java
   apt:
     name: "default-jre-headless"
     state: "present"
+  become: true
 
 - name: debian_elasticsearch | installing elasticsearch
   apt:
     name: "elasticsearch={{ es_minor_version }}"
     state: "present"
+  become: true
 
 - name: debian_elasticsearch | ensuring elasticsearch service is started and enabled on boot
   service:
     name: "elasticsearch"
     state: started
     enabled: yes
+  become: true

@@ -4,21 +4,26 @@
   service:
     name: "squid"
     state: "restarted"
+  become: true
 
 - name: restart squid3
   service:
     name: "squid3"
     state: "restarted"
+  become: true
 
 - name: reload haproxy
   service:
     name: "haproxy"
     state: "reloaded"
+  become: true
 
 - name: restart haproxy
   service:
     name: "haproxy"
     state: "restarted"
+  become: true
 
 - name: reload ferm
   shell: service ferm force-reload
+  become: true

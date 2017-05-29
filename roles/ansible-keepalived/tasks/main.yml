@@ -9,6 +9,4 @@
 - include: config_keepalived.yml
   tags:
     - config_keepalived
-  when: >
-        config_keepalived is defined and
-        config_keepalived
+  when: keepalived_config

@@ -1,0 +1,22 @@
+---
+- name: install | Downloading Prometheus Node Exporter {{ prometheus_node_exporter_version }}
+  get_url:
+    url: "{{ prometheus_node_exporter_download }}"
+    dest: "{{ prometheus_node_exporter_source_dir }}/"
+  become: true
+
+- name: install | Extracting Prometheus Node Exporter From {{ prometheus_node_exporter_source_dir }} To {{ prometheus_node_exporter_install_dir }}
+  unarchive:
+    src: "{{ prometheus_node_exporter_source_dir }}/{{ prometheus_node_exporter_download|basename }}"
+    dest: "{{ prometheus_node_exporter_install_dir }}"
+    copy: false
+  args:
+    creates: "{{ prometheus_node_exporter_install_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64/node_exporter"
+  become: true
+
+- name: install | Creating Symlink For Prometheus ({{ prometheus_node_exporter_install_dir }}/node_exporter)
+  file:
+    src: "{{ prometheus_node_exporter_install_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64"
+    dest: "{{ prometheus_node_exporter_install_dir }}/node_exporter"
+    state: "link"
+  become: true

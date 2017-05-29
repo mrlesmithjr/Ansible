@@ -1,0 +1,79 @@
+---
+- name: 'node0'
+  ansible_groups:
+    - 'k8s'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  # disks:
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  interfaces:
+    - ip: '192.168.250.10'
+      auto_config: true
+      method: 'static'
+  #   - ip: '192.168.1.10'
+  #     auto_config: false
+  #     method: 'static'
+  #     network_name: 'network-1'
+  mem: '1024'
+  provision: true
+  vcpu: '1'
+  # port_forwards:
+  #   - guest: '80'
+  #     host: '8080'
+  #   - guest: '443'
+  #     host: '4433'
+- name: 'node1'
+  ansible_groups:
+    - 'k8s'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  # disks:
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  interfaces:
+    - ip: '192.168.250.11'
+      auto_config: true
+      method: 'static'
+  #   - ip: '192.168.1.10'
+  #     auto_config: false
+  #     method: 'static'
+  #     network_name: 'network-1'
+  mem: '1024'
+  provision: true
+  vcpu: '1'
+  # port_forwards:
+  #   - guest: '80'
+  #     host: '8080'
+  #   - guest: '443'
+  #     host: '4433'
+- name: 'node2'
+  ansible_groups:
+    - 'k8s'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  # disks:
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  interfaces:
+    - ip: '192.168.250.12'
+      auto_config: true
+      method: 'static'
+  #   - ip: '192.168.1.10'
+  #     auto_config: false
+  #     method: 'static'
+  #     network_name: 'network-1'
+  mem: '1024'
+  provision: true
+  vcpu: '1'
+  # port_forwards:
+  #   - guest: '80'
+  #     host: '8080'
+  #   - guest: '443'
+  #     host: '4433'

@@ -1,0 +1,40 @@
+---
+- name: config | Checking If Bro IDS Has Been Installed
+  stat:
+    path: "/etc/bro/.bro_ids_installed"
+  register: "_bro_ids_installed_check"
+
+# Need to install Bro-IDS using broctl to initialize
+- name: config | Installing Bro IDS (broctl install)
+  command: "broctl install"
+  register: "_bro_ids_installed"
+  become: true
+  when: not _bro_ids_installed_check['stat']['exists']
+
+- name: config | Marking Bro IDS As Installed
+  file:
+    path: "/etc/bro/.bro_ids_installed"
+    state: "touch"
+  become: true
+  when: _bro_ids_installed['changed']
+
+- name: config | Configuring Bro IDS (node.cfg)
+  template:
+    src: "etc/bro/node.cfg.j2"
+    dest: "/etc/bro/node.cfg"
+  become: true
+  notify: "restart bro-ids"
+
+- name: config | Configuring Bro IDS (networks.cfg)
+  template:
+    src: "etc/bro/networks.cfg.j2"
+    dest: "/etc/bro/networks.cfg"
+  become: true
+  notify: "restart bro-ids"
+
+- name: config | Configuring Bro IDS (broctl.cfg)
+  template:
+    src: "etc/bro/broctl.cfg.j2"
+    dest: "/etc/bro/broctl.cfg"
+  become: true
+  notify: "restart bro-ids"

@@ -7,7 +7,7 @@ mysql_allow_remote_connections: false
 # Defines hosts where root can login from
 mysql_allow_root_access_from_hosts:
   - '{{ ansible_hostname }}'
-  - '127.0.0.1'
+  - 127.0.0.1
   - '::1'
   - 'localhost'
 #  - '%'
@@ -41,7 +41,7 @@ mysql_enable_cacti_monitoring: false
 mysql_mem_multiplier: .25
 
 # Defines the port for mysql to listen on
-mysql_port: '3306'
+mysql_port: 3306
 
 mysql_replication_account_info:
   user: 'replicator'
@@ -53,10 +53,10 @@ mysql_replication_master_node: 'node0'
 mysql_replication_nodes:
   - name: 'node0'
     role: 'master'
-    server_id: '1'
+    server_id: 1
   - name: 'node1'
     role: 'slave'
-    server_id: '2'
+    server_id: 2
 
 # Defines mysql root password
 # generate using echo password | mkpasswd -s -m sha-512
@@ -65,27 +65,28 @@ mysql_root_password: 'root'
 mysql_settings:
   collation_server: 'latin1_swedish_ci'
   character_set_client: 'latin1'
-  expire_logs_days: '10'
+  expire_logs_days: 10
   # ON|OFF
+  innodb_buffer_pool_size: 128M
   innodb_doublewrite: 'ON'
-  innodb_flush_log_at_timeout: '1'
-  innodb_read_io_threads: '4'
-  innodb_write_io_threads: '4'
-  join_buffer_size: '1M'
+  innodb_flush_log_at_timeout: 1
+  innodb_read_io_threads: 4
+  innodb_write_io_threads: 4
+  join_buffer_size: 1M
   #Default is 16M
   key_buffer_size: '{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M'
-  max_allowed_packet: '16M'
-  max_binlog_size: '100M'
-  max_connections: '150'
-  max_heap_table_size: '16M'
-  query_cache_limit: '1M'
-  query_cache_size: '16M'
-  thread_cache_size: '8'
-  thread_stack: '192K'
-  tmp_table_size: '16M'
+  max_allowed_packet: 16M
+  max_binlog_size: 100M
+  max_connections: 150
+  max_heap_table_size: 16M
+  query_cache_limit: 1M
+  query_cache_size: 16M
+  thread_cache_size: 8
+  thread_stack: 192K
+  tmp_table_size: 16M
 
 # Defines the host to run mysqlchk against...usually localhost
-mysql_mysqlchk_host: '127.0.0.1'
+mysql_mysqlchk_host: 127.0.0.1
 
 # Defines mysqlchk options to pass
 mysql_mysqlchk_opts: '-N -q -A'

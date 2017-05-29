@@ -1,0 +1,5 @@
+# This tells the slave to keep pulling WALs from master.
+standby_mode = on
+
+# This is how to connect to the master.
+primary_conninfo = 'host={{ postgresql_master_ip }} user={{ postgresql_replication['user'] }}'

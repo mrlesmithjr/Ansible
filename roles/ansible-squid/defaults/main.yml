@@ -1,32 +1,128 @@
 ---
 # defaults file for ansible-squid
-squid_acl_localnet: [] #defines local subnets to allow to connect to squid
-#  - 10.0.0.0/8
-#  - 172.16.0.0/16
-#  - 192.168.0.0/16
-squid_cache_peer: [] #defines squid peers to sync with #do not enter FQDN...It will be added
-#  - host: squid-1  #do not enter FQDN...hostname only
-#    domain: '{{ squid_pri_domain_name }}'  #enter domain name for hostname above
-#    type: sibling
-#    proxy_port: '{{ squid_http_port }}'
-#    icp_port: '{{ squid_icp_port }}'
-#    options: default
-#  - host: squid-2  #do not enter FQDN...hostname only
-#    domain: '{{ squid_pri_domain_name }}'  #enter domain name for hostname above
-#    type: sibling
-#    proxy_port: '{{ squid_http_port }}'
-#    icp_port: '{{ squid_icp_port }}'
-#    options: default
-squid_cache_peering: false  #define here or in group_vars/group
-squid_enable_haproxy: false  #defines if haproxy should be installed
-squid_haproxy_http_port: '8080'  #define load balanced port for clients to connect to if haproxy is used
-squid_http_port: '3128'  #define here or in group_vars/group
-squid_icp_access: 'all'  #define here or in group_vars/group
-squid_icp_port: '3130'  #define here or in group_vars/group
-squid_keepalived_vip: [] #defines keepalived vip if keepalived is used
-squid_pri_domain_name: 'example.org'  #define primary domain name
-squid_servers: []  #defines squid servers to configure haproxy if used
-#  - squid-1
-#  - squid-2
-squid_transparent_proxy: false  #defines if squid should function in transparent mode
-squid_transparent_proxy_ferm: false  #defines if squid transparent should configure ferm firewall for masquerading
+
+# acl aclname acltype argument
+squid_acl:
+  - name: 'SSL_ports'
+    type: 'port'
+    arg: '443'
+  - name: 'CONNECT'
+    type: 'method'
+    arg: 'CONNECT'
+
+# Adapt to list your (internal) IP networks from where browsing
+# should be allowed
+squid_acl_localnet:
+  - '10.0.0.0/8'
+  - '172.16.0.0/16'
+  - '192.168.0.0/16'
+
+squid_acl_safeports:
+  - port: '21'
+    comment: 'ftp'
+  - port: '70'
+    comment: 'gopher'
+  - port: '80'
+    comment: 'http'
+  - port: '210'
+    comment: 'wais'
+  - port: '280'
+    comment: 'http-mgmt'
+  - port: '443'
+    comment: 'https'
+  - port: '488'
+    comment: 'gss-http'
+  - port: '591'
+    comment: 'filemaker'
+  - port: '777'
+    comment: 'multiling http'
+  - port: '1025-65535'
+    comment: 'unregistered ports'
+
+# Defines squid peers to sync with
+# #do not enter FQDN...It will be added
+squid_cache_peer: []
+ #   # do not enter FQDN...hostname only
+ # - host: squid-1
+ #   #enter domain name for hostname above
+ #   domain: '{{ squid_pri_domain_name }}'
+ #   type: sibling
+ #   proxy_port: '{{ squid_http_port }}'
+ #   icp_port: '{{ squid_icp_port }}'
+ #   options: default
+ #   # do not enter FQDN...hostname only
+ # - host: squid-2
+ #   # enter domain name for hostname above
+ #   domain: '{{ squid_pri_domain_name }}'
+ #   type: sibling
+ #   proxy_port: '{{ squid_http_port }}'
+ #   icp_port: '{{ squid_icp_port }}'
+ #   options: default
+
+squid_cache_peering: false
+
+squid_http_access:
+  - action: 'deny'
+    acl:
+      - '!Safe_ports'
+  - action: 'deny'
+    acl:
+      - 'CONNECT'
+      - '!SSL_ports'
+  - action: 'allow'
+    acl:
+      - 'localhost'
+      - 'manager'
+  - action: 'deny'
+    acl:
+      - 'manager'
+  - action: 'allow'
+    acl:
+      - 'localhost'
+  - action: 'allow'
+    acl:
+      - 'localnet'
+  - action: 'deny'
+    acl:
+      - 'all'
+
+squid_http_port: '3128'
+
+squid_icp_access: 'all'
+
+squid_icp_port: '3130'
+
+# Define primary domain name
+squid_pri_domain_name: 'example.org'
+
+squid_refresh_patterns:
+  - regex: '^ftp:'
+    min: '1440'
+    percent: '20%'
+    max: '10080'
+  - regex: '^gopher:'
+    min: '1440'
+    percent: '0%'
+    max: '1440'
+  - regex: '-i (/cgi-bin/|\?)'
+    min: '0'
+    percent: '0%'
+    max: '0'
+  - regex: '(Release|Packages(.gz)*)$'
+    min: '0'
+    percent: '20%'
+    max: '2880'
+  # - regex: '(\.deb|\.udeb)$'
+  #   min: '129600'
+  #   percent: '100%'
+  #   max: '129600'
+  - regex: '.'
+    min: '0'
+    percent: '20%'
+    max: '4320'
+
+# Defines if squid should function in transparent mode
+squid_transparent_proxy: false
+
+# Defines if squid transparent should configure ferm firewall for masquerading
+squid_transparent_proxy_ferm: false

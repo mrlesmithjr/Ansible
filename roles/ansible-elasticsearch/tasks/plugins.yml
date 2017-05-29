@@ -18,6 +18,7 @@
   register: es_plugins_installed
   always_run: yes
   changed_when: false
+  become: true
 
 - name: plugins | Capturing Currently Installed Plugins
   debug: var=es_plugins_installed
@@ -25,6 +26,7 @@
 
 - name: plugins | uninstalling plugins
   shell: '{{ es_plugin_bin }} -r {{ item }}'
+  become: true
   with_items: es_plugins_installed.stdout
   when: >
         (es_uninstall_plugins is defined and
@@ -32,6 +34,7 @@
         es_major_version|int == 1.7
 
 - name: plugins | installing plugins
+  become: true
   command: '{{ es_plugin_bin }} {{ es_plugin_install }} {{ item.plugin }}'
   with_items: '{{ es_plugins }}'
   when: >

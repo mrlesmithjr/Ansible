@@ -1,11 +1,13 @@
-{
-  "client":{
-    "name": "{{ ansible_hostname }}",
-    "address": "{{ sensu_client_address }}",
-    "subscriptions": [
+{% set client = {} %}
+{% set _client = {} %}
+{% set _client_subs = [] %}
+{% set _opts = _client.update({"name": ansible_hostname}) %}
+{% set _opts = _client.update({"address": sensu_client_address}) %}
 {% if sensu_client_subscriptions is defined %}
-    "{{ sensu_client_subscriptions|join ('", "')}}"
+{%   for item in sensu_client_subscriptions %}
+{%   set _client_subs = _client_subs.append(item) %}
+{%   endfor %}
 {% endif %}
-    ]
-  }
-}
+{% set _opts = _client.update({"subscriptions": _client_subs}) %}
+{% set __client = client.update({"client": _client}) %}
+{{ client|to_nice_json }}

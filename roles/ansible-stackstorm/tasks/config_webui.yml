@@ -5,21 +5,25 @@
     name: "{{ stackstorm_webui_login_info.user }}"
     password: "{{ stackstorm_webui_login_info.password }}"
     state: "present"
+  become: true
 
 - name: config_webui | Ensuring {{ stackstorm_ssl_info.cert_dir }} Directory Exists
   file:
     path: "{{ stackstorm_ssl_info.cert_dir }}"
     state: "directory"
+  become: true
 
 - name: config_webui | Generating SSL Certs
   command: "openssl req -x509 -newkey rsa:2048 -keyout {{ stackstorm_ssl_info.cert_dir }}/st2.key -out {{ stackstorm_ssl_info.cert_dir }}/st2.crt -days {{ stackstorm_ssl_info.cert_days }} -nodes -subj \"{{ stackstorm_ssl_info.cert_info }}\""
   args:
     creates: "{{ stackstorm_ssl_info.cert_dir }}/st2.crt"
+  become: true
 
 - name: config_webui | Removing NGINX Default Website
   file:
     path: "/etc/nginx/sites-enabled/default"
     state: "absent"
+  become: true
 
 - name: config_webui | Configuring Stackstorm NGINX Site
   template:
@@ -28,6 +32,7 @@
     owner: "root"
     group: "root"
     mode: 0644
+  become: true
   notify:
     - "restart nginx"
 
@@ -36,3 +41,4 @@
     src: "/etc/nginx/sites-available/st2.conf"
     dest: "/etc/nginx/sites-enabled/st2.conf"
     state: "link"
+  become: true

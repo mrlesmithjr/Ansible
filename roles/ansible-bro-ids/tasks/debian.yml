@@ -1,0 +1,14 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ bro_ids_debian_pre_reqs }}'
+
+- name: debian | Installing Bro IDS
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ bro_ids_debian_packages }}'

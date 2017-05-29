@@ -3,15 +3,18 @@
   apt_key:
     url: "{{ sensu_debian_repo_key }}"
     state: present
+  become: true
 
 - name: debian_client | adding sensu repo
   apt_repository:
     repo: "{{ sensu_debian_repo }}"
     state: present
+  become: true
 
 - name: debian_client | adding brightbox ruby repository
   apt_repository:
     repo: 'ppa:brightbox/ruby-ng'
+  become: true
   when: >
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04')
@@ -20,19 +23,22 @@
   apt:
     name: "{{ item }}"
     state: present
-  with_items: sensu_client_debian_packages
+  become: true
+  with_items: '{{ sensu_client_debian_packages }}'
 
 - name: debian_client | ensuring services are enabled and start on boot
   service:
     name: "{{ item }}"
     enabled: yes
-  with_items: sensu_client_services
+  become: true
+  with_items: '{{ sensu_client_services }}'
 
 - name: debian_client | Disabling Sensu Server Service
   service:
     name: "{{ item }}"
     enabled: no
     state: "stopped"
+  become: true
   with_items:
     - 'sensu-api'
     - 'sensu-server'

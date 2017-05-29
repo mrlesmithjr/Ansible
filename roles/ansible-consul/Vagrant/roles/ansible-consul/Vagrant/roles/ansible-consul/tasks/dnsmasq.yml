@@ -2,15 +2,25 @@
 - name: dnsmasq | installing dnsmasq (Debian)
   apt:
     name: "dnsmasq"
-    state: present
+    state: "present"
   when: ansible_os_family == "Debian"
 
-- name: dnsmasq | installing dnsmasq (RedHat)
+- name: dnsmasq | installing dnsmasq (Fedora)
   dnf:
     name: "dnsmasq"
-    state: present
-  when: ansible_os_family == "RedHat"
-  
+    state: "present"
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+- name: dnsmasq | installing dnsmasq (RedHat, but not Fedora)
+  yum:
+    name: "dnsmasq"
+    state: "present"
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
 - name: dnsmasq | ensuring dnsmasq service is enabled
   service:
     name: "dnsmasq"
@@ -20,8 +30,8 @@
   template:
     src: "etc/dnsmasq.d/10-consul.j2"
     dest: "/etc/dnsmasq.d/10-consul"
-    owner: root
-    group: root
-    mode: 0644
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
   notify:
-    - restart dnsmasq
+    - "restart dnsmasq"

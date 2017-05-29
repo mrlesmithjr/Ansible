@@ -1,0 +1,23 @@
+{% set init_keys ={} %}
+{% set _unseal_keys = [] %}
+{% set _root_token = [] %}
+{% if _hashi_vault_init['stdout'] is defined %}
+{%   for item in _hashi_vault_init['stdout_lines'] %}
+{%     if loop.index <= 5 %}
+{%       set _keys = item.split(': ') %}
+{%       set _unseal_keys = _unseal_keys.append(_keys[1]) %}
+{%     elif loop.index == 6 %}
+{%       set _temp_root_token = item.split(': ') %}
+{%       set _root_token = _root_token.append(_temp_root_token[1]) %}
+{%     endif %}
+{%   endfor %}
+{%       set _unseal_keys = init_keys.update({"unseal_keys": _unseal_keys}) %}
+{%       set _root_token = init_keys.update({"root_token": _root_token}) %}
+{% elif _hashi_vault_init['json'] is defined %}
+{%   for item in _hashi_vault_init['json']['keys'] %}
+{%       set _unseal_keys = _unseal_keys.append(item) %}
+{%   endfor %}
+{%       set _unseal_keys = init_keys.update({"unseal_keys": _unseal_keys}) %}
+{%       set _root_token = init_keys.update({"root_token": _hashi_vault_init['json']['root_token']}) %}
+{{ init_keys|to_nice_json }}
+{% endif %}

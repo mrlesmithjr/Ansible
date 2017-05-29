@@ -1,0 +1,54 @@
+---
+# defaults file for ansible-k8s
+#
+k8s_admin_config: '/etc/kubernetes/admin.conf'
+
+# Define Ansible group which defines the K8s Cluster
+k8s_advertise_address_int: 'enp0s8'
+
+k8s_advertise_bind_port: '6443'
+
+k8s_cluster_group: 'k8s'
+
+k8s_dashboard: 'https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml'
+
+k8s_debian_packages:
+  - 'kubelet'
+  - 'kubeadm'
+  - 'kubectl'
+  - 'kubernetes-cni'
+
+k8s_debian_repo_info:
+  key: '{{ k8s_package_url }}/apt/doc/apt-key.gpg'
+  repo: 'deb http://apt.kubernetes.io/ kubernetes-{{ ansible_distribution_release|lower }} main'
+
+# https://github.com/kubernetes/helm
+k8s_helm_install: false
+
+k8s_helm_install_dir: '/usr/local/bin'
+
+k8s_helm_package: 'helm-v{{ k8s_helm_version }}-linux-amd64.tar.gz'
+
+k8s_helm_url: 'https://kubernetes-helm.storage.googleapis.com'
+
+k8s_helm_version: '2.3.0'
+
+k8s_package_url: 'https://packages.cloud.google.com'
+
+k8s_pod_network_config: 'https://git.io/weave-kube-1.6'
+
+k8s_reports:
+  all_pod_namespaces: true
+  all_service_namespaces: true
+  display_dashboard_link: true
+
+k8s_reset_cluster: false
+
+# Defines services which should be enabled on boot
+k8s_services:
+  - 'kubelet'
+
+k8s_token_file: '/etc/kubernetes/.k8s_token'
+
+k8s_users:
+  - user: 'vagrant'

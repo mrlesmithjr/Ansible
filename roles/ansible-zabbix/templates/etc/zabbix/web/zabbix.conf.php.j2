@@ -3,22 +3,17 @@
 global $DB;
 
 $DB['TYPE']     = 'MYSQL';
-$DB['SERVER']   = '{{ zabbix_db_info.host }}';
-$DB['PORT']     = '0';
-$DB['DATABASE'] = '{{ zabbix_db_info.name }}';
-$DB['USER']     = '{{ zabbix_db_info.user }}';
-$DB['PASSWORD'] = '{{ zabbix_db_info.password }}';
+$DB['SERVER']   = '{{ zabbix_db_info['host'] }}';
+$DB['PORT']     = '{{ zabbix_db_info['port'] }}';
+$DB['DATABASE'] = '{{ zabbix_db_info['name']}}';
+$DB['USER']     = '{{ zabbix_db_info['user'] }}';
+$DB['PASSWORD'] = '{{ zabbix_db_info['password'] }}';
 
 // Schema name. Used for IBM DB2 and PostgreSQL.
 $DB['SCHEMA'] = '';
 
-{% if inventory_hostname in groups[zabbix_server_group] %}
 $ZBX_SERVER      = 'localhost';
-{% elif inventory_hostname not in groups[zabbix_server_group] %}
-$ZBX_SERVER      = '{{ zabbix_server }}'
-{% endif %}
-$ZBX_SERVER_PORT = '{{ zabbix_server_port }}';
-$ZBX_SERVER_NAME = '{{ ansible_hostname }}';
+$ZBX_SERVER_PORT = '10051';
+$ZBX_SERVER_NAME = 'localhost';
 
 $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
-?>

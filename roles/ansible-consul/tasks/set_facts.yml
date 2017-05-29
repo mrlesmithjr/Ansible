@@ -1,4 +1,10 @@
 ---
+# Defines which node is the consul master
+- name: set_facts | Setting Consul Master
+  set_fact:
+    consul_master: '{{ groups[consul_servers_group][0] }}'
+  when: consul_cluster
+
 - name: set_facts | Setting Facts
   set_fact:
     consul_bind_address: "{{ hostvars[inventory_hostname]['ansible_' + consul_bind_interface]['ipv4']['address'] }}"
@@ -11,3 +17,4 @@
 
 - name: set_facts | Show Consul Master
   debug: var=consul_master
+  when: consul_cluster

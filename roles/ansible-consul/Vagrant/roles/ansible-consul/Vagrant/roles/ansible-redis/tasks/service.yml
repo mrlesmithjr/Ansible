@@ -1,0 +1,6 @@
+---
+- name: service | ensuring redis is enabled and started
+  service:
+    name: "{{ redis_service }}"
+    state: "started"
+    enabled: yes

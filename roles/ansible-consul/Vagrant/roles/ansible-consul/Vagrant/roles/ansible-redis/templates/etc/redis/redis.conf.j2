@@ -1,0 +1,109 @@
+{% if redis_daemonize %}
+daemonize yes
+{% elif not redis_daemonize %}
+daemonize no
+{% endif %}
+pidfile {{ redis_pid_file }}
+port {{ redis_port }}
+tcp-backlog {{ redis_tcp_backlog }}
+bind {{ redis_bind_addresses|join (' ') }}
+timeout 0
+tcp-keepalive 0
+loglevel notice
+logfile {{ redis_log_file }}
+{% if redis_syslog_logging %}
+syslog-enabled yes
+{% endif %}
+databases {{ redis_databases }}
+
+################################ SNAPSHOTTING  ################################
+
+{% for item in redis_save_to_disk %}
+save {{ item.seconds }} {{ item.changes }}
+{% endfor %}
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+dir {{ redis_working_directory }}
+
+################################# REPLICATION #################################
+
+{% if redis_replication %}
+{%   if redis_replication_master_address is defined and inventory_hostname != redis_replication_master %}
+slaveof {{ redis_replication_master_address }} {{ redis_port }}
+{%   endif %}
+{% endif %}
+slave-serve-stale-data yes
+slave-read-only yes
+repl-diskless-sync no
+repl-diskless-sync-delay 5
+repl-disable-tcp-nodelay no
+slave-priority 100
+
+################################## SECURITY ###################################
+
+
+################################### LIMITS ####################################
+
+maxclients {{ redis_max_clients }}
+{% if redis_maxmemory_config %}
+maxmemory {{ redis_maxmemory }}
+maxmemory-policy {{ redis_maxmemory_policy }}
+maxmemory-samples {{ redis_maxmemory_samples }}
+{% endif %}
+
+############################## APPEND ONLY MODE ###############################
+
+appendonly no
+appendfilename "appendonly.aof"
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+aof-load-truncated yes
+
+################################ LUA SCRIPTING  ###############################
+
+lua-time-limit 5000
+
+################################ REDIS CLUSTER  ###############################
+{% if redis_cluster %}
+cluster-enabled yes
+# cluster-node-timeout 15000
+# cluster-slave-validity-factor 10
+# cluster-migration-barrier 1
+# cluster-require-full-coverage yes
+{% elif not redis_cluster %}
+cluster-enabled no
+{% endif %}
+
+################################## SLOW LOG ###################################
+
+slowlog-log-slower-than 10000
+slowlog-max-len 128
+
+################################ LATENCY MONITOR ##############################
+
+latency-monitor-threshold 0
+
+############################# EVENT NOTIFICATION ##############################
+
+notify-keyspace-events ""
+
+############################### ADVANCED CONFIG ###############################
+
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-entries 512
+list-max-ziplist-value 64
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+activerehashing yes
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit slave 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+hz 10
+aof-rewrite-incremental-fsync yes

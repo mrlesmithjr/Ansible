@@ -1,0 +1,44 @@
+{{ item.logs| join (' ') }} {
+      {{ item.rotation }}
+{% if item.rotate is defined %}
+      rotate {{ item.rotate }}
+{% endif %}
+{% if item.compress %}
+      compress
+{% endif %}
+{% if item.copytruncate %}
+      copytruncate
+{% endif %}
+{% if item.create is defined %}
+      create {{ item.create.mode }} {{ item.create.owner }} {{ item.create.group }}
+{% endif %}
+{% if item.delaycompress %}
+      delaycompress
+{% endif %}
+{% if item.missingok %}
+      missingok
+{% endif %}
+{% if item.notifempty %}
+      notifempty
+{% endif %}
+{% if item.postrotate is defined %}
+      postrotate
+{%   for pr in item.postrotate %}
+            {{ pr }}
+{%   endfor %}
+      endscript
+{% endif %}
+{% if item.prerotate is defined %}
+      prerotate
+{%   for pr in item.prerotate %}
+            {{ pr }}
+{%   endfor %}
+      endscript
+{% endif %}
+{% if item.sharedscripts %}
+      sharedscripts
+{% endif %}
+{% if item.size is defined %}
+      size {{ item.size }}
+{% endif %}
+}

@@ -1,0 +1,7 @@
+{% if _k8s_get_services_all is defined and k8s_reports['display_dashboard_link'] %}
+{%   for item in (_k8s_get_services_all['stdout']|from_json)['items'] %}
+{%     if item['metadata']['name'] == 'kubernetes-dashboard' %}
+Kubernetes Dashboard Can be reached at: http://{{ hostvars[k8s_master]['k8s_advertise_address'] }}:{{ item['spec']['ports'][0]['nodePort'] }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

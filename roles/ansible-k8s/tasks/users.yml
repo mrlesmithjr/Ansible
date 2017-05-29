@@ -1,0 +1,26 @@
+---
+# We ensure that the folder exists to copy the {{ k8s_admin_config }} to the
+# users (defined in k8s_users) home/.kube
+- name: users | Ensuring Users home/user/.kube Exists
+  file:
+    path: "/home/{{ item['user'] }}/.kube"
+    owner: "{{ item['user'] }}"
+    group: "{{ item['user'] }}"
+    state: "directory"
+  become: true
+  with_items: '{{ k8s_users }}'
+  when: inventory_hostname == k8s_master
+
+# We copy the {{ k8s_admin_config }} to the
+# users (defined in k8s_users) home/.kube/config
+# This allows the user(s) to execute kubectl commands
+- name: users | Copying {{ k8s_admin_config }} To Users home/user/.kube/config
+  copy:
+    src: "{{ k8s_admin_config }}"
+    dest: "/home/{{ item['user'] }}/.kube/config"
+    remote_src: true
+    owner: "{{ item['user'] }}"
+    group: "{{ item['user'] }}"
+  become: true
+  with_items: '{{ k8s_users }}'
+  when: inventory_hostname == k8s_master

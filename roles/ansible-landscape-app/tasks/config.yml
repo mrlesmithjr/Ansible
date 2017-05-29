@@ -1,0 +1,91 @@
+---
+- name: config | Configuring Landscape
+  template:
+    src: "etc/landscape/service.conf.j2"
+    dest: "/etc/landscape/service.conf"
+    owner: "landscape"
+    group: "root"
+    mode: "u=rw,g=r,o="
+  become: true
+  notify: "restart landscape services"
+
+- name: config | Checking If Landscape Has Been Setup
+  stat:
+    path: "/etc/landscape/.landscape_setup"
+  register: "_landscape_setup_check"
+  when: not landscape_app_ha
+
+- name: config | Checking If Landscape Has Been Setup
+  stat:
+    path: "/etc/landscape/.landscape_setup"
+  register: "_landscape_setup_check"
+  when: >
+        landscape_app_ha and
+        (inventory_hostname == landscape_app_primary)
+
+- name: config | Running Landscape Setup
+  command: "setup-landscape-server"
+  become: true
+  register: "_landscape_setup"
+  when: >
+        not landscape_app_ha and
+        not _landscape_setup_check['stat']['exists']
+
+- name: config | Running Landscape Setup
+  command: "setup-landscape-server"
+  become: true
+  register: "_landscape_setup"
+  when: >
+        landscape_app_ha and
+        (inventory_hostname == landscape_app_primary) and
+        not _landscape_setup_check['stat']['exists']
+
+- name: config | Marking Landscape As Being Setup
+  file:
+    path: "/etc/landscape/.landscape_setup"
+    state: "touch"
+  become: true
+  when: _landscape_setup['changed']
+
+- name: config | Configuring Landscape Services
+  template:
+    src: "etc/default/landscape-server.j2"
+    dest: "/etc/default/landscape-server"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart landscape services"
+
+- name: config | Configuring Apache2
+  template:
+    src: "etc/apache2/sites-available/landscape.conf.j2"
+    dest: "/etc/apache2/sites-available/landscape.conf"
+  become: true
+  register: "_landscape_apache2_configured"
+  notify: "restart apache2"
+
+- name: config | Configuring Apache2 Modules
+  apache2_module:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  notify: "restart apache2"
+  with_items:
+    - 'expires'
+    - 'headers'
+    - 'proxy_http'
+    - 'rewrite'
+    - 'ssl'
+
+- name: config | Disabling Apache2 Default Site
+  command: "a2dissite 000-default"
+  become: true
+  notify: "restart apache2"
+  when: _landscape_apache2_configured['changed']
+
+- name: config | Enabling Landscape Apache2 Site
+  command: "a2ensite landscape.conf"
+  become: true
+  notify: "restart apache2"
+  when: _landscape_apache2_configured['changed']

@@ -3,12 +3,14 @@
   apt:
     name: "ferm"
     state: "present"
+  become: true
   when: ansible_os_family == "Debian"
 
 - name: config_squid_transparent_proxy | ensuring ferm is installed (RedHat)
   yum:
     name: "ferm"
     state: "present"
+  become: true
   when: ansible_os_family == "RedHat"
 
 - name: config_squid_transparent_proxy | creating ferm directory
@@ -17,6 +19,7 @@
     state: "directory"
     owner: "root"
     group: "root"
+  become: true
 
 - name: config_squid_transparent_proxy | creating ferm configuration directory
   file:
@@ -24,17 +27,20 @@
     state: "directory"
     owner: "root"
     group: "root"
+  become: true
 
 - name: config_squid_transparent_proxy | configuring ferm default rules
   template:
     src: "etc/ferm/ferm.conf.j2"
     dest: "/etc/ferm/ferm.conf"
+  become: true
   notify: "reload ferm"
 
 - name: config_squid_transparent_proxy | configuring transparent proxy rule(s)
   template:
     src: "etc/ferm/ferm.d/900_transparent_squid_proxy.conf.j2"
     dest: "/etc/ferm/ferm.d/900_transparent_squid_proxy.conf"
+  become: true
   notify: "reload ferm"
 
 - name: config_squid_transparent_proxy | creating symlink for RedHat based installs
@@ -44,6 +50,7 @@
     owner: "root"
     group: "root"
     state: "link"
+  become: true
   notify: "reload ferm"
   when: ansible_os_family == "RedHat"
 
@@ -52,3 +59,4 @@
     name: "ferm"
     state: "started"
     enabled: yes
+  become: true

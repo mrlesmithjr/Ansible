@@ -3,12 +3,14 @@
   yum:
     name: "epel-release"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing dependencies
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'python-devel'
     - 'python-pip'
@@ -20,6 +22,7 @@
   dnf:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'libselinux-python'
     - 'python-devel'
@@ -34,6 +37,7 @@
     state: "present"
   notify:
     - 'start redis'
+  become: true
   when: >
         ansible_distribution != "Fedora" and
         not redis_install_from_source
@@ -44,6 +48,7 @@
     state: "present"
   notify:
     - 'start redis'
+  become: true
   when: >
         ansible_distribution == "Fedora" and
         not redis_install_from_source

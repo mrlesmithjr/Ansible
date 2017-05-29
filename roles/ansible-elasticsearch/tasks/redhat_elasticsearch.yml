@@ -3,34 +3,40 @@
   rpm_key:
     key: "{{ es_repo_key }}"
     state: present
+  become: true
 
 - name: redhat_elasticsearch | adding elasticsearch repo
   template:
     src: elasticsearch_repo.j2
     dest: /etc/yum.repos.d/elasticsearch.repo
+  become: true
 
 - name: redhat_elasticsearch | installing java
   yum:
     name: "java-{{ es_java_version }}-openjdk-headless"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat_elasticsearch | installing elasticsearch
   yum:
     name: "elasticsearch-{{ es_minor_version }}"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat_elasticsearch | installing java
   dnf:
     name: "java"
     state: "present"
+  become: true
   when: ansible_distribution == "Fedora"
 
 - name: redhat_elasticsearch | installing elasticsearch
   dnf:
     name: "elasticsearch-{{ es_minor_version }}"
     state: "present"
+  become: true
   when: ansible_distribution == "Fedora"
 
 - name: redhat_elasticsearch | ensuring elasticsearch is running and enabled
@@ -38,3 +44,4 @@
     name: "elasticsearch"
     state: started
     enabled: yes
+  become: true

@@ -1,0 +1,10 @@
+---
+- name: service | Configuring Prometheus Service
+  template:
+    src: "etc/systemd/system/prometheus.service.j2"
+    dest: "/etc/systemd/system/prometheus.service"
+  notify:
+    - reload systemd
+    - restart prometheus
+  become: true
+  when: ansible_service_mgr == "systemd"

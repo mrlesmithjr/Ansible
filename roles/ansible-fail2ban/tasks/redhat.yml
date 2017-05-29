@@ -1,0 +1,26 @@
+---
+- name: redhat | Installing Fail2ban (Fedora)
+  dnf:
+    name: "fail2ban"
+    state: "present"
+  become: true
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing Fail2ban (RedHat)
+  yum:
+    name: "fail2ban"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Ensuring PID ({{ fail2ban_pid_file }}) Directory Exists
+  file:
+    path: "{{ fail2ban_pid_file|dirname }}"
+    state: "directory"
+  become: true
+
+- name: redhat | Ensuring Socket ({{ fail2ban_socket }}) Directory Exists
+  file:
+    path: "{{ fail2ban_socket|dirname }}"
+    state: "directory"
+  become: true

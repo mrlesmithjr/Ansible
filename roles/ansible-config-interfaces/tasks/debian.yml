@@ -1,30 +1,29 @@
 ---
 - name: debian | Installing Pre-Req Packages
   apt:
-    name: "{{ item }}"
+    name: "lldpd"
     state: "present"
-  with_items: '{{ config_interfaces_debian_packages }}'
+  become: true
 
-- name: debian | Installing ifenslave
+- name: debian | Installing bridge-utils
+  apt:
+    name: "bridge-utils"
+  become: true
+  when: config_network_bridges
+
+- name: debian | Installing Bonding Packages
   apt:
     name: "ifenslave"
     state: "present"
-  # when: >
-  #       ansible_distribution == "Ubuntu" and
-  #       ansible_distribution_version < '16.04'
+  become: true
+  when: config_network_bonds
 
-# Disabled as this causes issues
-# - name: debian | Installing ifupdown2
-#   apt:
-#     name: "ifupdown2"
-#     state: "present"
-#   when: >
-#         ansible_distribution == "Ubuntu" and
-#         ansible_distribution_version >= '16.04'
-
-#- name: debian | grabbing interfaces
-#  shell: ifconfig -a | sed 's/[ \t].*//;/^\(lo\|\)$/d'
-#  register: show_interfaces
+- name: debian | Installing VLAN Packages
+  apt:
+    name: "vlan"
+    state: "present"
+  become: true
+  when: config_network_vlans
 
 - name: debian | Configuring Defined Interfaces
   template:
@@ -34,37 +33,37 @@
     group: "root"
     mode: "u=rw,g=r,o=r"
   register: "config_interface"
-  when: >
-        config_network_interfaces is defined and
-        config_network_interfaces
-
-#- name: debian | ensuring interfaces.d folder exists
-#  file: path=/etc/network/interfaces.d state=directory
-
-#- name: debian | configuring defined interfaces
-#  template: src=etc/network/interfaces.d/interfaces.j2 dest=/etc/network/interfaces.d/ifcfg-{{ item.name }} owner=root group=root mode=0644
-#  register: config_interface
-#  with_items: interfaces
-#  when: config_network_interfaces is defined and config_network_interfaces
-
-- name: debian | Restarting Network Interfaces
-  shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
-  with_items: '{{ network_interfaces }}'
+  become: true
   when: >
         (config_network_interfaces is defined and
-          config_network_interfaces) and
-          item.configure and
-          config_interface.changed and
-          (enable_configured_interfaces_after_defining is defined and
-            enable_configured_interfaces_after_defining)
+        config_network_interfaces) and
+        network_interfaces != []
 
 - name: debian | Restarting Network Interfaces
   shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
+  become: true
+  with_items: '{{ network_interfaces }}'
+  when: >
+        enable_configured_interfaces_after_defining and
+        item['configure'] and
+        config_interface['changed']
+
+- name: debian | Restarting Network VLANs
+  shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
+  become: true
   with_items: '{{ network_vlans }}'
   when: >
-        (config_network_vlans is defined and
-          config_network_vlans) and
-          item.configure and
-          config_interface.changed and
-          (enable_configured_interfaces_after_defining is defined and
-            enable_configured_interfaces_after_defining)
+        config_network_vlans and
+        enable_configured_interfaces_after_defining and
+        item['configure'] and
+        config_interface['changed']
+
+- name: debian | Restarting Network Bridges
+  shell: bash -c "ifdown {{ item.name }} && ifup {{ item.name }}"
+  become: true
+  with_items: '{{ network_bridges }}'
+  when: >
+        config_network_bridges and
+        enable_configured_interfaces_after_defining and
+        item['configure'] and
+        config_interface['changed']

@@ -3,6 +3,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'libselinux-python'
   when: >
@@ -12,6 +13,7 @@
   dnf:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'libselinux-python'
   when: >

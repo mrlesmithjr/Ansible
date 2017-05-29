@@ -14,9 +14,9 @@ LogRemoteCommands=1
 {% elif not zabbix_agent_log_remote_commands %}
 LogRemoteCommands=0
 {% endif %}
-Server={% for item in zabbix_agent_servers %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
+Server={{ zabbix_agent_servers|join(', ') }}
 
-ServerActive={% for item in zabbix_agent_server_active %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}
+ServerActive={{ zabbix_agent_server_active|join(', ') }}
 
 StartAgents={{ zabbix_agent_start_agents }}
 {% if zabbix_agent_advanced_parameters is defined %}

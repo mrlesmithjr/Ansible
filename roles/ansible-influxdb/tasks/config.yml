@@ -1,0 +1,8 @@
+---
+- name: config | Configuring InfluxDB
+  template:
+    src: "etc/influxdb/influxdb.conf.j2"
+    dest: "/etc/influxdb/influxdb.conf"
+  become: true
+  notify:
+    - restart influxdb

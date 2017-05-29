@@ -1,0 +1,12 @@
+---
+- name: debian | Adding Landscape Repo
+  apt_repository:
+    repo: "{{ landscape_app_repo }}"
+    state: "present"
+  become: true
+
+- name: debian | Installing Landscape
+  apt:
+    name: "landscape-server"
+    state: "present"
+  become: true

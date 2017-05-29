@@ -1,0 +1,27 @@
+---
+# tasks file for ansible-motd
+- name: main | Configuring MOTD
+  template:
+    src: "etc/motd.j2"
+    dest: "/etc/motd"
+  become: true
+
+# Disables all default MOTD scripts
+- name: main | Disabling All Default MOTD
+  file:
+    path: "{{ motd_default_dir }}"
+    state: "directory"
+    recurse: yes
+    mode: "u=rw,g=r,o=r"
+  become: true
+  when: motd_disable_defaults
+
+# Enables all default MOTD scripts
+- name: main | Enabling All Default MOTD
+  file:
+    path: "{{ motd_default_dir }}"
+    state: "directory"
+    recurse: yes
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  when: not motd_disable_defaults

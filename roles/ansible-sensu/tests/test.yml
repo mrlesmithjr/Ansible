@@ -1,5 +1,14 @@
 ---
 - hosts: localhost
+  connection: local
   remote_user: root
+  vars:
+    sensu_client: false
+    sensu_host: '127.0.0.1'
+    sensu_server: true
   roles:
-    - ansible-sensu
+    - role: ansible-rabbitmq
+      become: true
+    - role: ansible-redis
+      become: true
+    - role: ansible-sensu

@@ -1,0 +1,58 @@
+---
+- name: app_services | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-dev'
+    - 'python-pip'
+  when: ansible_os_family == "Debian"
+
+- name: app_services | installing python modules
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-consul'
+
+# The below will eventually replace the app services by template lower down
+#- name: app_services | configuring consul app services
+#  consul:
+#    check_id: "{{ item.check_id|default (omit) }}"
+#    check_name: "{{ item.check_name|default (omit) }}"
+#    interval: "{{ item.interval|default (omit) }}"
+#    script: "{{ item.script|default (omit) }}"
+#    service_name: "{{ item.service['name']|default (omit) }}"
+#    service_port: "{{ item.service_port|default (omit) }}"
+#    state: "{{ item.state }}"
+#    tags: "{{ item.tags|default (omit) }}"
+#  with_items: consul_services
+
+- name: app_services | configuring consul app services
+  template:
+    src: "etc/consul.d/client/service.json.j2"
+    dest: "{{ consul_config_dir }}/client/services.json"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "reload consul"
+  when: not ansible_check_mode
+
+#- name: checking if mysql is installed
+#  shell: dpkg -l mysql-server
+#  register: mysql_installed
+#  changed_when: no
+#  ignore_errors: true
+
+#- name: configuring consul mysql user for checks
+#  mysql_user:
+#    name: "{{ consul_mysql_user }}"
+#    password: "{{ consul_mysql_password }}"
+#    priv: "*.*:ALL"
+#    state: present
+#  when: >
+#        mysql_installed.rc == 0

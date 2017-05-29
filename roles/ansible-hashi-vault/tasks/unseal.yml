@@ -1,0 +1,21 @@
+---
+- include: unseal_keys.yml
+  tags:
+    - 'hashi_vault_unseal'
+
+# We unseal vault in order to read secrets
+# We must iterate through all keys in order to reach the hashi_vault_secret_threshold
+- name: unseal | Unsealing HashiCorp Vault
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/unseal"
+    body:
+      key: '{{ item }}'
+    body_format: "json"
+    method: "PUT"
+  register: "_hashi_vault_unsealed"
+  no_log: true
+  become: true
+  with_items: "{{ _hashi_vault_unseal_keys['unseal_keys'] }}"
+  when: _hashi_vault_sealed['json']['sealed']
+  tags:
+    - 'hashi_vault_unseal'

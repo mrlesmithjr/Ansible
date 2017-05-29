@@ -8,19 +8,4 @@
     mode: 0644
   notify:
     - 'restart filebeat'
-
-- name: config_filebeat | checking status of filebeat ES Index Template import
-  stat:
-    path: "/etc/filebeat/.filebeat_es_index_template_imported"
-  register: "filebeat_es_index_template_imported_check"
-
-- name: config_filebeat | loading filebeat ES Index Template
-  command: "curl -XPUT 'http://{{ es_filebeat_elasticsearch_host }}/_template/filebeat?pretty' -d@/etc/filebeat/filebeat.template.json"
-  register: "filebeat_es_index_template_imported"
-  when: not filebeat_es_index_template_imported_check.stat.exists
-
-- name: config_filebeat | marking filebeat ES Index Template as imported
-  file:
-    path: "/etc/filebeat/.filebeat_es_index_template_imported"
-    state: "touch"
-  when: filebeat_es_index_template_imported.changed
+  become: true

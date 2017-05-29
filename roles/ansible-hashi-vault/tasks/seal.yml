@@ -1,0 +1,20 @@
+---
+- include: unseal_keys.yml
+  tags:
+    - 'hashi_vault_seal'
+
+# We seal vault to ensure that it is sealed
+- name: seal | Sealing HashiCorp Vault
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/seal"
+    headers:
+      X-Vault-Token: "{{ _hashi_vault_unseal_keys['root_token'] }}"
+    method: "PUT"
+    status_code: '204'
+  register: "_hashi_vault_sealed"
+  # changed_when: true
+  no_log: true
+  tags:
+    - 'hashi_vault_seal'
+  become: true
+  when: not _hashi_vault_sealed['json']['sealed']

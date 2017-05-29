@@ -1,0 +1,12 @@
+---
+# defaults file for ansible-virtualbox
+
+virtualbox_build_ver: 115126
+virtualbox_debian_package: 'virtualbox-{{ virtualbox_major_ver }}_{{ virtualbox_minor_ver }}-{{ virtualbox_build_ver }}~{{ ansible_distribution }}~{{ ansible_distribution_release|lower }}_amd64.deb'
+
+virtualbox_dl_url: 'http://download.virtualbox.org/virtualbox/{{ virtualbox_minor_ver }}'
+
+virtualbox_ext_pack: 'Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_minor_ver }}-{{ virtualbox_build_ver }}.vbox-extpack'
+virtualbox_ext_pack_license_agreement: '715c7246dc0f779ceab39446812362b2f9bf64a55ed5d3a905f053cfab36da9e'
+virtualbox_major_ver: 5.1
+virtualbox_minor_ver: 5.1.22

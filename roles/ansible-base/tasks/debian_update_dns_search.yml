@@ -6,3 +6,4 @@
     line: "dns-search {{ base_dns_search }}"
     state: "{{ base_dns_search_state }}"
   notify: "update resolvconf"
+  become: true

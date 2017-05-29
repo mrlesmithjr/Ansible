@@ -6,12 +6,14 @@
     cache_valid_time: 3600
     state: latest
   register: sensu_packages
+  become: true
   when: ansible_os_family == "Debian"
 
 - name: upgrade_sensu | restarting services if packages upgraded
   service:
     name: "{{ item }}"
     state: restarted
+  become: true
   with_items:
     - sensu-api
     - sensu-client
@@ -25,6 +27,7 @@
   service:
     name: "sensu-client"
     state: restarted
+  become: true
   when: >
         ansible_os_family == "Debian" and
         sensu_packages.changed and

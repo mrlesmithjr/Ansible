@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-landscape-db.git
+- src: https://github.com/mrlesmithjr/ansible-postgresql.git
+- src: https://github.com/mrlesmithjr/ansible-users.git

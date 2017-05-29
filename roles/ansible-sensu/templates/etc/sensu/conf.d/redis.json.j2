@@ -1,6 +1,6 @@
-{
-  "redis":{
-    "host": "localhost",
-    "port": 6379
-  }
-}
+{% set redis = {} %}
+{% set _redis = {} %}
+{% set _opts = _redis.update({"host": sensu_redis_info['host']}) %}
+{% set _opts = _redis.update({"port": sensu_redis_info['port']|int}) %}
+{% set __redis = redis.update({"redis": _redis}) %}
+{{ redis|to_nice_json }}

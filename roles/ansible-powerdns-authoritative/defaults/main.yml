@@ -5,14 +5,14 @@
 pdns_allow_ddns_updates: false
 
 # Defines subnet to allow DDNS updates from if allowed
-pdns_allow_ddns_updates_from: '0.0.0.0/0'
+pdns_allow_ddns_updates_from: 0.0.0.0/0
 
 #Defines if additional nameservers should be notified of zone updates.
 pdns_also_notify:
   configure: false
   notify_ips:
-    - '192.168.200.201'
-    - '192.168.200.202'
+    - 192.168.200.201
+    - 192.168.200.202
 
 # Defines the API Key
 pdns_api_key: 'changeme'
@@ -21,13 +21,13 @@ pdns_api_key: 'changeme'
 pdns_api_url: 'http://127.0.0.1:{{ pdns_webserver_port }}/servers/localhost/zones'
 
 # Defines the listen port
-pdns_auth_port: '53'
+pdns_auth_port: 53
 
 # Defines the Carbon server info for metrics
 pdns_carbon_info:
-  interval: '30'
+  interval: 30
   ourname: '{{ ansible_hostname }}'
-  server: '192.168.200.201' # Must be defined as IP otherwise will not work
+  server: 192.168.200.201 # Must be defined as IP otherwise will not work
 
 # Set to true if setting up Master/Slave
 # Otherwise Master zones will not update their SOA in order to transfer
@@ -45,7 +45,7 @@ pdns_curl_header: "-H 'X-API-Key: {{ pdns_api_key }}'"
 # Defines hosts where {{ pdns_db_user }} can login from
 pdns_db_allow_access_from_hosts:
   - '{{ ansible_hostname }}'
-  - '127.0.0.1'
+  - 127.0.0.1
   - '::1'
   - 'localhost'
  # Allows from everywhere
@@ -111,40 +111,40 @@ pdns_records:
     zone: '{{ pri_domain_name }}'
     type: 'A'
     changetype: 'REPLACE'
-    content: '10.0.101.40'
+    content: 10.0.101.40
     disabled: false
-    ttl: '3600'
-    priority: '0'
+    ttl: 3600
+    priority: 0
   - name: 'logstash'
     zone: '{{ pri_domain_name }}'
     type: 'A'
     changetype: 'REPLACE'
-    content: '10.0.101.60'
+    content: 10.0.101.60
     disabled: false
-    ttl: '3600'
-    priority: '0'
+    ttl: 3600
+    priority: 0
   - name: 'dns'
     zone: '{{ pri_domain_name }}'
     type: 'A'
     changetype: 'REPLACE'
-    content: '192.168.70.241'
+    content: 192.168.70.241
     disabled: false
-    ttl: '3600'
-    priority: '0'
+    ttl: 3600
+    priority: 0
   - name: 'ntp1'
     zone: '{{ pri_domain_name }}'
     type: 'CNAME'
     changetype: 'REPLACE'
     content: 'dns.{{ pri_domain_name }}'
     disabled: false
-    ttl: '3600'
-    priority: '0'
+    ttl: 3600
+    priority: 0
 
 # Defines PDNS recursor host
-pdns_recursor_host: '127.0.0.1'
+pdns_recursor_host: 127.0.0.1
 
 # Defines PDNS recursor port
-pdns_recursor_port: '5300'
+pdns_recursor_port: 5300
 
 # Defines the DNS reverse zones to create if pdns_create_pdns_zones is true
 pdns_rev_zones:
@@ -162,20 +162,21 @@ pdns_rev_zones:
   - '200.168.192.in-addr.arpa'
 
 # Defines version to install
+# To install 3.4.10-1 change to 3.4.10-1
 # To install 4.x change to 4.x
-pdns_server_version: '3.4.10-1'
+pdns_server_version: '4.x'
 
 # Defines if node should perform as PDNS Slave
 pdns_slave: false
 pdns_slaves:
-  - '172.28.128.4/32'
-  - '172.28.128.6/32'
-pdns_webserver_address: '0.0.0.0'
+  - 172.28.128.4/32
+  - 172.28.128.6/32
+pdns_webserver_address: 0.0.0.0
 pdns_webserver_allow: '0.0.0.0/0,::/0'
 pdns_webserver_password: 'changeme'
 
 # Defines API Webserver port
-pdns_webserver_port: '8081'
+pdns_webserver_port: 8081
 
 # Defines zone types to create using API
 # Native,Master,Slave

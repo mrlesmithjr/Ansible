@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-dumb-init
+dumb_init_debian_package: 'https://github.com/Yelp/dumb-init/releases/download/v{{ dumb_init_version }}/dumb-init_{{ dumb_init_version }}_amd64.deb'
+dumb_init_version: 1.2.0

@@ -1,0 +1,34 @@
+---
+- name: uninstall | Prepping For Uninstalling Netdata
+  replace:
+    dest: "{{ netdata_source_dir }}/{{ netdata_uninstaller|basename }}"
+    regexp: "rm -I -R \""
+    replace: "rm -R \""
+  become: true
+
+- name: uninstall | Prepping For Uninstalling Netdata
+  replace:
+    dest: "{{ netdata_source_dir }}/{{ netdata_uninstaller|basename }}"
+    regexp: "rm -i \""
+    replace: "rm \""
+  become: true
+
+- name: uninstall | Uninstalling Netdata
+  command: "{{ netdata_uninstaller }} --force"
+  args:
+    chdir: "{{ netdata_source_dir }}"
+  become: true
+
+- name: uninstall | Cleaning Up After Uninstalling Netdata
+  replace:
+    dest: "{{ netdata_source_dir }}/{{ netdata_uninstaller|basename }}"
+    regexp: "rm -R \""
+    replace: "rm -I -R \""
+  become: true
+
+- name: uninstall | Cleaning Up After Uninstalling Netdata
+  replace:
+    dest: "{{ netdata_source_dir }}/{{ netdata_uninstaller|basename }}"
+    regexp: "rm \""
+    replace: "rm -i \""
+  become: true

@@ -1,5 +1,7 @@
 ---
 # tasks file for ansible-kvm
+- include: set_facts.yml
+
 - include: hw_virtualization_check.yml
   tags:
     - config_vms
@@ -7,20 +9,20 @@
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
 - include: config_kvm.yml
   tags:
     - config_kvm
-  when: >
-        config_kvm is defined and
-        config_kvm
+  when: kvm_config
 
 - include: users.yml
   tags:
     - config_users
   when: >
-        (kvm_config_users is defined and
-          kvm_config_users) and
-          kvm_users is defined
+        kvm_config_users and
+        kvm_users is defined
 
 - include: config_ssh.yml
   tags:
@@ -33,9 +35,8 @@
   tags:
     - config_virtual_networks
   when: >
-        (kvm_config_virtual_networks is defined and
-          kvm_config_virtual_networks) and
-          kvm_virtual_networks is defined
+        kvm_config_virtual_networks and
+        kvm_virtual_networks is defined
 
 - include: config_vms.yml
   tags:
@@ -47,3 +48,8 @@
 
 - include: system_tweaks.yml
   when: kvm_enable_system_tweaks
+
+- include: apparmor.yml
+  when: >
+        ansible_os_family == "Debian" and
+        kvm_disable_apparmor

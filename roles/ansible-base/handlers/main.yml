@@ -2,3 +2,4 @@
 # handlers file for ansible-base
 - name: update resolvconf
   shell: resolvconf -u
+  become: true

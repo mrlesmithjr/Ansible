@@ -13,7 +13,7 @@ server {
 {%   if item.enable_php %}
 	location ~ \.php$ {
 		fastcgi_split_path_info ^(.+\.php)(/.+)$;
-		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_pass unix:{{ nginx_php_fpm_socket }}/php{{ nginx_php_ver }}-fpm.sock;
 		fastcgi_index index.php;
 		include fastcgi_params;
 	}

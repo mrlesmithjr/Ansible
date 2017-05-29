@@ -35,6 +35,12 @@ galera_enable_galera_monitoring_script: false
 # Defines if we should enable the MariaDB repo or use version within OS repos.
 galera_enable_mariadb_repo: true
 
+# https://mariadb.com/kb/en/mariadb/wsrep_provider_options/
+galera_extra_wsrep_provider_options: []
+  # evs.auto_evict: 1
+  # evs.delayed_margin: 'PT5S'
+  # evs.delayed_keep_period: 'PT45S'
+
 # Define which network segment this node is in.
 # value is an integer from 0 to 255
 # By default all nodes are placed in the same segment (0)

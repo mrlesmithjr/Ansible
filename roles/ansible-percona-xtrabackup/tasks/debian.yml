@@ -1,0 +1,16 @@
+---
+- name: debian | Installing Package Installer For Percona Xtrabackup
+  apt:
+    deb: "{{ percona_xtrabackup_debian_info.url }}/{{ percona_xtrabackup_debian_info.package }}"
+    state: "present"
+  register: "percona_package_installed"
+
+- name: debian | Updating Apt-Cache
+  apt:
+    update_cache: true
+  when: percona_package_installed.changed
+
+- name: debian | Installing Percona Xtrabackup
+  apt:
+    name: "percona-xtrabackup-24"
+    state: "present"

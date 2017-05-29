@@ -1,26 +1,43 @@
 ---
 # defaults file for ansible-es-filebeat
-es_filebeat_debian_package: 'filebeat_{{ es_filebeat_version }}_amd64.deb'
-es_filebeat_dl_url: 'https://download.elastic.co/beats/filebeat'
-es_filebeat_elasticsearch_host: 'es.{{ pri_domain_name }}:9200'
-es_filebeat_idle_timeout: '5s'
-es_filebeat_outputs:
-  - name: elasticsearch
-    host: '{{ es_filebeat_elasticsearch_host }}'
-    workers: 1
-es_filebeat_prospectors:  #define the paths (directories) to watch
-  - paths:
-      - '/var/log/syslog'
-#      - '/var/log/*.log'  #collects all logs from /var/logs/ and not subdirectories
-#      - '/var/log/*/.log'  #collects all logs from subdirectories of /var/logs/
-    encoding: 'plain'  #plain (Default), utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030, gbk, hz-gb-2312, euc-kr, euc-jp, iso-2022-jp, shift-jis, ...
-    input_type: 'log'  #log (Default) | stdin
-    document_type: 'syslog'  #The event type to use for published lines read by harvesters. For Elasticsearch output, the value that you specify here is used to set the type field in the output document. The default value is log.
-#  - paths:
-#      - '/opt/myapp/var/*.log'
-#    document_type: 'my_app_log'
+es_filebeat_debian_package: 'filebeat-{{ es_filebeat_version }}-amd64.deb'
+es_filebeat_dl_url: 'https://artifacts.elastic.co/downloads/beats/filebeat'
+
+# Define filebeat config per
+# https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-configuration-details.html
+# The config here will be automatically converted to proper YAML for Filebeat
+# /etc/filebeat/filebeat.yml using the Jinja2 template.
+es_filebeat_config:
+  filebeat.prospectors:
+    - paths:
+      - '/var/lib/docker/containers/*/*.log'
+      encoding: 'plain'
+      input_type: 'log'
+      json.add_error_key: true
+      json.keys_under_root: true
+      json.message_key: 'log'
+      document_type: 'docker-logs'
+  logging:
+    level: 'debug'
+    to_files: true
+    to_syslog: false
+    files:
+      path: '/var/log'
+      name: 'filebeat.log'
+      keepfiles: 7
+  output:
+    elasticsearch:
+      hosts:
+      - 'http://192.168.250.14:9200'
+      - 'http://192.168.250.15:9200'
+      index: 'filebeat'
+      template:
+        name: 'filebeat'
+        path: '/etc/filebeat/filebeat.template.json'
+  registry_file: '/var/lib/filebeat/registry'
+
 es_filebeat_redhat_package: 'filebeat-{{ es_filebeat_version }}-x86_64.rpm'
-es_filebeat_registry_file: '/var/lib/filebeat/registry'
-es_filebeat_spool_size: 2048  #Event count spool threshold - forces network flush if exceeded
-es_filebeat_version: '1.2.2'
-pri_domain_name: 'example.org'
+
+# Event count spool threshold - forces network flush if exceeded
+es_filebeat_spool_size: 2048
+es_filebeat_version: '5.3.2'

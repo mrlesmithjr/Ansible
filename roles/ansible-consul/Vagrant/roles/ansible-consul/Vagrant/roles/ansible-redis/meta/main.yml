@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs Redis Server
+  description: An Ansible role to install Redis
   #company: your company (optional)
   # Some suggested licenses:
   # - BSD (default)
@@ -47,15 +47,15 @@ galaxy_info:
   #  versions:
   #  - all
   #  - any
-  - name: opensuse
-    versions:
+  # - name: opensuse
+  #   versions:
   #  - all
   #  - 12.1
   #  - 12.2
   #  - 12.3
   #  - 13.1
   #  - 13.2
-    - 42.1
+    # - 42.1
   #- name: Amazon
   #  versions:
   #  - all
@@ -92,6 +92,7 @@ galaxy_info:
   #  - utopic
     - vivid
     - wily
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

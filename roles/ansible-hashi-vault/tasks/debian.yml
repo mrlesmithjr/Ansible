@@ -1,0 +1,19 @@
+---
+# We install JQ in case we want to parse any output into JSON when the
+# existing output is not already in JSON
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  tags:
+    - 'hashi_vault_pre_reqs'
+  become: true
+  with_items:
+    # - 'build-essential'
+    - 'jq'
+    - 'libcap2-bin'
+    # - 'libffi-dev'
+    # - 'libssl-dev'
+    # - 'python-dev'
+    # - 'python-pip'
+    # - 'python-setuptools'

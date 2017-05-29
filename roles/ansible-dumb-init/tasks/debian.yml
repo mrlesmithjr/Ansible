@@ -1,0 +1,10 @@
+---
+- name: debian | Installing pre-reqs
+  apt:
+    name: "ca-certificates"
+    state: "present"
+
+- name: debian | Installing dumb-init
+  apt:
+    deb: "{{ dumb_init_debian_package }}"
+    state: "present"

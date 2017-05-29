@@ -3,6 +3,7 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'keepalived'
 
@@ -12,3 +13,4 @@
     value: 1
     state: "present"
     reload: yes
+  become: true

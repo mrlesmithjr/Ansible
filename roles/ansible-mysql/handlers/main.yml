@@ -4,16 +4,19 @@
   service:
     name: "mariadb"
     state: "restarted"
+  become: true
   when: not ansible_check_mode
 
 - name: "restart mysql"
   service:
     name: "mysql"
     state: "restarted"
+  become: true
   when: not ansible_check_mode
 
 - name: "reload mysql"
   service:
     name: "mysql"
     state: "reloaded"
+  become: true
   when: not ansible_check_mode

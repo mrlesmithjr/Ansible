@@ -25,7 +25,7 @@ script:
   # Basic role syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
   # Install role
-  - ansible-playbook tests/test.yml -i tests/inventory --check
+  # - ansible-playbook tests/test.yml -i tests/inventory --check
   # # Check idempotence
   # - "ansible-playbook tests/test.yml -i tests/inventory | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)"
 

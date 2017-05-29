@@ -1,0 +1,14 @@
+# /etc/systemd/system/node_exporter.service
+[Unit]
+Description=Prometheus Node Exporter
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+User={{ prometheus_node_exporter_user_info['user'] }}
+Restart=on-failure
+ExecStart={{ prometheus_node_exporter_install_dir }}/node_exporter/node_exporter \
+          -web.listen-address ":{{ prometheus_node_exporter_listen_port }}"
+
+[Install]
+WantedBy=multi-user.target

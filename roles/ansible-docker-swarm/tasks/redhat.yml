@@ -3,6 +3,7 @@
   yum:
     name: "epel-release"
     state: "present"
+  become: true
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution != "Fedora"

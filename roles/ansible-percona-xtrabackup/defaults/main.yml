@@ -1,0 +1,13 @@
+---
+# defaults file for ansible-percona-xtrabackup
+percona_xtrabackup_folder: '/backup/mysql'
+
+percona_xtrabackup_debian_info:
+  package: 'percona-release_{{ percona_xtrabackup_version }}.{{ ansible_distribution_release|lower }}_all.deb'
+  url: 'https://repo.percona.com/apt'
+
+percona_xtrabackup_user:
+  name: 'backupusr'
+  password: 'backupusr'
+
+percona_xtrabackup_version: '0.1-4'

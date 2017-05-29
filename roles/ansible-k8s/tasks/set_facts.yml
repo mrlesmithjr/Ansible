@@ -1,0 +1,18 @@
+---
+- name: set_facts | Setting K8s Master
+  set_fact:
+    k8s_master: "{{ groups[k8s_cluster_group][0] }}"
+  tags:
+    - 'k8s_get_dashboard'
+
+- name: set_facts | Showing K8s Master
+  debug: var=k8s_master
+
+- name: set_facts | Setting K8s Advertise Address
+  set_fact:
+    k8s_advertise_address: "{{ hostvars[inventory_hostname]['ansible_' + k8s_advertise_address_int]['ipv4']['address'] }}"
+  tags:
+    - 'k8s_get_dashboard'
+
+- name: set_facts | Showing K8s Advertise Address
+  debug: var=k8s_advertise_address

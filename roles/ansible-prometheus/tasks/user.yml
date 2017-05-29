@@ -1,0 +1,14 @@
+---
+- name: user | Creating Prometheus Group
+  group:
+    name: "{{ prometheus_user_info['group'] }}"
+  become: true
+
+- name: user | Creating Prometheus User
+  user:
+    name: "{{ prometheus_user_info['user'] }}"
+    groups: "{{ prometheus_user_info['group'] }}"
+    state: "present"
+    system: true
+    append: true
+  become: true

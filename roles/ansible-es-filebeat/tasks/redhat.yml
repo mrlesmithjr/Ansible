@@ -3,6 +3,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'unzip'
   when: ansible_distribution != "Fedora"
@@ -11,9 +12,11 @@
   get_url:
     url: "{{ es_filebeat_dl_url }}/{{ es_filebeat_redhat_package }}"
     dest: "/opt/{{ es_filebeat_redhat_package }}"
+  become: true
 
-- name: debian | installing filebeat
+- name: redhat | installing filebeat
   yum:
-    deb: "/opt/{{ es_filebeat_redhat_package }}"
+    name: "/opt/{{ es_filebeat_redhat_package }}"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"

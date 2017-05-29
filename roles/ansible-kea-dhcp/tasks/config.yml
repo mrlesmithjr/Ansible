@@ -8,6 +8,7 @@
     mode: "o=rw,g=r,o=r"
   notify:
     - 'restart redhat kea-dhcp'
+  become: true
   when: ansible_os_family == "RedHat"
 
 - name: config | configuring kea dhcp services (Debian)
@@ -19,6 +20,7 @@
     mode: "o=rw,g=r,o=r"
   notify:
     - 'restart {{ ansible_os_family|lower }} kea-dhcp'
+  become: true
   with_items:
     - 'etc/kea/kea-dhcp-ddns.conf'
     - 'etc/kea/kea-dhcp4.conf'

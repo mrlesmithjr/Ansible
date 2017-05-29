@@ -1,0 +1,5 @@
+---
+- name: config | Ensuring Percona Xtrabackup {{ percona_xtrabackup_folder }} Exists
+  file:
+    path: "{{ percona_xtrabackup_folder }}"
+    state: "directory"

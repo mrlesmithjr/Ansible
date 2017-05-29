@@ -1,0 +1,68 @@
+---
+# tasks file for ansible-hashi-vault
+
+- include: set_facts.yml
+  tags:
+    - 'hashi_vault_health_status'
+    - 'hashi_vault_init'
+    - 'hashi_vault_key_status'
+    - 'hashi_vault_leader'
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_mounts'
+    - 'hashi_vault_policies'
+    - 'hashi_vault_read_policies'
+    - 'hashi_vault_reinit'
+    - 'hashi_vault_seal'
+    - 'hashi_vault_unseal'
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: account.yml
+  tags:
+    - 'hashi_vault_account'
+
+- include: install.yml
+  tags:
+    - 'hashi_vault_install'
+
+- include: config.yml
+  tags:
+    - 'hashi_vault_config'
+
+- include: service.yml
+  tags:
+    - 'hashi_vault_service'
+
+- include: init.yml
+  tags:
+    - 'hashi_vault_init'
+    - 'hashi_vault_reinit'
+
+- include: key_status.yml
+  tags:
+    - 'hashi_vault_key_status'
+  when: hashi_vault_show_key_status
+
+- include: secrets.yml
+  when: hashi_vault_manage_secrets
+
+- include: health.yml
+  tags:
+    - 'hashi_vault_health_status'
+  when: hashi_vault_show_health_status
+
+- include: leader.yml
+  tags:
+    - 'hashi_vault_leader'
+  when: hashi_vault_show_leader
+
+- include: mounts.yml
+  tags:
+    - 'hashi_vault_mounts'
+  when: hashi_vault_show_mounts
+
+- include: policies.yml
+  tags:
+    - 'hashi_vault_policies'
+  when: not ansible_check_mode

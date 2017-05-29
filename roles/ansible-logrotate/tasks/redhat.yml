@@ -1,0 +1,20 @@
+---
+- name: redhat | Installing Pre-Reqs
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - 'libselinux-python'
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing logrotate
+  dnf:
+    name: "logrotate"
+    state: "present"
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing logrotate
+  yum:
+    name: "logrotate"
+    state: "present"
+  when: ansible_distribution != "Fedora"

@@ -1,0 +1,5 @@
+---
+- name: debian | Installing logrotate
+  apt:
+    name: "logrotate"
+    state: "present"

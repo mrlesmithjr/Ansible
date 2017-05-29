@@ -19,9 +19,19 @@ apache2_install_php_sqlite: false
 # Defines if php should be installed
 apache2_install_php: false
 
+apache2_php_max_execution_time: 30
+
+apache2_php_max_input_time: 60
+
 # Defines max memory for Apache php
 # default is 128M
-apache2_php_max_memory: '128M'
+apache2_php_max_memory: 128M
+
+apache2_php_post_max_size: 8M
+
+apache2_php_timezone: "UTC"
+
+apache2_php_upload_max_filesize: 2M
 
 apache2_server_admin: 'webmaster@localhost'
 

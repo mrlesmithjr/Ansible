@@ -3,6 +3,7 @@
   yum:
     name: "epel-release"
     state: present
+  become: true
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution != "Fedora"
@@ -11,6 +12,7 @@
   dnf:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ influxdb_redhat_pre_reqs }}'
   when: ansible_distribution == "Fedora"
 
@@ -18,6 +20,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ influxdb_redhat_pre_reqs }}'
   when: ansible_distribution != "Fedora"
 
@@ -31,10 +34,12 @@
     enabled: yes
     priority: 90
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Installing InfluxDB
   yum:
     name: "influxdb"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"

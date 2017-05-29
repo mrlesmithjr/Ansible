@@ -1,4 +1,34 @@
 ---
+# We do this to capture which group was created during install
+# https://github.com/mrlesmithjr/ansible-kvm/pull/2
+- name: config_kvm | Capturing Libvirt Group
+  shell: "getent group libvirt | cut -d: -f1"
+  register: "_libvirt_group_found"
+  changed_when: false
+  check_mode: no
+
+# We do this to capture which group was created during install
+# https://github.com/mrlesmithjr/ansible-kvm/pull/2
+- name: config_kvm | Capturing Libvirt Group
+  shell: "getent group libvirtd | cut -d: -f1"
+  register: "_libvirtd_group_found"
+  changed_when: false
+  check_mode: no
+
+- name: config_kvm | Setting unix_sock_group
+  set_fact:
+    kvm_unix_sock_group: 'libvirt'
+  when: >
+        (_libvirt_group_found is defined and
+          _libvirt_group_found['stdout'] == 'libvirt')
+
+- name: config_kvm | Setting unix_sock_group
+  set_fact:
+    kvm_unix_sock_group: 'libvirtd'
+  when: >
+        (_libvirtd_group_found is defined and
+          _libvirtd_group_found['stdout'] == 'libvirtd')
+
 - name: config_kvm | configuring kvm
   template:
     src: "etc/libvirt/libvirtd.conf.j2"
@@ -6,35 +36,20 @@
     owner: "root"
     group: "root"
     mode: "u=rw,g=r,o=r"
+  become: true
   notify:
-    - restart kvm
+    - "restart {{ kvm_service_name }}"
+  when: not ansible_check_mode
 
 - name: config_kvm | configuring kvm
   replace:
     dest: "/etc/default/libvirt-bin"
     regexp: "^libvirtd_opts=\"-d\""
     replace: "libvirtd_opts=\"-d -l\""
+  become: true
   notify:
-    - restart kvm
+    - "restart {{ kvm_service_name }}"
   when: >
-        kvm_enable_tcp is defined and
-        kvm_enable_tcp
-
-- name: config_kvm | disabling apparmor profiles for libvirt
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  register: "libvirt_apparmor_disabled"
-  with_items:
-    - src: '/etc/apparmor.d/usr.sbin.libvirtd'
-      dest: '/etc/apparmor.d/disable/usr.sbin.libvirtd'
-    - src: '/etc/apparmor.d/usr.lib.libvirt.virt-aa-helper'
-      dest: '/etc/apparmor.d/disable/usr.lib.libvirt.virt-aa-helper'
-
-- name: config_kvm | disabling apparmor profiles for libvirt
-  command: "apparmor_parser -R {{ item }}"
-  with_items:
-    - '/etc/apparmor.d/usr.sbin.libvirtd'
-    - '/etc/apparmor.d/usr.lib.libvirt.virt-aa-helper'
-  when: libvirt_apparmor_disabled.changed
+        kvm_enable_tcp and
+        ansible_os_family == "Debian" and
+        not ansible_check_mode

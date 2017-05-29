@@ -1,0 +1,42 @@
+---
+- name: users | Creating A Superuser Landscape Can Use (Non-Replicated-DB)
+  postgresql_user:
+    name: "{{ landscape_db_superuser_info['name'] }}"
+    password: "{{ landscape_db_superuser_info['password'] }}"
+    role_attr_flags: "CREATEDB,CREATEROLE,SUPERUSER"
+    state: "present"
+  become: true
+  become_user: "postgres"
+  when: not landscape_replicated_db
+
+- name: users | Creating A Superuser Landscape Can Use (Replicated-DB)
+  postgresql_user:
+    name: "{{ landscape_db_superuser_info['name'] }}"
+    password: "{{ landscape_db_superuser_info['password'] }}"
+    role_attr_flags: "CREATEDB,CREATEROLE,SUPERUSER"
+    state: "present"
+  become: true
+  become_user: "postgres"
+  when: >
+        landscape_replicated_db and
+        inventory_hostname == landscape_db_master
+
+- name: users | Assigning Landscape User Permissions
+  postgresql_user:
+    name: "{{ landscape_app_user_info['name'] }}"
+    password: "{{ landscape_app_user_info['password'] }}"
+    db: "landscape"
+  become: true
+  become_user: "postgres"
+  when: not landscape_replicated_db
+
+- name: users | Assigning Landscape User Permissions
+  postgresql_user:
+    name: "{{ landscape_app_user_info['name'] }}"
+    password: "{{ landscape_app_user_info['password'] }}"
+    db: "landscape"
+  become: true
+  become_user: "postgres"
+  when: >
+        landscape_replicated_db and
+        inventory_hostname == landscape_db_master

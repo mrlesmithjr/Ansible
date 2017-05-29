@@ -3,12 +3,14 @@
   yum:
     name: "epel-release"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing dependencies
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'python-devel'
     - 'python-pip'
@@ -18,6 +20,7 @@
   dnf:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'jq'
     - 'tree'
@@ -28,6 +31,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'jq'
     - 'tree'

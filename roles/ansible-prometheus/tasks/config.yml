@@ -1,0 +1,26 @@
+---
+- name: config | Configuring Prometheus
+  template:
+    src: "prometheus.yml.j2"
+    dest: "{{ prometheus_config_file }}"
+    owner: "{{ prometheus_user_info['user'] }}"
+    group: "{{ prometheus_user_info['group'] }}"
+  notify:
+    - restart prometheus
+  become: true
+
+- name: config | Setting Folder/File Permissions
+  file:
+    path: "{{ prometheus_install_dir }}"
+    owner: "{{ prometheus_user_info['user'] }}"
+    group: "{{ prometheus_user_info['group'] }}"
+    recurse: true
+  become: true
+
+- name: config | Ensuring {{ prometheus_local_storage }} Exists
+  file:
+    path: "{{ prometheus_local_storage }}"
+    state: "directory"
+    owner: "{{ prometheus_user_info['user'] }}"
+    group: "{{ prometheus_user_info['group'] }}"
+  become: true

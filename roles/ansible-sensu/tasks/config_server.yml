@@ -10,6 +10,7 @@
     - restart sensu-api
     - restart sensu-client
     - restart sensu-server
+  become: true
   with_items:
     - rabbitmq.json
     - redis.json
@@ -22,6 +23,7 @@
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - restart sensu-api
     - restart sensu-client

@@ -1,0 +1,8 @@
+---
+- name: services | Ensuring All Services Are Started And Enabled On Boot
+  service:
+    name: "{{ item }}"
+    enabled: true
+    state: "started"
+  become: true
+  with_items: '{{ k8s_services }}'

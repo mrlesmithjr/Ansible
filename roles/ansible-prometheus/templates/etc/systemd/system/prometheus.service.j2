@@ -1,0 +1,15 @@
+# /etc/systemd/system/prometheus.service
+[Unit]
+Description=Prometheus Server
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+User={{ prometheus_user_info['user'] }}
+Restart=on-failure
+ExecStart={{ prometheus_install_dir }}/prometheus/prometheus \
+                                -config.file={{ prometheus_config_file }} \
+                                -storage.local.path={{ prometheus_local_storage }}
+
+[Install]
+WantedBy=multi-user.target

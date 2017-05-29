@@ -11,23 +11,24 @@ Build Status
 Requirements
 ------------
 
-Define your consul servers and clients into their respective Ansible groups in
-you inventory file. And ensure to update the default vars for consul_clients_group
-and consul_servers_group to match.  
+Define your Ansible host group name of consul servers within ``consul_servers_group``.
+
+Attaching the role to a group of servers NOT being in the group of ``consul_servers_group`` will treat them as consul clients joining the servers inside ``consul_servers_group``.
+
 
 Vagrant
 -------
-You can spin up a 5-node Consul environment for testing by doing the following:  
+You can spin up a 5-node Consul environment for testing by doing the following:
 
-Spin up environment  
+Spin up environment
 ```
 vagrant up
 ```
 
 This should bring up an environment with a 3-node Consul cluster and 2 nodes
-running redis and nginx for service discovery and testing.  
+running redis and nginx for service discovery and testing.
 
-You can view the consul web-ui by using your browser to open  
+You can view the consul web-ui by using your browser to open
 - [node3]
 - [node4]
 
@@ -43,7 +44,20 @@ Role Variables
 ```
 ---
 # defaults file for ansible-consul
+
+# Either "allow" or "deny"; defaults to "allow".
+consul_acl_default_policy: 'allow'
+
+# Either "allow", "deny" or "extend-cache"; "extend-cache" is the default.
+consul_acl_down_policy: 'extend-cache'
+
+consul_acl_master_token_file: '/etc/consul_acl_master_token'
+
 consul_bin_path: '/usr/local/bin'
+consul_bin_owner: "{{ consul_user }}"
+consul_bin_group: "{{ consul_group }}"
+consul_bin_mode: '0750'
+
 # consul_bind_address: "{{ hostvars[inventory_hostname]['ansible_' + consul_bind_interface]['ipv4']['address'] }}"
 
 # Define interface to bind to...(eth0|eth1|enp0s8)
@@ -53,9 +67,10 @@ consul_bind_interface: "{{ ansible_default_ipv4['interface'] }}"
 # either set to 0.0.0.0 (default) or consul_bind_address var.
 consul_client_address: '0.0.0.0'
 
-# Defines Ansible group that nodes belong to which are clients
-# (agents or services running on)
-consul_clients_group: 'consul_clients'
+# Defines if setting up cluster (default)
+# currently does not work as only standalone but adding in ability for testing
+# purposes at a later time
+consul_cluster: true
 
 consul_config_dir: '/etc/consul.d'
 consul_config_file: '/etc/consul.conf'
@@ -67,21 +82,21 @@ consul_datacenter: 'dc1'
 consul_dl_file: 'consul_{{ consul_version }}_linux_amd64.zip'
 consul_dl_url: 'https://releases.hashicorp.com/consul/{{ consul_version }}'
 
+consul_enable_acls: true
+
 # Defines if dnsmasq should be installed and configured to resolv
 # consul dns queries to port 8600
 consul_enable_dnsmasq: true
 
 # Generate using 'consul keygen'
 # make sure to generate a new key and replace this
-consul_encryption_key: 'qLLp1YCJzp9E/xhg11qkdQ=='
+# consul_encryption_key: 'qLLp1YCJzp9E/xhg11qkdQ=='
 
+consul_user: 'consul'
 consul_group: 'consul'
-consul_home: '/opt/consul'
+# Defines weather the consul service should run as consul_user/consul_group or not
+consul_runas_user: true
 consul_key_file: '/etc/consul.key'
-consul_log_file: '/var/log/consul'
-
-# Defines which node is the consul master
-consul_master: '{{ groups[consul_servers_group][0] }}'
 
 consul_mysql_password: 'consul'
 consul_mysql_user: 'consul'
@@ -90,44 +105,13 @@ consul_mysql_user: 'consul'
 consul_servers_group: 'consul_servers'
 
 # Define services to register and checks to ensure those services
-# are running on clients
-consul_services:
-  - service_name: elasticsearch
-    service_port: 9200
-    tags:
-      - elasticsearch
-#      - es
-#      - testing
-    check_script: 'curl localhost:9200 > /dev/null 2>&1'
-    interval: 10s
-    state: absent
-  - service_name: mysql
-    service_port: 3306
-    tags:
-      - mysql
-#      - testing
-    check_script: "mysql -u{{ consul_mysql_user }} -p{{ consul_mysql_password }} -h localhost -e 'select now()'"
-    interval: 10s
-    state: absent
-  - service_name: nginx
-    service_port: 80
-    tags:
-      - nginx
-#      - testing
-    check_script: 'curl localhost:80 > /dev/null 2>&1'
-    interval: 10s
-    state: present
-  - service_name: redis
-    service_port: 6379
-    tags:
-      - redis
-#      - testing
-    check_script: 'redis-cli ping'
-    interval: 10s
-    state: present
-consul_ui_dl_file: 'consul_{{ consul_version }}_web_ui.zip'
-consul_user: 'consul'
+# are running on clients. See playbook.yml for examples.
+consul_services: []
+
+consul_ui: false
+
 consul_version: '0.8.1'
+consul_wan_group: 'consul_wan'
 ```
 
 Dependencies
@@ -140,8 +124,8 @@ Example Playbook
 
 ```
 - hosts: all
-  become: true
   vars:
+    - consul_servers_group: 'consulservers'
     - pri_domain_name: 'test.vagrant.local'
   roles:
     - role: ansible-ntp

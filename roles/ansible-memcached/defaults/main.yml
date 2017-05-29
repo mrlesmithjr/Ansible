@@ -8,3 +8,4 @@ memcached_memory_cap: '64'
 memcached_port: '11211'
 memcached_verbose: false
 memcached_verbose_verbose: false
+memcached_user: memcache

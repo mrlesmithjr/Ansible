@@ -1,0 +1,9 @@
+[
+ {rabbit, [
+{% if rabbitmq_listeners is not defined %}
+   {tcp_listeners, [{{ rabbitmq_listen_port }}]}
+{% elif rabbitmq_listeners is defined %}
+   {tcp_listeners, [{% for item in rabbitmq_listeners %}{"{{ item }}", {{ rabbitmq_listen_port }}}{% if not loop.last %}, {% endif %}{% endfor %}]}
+{% endif %}
+  ]}
+].

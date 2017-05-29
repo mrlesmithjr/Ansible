@@ -8,6 +8,7 @@
 - src: https://github.com/mrlesmithjr/ansible-bashrc
 - src: https://github.com/mrlesmithjr/ansible-bind
 - src: https://github.com/mrlesmithjr/ansible-bootstrap
+- src: https://github.com/mrlesmithjr/ansible-bro-ids
 - src: https://github.com/mrlesmithjr/ansible-cacti
 - src: https://github.com/mrlesmithjr/ansible-cassandra
 - src: https://github.com/mrlesmithjr/ansible-ceph
@@ -35,6 +36,7 @@
 - src: https://github.com/mrlesmithjr/ansible-domain-join
 - src: https://github.com/mrlesmithjr/ansible-dovecot-ldap
 - src: https://github.com/mrlesmithjr/ansible-dropbox-nsot
+- src: https://github.com/mrlesmithjr/ansible-dumb-init
 - src: https://github.com/mrlesmithjr/ansible-elasticsearch
 - src: https://github.com/mrlesmithjr/ansible-elk-broker
 - src: https://github.com/mrlesmithjr/ansible-elk-es
@@ -48,6 +50,7 @@
 - src: https://github.com/mrlesmithjr/ansible-es-packetbeat
 - src: https://github.com/mrlesmithjr/ansible-es-topbeat
 - src: https://github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://github.com/mrlesmithjr/ansible-fail2ban
 - src: https://github.com/mrlesmithjr/ansible-ferm
 - src: https://github.com/mrlesmithjr/ansible-fluentd
 - src: https://github.com/mrlesmithjr/ansible-gerrit
@@ -60,6 +63,7 @@
 - src: https://github.com/mrlesmithjr/ansible-graylog
 - src: https://github.com/mrlesmithjr/ansible-hadoop
 - src: https://github.com/mrlesmithjr/ansible-haproxy
+- src: https://github.com/mrlesmithjr/ansible-hashi-vault
 - src: https://github.com/mrlesmithjr/ansible-hashicorp-toolbox
 - src: https://github.com/mrlesmithjr/ansible-influxdb
 - src: https://github.com/mrlesmithjr/ansible-inventory
@@ -72,15 +76,22 @@
 - src: https://github.com/mrlesmithjr/ansible-jenkins
 - src: https://github.com/mrlesmithjr/ansible-jmeter
 - src: https://github.com/mrlesmithjr/ansible-juju
+- src: https://github.com/mrlesmithjr/ansible-k8s
 - src: https://github.com/mrlesmithjr/ansible-kea-dhcp
 - src: https://github.com/mrlesmithjr/ansible-keepalived
 - src: https://github.com/mrlesmithjr/ansible-knot-dns
 - src: https://github.com/mrlesmithjr/ansible-kodi
 - src: https://github.com/mrlesmithjr/ansible-kvm
+- src: https://github.com/mrlesmithjr/ansible-landscape-app
+- src: https://github.com/mrlesmithjr/ansible-landscape-client
+- src: https://github.com/mrlesmithjr/ansible-landscape-db
+- src: https://github.com/mrlesmithjr/ansible-letsencrypt
 - src: https://github.com/mrlesmithjr/ansible-lighttpd
+- src: https://github.com/mrlesmithjr/ansible-logrotate
 - src: https://github.com/mrlesmithjr/ansible-logstash
 - src: https://github.com/mrlesmithjr/ansible-lsi-megaraid
 - src: https://github.com/mrlesmithjr/ansible-m-pdns_zone
+- src: https://github.com/mrlesmithjr/ansible-maas
 - src: https://github.com/mrlesmithjr/ansible-mailcatcher
 - src: https://github.com/mrlesmithjr/ansible-manage-lvm
 - src: https://github.com/mrlesmithjr/ansible-manage-ssh-keys
@@ -92,8 +103,10 @@
 - src: https://github.com/mrlesmithjr/ansible-module-chaperone
 - src: https://github.com/mrlesmithjr/ansible-mongodb
 - src: https://github.com/mrlesmithjr/ansible-monit
+- src: https://github.com/mrlesmithjr/ansible-motd
 - src: https://github.com/mrlesmithjr/ansible-mysql
 - src: https://github.com/mrlesmithjr/ansible-nagios
+- src: https://github.com/mrlesmithjr/ansible-netdata
 - src: https://github.com/mrlesmithjr/ansible-network-tweaks
 - src: https://github.com/mrlesmithjr/ansible-nginx
 - src: https://github.com/mrlesmithjr/ansible-nipap
@@ -110,6 +123,7 @@
 - src: https://github.com/mrlesmithjr/ansible-owncloud
 - src: https://github.com/mrlesmithjr/ansible-pacemaker
 - src: https://github.com/mrlesmithjr/ansible-passenger
+- src: https://github.com/mrlesmithjr/ansible-percona-xtrabackup
 - src: https://github.com/mrlesmithjr/ansible-php
 - src: https://github.com/mrlesmithjr/ansible-phpipam
 - src: https://github.com/mrlesmithjr/ansible-playbooks
@@ -123,6 +137,7 @@
 - src: https://github.com/mrlesmithjr/ansible-powerdns-dnsdist
 - src: https://github.com/mrlesmithjr/ansible-powerdns-recursor
 - src: https://github.com/mrlesmithjr/ansible-prometheus
+- src: https://github.com/mrlesmithjr/ansible-prometheus-node-exporter
 - src: https://github.com/mrlesmithjr/ansible-quagga
 - src: https://github.com/mrlesmithjr/ansible-rabbitmq
 - src: https://github.com/mrlesmithjr/ansible-rancid-git
@@ -137,6 +152,7 @@
 - src: https://github.com/mrlesmithjr/ansible-snorby
 - src: https://github.com/mrlesmithjr/ansible-snort
 - src: https://github.com/mrlesmithjr/ansible-squid
+- src: https://github.com/mrlesmithjr/ansible-sshd
 - src: https://github.com/mrlesmithjr/ansible-stackstorm
 - src: https://github.com/mrlesmithjr/ansible-supervisor
 - src: https://github.com/mrlesmithjr/ansible-suricata
@@ -148,7 +164,9 @@
 - src: https://github.com/mrlesmithjr/ansible-ufw
 - src: https://github.com/mrlesmithjr/ansible-unbound
 - src: https://github.com/mrlesmithjr/ansible-users
+- src: https://github.com/mrlesmithjr/ansible-virtualbox
 - src: https://github.com/mrlesmithjr/ansible-vmware-chaperone
+- src: https://github.com/mrlesmithjr/ansible-wok
 - src: https://github.com/mrlesmithjr/ansible-zabbix
 - src: https://github.com/mrlesmithjr/ansible-zabbix-agent
 - src: https://github.com/mrlesmithjr/ansible-zabbix-old

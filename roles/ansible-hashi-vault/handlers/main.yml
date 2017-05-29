@@ -1,0 +1,15 @@
+---
+# handlers file for ansible-hashi-vault
+
+- name: "restart vault-server"
+  service:
+    name: "vault-server"
+    state: "restarted"
+  become: true
+  when: not ansible_check_mode
+
+# The below format is the only way that works for firing this handler as an
+# include
+# https://github.com/ansible/ansible/issues/15915
+- name: "init"
+  include: "{{ 'init' }}.yml"

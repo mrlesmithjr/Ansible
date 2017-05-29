@@ -1,4 +1,11 @@
 ---
+- name: setting Alpine facts
+  set_fact:
+    nginx_web_group: "nginx"
+    nginx_web_owner: "nginx"
+    nginx_web_root: "/var/lib/nginx/html"
+  when: ansible_os_family == "Alpine"
+
 - name: setting Debian facts
   set_fact:
     nginx_web_group: "www-data"
@@ -22,6 +29,13 @@
         ansible_distribution == "Debian" or
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04')
+
+- name: setting PHP version
+  set_fact:
+    nginx_php_fpm_socket: '/var/run/php'
+    nginx_php_path: 'etc/php/5'  #no leading / for template path
+    nginx_php_ver: 5
+  when: ansible_os_family == "Alpine"
 
 - name: setting PHP version
   set_fact:

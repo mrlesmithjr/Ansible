@@ -1,0 +1,6 @@
+---
+# handlers file for ansible-maas
+- name: restart maas-regiond
+  service:
+    name: "maas-regiond"
+    state: "restarted"

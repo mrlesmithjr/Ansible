@@ -1,0 +1,97 @@
+[stores]
+user = {{ landscape_app_user_info['name'] }}
+password = {{ landscape_app_user_info['password'] }}
+host = {{ landscape_db_host }}
+main = landscape-standalone-main
+account-1 = landscape-standalone-account-1
+resource-1 = landscape-standalone-resource-1
+package = landscape-standalone-package
+session = landscape-standalone-session
+session-autocommit = landscape-standalone-session?isolation=autocommit
+knowledge = landscape-standalone-knowledge
+
+[global]
+oops-path = /var/lib/landscape/landscape-oops
+syslog-address = /dev/log
+deployment-mode = {{ landscape_app_deployment_mode }}
+
+[broker]
+port = {{ landscape_app_rabbitmq_port }}
+host = {{ landscape_app_rabbitmq_host }}
+user = {{ landscape_app_rabbitmq_user['name'] }}
+password = {{ landscape_app_rabbitmq_user['password'] }}
+vhost = {{ landscape_app_rabbitmq_user['vhost'] }}
+
+[landscape]
+base-port = 8080
+threads = 8
+stores = main account-1 resource-1 package session session-autocommit knowledge
+oops-key = DF%(instance-letter)s
+mailer = queue
+mailer-path = /var/lib/landscape/landscape-mail-queue
+reprepro-binary = /opt/canonical/landscape/scripts/reprepro-wrapper.sh
+repository-path = /var/lib/landscape/landscape-repository
+
+[message-server]
+base-port = 8090
+threads = 8
+stores = main account-1 resource-1 package
+oops-key = DM%(instance-letter)s
+
+[load-shaper]
+critical-load = 10.0
+good-load = 3.0
+good-duration = 60.0
+
+[pingserver]
+base-port = 8070
+stores = main account-1 resource-1
+threads = 2
+
+[job-handler]
+stores = main account-1 resource-1 package
+threads = 10
+mailer = queue
+mailer-path = /var/lib/landscape/landscape-mail-queue
+
+[async-frontend]
+base-port = 9090
+
+[api]
+stores = main account-1 resource-1 package
+threads = 10
+base-port = 9080
+mailer = queue
+mailer-path = /var/lib/landscape/landscape-mail-queue
+
+[maintenance]
+threads = 1
+stores = main account-1 resource-1 package session session-autocommit knowledge
+mailer = queue
+mailer-path = /var/lib/landscape/landscape-mail-queue
+
+[schema]
+threads = 1
+stores = main account-1 resource-1 package session knowledge
+store_user = {{ landscape_db_superuser_info['name'] }}
+store_password = {{ landscape_db_superuser_info['password'] }}
+
+[scripts]
+threads = 1
+stores = main account-1 resource-1 package session knowledge
+mailer = queue
+mailer-path = /var/lib/landscape/landscape-mail-queue
+
+[package-upload]
+stores = main account-1
+threads = 10
+port = 9100
+root-url = http://localhost:9100
+mailer = queue
+mailer-path = /var/lib/landscape/landscape-mail-queue
+
+[package-search]
+port = 9099
+stores = main package resource-1
+pid-path = /var/run/landscape/landscape-package-search-1.pid
+account-threshold = 800

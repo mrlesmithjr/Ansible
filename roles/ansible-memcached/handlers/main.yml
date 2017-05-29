@@ -4,3 +4,4 @@
   service:
     name: "memcached"
     state: "restarted"
+  become: true
