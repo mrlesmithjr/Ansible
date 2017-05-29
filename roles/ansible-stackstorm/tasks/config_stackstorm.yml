@@ -6,6 +6,7 @@
     owner: "root"
     group: "root"
     mode: 0644
+  become: true
   notify:
     - "restart stackstorm"
     - "reload stackstorm"
@@ -15,10 +16,12 @@
   command: "st2ctl status"
   register: "st2_status"
   changed_when: false
+  become: true
 
 - name: config_stackstorm | Ensuring Stackstorm Is Started
   command: "st2ctl restart"
   register: "stackstorm_started"
+  become: true
   when: "'not running' in st2_status.stdout"
 
 - name: config_stackstorm | waiting for services
@@ -29,4 +32,5 @@
 
 - name: config_stackstorm | Reloading Stackstorm If First Started
   command: "st2ctl reload"
+  become: true
   when: stackstorm_started.changed

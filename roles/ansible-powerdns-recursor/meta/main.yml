@@ -1,6 +1,6 @@
 galaxy_info:
   author: Larry Smith Jr.
-  description: An Ansible role that installs/configures [PowerDNS] Recursor
+  description: An [Ansible] role that installs/configures [PowerDNS] Recursor
   # company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -149,7 +149,7 @@ galaxy_info:
   #  - utopic
   #  - vivid
   #  - wily
-  #  - xenial
+    - xenial
   #- name: SLES
   #  versions:
   #  - all

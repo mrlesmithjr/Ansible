@@ -1,0 +1,19 @@
+---
+# We setup a specific group to run vault as a member of
+- name: account | Creating HashiCorp Vault Group
+  group:
+    name: "{{ hashi_vault_user_info['group'] }}"
+    system: true
+    state: "present"
+  become: true
+
+# We setup a specific user to run vault as
+- name: account | Creating HashiCorp Vault User
+  user:
+    name: "{{ hashi_vault_user_info['user'] }}"
+    shell: "/bin/false"
+    createhome: false
+    group: "{{ hashi_vault_user_info['group'] }}"
+    system: true
+    state: "present"
+  become: true

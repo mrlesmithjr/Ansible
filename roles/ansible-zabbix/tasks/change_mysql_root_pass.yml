@@ -4,6 +4,7 @@
     name: root
     host: "{{ item }}"
     password: "{{ zabbix_mysql_root_password }}"
+  become: true
   with_items:
     - '{{ ansible_hostname }}'
     - '127.0.0.1'
@@ -17,3 +18,4 @@
     owner: root
     group: root
     mode: 0600
+  become: true

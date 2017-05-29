@@ -1,0 +1,31 @@
+---
+# handlers file for ansible-wok
+- name: enable wokd
+  service:
+    name: "wokd"
+    enabled: true
+  become: true
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+    name: "wokd"
+  become: true
+
+- name: start wokd
+  service:
+    name: "wokd"
+    state: "started"
+  become: true
+
+- name: restart nginx
+  service:
+    name: "nginx"
+    state: "restarted"
+  become: true
+
+- name: restart wokd
+  service:
+    name: "wokd"
+    state: "restarted"
+  become: true

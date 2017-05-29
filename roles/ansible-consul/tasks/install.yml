@@ -1,0 +1,23 @@
+---
+- name: install | download and extract consul
+  unarchive:
+    src: "{{ consul_dl_url }}/{{ consul_dl_file }}"
+    dest: "{{ consul_bin_path }}"
+    remote_src: True
+    creates: "{{ consul_bin_path }}/consul"
+    owner: "{{ consul_bin_owner }}"
+    group: "{{ consul_bin_group }}"
+    mode: "{{ consul_bin_mode }}"
+  become: true
+  when: not ansible_check_mode
+
+- name: install | ensure binary ownership and mode
+  file:
+    path: "{{ consul_bin_path }}/consul"
+    owner: "{{ consul_bin_owner }}"
+    group: "{{ consul_bin_group }}"
+    mode: "{{ consul_bin_mode }}"
+  become: true
+  notify:
+    - restart consul
+  when: not ansible_check_mode

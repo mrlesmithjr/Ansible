@@ -1,17 +1,28 @@
 Role Name
 =========
 
-Installs and configures Postgresql
+An [Ansible] role to install/configure [Postgresql]
 
 Requirements
 ------------
 
-None
+Install [required](./requirements.yml) [Ansible] roles:
+```
+sudo ansible-galaxy install -r requirements.yml
+```
+
+If setting up replication:
+
+`defaults/main.yml`
+```
+# Define Ansible group which contains the hosts to setup replication
+postgresql_replication_group: 'postgres_replication'
+```
 
 Role Variables
 --------------
 
-None
+[Role Defaults](./defaults/main.yml)
 
 Dependencies
 ------------
@@ -21,26 +32,7 @@ None
 Example Playbook
 ----------------
 
-#### GitHub
-````
----
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: ansible-postgresql
-  tasks:
-````
-#### Galaxy
-````
----
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: mrlesmithjr.postgresql
-  tasks:
-````
+[Example Playbook](./playbook.yml)
 
 License
 -------
@@ -54,3 +46,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[Postgresql]: <https://www.postgresql.org/>

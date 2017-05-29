@@ -29,14 +29,17 @@
 - name: config_db | Populating DB {{ stackstorm_db_info.db }}
   command: "/opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf upgrade head"
   register: "mistral_db_populated"
+  become: true
   when: not mistral_db_populated_check.stat.exists
 
 - name: config_db | Registering Mistral Actions
   command: "/opt/stackstorm/mistral/bin/mistral-db-manage --config-file /etc/mistral/mistral.conf populate"
+  become: true
   when: mistral_db_populated.changed
 
 - name: config_db | Marking DB {{ stackstorm_db_info.db }} As Populated
   file:
     path: "/etc/mistral/.db_populated"
     state: touch
+  become: true
   when: mistral_db_populated.changed

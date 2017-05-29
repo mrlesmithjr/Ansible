@@ -1,0 +1,16 @@
+---
+- name: db | Creating Landscape DB
+  postgresql_db:
+    name: "landscape"
+  become: true
+  become_user: "postgres"
+  when: not landscape_replicated_db
+
+- name: db | Creating Landscape DB
+  postgresql_db:
+    name: "landscape"
+  become: true
+  become_user: "postgres"
+  when: >
+        landscape_replicated_db and
+        inventory_hostname == landscape_db_master

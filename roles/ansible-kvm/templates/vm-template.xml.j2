@@ -14,6 +14,9 @@
     <apic/>
   </features>
   <devices>
+{% if graphics is defined and graphics == true %}
+    <graphics type='spice' autoport='yes'/>
+{% endif %}
 {% for hd in item.disks %}
     <disk type='file' device='disk'>
       <driver name='qemu' type='{{ kvm_images_format_type }}'/>

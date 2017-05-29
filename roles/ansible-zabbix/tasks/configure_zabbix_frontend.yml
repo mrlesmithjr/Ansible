@@ -3,12 +3,20 @@
   template:
     src: "etc/zabbix/apache.conf.j2"
     dest: "/etc/zabbix/apache.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - restart apache2
+    owner: "root"
+    group: "root"
+    mode: "o=rw,g=r,o=r"
+  become: true
+  notify: "restart apache2"
   when: ansible_os_family == "Debian"
+
+- name: configure_zabbix_frontend | Configuring Zabbix Frontend
+  file:
+    src: "/etc/apache2/conf-available/zabbix.conf"
+    dest: "/etc/apache2/conf-enabled/zabbix.conf"
+    state: "link"
+  become: true
+  notify: "restart apache2"
 
 - name: configure_zabbix_frontend | configuring server web
   template:
@@ -16,5 +24,5 @@
     dest: "/etc/zabbix/web/zabbix.conf.php"
     owner: www-data
     group: www-data
+  become: true
   when: ansible_os_family == "Debian"
-    

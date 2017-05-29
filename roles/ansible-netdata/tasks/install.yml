@@ -1,0 +1,15 @@
+---
+- name: install | Cloning {{ netdata_git_repo }} to {{ netdata_source_dir }}
+  git:
+    repo: "{{ netdata_git_repo }}"
+    dest: "{{ netdata_source_dir }}"
+    depth: 1
+  become: true
+
+- name: install | Installing Netdata ({{ netdata_installer }}) From {{ netdata_source_dir }}
+  command: "{{ netdata_installer }} --dont-wait"
+  args:
+    chdir: "{{ netdata_source_dir }}"
+    creates: "/usr/sbin/netdata"
+  become: true
+  notify: "restart netdata"

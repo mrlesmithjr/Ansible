@@ -2,21 +2,28 @@
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items: '{{ zabbix_debian_pre_req_packages }}'
-
-- name: debian | downloading zabbix package
-  get_url:
-    url: "{{ zabbix_debian_repo_info.url }}/{{ zabbix_debian_repo_info.package }}"
-    dest: "{{ zabbix_package_dir }}/{{ zabbix_debian_repo_info.package }}"
 
 - name: debian | adding zabbix package
   apt:
-    deb: "{{ zabbix_package_dir }}/{{ zabbix_debian_repo_info.package }}"
-    state: present
-  register: package_added
+    deb: "{{ zabbix_debian_repo_info['url'] }}/{{ zabbix_debian_repo_info['package'] }}"
+    state: "present"
+  become: true
+  register: "package_added"
 
 - name: debian | updating apt-cache (If zabbix package added)
   apt:
     update_cache: true
-  when: package_added.changed
+  become: true
+  when: package_added['changed']
+
+- name: debian | installing zabbix
+  apt:
+    name: "{{ item }}"
+    state: "latest"
+  become: true
+  with_items:
+    - 'zabbix-server-mysql'
+    - 'zabbix-frontend-php'

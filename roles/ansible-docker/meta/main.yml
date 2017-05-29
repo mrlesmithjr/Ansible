@@ -21,6 +21,10 @@ galaxy_info:
   # platform on this list, let us know and we'll get it added!
   #
   platforms:
+  #- name: Alpine
+  #  versions:
+  #    - 3.4
+  #    - 3.5
   - name: EL
     versions:
   #  - all

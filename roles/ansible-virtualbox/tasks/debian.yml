@@ -1,0 +1,6 @@
+---
+- name: debian | Installing Virtualbox
+  apt:
+    deb: "{{ virtualbox_dl_url }}/{{ virtualbox_debian_package }}"
+    state: "present"
+  become: true

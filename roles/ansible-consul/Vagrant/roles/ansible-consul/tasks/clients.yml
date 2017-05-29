@@ -1,0 +1,30 @@
+---
+- name: clients | creating consul client folders
+  file:
+    path: "{{ consul_home }}"
+    state: "directory"
+  become: true
+
+- name: clients | downloading consul ui
+  get_url:
+    url: "{{ consul_dl_url }}/{{ consul_ui_dl_file }}"
+    dest: "/opt"
+  become: true
+
+- name: clients | extracting consul ui
+  unarchive:
+    src: "/opt/{{ consul_ui_dl_file }}"
+    dest: "{{ consul_home }}"
+    copy: no
+    creates: "{{ consul_home }}/index.html"
+  become: true
+  when: not ansible_check_mode
+
+- name: clients | setting permissions on consul home folder
+  file:
+    path: "{{ consul_home }}"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    recurse: yes
+    state: "directory"
+  become: true

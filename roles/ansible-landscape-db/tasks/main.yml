@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-landscape-db
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: db.yml
+
+- include: users.yml
+
+- include: config.yml

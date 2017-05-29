@@ -3,21 +3,14 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ kvm_debian_packages }}'
 
-- name: debian | Installing ifenslave
+- name: debian | Installing Additional Ubuntu Packages
   apt:
-    name: "ifenslave"
+    name: "{{ item }}"
     state: "present"
-  # when: >
-  #       ansible_distribution == "Ubuntu" and
-  #       ansible_distribution_version < '16.04'
-
-# Disabled as this causes issues
-# - name: debian | Installing ifupdown2
-#   apt:
-#     name: "ifupdown2"
-#     state: "present"
-#   when: >
-#         ansible_distribution == "Ubuntu" and
-#         ansible_distribution_version >= '16.04'
+  become: true
+  with_items:
+    - 'ubuntu-vm-builder'
+  when: ansible_distribution == "Ubuntu"

@@ -14,42 +14,30 @@ haproxy_admin_user: 'admin'
 haproxy_config: false
 
 # Defines load balancer configurations to enable/disable
-haproxy_configs:
-  - name: 'web-http'
-    # Defines if backend server checks are to be performed (true|false)
-    backend_checks: true
-    # Defines name of backend-name config
-    backend_name: 'web-servers'
-    # Defines the port that backend servers listen on
-    backend_servers_bind_port: '80'
-    # Define Ansible inventory group host resides in
-    backend_servers_group: 'web_nodes'
-    # Define load balancing method
-    # (roundrobin|static-rr|leastconn|first|source|uri|url_param)
-    balance: 'roundrobin'
-    # Define default-server options
-    default_server_options:
-      - name: 'maxconn'
-        value: '256'
-      - name: 'maxqueue'
-        value: '128'
-      - name: 'weight'
-        value: '100'
-    # Defines if config is enabled or not (true|false)
-    enabled: true
-    frontend_bind_address: '{{ haproxy_lb_vip }}'
-    # Defines the port that frontend server listens on
-    frontend_bind_port: '80'
-    # Defines frontend name to create
-    frontend_name: 'http-in'
-    # Defines listen mode (http|tcp)
-    mode: 'http'
-    # Defines options to add to backend group
-    # (not the same as default_server_options)
-    options:
-      - 'httplog'
-      - 'httpchk'
-#      - httpchk HEAD / HTTP/1.1\r\nHost:localhost  #Works for default NGINX health checks
+haproxy_configs: []
+  # - name: 'squid-3128'
+  #   backend_checks: true
+  #   backend_name: 'squid-servers'
+  #   backend_servers_bind_port: '3128'
+  #   backend_servers:
+  #     - '192.168.250.10'
+  #     - '192.168.250.11'
+  #   balance: 'roundrobin'
+  #   default_server_options:
+  #     - name: 'maxconn'
+  #       value: '256'
+  #     - name: 'maxqueue'
+  #       value: '128'
+  #     - name: 'weight'
+  #       value: '100'
+  #   enabled: true
+  #   frontend_bind_address: '{{ haproxy_lb_vip }}'
+  #   frontend_bind_port: '8080'
+  #   frontend_name: 'squid-in'
+  #   mode: 'tcp'
+  #   options:
+  #     - 'tcplog'
+  #     # - 'httpchk'
 
 # Defines default configurations for default block
 haproxy_defaults:

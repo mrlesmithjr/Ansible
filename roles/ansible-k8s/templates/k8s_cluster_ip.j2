@@ -1,0 +1,1 @@
+{{ (_k8s_cluster_ip['stdout']|from_json)['items'][0]['spec']['clusterIP'] }}

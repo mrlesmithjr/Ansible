@@ -6,6 +6,7 @@
     owner: "root"
     group: "root"
     mode: 0774
+  become: true
 
 - name: cron | creating cron job
   cron:
@@ -13,3 +14,4 @@
     minute: "*/5"
     job: "/etc/cron.d/dns_check.sh"
     state: "present"
+  become: true

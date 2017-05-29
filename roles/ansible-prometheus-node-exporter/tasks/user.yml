@@ -1,0 +1,15 @@
+---
+- name: user | Creating Prometheus Node Exporter Group
+  group:
+    name: "{{ prometheus_node_exporter_user_info['group'] }}"
+    state: "present"
+  become: true
+
+- name: user | Creating Prometheus Node Exporter User
+  user:
+    name: "{{ prometheus_node_exporter_user_info['user'] }}"
+    groups: "{{ prometheus_node_exporter_user_info['group'] }}"
+    state: "present"
+    system: true
+    append: true
+  become: true

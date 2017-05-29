@@ -11,6 +11,7 @@
     owner: "root"
     group: "root"
     mode: 0644
+  become: true
   notify: "restart rsyslog"
   when: rsyslog_haproxy_conf.stat.exists
 
@@ -21,12 +22,14 @@
     owner: "root"
     group: "root"
     mode: 0644
+  become: true
   register: haproxy_reconfigured
 
 - name: config_haproxy | restarting haproxy
   service:
     name: "haproxy"
     state: "restarted"
+  become: true
   when: >
         haproxy_reconfigured['changed'] and
         not ansible_check_mode

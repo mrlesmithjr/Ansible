@@ -24,13 +24,22 @@
     redis_working_directory: "{{ redis_install_dir }}"
   when: ansible_os_family == "RedHat"
 
+# Define the node which should act as primary
+# By default it will choose the first node listed in the redis_replication_ansible_group
+# redis_replication_master: "{{ groups[redis_replication_ansible_group][0] }}"
+- name: set_facts | Setting Replication Master
+  set_fact:
+    redis_replication_master: "{{ groups[redis_replication_ansible_group][0] }}"
+  when: >
+        redis_replication
+
 - name: set_facts | Setting Master Replication Address
   set_fact:
     redis_replication_master_address: "{{ redis_replication_address }}"
   when: >
         redis_replication and
-        redis_replication_master is defined and
-        inventory_hostname == redis_replication_master
+        (redis_replication_master is defined and
+        inventory_hostname == redis_replication_master)
 
 - name: set_facts | Setting Master Replication Address On Slaves
   set_fact:

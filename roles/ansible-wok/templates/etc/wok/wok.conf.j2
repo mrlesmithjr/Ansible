@@ -1,0 +1,57 @@
+#
+# Configuration file for Wok Web Server
+#
+
+[server]
+# Start an SSL-enabled server on the given port
+#proxy_port = 8001
+
+# Cherrypy server port
+#cherrypy_port = 8010
+
+# Port for websocket proxy to listen on
+#websockets_port = 64667
+
+# Number of minutes that a session can remain idle before the server
+# terminates it automatically.
+#session_timeout = 10
+
+# Running environment of the server
+#environment = production
+
+# Max request body size in KB, default value is 4GB
+#max_body_size = 4 * 1024 * 1024
+
+# Wok server root. Set the following variable to configure any relative path to
+# the server. For example, to have Wok pointing to https://localhost:8001/wok/
+# uncomment the following:
+#server_root=/wok
+
+[logging]
+# Log directory
+
+# Be aware that editting logging directory, you must change logrotate
+# configuration file to keep logs being compressed.
+# Look /etc/logrotate.d/wokd
+
+#log_dir = /var/log/wok
+
+# Logging level: debug, info, warning, error or critical
+#log_level = info
+
+[authentication]
+# Authentication method, available option: pam, ldap.
+# method = pam
+
+# If specified method to ldap, following fields need to be specified.
+# ldap server domain name used to authenticate.
+# ldap_server = "localhost"
+
+# Search tree base in ldap
+# ldap_search_base = "ou=People, dc=wok, dc=org"
+
+# User id filter
+# ldap_search_filter = "uid=%(username)s"
+
+# User IDs regarded as Wok admin
+# ldap_admin_id = "foo@foo.com, bar@bar.com"

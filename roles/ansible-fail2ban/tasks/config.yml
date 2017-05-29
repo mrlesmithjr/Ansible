@@ -1,0 +1,8 @@
+---
+- name: config | Configuring Fail2ban
+  template:
+    src: "etc/fail2ban/{{ item }}.j2"
+    dest: "/etc/fail2ban/{{ item }}"
+  notify: "restart fail2ban"
+  become: true
+  with_items: '{{ fail2ban_configs }}'

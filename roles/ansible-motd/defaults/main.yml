@@ -1,0 +1,11 @@
+---
+# defaults file for ansible-motd
+#
+# Defines default directory for MOTD scripts
+motd_default_dir: '/etc/update-motd.d'
+
+# Defines a default message to apply above any custom messages
+motd_default_message: 'Welcome to your DEV environment'
+
+# Defines if all default MOTD scripts in motd_default_dir should be disabled
+motd_disable_defaults: true

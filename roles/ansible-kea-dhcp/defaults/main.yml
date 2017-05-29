@@ -1,9 +1,17 @@
 ---
 # defaults file for ansible-kea-dhcp
+
+# Defines if Kea DHCP should be configured
+kea_dhcp_config: false
+
+# Defines  Kea DHCP packages to install for Debian/Ubuntu
 kea_dhcp_debian_packages:
   - 'kea-dhcp-ddns-server'
   - 'kea-dhcp4-server'
-#  - 'kea-dhcp6-server'
+  # - 'kea-dhcp6-server'
+  - 'socat'
+
+# Defines Kea DHCP Debian/Ubuntu services should be enabled
 kea_dhcp_debian_services:
   - name: 'kea-dhcp-ddns-server'
     enabled: true
@@ -11,62 +19,108 @@ kea_dhcp_debian_services:
     enabled: true
   - name: 'kea-dhcp6-server'
     enabled: false
-kea_dhcp_configs:
-  - name: 'Dhcp4'
-    backend: 'memfile'
-    ddns:
-      qualifying_suffix: '{{ pri_domain_name }}'
-    enable_ddns: true
-    expired_leases_processing:
-      reclaim_timer_wait_time: 10
-      flush_reclaimed_timer_wait_time: 25
-      hold_reclaimed_time: 3600
-      max_reclaim_leases: 100
-      max_reclaim_time: 250
-      unwarned_reclaim_cycles: 5
-    listen_interfaces:
-      - '*'
-#      - 'eth0'
-#      - 'eth1'
-    options:
-      - name: 'domain-name-servers'
-        code: 6
-        csv_format: true
-        data:
-          - '8.8.8.8'
-          - '8.8.4.4'
-      - name: 'domain-name'
-        code: 15
-        csv_format: true
-        data: '{{ pri_domain_name }}'
-      - name: 'tftp-server-name'
-        code: 66
-        csv_format: true
-        data: 'tftp.{{ pri_domain_name }}'
-      - name: 'boot-file-name'
-        code: 67
-        csv_format: true
-        data: 'pxelinux.0'
-    socket_type: 'raw'
-    subnets:
-      - name: 'subnet4'
-        pools:
-          - range: '192.0.2.1 - 192.0.2.200'
-            subnet: '192.0.2.0/24'
-            reservations:
-              - hw_address: '1a:1b:1c:1d:1e:1f'
-                ip_address: '192.0.2.202'
-          - range: '192.0.3.1 - 192.0.3.200'
-            subnet: '192.0.3.0/24'
-          - range: '192.0.4.1 - 192.0.4.200'
-            subnet: '192.0.4.0/24'
-    valid_lifetime: 4000
-kea_dhcp_ddns_configs:
-kea_dhcp_redhat_services:  #Defines services to enable
+
+# The DHCP DDNS configuration below is formatted appropriately to be converted
+# directly to JSON using the kea-dhcp-ddns.conf.j2 Jinja2 template.
+kea_dhcp_ddns_config:
+  DhcpDdns:
+    ip-address: '127.0.0.1'
+    port: 53001
+    tsig-keys: []
+    forward-ddns: {}
+    reverse-ddns: {}
+  Logging:
+    loggers:
+      - name: 'kea-dhcp-ddns'
+        output_options:
+          - output: '/var/log/kea-ddns.log'
+        severity: 'INFO'
+        debuglevel: 0
+
+# The DHCP configuration below is formatted appropriately to be converted
+# directly to JSON using the kea-dhcp4.conf.j2 Jinja2 template. If you need
+# to add more settings/options below ensure they are added appropriately in
+# YAML format in order to parse to JSON correctly.
+# Reference the below guide for more information
+# http://kea.isc.org/docs/kea-guide.html#idp50527472
+kea_dhcp_dhcp4_config:
+  Dhcp4:
+    renew-timer: 1000
+    rebind-timer: 2000
+    # Add names of interfaces to listen on
+    interfaces-config:
+      interfaces:
+        - '*'
+        # - 'eth0'
+        # - 'eth1'
+      dhcp-socket-type: 'raw'
+    # Use Memfile lease database backend to store leases in a CSV file.
+    lease-database:
+      type: 'memfile'
+      persist: true
+      lfc-interval: 0
+    # Setup reclamation of the expired leases and leases affinity.
+    expired-leases-processing:
+      reclaim-timer-wait-time: 10
+      flush-reclaimed-timer-wait-time: 25
+      hold-reclaimed-time: 3600
+      max-reclaim-leases: 100
+      max-reclaim-time: 250
+      unwarned-reclaim-cycles: 5
+    # Global (inherited by all subnets) lease lifetime is mandatory parameter.
+    valid-lifetime: 4000
+    # Below an example of the simple subnet declarations
+    subnet4: []
+    #   - subnet: '192.0.2.0/24'
+    #     next-server: '192.0.2.234'
+    #     pools:
+    #       - pool: '192.0.2.1 - 192.0.2.200'
+    #     reservations:
+    #       - hw-address: '1a:1b:1c:1d:1e:1f'
+    #         ip-address: '192.0.2.202'
+    #   - subnet: '192.0.3.0/24'
+    #     pools:
+    #       - pool: '192.0.3.1 - 192.0.3.200'
+    #     relay:
+    #       ip-address: '10.0.0.1'
+    #   - subnet: '192.0.4.0/24'
+    #     pools:
+    #       - pool: '192.0.4.1 - 192.0.4.200'
+    # option-data:
+    #   - name: 'domain-name-servers'
+    #     data: '8.8.8.8, 8.8.4.4'
+    #   - name: 'domain-name'
+    #     data: '{{ kea_dhcp_pri_domain_name }}'
+    #   - name: 'tftp-server-name'
+    #     data: 'tftp.{{ kea_dhcp_pri_domain_name }}'
+    #   - name: 'boot-file-name'
+    #     data: 'pxelinux.0'
+    dhcp-ddns: []
+    #   enable-updates: false
+    #   qualifying-suffix: '{{ kea_dhcp_pri_domain_name }}'
+    # next-server: '0.0.0.0'
+    # control-socket:
+    #   socket-type: 'unix'
+    #   socket-name: '/var/run/kea.socket'
+  # Logging configuration starts here. It tells Kea servers to store
+  # all log messages (on severity INFO or more) in a file.
+  # debuglevel variable is used on DEBUG level only.
+  Logging:
+    loggers:
+      - name: 'kea-dhcp4'
+        output_options:
+          - output: '/var/log/kea-dhcp4.log'
+        severity: 'INFO'
+        debuglevel: 0
+
+# Defines Kea DHCP RedHat services should be enabled
+kea_dhcp_redhat_services:
   - name: 'kea-dhcp-ddns'
     enabled: true
   - name: 'kea-dhcp4'
     enabled: true
   - name: 'kea-dhcp6'
     enabled: false
-pri_domain_name: 'vagrant.local'
+
+# Defines primary domain name of environment
+kea_dhcp_pri_domain_name: 'vagrant.local'

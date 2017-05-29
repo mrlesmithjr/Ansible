@@ -1,226 +1,138 @@
-##################### Grafana Configuration Example #####################
-#
-# Everything has defaults so you only need to uncomment things you want to
-# change
-
-# possible values : production, development
-; app_mode = production
-
-# instance name, defaults to HOSTNAME environment variable value or hostname if HOSTNAME var is empty
-; instance_name = ${HOSTNAME}
-
-#################################### Paths ####################################
 [paths]
-data = {{ grafana_paths.data }}
-logs = {{ grafana_paths.logs }}
-plugins = {{ grafana_paths.plugins }}
+data = {{ grafana_paths['data'] }}
+logs = {{ grafana_paths['logs'] }}
+plugins = {{ grafana_paths['plugins'] }}
 
-#
-#################################### Server ####################################
 [server]
-protocol = {{ grafana_server_info.protocol }}
-http_addr = {{ grafana_server_info.http_addr }}
-http_port = {{ grafana_server_info.http_port }}
-domain = {{ grafana_server_info.domain }}
-enforce_domain = {{ grafana_server_info.enforce_domain }}
-root_url = {{ grafana_server_info.root_url }}
-router_logging = {{ grafana_server_info.router_logging }}
-static_root_path = {{ grafana_server_info.static_root_path }}
-enable_gzip = {{ grafana_server_info.enable_gzip }}
+protocol = {{ grafana_server_info['protocol'] }}
+http_addr = {{ grafana_server_info['http_addr'] }}
+http_port = {{ grafana_server_info['http_port'] }}
+domain = {{ grafana_server_info['domain'] }}
+enforce_domain = {{ grafana_server_info['enforce_domain']|lower }}
+root_url = {{ grafana_server_info['root_url'] }}
+router_logging = {{ grafana_server_info['router_logging']|lower }}
+static_root_path = {{ grafana_server_info['static_root_path'] }}
+enable_gzip = {{ grafana_server_info['enable_gzip']|lower }}
 
-# https certs & key file
-;cert_file =
-;cert_key =
-
-#################################### Database ####################################
 [database]
-# Either "mysql", "postgres" or "sqlite3", it's your choice
-
 type = {{ grafana_db_type }}
 {% if grafana_db_type != 'sqlite3' %}
-host = {{ grafana_db_info.host }}
-name = {{ grafana_db_info.name }}
-user = {{ grafana_db_info.user }}
-password = {{ grafana_db_info.password }}
+host = {{ grafana_db_info['host'] }}
+name = {{ grafana_db_info['name'] }}
+user = {{ grafana_db_info['user'] }}
+password = {{ grafana_db_info['password'] }}
 {% endif %}
 
-# For "postgres" only, either "disable", "require" or "verify-full"
-;ssl_mode = disable
-
-# For "sqlite3" only, path relative to data_path setting
-;path = grafana.db
-
-#################################### Session ####################################
 [session]
-provider = {{ grafana_session_info.provider }}
-provider_config = {{ grafana_session_info.provider_config }}
-cookie_name = {{ grafana_session_info.cookie_name }}
-cookie_secure = {{ grafana_session_info.cookie_secure }}
-session_life_time = {{ grafana_session_info.session_life_time }}
+provider = {{ grafana_session_info['provider'] }}
+provider_config = {{ grafana_session_info['provider_config'] }}
+cookie_name = {{ grafana_session_info['cookie_name'] }}
+cookie_secure = {{ grafana_session_info['cookie_secure']|lower }}
+session_life_time = {{ grafana_session_info['session_life_time'] }}
 
-#################################### Analytics ####################################
 [analytics]
-reporting_enabled = {{ grafana_analytics.reporting_enabled }}
-check_for_updates = {{ grafana_analytics.check_for_updates }}
-google_analytics_ua_id = {{ grafana_analytics.google_analytics_ua_id }}
+reporting_enabled = {{ grafana_analytics['reporting_enabled']|lower }}
+check_for_updates = {{ grafana_analytics['check_for_updates']|lower }}
+google_analytics_ua_id = {{ grafana_analytics['google_analytics_ua_id'] }}
 
-#################################### Security ####################################
 [security]
-admin_user = {{ grafana_security_info.admin_user }}
-admin_password = {{ grafana_security_info.admin_password }}
-secret_key = {{ grafana_security_info.secret_key }}
-login_remember_days = {{ grafana_security_info.login_remember_days }}
-cookie_username = {{ grafana_security_info.cookie_username }}
-cookie_remember_name = {{ grafana_security_info.cookie_remember_name }}
-disable_gravatar = {{ grafana_security_info.disable_gravatar }}
-data_source_proxy_whitelist = {{grafana_security_info.data_source_proxy_whitelist }}
+admin_user = {{ grafana_security_info['admin_user'] }}
+admin_password = {{ grafana_security_info['admin_password'] }}
+secret_key = {{ grafana_security_info['secret_key'] }}
+login_remember_days = {{ grafana_security_info['login_remember_days'] }}
+cookie_username = {{ grafana_security_info['cookie_username'] }}
+cookie_remember_name = {{ grafana_security_info['cookie_remember_name'] }}
+disable_gravatar = {{ grafana_security_info['disable_gravatar']|lower }}
+data_source_proxy_whitelist = {{ grafana_security_info['data_source_proxy_whitelist'] }}
 
 [snapshots]
-external_enabled = {{ grafana_snapshots_info.external_enabled }}
-external_snapshot_url = {{ grafana_snapshots_info.external_snapshot_url }}
-external_snapshot_name = {{ grafana_snapshots_info.external_snapshot_name }}
+external_enabled = {{ grafana_snapshots_info['external_enabled']|lower }}
+external_snapshot_url = {{ grafana_snapshots_info['external_snapshot_url'] }}
+external_snapshot_name = {{ grafana_snapshots_info['external_snapshot_name'] }}
 
-#################################### Users ####################################
 [users]
-allow_sign_up = {{ grafana_users_info.allow_sign_up }}
-allow_org_create = {{ grafana_users_info.allow_org_create }}
-auto_assign_org = {{ grafana_users_info.auto_assign_org }}
-auto_assign_org_role = {{ grafana_users_info.auto_assign_org_role }}
-login_hint = {{ grafana_users_info.login_hint }}
-default_theme = {{ grafana_users_info.default_theme }}
+allow_sign_up = {{ grafana_users_info['allow_sign_up']|lower }}
+allow_org_create = {{ grafana_users_info['allow_org_create']|lower }}
+auto_assign_org = {{ grafana_users_info['auto_assign_org']|lower }}
+auto_assign_org_role = {{ grafana_users_info['auto_assign_org_role'] }}
+login_hint = {{ grafana_users_info['login_hint'] }}
+default_theme = {{ grafana_users_info['default_theme'] }}
 
-#################################### Anonymous Auth ##########################
 [auth.anonymous]
-enabled = {{ grafana_anonymous_auth_info.enabled }}
-org_name = {{ grafana_anonymous_auth_info.org_name }}
-org_role = {{ grafana_anonymous_auth_info.org_role }}
+enabled = {{ grafana_anonymous_auth_info['enabled']|lower }}
+org_name = {{ grafana_anonymous_auth_info['org_name'] }}
+org_role = {{ grafana_anonymous_auth_info['org_role'] }}
 
-#################################### Github Auth ##########################
 [auth.github]
-enabled = {{ grafana_github_auth_info.enabled }}
-allow_sign_up = {{ grafana_github_auth_info.allow_sign_up }}
-client_id = {{ grafana_github_auth_info.client_id }}
-client_secret = {{ grafana_github_auth_info.client_secret }}
-scopes = {{ grafana_github_auth_info.scopes }}
-auth_url = {{ grafana_github_auth_info.auth_url }}
-token_url = {{ grafana_github_auth_info.token_url }}
-api_url = {{ grafana_github_auth_info.api_url }}
-team_ids = {{ grafana_github_auth_info.team_ids }}
-allowed_organizations = {{ grafana_github_auth_info.allowed_organizations }}
+enabled = {{ grafana_github_auth_info['enabled']|lower }}
+allow_sign_up = {{ grafana_github_auth_info['allow_sign_up']|lower }}
+client_id = {{ grafana_github_auth_info['client_id'] }}
+client_secret = {{ grafana_github_auth_info['client_secret'] }}
+scopes = {{ grafana_github_auth_info['scopes'] }}
+auth_url = {{ grafana_github_auth_info['auth_url'] }}
+token_url = {{ grafana_github_auth_info['token_url'] }}
+api_url = {{ grafana_github_auth_info['api_url'] }}
+team_ids = {{ grafana_github_auth_info['team_ids'] }}
+allowed_organizations = {{ grafana_github_auth_info['allowed_organizations'] }}
 
-#################################### Google Auth ##########################
 [auth.google]
-enabled = {{ grafana_google_auth_info.enabled }}
-allow_sign_up = {{ grafana_google_auth_info.allow_sign_up }}
-client_id = {{ grafana_google_auth_info.client_id }}
-client_secret = {{ grafana_google_auth_info.client_secret }}
-scopes = {{ grafana_google_auth_info.scopes }}
-auth_url = {{ grafana_google_auth_info.auth_url }}
-token_url = {{ grafana_google_auth_info.token_url }}
-api_url = {{ grafana_google_auth_info.api_url }}
-allowed_domains = {{ grafana_google_auth_info.allowed_domains }}
+enabled = {{ grafana_google_auth_info['enabled']|lower }}
+allow_sign_up = {{ grafana_google_auth_info['allow_sign_up'] }}
+client_id = {{ grafana_google_auth_info['client_id'] }}
+client_secret = {{ grafana_google_auth_info['client_secret'] }}
+scopes = {{ grafana_google_auth_info['scopes'] }}
+auth_url = {{ grafana_google_auth_info['auth_url'] }}
+token_url = {{ grafana_google_auth_info['token_url'] }}
+api_url = {{ grafana_google_auth_info['api_url'] }}
+allowed_domains = {{ grafana_google_auth_info['allowed_domains'] }}
 
-#################################### Auth Proxy ##########################
 [auth.proxy]
-;enabled = false
-;header_name = X-WEBAUTH-USER
-;header_property = username
-;auto_sign_up = true
 
-#################################### Basic Auth ##########################
 [auth.basic]
 enabled = {{ grafana_auth_basic|lower }}
 
-#################################### Auth LDAP ##########################
 [auth.ldap]
 enabled = {{ grafana_auth_ldap|lower }}
 config_file = {{ grafana_auth_ldap_config_file }}
 
-#################################### SMTP / Emailing ##########################
 [smtp]
-enabled = {{ grafana_smtp_info.enabled }}
-host = {{ grafana_smtp_info.host }}
-user = {{ grafana_smtp_info.user }}
-password = {{ grafana_smtp_info.password }}
-cert_file = {{ grafana_smtp_info.cert_file }}
-key_file = {{ grafana_smtp_info.key_file }}
-skip_verify = {{ grafana_smtp_info.skip_verify }}
-from_address = {{ grafana_smtp_info.from_address }}
+enabled = {{ grafana_smtp_info['enabled']|lower }}
+host = {{ grafana_smtp_info['host'] }}
+user = {{ grafana_smtp_info['user'] }}
+password = {{ grafana_smtp_info['password'] }}
+cert_file = {{ grafana_smtp_info['cert_file'] }}
+key_file = {{ grafana_smtp_info['key_file'] }}
+skip_verify = {{ grafana_smtp_info['skip_verify']|lower }}
+from_address = {{ grafana_smtp_info['from_address'] }}
 
 [emails]
 welcome_email_on_sign_up = {{ grafana_welcome_emails|lower }}
 
-#################################### Logging ##########################
 [log]
-mode = {{ grafana_logging_info.mode|join (' ')}}
-level = {{ grafana_logging_info.level }}
+mode = {{ grafana_logging_info['mode']|join (' ') }}
+level = {{ grafana_logging_info['level'] }}
 
-# For "console" mode only
 [log.console]
-level = {{ grafana_logging_info.level }}
+level = {{ grafana_logging_info['level'] }}
 
-# log line format, valid options are text, console and json
-;format = console
-
-# For "file" mode only
 [log.file]
-level = {{ grafana_logging_info.level }}
-
-# log line format, valid options are text, console and json
-;format = text
-
-# This enables automated log rotate(switch of following options), default is true
-;log_rotate = true
-
-# Max line number of single file, default is 1000000
-;max_lines = 1000000
-
-# Max size shift of single file, default is 28 means 1 << 28, 256MB
-;max_size_shift = 28
-
-# Segment log daily, default is true
-;daily_rotate = true
-
-# Expired days of log file(delete after max days), default is 7
-;max_days = 7
+level = {{ grafana_logging_info['level'] }}
 
 [log.syslog]
-{% if grafana_logging_info.syslog_info.enabled %}
-level = {{ grafana_logging_info.level }}
-format = {{ grafana_logging_info.syslog_info.format }}
-network = {{ grafana_logging_info.syslog_info.network }}
-address = {{ grafana_logging_info.syslog_info.address }}
-facility = {{ grafana_logging_info.syslog_info.facility }}
-tag = {{ grafana_logging_info.syslog_info.tag }}
+{% if grafana_logging_info['syslog_info']['enabled']|lower %}
+level = {{ grafana_logging_info['level'] }}
+format = {{ grafana_logging_info['syslog_info']['format'] }}
+network = {{ grafana_logging_info['syslog_info']['network'] }}
+address = {{ grafana_logging_info['syslog_info']['address'] }}
+facility = {{ grafana_logging_info['syslog_info']['facility'] }}
+tag = {{ grafana_logging_info['syslog_info']['tag'] }}
 {% endif %}
 
-
-#################################### AMQP Event Publisher ##########################
 [event_publisher]
-;enabled = false
-;rabbitmq_url = amqp://localhost/
-;exchange = grafana_events
 
-;#################################### Dashboard JSON files ##########################
 [dashboards.json]
-;enabled = false
-;path = /var/lib/grafana/dashboards
 
-#################################### Internal Grafana Metrics ##########################
-# Metrics available at HTTP API Url /api/metrics
 [metrics]
-# Disable / Enable internal metrics
-;enabled           = true
 
-# Publish interval
-;interval_seconds  = 10
-
-# Send internal metrics to Graphite
-; [metrics.graphite]
-; address = localhost:2003
-; prefix = prod.grafana.%(instance_name)s.
-
-#################################### Internal Grafana Metrics ##########################
-# Url used to to import dashboards directly from Grafana.net
 [grafana_net]
 url = https://grafana.net

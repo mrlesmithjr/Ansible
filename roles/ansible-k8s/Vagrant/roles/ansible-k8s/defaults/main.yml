@@ -1,0 +1,31 @@
+---
+# defaults file for ansible-k8s
+#
+k8s_admin_config: '/etc/kubernetes/admin.conf'
+
+# Define Ansible group which defines the K8s Cluster
+k8s_advertise_address_int: 'enp0s8'
+
+k8s_advertise_bind_port: '6443'
+
+k8s_cluster_group: 'k8s'
+
+k8s_dashboard: 'https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml'
+
+k8s_debian_packages:
+  - 'kubelet'
+  - 'kubeadm'
+  - 'kubectl'
+  - 'kubernetes-cni'
+
+k8s_debian_repo_info:
+  key: '{{ k8s_package_url }}/apt/doc/apt-key.gpg'
+  repo: 'deb http://apt.kubernetes.io/ kubernetes-{{ ansible_distribution_release|lower }} main'
+
+k8s_package_url: 'https://packages.cloud.google.com'
+
+k8s_pod_network_config: 'https://git.io/weave-kube-1.6'
+
+k8s_reset_cluster: false
+
+k8s_token_file: '/etc/kubernetes/.k8s_token'

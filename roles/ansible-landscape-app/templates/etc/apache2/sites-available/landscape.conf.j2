@@ -1,0 +1,178 @@
+<VirtualHost *:80>
+    ServerName {{ ansible_fqdn }}
+    ServerAdmin webmaster@{{ ansible_fqdn }}
+    ErrorLog /var/log/apache2/landscape.error-log
+    CustomLog /var/log/apache2/landscape.access-log combined
+    DocumentRoot /opt/canonical/landscape/canonical/landscape
+    ProxyVia on
+    ProxyTimeout 10
+
+    <Directory "/">
+      Options +Indexes
+      Order deny,allow
+      Allow from all
+      Require all granted
+      Satisfy Any
+      ErrorDocument 403 /offline/unauthorized.html
+      ErrorDocument 404 /offline/notfound.html
+    </Directory>
+
+    Alias /offline /opt/canonical/landscape/canonical/landscape/offline
+    Alias /static /opt/canonical/landscape/canonical/static
+    Alias /repository /var/lib/landscape/landscape-repository
+
+
+    <Location "/repository">
+      Order deny,allow
+      Deny from all
+      ErrorDocument 403 default
+      ErrorDocument 404 default
+    </Location>
+   <LocationMatch "/repository/[^/]+/[^/]+/(dists|pool)/.*">
+     Allow from all
+   </LocationMatch>
+   <Location "/icons">
+        Order allow,deny
+        Allow from all
+   </Location>
+   <Location "/ping">
+        Order allow,deny
+        Allow from all
+    </Location>
+
+    <Location "/message-system">
+        Order allow,deny
+        Allow from all
+    </Location>
+
+   <Location "/static">
+      Header always append X-Frame-Options SAMEORIGIN
+   </Location>
+
+   <Location "/r">
+      FileETag none
+      ExpiresActive on
+      ExpiresDefault "access plus 10 years"
+      Header append Cache-Control "public"
+   </Location>
+
+    RewriteEngine On
+
+    RewriteRule ^/r/([^/]+)/(.*) /$2
+
+    RewriteRule ^/ping$ http://localhost:8070/ping [P]
+
+    RewriteCond %{REQUEST_URI} !^/server-status
+    RewriteCond %{REQUEST_URI} !^/icons
+    RewriteCond %{REQUEST_URI} !^/static/
+    RewriteCond %{REQUEST_URI} !^/offline/
+    RewriteCond %{REQUEST_URI} !^/repository/
+    RewriteCond %{REQUEST_URI} !^/message-system
+
+    RewriteRule ^/(.*) https://{{ ansible_fqdn }}:443/$1 [R=permanent]
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName {{ ansible_fqdn }}
+    ServerAdmin webmaster@{{ ansible_fqdn }}
+
+    ErrorLog /var/log/apache2/landscape.error-log
+    CustomLog /var/log/apache2/landscape.access-log combined
+
+    DocumentRoot /opt/canonical/landscape/canonical/landscape
+
+    SSLEngine On
+    SSLCertificateFile {{ landscape_app_ssl_cert_file }}
+    SSLCertificateKeyFile {{ landscape_app_ssl_cert_key_file }}
+    SSLProtocol all -SSLv3 -SSLv2
+    SSLHonorCipherOrder On
+    SSLCompression Off
+    SSLCipherSuite EECDH+AESGCM+AES128:EDH+AESGCM+AES128:EECDH+AES128:EDH+AES128:ECDH+AESGCM+AES128:aRSA+AESGCM+AES128:ECDH+AES128:DH+AES128:aRSA+AES128:EECDH+AESGCM:EDH+AESGCM:EECDH:EDH:ECDH+AESGCM:aRSA+AESGCM:ECDH:DH:aRSA:HIGH:!MEDIUM:!aNULL:!NULL:!LOW:!3DES:!DSS:!EXP:!PSK:!SRP:!CAMELLIA:!DHE-RSA-AES128-SHA:!DHE-RSA-AES256-SHA:!aECDH
+
+    ProxyTimeout 305
+
+    <Directory "/">
+      Options -Indexes
+      Order deny,allow
+      Allow from all
+      Require all granted
+      Satisfy Any
+      ErrorDocument 403 /offline/unauthorized.html
+      ErrorDocument 404 /offline/notfound.html
+    </Directory>
+
+    <Location "/ajax">
+      Order allow,deny
+      Allow from all
+    </Location>
+
+    Alias /offline /opt/canonical/landscape/canonical/landscape/offline
+    Alias /config /opt/canonical/landscape/apacheroot
+    Alias /hash-id-databases /var/lib/landscape/hash-id-databases
+
+    ProxyRequests off
+    <Proxy *>
+       Order deny,allow
+       Allow from all
+       ErrorDocument 403 /offline/unauthorized.html
+       ErrorDocument 500 /offline/exception.html
+       ErrorDocument 502 /offline/unplanned-offline.html
+       ErrorDocument 503 /offline/unplanned-offline.html
+    </Proxy>
+
+    ProxyPass /robots.txt !
+    ProxyPass /favicon.ico !
+    ProxyPass /offline !
+    ProxyPass /static !
+
+    ProxyPreserveHost on
+
+
+   <Location "/r">
+      FileETag none
+      ExpiresActive on
+      ExpiresDefault "access plus 10 years"
+      Header append Cache-Control "public"
+   </Location>
+
+   <Location "/static">
+      Header always append X-Frame-Options SAMEORIGIN
+   </Location>
+
+    RewriteEngine On
+
+    RewriteRule ^/.*\+\+.* / [F]
+    RewriteRule ^/r/([^/]+)/(.*) /$2
+
+    RewriteRule ^/message-system http://localhost:8090/++vh++https:{{ ansible_fqdn }}:443/++/ [P,L]
+
+    RewriteRule ^/ajax http://localhost:9090/ [P,L]
+    RewriteRule ^/combo(.*) http://localhost:8080/combo$1 [P,L]
+    RewriteRule ^/api http://localhost:9080/ [P,L]
+    RewriteRule ^/attachment/(.*) http://localhost:8090/attachment/$1 [P,L]
+    RewriteRule ^/upload/(.*) http://localhost:9100/$1 [P,L]
+
+    RewriteCond %{REQUEST_URI} !^/robots.txt$
+    RewriteCond %{REQUEST_URI} !^/favicon.ico$
+    RewriteCond %{REQUEST_URI} !^/offline/
+    RewriteCond %{REQUEST_URI} !^/(r/[^/]+/)?static/
+    RewriteCond %{REQUEST_URI} !^/config/
+    RewriteCond %{REQUEST_URI} !^/hash-id-databases/
+
+    RewriteRule ^/(.*) http://localhost:8080/++vh++https:{{ ansible_fqdn }}:443/++/$1 [P]
+
+    <Location /message-system>
+      Order allow,deny
+      Allow from all
+    </Location>
+
+    <Location />
+        SetOutputFilter DEFLATE
+
+        SetEnvIfNoCase Request_URI \
+        \.(?:gif|jpe?g|png|deb)$ no-gzip dont-vary
+
+        Header append Vary User-Agent env=!dont-vary
+    </Location>
+
+</VirtualHost>

@@ -1,9 +1,9 @@
-{
-  "rabbitmq":{
-    "host": "{{ sensu_host }}",
-    "port": 5672,
-    "vhost": "/sensu",
-    "user": "{{ sensu_rabbitmq_info.user }}",
-    "password": "{{ sensu_rabbitmq_info.password }}"
-  }
-}
+{% set rabbitmq = {} %}
+{% set _rabbitmq = {} %}
+{% set _opts = _rabbitmq.update({"host": sensu_rabbitmq_info['host']}) %}
+{% set _opts = _rabbitmq.update({"port": sensu_rabbitmq_info['port']|int}) %}
+{% set _opts = _rabbitmq.update({"vhost": sensu_rabbitmq_info['vhost']}) %}
+{% set _opts = _rabbitmq.update({"user": sensu_rabbitmq_info['user']}) %}
+{% set _opts = _rabbitmq.update({"password": sensu_rabbitmq_info['password']}) %}
+{% set __rabbitmq = rabbitmq.update({"rabbitmq": _rabbitmq}) %}
+{{ rabbitmq|to_nice_json }}

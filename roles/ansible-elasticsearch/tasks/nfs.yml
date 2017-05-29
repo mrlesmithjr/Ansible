@@ -3,12 +3,14 @@
   apt:
     name: nfs-common
     state: present
+  become: true
   when: ansible_os_family == "Debian"
 
 - name: nfs | installing centos nfs client
   yum:
     name: nfs-common
     state: present
+  become: true
   when: ansible_os_family == "RedHat"
 
 - name: nfs | mounting nfs volume
@@ -18,4 +20,5 @@
     fstype: nfs
     opts: "{{ item.opts }}"
     state: mounted
+  become: true
   with_items: es_nfs

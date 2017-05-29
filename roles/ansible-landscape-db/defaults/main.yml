@@ -1,0 +1,38 @@
+---
+# defaults file for ansible-landscape-db
+
+# Define Ansible group which contains the Landscape App Servers
+landscape_app_group: 'landscape_app'
+
+# Define the interface which should be used for communcations
+landscape_app_interface: 'enp0s8'
+
+# Define Landscape application user
+landscape_app_user_info:
+  name: 'landscape'
+  password: 'landscape'
+
+# Define Landscape master DB server if using backend Postgres replication
+# If used
+landscape_db_master: 'node0'
+
+# Define Ansible group which contains the Postgres DB replicated servers
+# If used
+landscape_db_replication_group: 'landscape_db'
+
+# Define the interface which should be used for communcations
+landscape_db_replication_interface: 'enp0s8'
+
+# Define the Postgres DB replication user
+landscape_db_replication_user: 'repluser'
+
+# Landscape version 17.03 only works with 9.5
+landscape_db_postgresql_version: 9.5
+
+# Define Landscape DB superuser
+landscape_db_superuser_info:
+  name: 'landscape_superuser'
+  password: 'landscape'
+
+# Defines if backend Postgres DB is replicated
+landscape_replicated_db: false

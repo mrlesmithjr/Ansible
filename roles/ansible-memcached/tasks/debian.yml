@@ -3,3 +3,4 @@
   apt:
     name: "memcached"
     state: "present"
+  become: true

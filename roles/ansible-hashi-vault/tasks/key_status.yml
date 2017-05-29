@@ -1,0 +1,22 @@
+---
+- include: check_seal.yml
+
+- include: unseal.yml
+  when: _hashi_vault_sealed['json']['sealed']
+
+- name: key_status | Checking HashiCorp Vault Key Status
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/key-status"
+    headers:
+      X-Vault-Token: "{{ _hashi_vault_unseal_keys['root_token'] }}"
+  no_log: true
+  register: "_hashi_vault_sever_key_status"
+  become: true
+
+- include: check_seal.yml
+
+- include: seal.yml
+  when: not _hashi_vault_sealed['json']['sealed']
+
+- name: key_status | Showing HashiCorp Vault Key Status
+  debug: var=_hashi_vault_sever_key_status['json']

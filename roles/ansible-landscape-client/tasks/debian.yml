@@ -1,0 +1,6 @@
+---
+- name: debian | Installing Landscape Client
+  apt:
+    name: "landscape-client"
+    state: "present"
+  become: true

@@ -1,0 +1,19 @@
+---
+- name: config | Configuring Default Logrotate Settings
+  template:
+    src: "etc/logrotate.conf.j2"
+    dest: "/etc/logrotate.conf"
+
+- name: config | Removing Default Logrotate Configs
+  file:
+    dest: "{{ item }}"
+    state: "absent"
+  with_items: '{{ logroate_default_configs }}'
+  when: logrotate_remove_default_configs
+
+- name: config | Configuring Defined Log Rotations
+  template:
+    src: "etc/logrotate.d/log.j2"
+    dest: "/etc/logrotate.d/{{ item.name }}"
+  with_items: '{{ logrotate_configs }}'
+  when: logrotate_configs is defined

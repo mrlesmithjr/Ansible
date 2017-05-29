@@ -6,7 +6,8 @@
     interval: "{{ item.interval }}"
     subscribers: "{{ item.subscribers|join (',')}}"
     state: "{{ item.state }}"
-  with_items: '{{ sensu_checks }}'
   notify:
     - restart sensu-api
     - restart sensu-server
+  become: true
+  with_items: '{{ sensu_checks }}'

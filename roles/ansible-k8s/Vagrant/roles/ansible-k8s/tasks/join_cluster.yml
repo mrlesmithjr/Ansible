@@ -1,0 +1,11 @@
+---
+- name: join_cluster | Joining Additional Nodes To K8s Cluster
+  command: >
+           kubeadm join \
+           --token {{ k8s_token }} \
+           {{ hostvars[k8s_master]['k8s_advertise_address'] }}:{{ k8s_advertise_bind_port }}
+  args:
+    creates: "/etc/kubernetes/kubelet.conf"
+  become: true
+  no_log: true
+  when: not k8s_cluster_init

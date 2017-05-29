@@ -1,4 +1,5 @@
 [PHP]
+date.timezone = "{{ apache2_php_timezone }}"
 engine = On
 short_open_tag = Off
 asp_tags = Off
@@ -12,8 +13,8 @@ disable_functions = pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexi
 disable_classes =
 zend.enable_gc = On
 expose_php = On
-max_execution_time = 30
-max_input_time = 60
+max_execution_time = {{ apache2_php_max_execution_time }}
+max_input_time = {{ apache2_php_max_input_time }}
 {% if apache2_php_max_memory is defined %}
 memory_limit = {{ apache2_php_max_memory }}
 {% endif %}
@@ -34,7 +35,7 @@ variables_order = "GPCS"
 request_order = "GP"
 register_argc_argv = Off
 auto_globals_jit = On
-post_max_size = 8M
+post_max_size = {{ apache2_php_post_max_size }}
 auto_prepend_file =
 auto_append_file =
 default_mimetype = "text/html"
@@ -42,7 +43,7 @@ doc_root =
 user_dir =
 enable_dl = Off
 file_uploads = On
-upload_max_filesize = 2M
+upload_max_filesize = {{ apache2_php_upload_max_filesize }}
 max_file_uploads = 20
 allow_url_fopen = On
 allow_url_include = Off

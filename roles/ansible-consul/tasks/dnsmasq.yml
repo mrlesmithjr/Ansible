@@ -3,12 +3,14 @@
   apt:
     name: "dnsmasq"
     state: "present"
+  become: true
   when: ansible_os_family == "Debian"
 
 - name: dnsmasq | installing dnsmasq (Fedora)
   dnf:
     name: "dnsmasq"
     state: "present"
+  become: true
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution == "Fedora"
@@ -17,6 +19,7 @@
   yum:
     name: "dnsmasq"
     state: "present"
+  become: true
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution != "Fedora"
@@ -25,6 +28,7 @@
   service:
     name: "dnsmasq"
     enabled: yes
+  become: true
 
 - name: dnsmasq | configuring dnsmasq to resolv consul dns
   template:
@@ -33,5 +37,6 @@
     owner: "root"
     group: "root"
     mode: "u=rw,g=r,o=r"
+  become: true
   notify:
     - "restart dnsmasq"

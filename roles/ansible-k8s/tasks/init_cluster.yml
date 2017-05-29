@@ -1,0 +1,116 @@
+---
+# We look for this currently just as a check to ensure cluster has been
+# initialized or not. This should probably change.
+- name: init_cluster | Checking If Cluster Is Already Initialized
+  stat:
+    path: "{{ k8s_admin_config }}"
+  tags:
+    - 'k8s_get_dashboard'
+  register: "_k8s_kubectl_cluster_info"
+  when: inventory_hostname == k8s_master
+
+- name: init_cluster | Setting State Of Cluster On Master
+  set_fact:
+    k8s_cluster_init: false
+  tags:
+    - 'k8s_get_dashboard'
+  when: >
+        (inventory_hostname == k8s_master) and
+        not _k8s_kubectl_cluster_info['stat']['exists']
+
+- name: init_cluster | Setting State Of Cluster On Master
+  set_fact:
+    k8s_cluster_init: true
+  tags:
+    - 'k8s_get_dashboard'
+  when: >
+        (inventory_hostname == k8s_master) and
+        _k8s_kubectl_cluster_info['stat']['exists']
+
+- name: init_cluster | Setting State Of Cluster On Non-Master(s)
+  set_fact:
+    k8s_cluster_init: "{{ hostvars[k8s_master]['k8s_cluster_init'] }}"
+  when: inventory_hostname != k8s_master
+
+- name: init_cluster | Showing Status Of Cluster Fact
+  debug: msg="Cluster already initialized == {{ k8s_cluster_init }}"
+
+- name: init_cluster | Generating Token
+  command: "kubeadm token generate"
+  register: "_k8s_token"
+  changed_when: false
+  no_log: true
+  when: >
+        (inventory_hostname == k8s_master) and
+        not k8s_cluster_init
+
+- name: init_cluster | Setting Token On Master
+  set_fact:
+    k8s_token: "{{ _k8s_token['stdout_lines'][0] }}"
+  no_log: true
+  when: >
+        (inventory_hostname == k8s_master) and
+        not k8s_cluster_init
+
+- name: init_cluster | Setting Token On Non-Master(s)
+  set_fact:
+    k8s_token: "{{ hostvars[k8s_master]['k8s_token'] }}"
+  no_log: true
+  when: >
+        (inventory_hostname != k8s_master) and
+        not k8s_cluster_init
+
+# - name: init_cluster | Saving Token On Master
+#   template:
+#     src: "k8s_token.j2"
+#     dest: "{{ k8s_token_file }}"
+#     owner: "root"
+#     group: "root"
+#     mode: "u=rw,g=r,o="
+#   become: true
+#   when: >
+#         (inventory_hostname == k8s_master) and
+#         not k8s_cluster_init
+
+- name: init_cluster | Initializing Cluster Master
+  command: >
+           kubeadm init \
+           --apiserver-advertise-address \
+           {{ hostvars[inventory_hostname]['k8s_advertise_address'] }} \
+           --apiserver-bind-port \
+           {{ k8s_advertise_bind_port }} \
+           --token {{ k8s_token }}
+  register: "_k8s_cluster_master_init"
+  become: true
+  no_log: true
+  when: >
+        (inventory_hostname == k8s_master) and
+        not k8s_cluster_init
+
+- name: init_cluster | Capturing Existing Bootstrap Token
+  shell: >
+         kubeadm --kubeconfig {{ k8s_admin_config }} \
+         token list | grep -v TOKEN | grep 'bootstrap token' | awk '{print $1}'
+  register: '_k8s_bootstrap_token'
+  become: true
+  no_log: true
+  changed_when: false
+  when: >
+        (inventory_hostname == k8s_master) and
+        k8s_cluster_init
+
+- name: init_cluster | Setting Token On Master
+  set_fact:
+    k8s_token: "{{ _k8s_bootstrap_token['stdout_lines'][0] }}"
+  no_log: true
+  when: >
+        (inventory_hostname == k8s_master) and
+        k8s_cluster_init
+
+- name: init_cluster | Setting Token On Non-Master(s)
+  set_fact:
+    k8s_token: "{{ hostvars[k8s_master]['k8s_token'] }}"
+  no_log: true
+  when: >
+        (inventory_hostname != k8s_master) and
+        k8s_cluster_init

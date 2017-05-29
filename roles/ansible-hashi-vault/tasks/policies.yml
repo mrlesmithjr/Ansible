@@ -1,0 +1,74 @@
+---
+- include: check_seal.yml
+  tags:
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_read_policies'
+
+- include: unseal.yml
+  tags:
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_read_policies'
+
+- name: policies | Capturing List Of Configured HashiCorp Vault Policies
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/policy"
+    headers:
+      X-Vault-Token: "{{ _hashi_vault_unseal_keys['root_token'] }}"
+    return_content: true
+  no_log: true
+  register: "_hashi_vault_sever_policies_list"
+  become: true
+  tags:
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_read_policies'
+  when: not ansible_check_mode
+
+- name: Policies | Setting Facts For Policy Lists
+  set_fact:
+    _hashi_vault_policy_list: "{{ _hashi_vault_sever_policies_list['content']|from_json }}"
+  tags:
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_read_policies'
+
+- name: policies | Reading Rules For HashiCorp Vault Policies
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/policy/{{ item }}"
+    headers:
+      X-Vault-Token: "{{ _hashi_vault_unseal_keys['root_token'] }}"
+    return_content: true
+  no_log: true
+  register: "_hashi_vault_sever_policies_read"
+  tags:
+    - 'hashi_vault_read_policies'
+  become: true
+  with_items: "{{ _hashi_vault_policy_list['keys'] }}"
+
+- include: check_seal.yml
+  tags:
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_read_policies'
+
+- include: seal.yml
+  tags:
+    - 'hashi_vault_list_policies'
+    - 'hashi_vault_read_policies'
+
+- name: policies | Showing List Of HashiCorp Vault Policies
+  debug: var=_hashi_vault_policy_list['keys']
+  tags:
+    - 'hashi_vault_list_policies'
+
+# - debug: var=_hashi_vault_sever_policies_read['results']
+#   tags:
+#     - 'hashi_vault_read_policies'
+
+# The below does not work yet
+# - name: policies | Showing Rules Of HashiCorp Vault Policies
+#   set_fact:
+#     _hashi_vault_policy_read: "{{ lookup('template', 'vault_read_policies.yml.j2') }}"
+#   tags:
+#     - 'hashi_vault_read_policies'
+#
+# - debug: var=_hashi_vault_policy_read
+#   tags:
+#     - 'hashi_vault_read_policies'

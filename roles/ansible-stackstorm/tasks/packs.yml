@@ -3,6 +3,7 @@
   shell: "st2 pack list -y | grep name: | awk '{ print $2 }'"
   register: "st2_pack_list"
   changed_when: false
+  become: true
   tags:
     - "stackstorm-packs"
 
@@ -10,6 +11,7 @@
   command: "st2 run packs.install packs={{ item.name }}"
   tags:
     - "stackstorm-packs"
+  become: true
   with_items: '{{ stackstorm_packs }}'
   when: >
         item.installed and
@@ -19,6 +21,7 @@
   command: "st2 run packs.uninstall packs={{ item.name }}"
   tags:
     - "stackstorm-packs"
+  become: true
   with_items: '{{ stackstorm_packs }}'
   when: >
         not item.installed and

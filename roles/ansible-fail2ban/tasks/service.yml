@@ -1,0 +1,6 @@
+---
+- name: service | Ensuring Service Is Enabled And Starts On Boot
+  service:
+    name: "fail2ban"
+    enabled: yes
+  become: true

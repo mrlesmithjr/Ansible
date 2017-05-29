@@ -1,0 +1,59 @@
+---
+# tasks file for ansible-k8s
+
+- include: set_facts.yml
+  tags:
+    - 'k8s_cluster_ip'
+    - 'k8s_cluster_nodes'
+    - 'k8s_cluster_services'
+    - 'k8s_dashboard'
+    - 'k8s_helm'
+    - 'k8s_pods'
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: services.yml
+
+- include: init_cluster.yml
+  tags:
+    - 'k8s_cluster_services'
+    - 'k8s_pods'
+
+- include: network.yml
+
+- include: join_cluster.yml
+  when: inventory_hostname != k8s_master
+
+- include: cluster_summary.yml
+  tags:
+    - 'k8s_cluster_nodes'
+
+- include: users.yml
+
+- include: pods.yml
+  tags:
+    - 'k8s_pods'
+  when: >
+        (inventory_hostname == k8s_master) and
+        k8s_cluster_init
+
+- include: cluster_services.yml
+  tags:
+    - 'k8s_cluster_services'
+  when: >
+        (inventory_hostname == k8s_master) and
+        k8s_cluster_init
+
+- include: dashboard.yml
+  tags:
+    - 'k8s_dashboard'
+    - 'k8s_get_dashboard'
+
+- include: helm.yml
+  tags:
+    - 'k8s_helm'
+  when: k8s_helm_install
+
+- include: reset_cluster.yml
+  when: k8s_reset_cluster

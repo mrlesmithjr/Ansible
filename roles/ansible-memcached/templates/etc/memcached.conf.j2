@@ -8,6 +8,6 @@ logfile {{ memcached_log_file }}
 {% endif %}
 -m {{ memcached_memory_cap }}
 -p {{ memcached_port }}
--u memcache
+-u {{ memcached_user }}
 -l {{ memcached_listen_address }}
 -c {{ memcached_connections_in_limit }}

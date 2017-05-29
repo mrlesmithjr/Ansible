@@ -3,6 +3,7 @@
   user:
     name: "root"
     password: "{{ bootstrap_root_password }}"
+  become: true
   when: >
         ansible_os_family == "RedHat" and
         bootstrap_root_password is defined and
@@ -12,6 +13,7 @@
   user:
     name: "root"
     password: "{{ bootstrap_root_password }}"
+  become: true
   when: >
         ansible_os_family == "Debian" and
         bootstrap_root_password is defined and

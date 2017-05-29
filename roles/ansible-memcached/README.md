@@ -3,6 +3,11 @@ Role Name
 
 An [Ansible] role to install/configure [memcached]
 
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-memcached.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-memcached)
+
 Requirements
 ------------
 

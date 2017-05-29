@@ -5,6 +5,7 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'automysqlbackup'
     - 'software-properties-common'
@@ -15,6 +16,20 @@
   apt:
     name: "mysql-server"
     state: "present"
+  become: true
+  when: >
+        (ansible_distribution == "Debian" and
+        ansible_distribution_version < '9.0') or
+        (ansible_distribution == "Ubuntu")
+
+- name: debian | installing mysql
+  apt:
+    name: "mariadb-server"
+    state: "present"
+  become: true
+  when: >
+        (ansible_distribution == "Debian" and
+        ansible_distribution_version >= '9.0')
 
 - name: debian | configuring mysql
   template:
@@ -24,6 +39,7 @@
     group: "root"
     mode: 0644
   register: "mysql_reconfigured_14_04"
+  become: true
   notify: "restart mysql"
   when: >
         (ansible_distribution == "Ubuntu" and
@@ -38,6 +54,7 @@
     group: "root"
     mode: 0644
   register: "mysql_reconfigured_16_04"
+  become: true
   notify: "restart mysql"
   when: >
         (ansible_distribution == "Ubuntu" and
@@ -51,6 +68,7 @@
     group: "root"
     mode: 0644
   register: "mysql_reconfigured_debian"
+  become: true
   notify: "restart mysql"
   when: ansible_distribution == "Debian"
 
@@ -62,6 +80,7 @@
     group: "root"
     mode: 0644
   notify: "reload mysql"
+  become: true
   when: >
         ansible_distribution_version <= '14.04'
 
@@ -72,6 +91,7 @@
     host: "{{ mysql_cacti_server }}"
     priv: "*.*:SUPER,PROCESS"
     state: "present"
+  become: true
   tags:
     - cacti_monitoring
   when: >
@@ -85,6 +105,7 @@
     host: "{{ mysql_cacti_server_fqdn }}"
     priv: "*.*:SUPER,PROCESS"
     state: "present"
+  become: true
   tags:
     - cacti_monitoring
   when: >

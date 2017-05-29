@@ -1,7 +1,7 @@
 Role Name
 =========
 
-Installs NodeJS (https://nodejs.org/en/)
+An [Ansible] role to install [NodeJS]
 
 Requirements
 ------------
@@ -23,7 +23,10 @@ nodejs_debian_repo_info:
   repos:
     - 'deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release|lower }} main'
     - 'deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release|lower }} main'
-nodejs_version: '4.x'  #defines nodejs version to install..( 4.x|5.x )
+
+# Defines nodejs version to install..( 6.x|7.x )
+# Ubuntu Precise needs to be 6.x
+nodejs_version: '7.x'
 ```
 
 Dependencies
@@ -34,7 +37,7 @@ None
 Example Playbook
 ----------------
 
-````
+```
 ---
 - hosts: all
   become: true
@@ -42,7 +45,7 @@ Example Playbook
   roles:
     - role: ansible-nodejs
   tasks:
-````
+```
 
 License
 -------
@@ -56,3 +59,6 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[NodeJS]: <https://nodejs.org/en/>

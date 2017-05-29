@@ -3,3 +3,4 @@
   pip:
     name: "redis"
     state: "present"
+  become: true

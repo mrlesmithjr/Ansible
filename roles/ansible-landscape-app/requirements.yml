@@ -1,0 +1,6 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-apache2.git
+- src: https://github.com/mrlesmithjr/ansible-landscape-app.git
+- src: https://github.com/mrlesmithjr/ansible-landscape-db.git
+- src: https://github.com/mrlesmithjr/ansible-postgresql.git
+- src: https://github.com/mrlesmithjr/ansible-rabbitmq.git

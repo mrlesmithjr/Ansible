@@ -1,0 +1,41 @@
+[main]
+networks = {{ wok_kimchi_config['networks']|join(', ') }}
+
+[memory]
+current = {{ wok_kimchi_config['current'] }}
+maxmemory = {{ wok_kimchi_config['maxmemory'] }}
+
+[storage]
+
+{% for item in wok_kimchi_config['disks'] %}
+[[disk.{{ loop.index }}]]
+size = {{ item['size'] }}
+format = {{ item['format'] }}
+pool = {{ item['pool'] }}
+{% endfor %}
+
+# Only Applicable for s390x. Storage path used to handle the guest disk.
+# In Each disk, pool and path are mutually exclusive parameters and
+# pool will be ignored in case of both specified.
+#path = /var/lib/libvirt/images
+
+[graphics]
+# Graphics type
+# Valid options: vnc | spice
+#type = vnc
+
+# The network which the vnc/spice server listens on
+#listen = 127.0.0.1
+
+[processor]
+vcpus = {{ wok_kimchi_config['vcpus'] }}
+maxvcpus = {{ wok_kimchi_config['maxvcpus'] }}
+
+# Number of sockets (not set by default)
+#sockets =
+
+# Number of cores per socket (not set by default)
+#cores =
+
+# Number of threads per core (not set by default)
+#threads =

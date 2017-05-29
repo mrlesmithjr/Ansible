@@ -1,0 +1,63 @@
+---
+# We configure the vault service if the host uses systemd
+- name: service | Configuring HashiCorp Vault Service (Systemd)
+  template:
+    src: "vault.service.j2"
+    dest: "/etc/systemd/system/vault-server.service"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "_vault_service_configured_systemd"
+  notify:
+    - "restart vault-server"
+  become: true
+  when: ansible_service_mgr == "systemd"
+
+# We configure the vault service if the host uses upstart
+- name: service | Configuring HashiCorp Vault Service (upstart)
+  template:
+    src: "vault-upstart.conf.j2"
+    dest: "/etc/init/vault-server.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "_vault_service_configured_upstart"
+  notify:
+    - "restart vault-server"
+  become: true
+  when: ansible_service_mgr == "upstart"
+
+# We reload systemd for vault-server if service configuration changes
+- name: service | Reloading Systemd
+  systemd:
+    name: "vault-server"
+    daemon_reload: true
+  become: true
+  when: >
+        (_vault_service_configured_systemd['changed'] or
+        _vault_service_configured_upstart['changed']) and
+        ansible_service_mgr == "systemd"
+
+# We stop vault when running as inmem to reinitialize
+- name: service | Reinitializing HashiCorp Vault
+  service:
+    name: "vault-server"
+    state: "stopped"
+  tags:
+    - 'hashi_vault_reinit'
+  become: true
+  when: >
+        hashi_vault_backend == "inmem" and
+        hashi_vault_reinitialize
+
+# We ensure that the vault service is started and starts on system bootup
+- name: service | Ensuring HashiCorp Vault Service Is Started And Enabled On Boot
+  service:
+    name: "vault-server"
+    state: "started"
+    enabled: true
+  notify:
+    - "init"
+  tags:
+    - 'hashi_vault_reinit'
+  become: true

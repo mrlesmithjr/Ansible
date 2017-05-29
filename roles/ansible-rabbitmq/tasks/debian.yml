@@ -3,22 +3,26 @@
   apt_key:
     url: "{{ rabbitmq_debian_repo_key }}"
     state: present
+  become: true
 
 - name: debian | adding RabbitMQ repo
   apt_repository:
     repo: "{{ rabbitmq_debian_repo }}"
     state: present
   register: "rabbitmq_repo_added"
+  become: true
 
 - name: debian | updating apt cache
   apt:
     update_cache: yes
+  become: true
   when: rabbitmq_repo_added.changed
 
 - name: debian | installing RabbitMQ server
   apt:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
     - rabbitmq-server
 
@@ -26,6 +30,7 @@
   rabbitmq_plugin:
     names: rabbitmq_management
     state: enabled
+  become: true
   notify: restart rabbitmq-server
 
 - name: debian | ensuring that the RabbitMQ service is running
@@ -33,3 +38,4 @@
     name: rabbitmq-server
     state: started
     enabled: yes
+  become: true

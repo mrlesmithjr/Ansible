@@ -1,0 +1,18 @@
+---
+- name: config | Configuring Kimchi
+  template:
+    src: "etc/kimchi/template.conf.j2"
+    dest: "/etc/kimchi/template.conf"
+  become: true
+  notify:
+    - "restart wokd"
+
+# - name: config | Configuring Kimchi Service
+#   template:
+#     src: "etc/systemd/system/wokd.service.d/kimchi.conf.j2"
+#     dest: "/etc/systemd/system/wokd.service.d/kimchi.conf"
+#   become: true
+#   notify:
+#     - "reload systemd"
+#     - "restart wokd"
+#   when: ansible_service_mgr == "systemd"

@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-fail2ban
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config.yml
+  when: fail2ban_config
+
+- include: service.yml

@@ -4,22 +4,14 @@
   when: ansible_os_family == "Debian"
 
 - include: configure_zabbix_server.yml
-  when: inventory_hostname in groups[zabbix_server_group]
 
 - include: configure_zabbix_frontend.yml
 
 - include: change_mysql_root_pass.yml
   when: >
-        zabbix_change_mysql_root_password and
-        inventory_hostname in groups[zabbix_server_group]
+        zabbix_change_mysql_root_password
 
 - include: manage_mysql_db.yml
-  when: inventory_hostname in groups[zabbix_server_group]
-
-- include: configure_zabbix_agent.yml
-  when: >
-        inventory_hostname in groups[zabbix_agent_group] or
-        inventory_hostname in groups[zabbix_server_group]
 
 - include: manage_zabbix.yml
   when: >

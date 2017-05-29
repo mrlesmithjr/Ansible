@@ -2,10 +2,12 @@
 - name: debian | updating apt-cache
   apt:
     update_cache: "yes"
-    cache_valid_time: 86400
+    cache_valid_time: "86400"
+  become: true
 
 - name: debian | installing kea packages
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ kea_dhcp_debian_packages }}'

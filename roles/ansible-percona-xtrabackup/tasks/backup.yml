@@ -1,0 +1,3 @@
+---
+- name: backup | Performing Backup
+  command: "xtrabackup --backup --target-dir={{ percona_xtrabackup_folder }}"

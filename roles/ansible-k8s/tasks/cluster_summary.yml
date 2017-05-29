@@ -1,0 +1,31 @@
+---
+- name: cluster_summary | Capturing Cluster Nodes
+  command: >
+           kubectl --kubeconfig {{ k8s_admin_config }} get nodes
+  changed_when: false
+  become: true
+  # We wait for the number of nodes to match the number of hosts defined in
+  # the ansible group. We subtract 1 to account for the header line
+  until: >
+         ((_k8s_cluster_nodes['stdout_lines']|length - 1) == (groups[k8s_cluster_group]|length) and
+         'NotReady' not in _k8s_cluster_nodes['stdout'])
+  retries: 30
+  delay: 10
+  register: "_k8s_cluster_nodes"
+  when: inventory_hostname == k8s_master
+
+# We capture as JSON in order to use for later iteration
+- name: cluster_summary | Capturing Cluster Nodes (JSON)
+  command: >
+           kubectl --kubeconfig {{ k8s_admin_config }} get nodes -o json
+  changed_when: false
+  become: true
+  register: "_k8s_cluster_nodes_json"
+  when: inventory_hostname == k8s_master
+
+- name: cluster_summary | Displaying Cluster Nodes
+  debug: var=_k8s_cluster_nodes['stdout_lines']
+  when: inventory_hostname == k8s_master
+
+# - debug: var=_k8s_cluster_nodes_json['stdout']
+#   when: inventory_hostname == k8s_master

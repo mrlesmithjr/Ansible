@@ -2,34 +2,38 @@
 - name: config_virtual_networks | defining virtual networks
   virt_net:
     command: "define"
-    name: "{{ item.name }}"
-    xml: "{{ lookup('template', 'lookup/pool/bridge.xml.j2') }}"
+    name: "{{ item['name'] }}"
+    xml: "{{ lookup('template', 'files/lookup/pool/bridge.xml.j2') }}"
   register: "kvm_bridges_defined"
+  become: true
   with_items: '{{ kvm_virtual_networks }}'
 
 - name: config_virtual networks | setting state of virtual networks
   virt_net:
-    state: "{{ item.state }}"
-    name: "{{ item.name }}"
+    state: "{{ item['state'] }}"
+    name: "{{ item['name'] }}"
+  become: true
   with_items: '{{ kvm_virtual_networks }}'
-  when: item.state is defined
+  when: item['state'] is defined
 
 - name: config_virtual networks | setting virtual networks to autostart
   virt_net:
     autostart: yes
-    name: "{{ item.name }}"
+    name: "{{ item['name'] }}"
+  become: true
   with_items: '{{ kvm_virtual_networks }}'
   when: >
-        (item.autostart is defined and
-          item.autostart) and
-          (item.state is defined and
-            item.state == "active")
+        (item['autostart'] is defined and
+          item['autostart']) and
+          (item['state'] is defined and
+            item['state'] == "active")
 
 - name: config_virtual networks | setting virtual networks to not autostart
   virt_net:
     autostart: no
-    name: "{{ item.name }}"
+    name: "{{ item['name'] }}"
+  become: true
   with_items: '{{ kvm_virtual_networks }}'
   when: >
-        item.autostart is defined and
-        not item.autostart
+        item['autostart'] is defined and
+        not item['autostart']

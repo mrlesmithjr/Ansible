@@ -5,7 +5,7 @@
   register: pdns_zones_dir_check
   delegate_to: localhost
   run_once: true
-  sudo: false
+  become: false
 
 - name: pdns_zones | creating pdns_zones_dir if it does not exist
   file:
@@ -13,8 +13,8 @@
     state: directory
   delegate_to: localhost
   run_once: true
-  sudo: false
-  when: not pdns_zones_dir_check.stat.exists
+  become: false
+  when: not pdns_zones_dir_check['stat']['exists']
 
 - name: pdns_zones | creating pdns zones folders
   file:
@@ -22,7 +22,7 @@
     state: directory
   delegate_to: localhost
   run_once: true
-  sudo: false
+  become: false
   with_items:
     - "{{ pdns_fwd_zones }}"
     - "{{ pdns_rev_zones }}"
@@ -36,7 +36,7 @@
     dest: "{{ pdns_zones_dir }}/{{ item }}/{{ item }}_zone"
   delegate_to: localhost
   run_once: true
-  sudo: false
+  become: false
   register: pdns_zones_created
   with_items:
     - "{{ pdns_fwd_zones }}"
@@ -53,7 +53,7 @@
     group: root
     mode: 0770
   when: >
-        pdns_zones_created.changed and
+        pdns_zones_created['changed'] and
         (pdns_fwd_zones is defined or
         pdns_rev_zones is defined)
 
@@ -75,13 +75,13 @@
   run_once: true
   when: >
         pdns_db_cluster and
-        pdns_zones_created.changed
+        pdns_zones_created['changed']
 
 - name: pdns_zones | creating pdns zones
   shell: /tmp/pdns_zones.sh
   when: >
         not pdns_db_cluster and
-        pdns_zones_created.changed
+        pdns_zones_created['changed']
 
 - name: pdns_zones | creating pdns zones
   shell: /tmp/pdns_zones.sh

@@ -1,0 +1,53 @@
+---
+- name: config | Configuring MAAS Region Controller
+  lineinfile:
+    dest: "/etc/maas/regiond.conf"
+    regexp: "^maas_url:"
+    line: "maas_url: {{ maas_region_controller_url }}"
+  notify: "restart maas-regiond"
+  when: >
+        maas_single_node_install or
+        (not maas_single_node_install and
+          inventory_hostname in groups['maas_region_controller'])
+
+- name: config | Setting MAAS Region Controller
+  set_fact:
+    maas_region_controller_host: "{{ groups['maas_region_controller'][0] }}"
+  when: >
+        not maas_single_node_install
+
+- name: config | Capturing MAAS Region Controller Secret
+  command: "cat /var/lib/maas/secret"
+  register: "maas_region_controller_secret_raw"
+  when: >
+        not maas_single_node_install and
+        inventory_hostname == maas_region_controller_host
+
+- name: config | Setting MAAS Region Controller Secret Fact
+  set_fact:
+    maas_region_controller_secret: '{{ maas_region_controller_secret_raw.stdout }}'
+  when: >
+        not maas_single_node_install and
+        inventory_hostname == maas_region_controller_host
+
+- name: config | Checking If Rack Controller Is Registered With Region Controller
+  stat:
+    path: "/etc/maas/.controller_registered"
+  register: "maas_controller_registered"
+  when: >
+        not maas_single_node_install and
+        inventory_hostname in groups['maas_rack_controller']
+
+- name: config | Setting MAAS Region Controller Secret Fact
+  set_fact:
+    maas_region_controller_secret: "{{ hostvars[maas_region_controller_host]['maas_region_controller_secret'] }}"
+  when: >
+        not maas_single_node_install and
+        inventory_hostname in groups['maas_rack_controller']
+
+- name: config | Registering Rack Controller
+  command: "maas-rack register --url {{ maas_region_controller_url }} --secret {{ maas_region_controller_secret }}"
+  when: >
+        not maas_single_node_install and
+        inventory_hostname in groups['maas_rack_controller'] and
+        not maas_controller_registered.stat.exists

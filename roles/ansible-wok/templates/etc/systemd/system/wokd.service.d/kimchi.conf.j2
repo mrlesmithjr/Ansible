@@ -1,0 +1,8 @@
+[Unit]
+Requires=wokd.service
+Wants={{ wok_kimchi_kvm_service_name }}.service
+After={{ wok_kimchi_kvm_service_name }}.service wokd.service
+
+[Service]
+Nice=0
+PrivateTmp=no

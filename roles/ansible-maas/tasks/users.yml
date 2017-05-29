@@ -1,0 +1,5 @@
+---
+- name: users | Setting Up maas User
+  user:
+    generate_ssh_key: yes
+    name: "maas"

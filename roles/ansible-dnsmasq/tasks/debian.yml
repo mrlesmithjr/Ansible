@@ -3,3 +3,4 @@
   apt:
     name: "dnsmasq"
     state: "present"
+  become: true

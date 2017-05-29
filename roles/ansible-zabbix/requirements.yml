@@ -1,2 +1,5 @@
 ---
+- src: https://github.com/mrlesmithjr/ansible-apache2.git
+- src: https://github.com/mrlesmithjr/ansible-mysql.git
+- src: https://github.com/mrlesmithjr/ansible-php.git
 - src: https://github.com/mrlesmithjr/ansible-zabbix.git

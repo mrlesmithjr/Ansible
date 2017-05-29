@@ -1,0 +1,51 @@
+---
+- name: config | Configuring Netdata
+  template:
+    src: "netdata.conf.j2"
+    dest: "{{ netdata_config_file }}"
+    owner: "{{ netdata_user_info['user'] }}"
+    group: "root"
+    mode: "u=rx,g=rx,o=r"
+  notify: "restart netdata"
+  become: true
+
+- name: config | Configuring Netdata Service (systemd)
+  template:
+    src: "etc/systemd/system/netdata.service.j2"
+    dest: "/etc/systemd/system/netdata.service"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=rw,o=r"
+  notify:
+    - "reload systemd netdata"
+    - "restart netdata"
+  become: true
+  when: ansible_service_mgr == "systemd"
+
+- name: config | Configuring Netdata Service (upstart) - Debian
+  template:
+    src: "etc/init.d/netdata.debian.j2"
+    dest: "/etc/init.d/netdata"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+  notify:
+    - "restart netdata"
+  become: true
+  when: >
+        (ansible_service_mgr == "upstart") and
+        ansible_os_family == "Debian"
+
+- name: config | Configuring Netdata Service (upstart) - RedHat
+  template:
+    src: "etc/init.d/netdata.redhat.j2"
+    dest: "/etc/init.d/netdata"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+  notify:
+    - "restart netdata"
+  become: true
+  when: >
+        (ansible_service_mgr == "upstart") and
+        ansible_os_family == "RedHat"

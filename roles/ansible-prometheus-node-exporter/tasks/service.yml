@@ -1,0 +1,10 @@
+---
+- name: service | Configuring Prometheus Node Exporter Service
+  template:
+    src: "etc/systemd/system/node_exporter.service.j2"
+    dest: "/etc/systemd/system/node_exporter.service"
+  notify:
+    - reload systemd
+    - restart node_exporter
+  become: true
+  when: ansible_service_mgr == "systemd"

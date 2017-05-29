@@ -1,0 +1,12 @@
+[Unit]
+Description=Vault server
+After=network.target
+
+[Service]
+ExecStart={{ hashi_vault_install_dir }}/vault server -config={{ hashi_vault_config }}
+StandardOutput=journal
+User={{ hashi_vault_user_info['user'] }}
+Group={{ hashi_vault_user_info['group'] }}
+
+[Install]
+WantedBy=multi-user.target

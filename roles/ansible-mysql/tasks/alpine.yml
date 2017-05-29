@@ -1,0 +1,45 @@
+---
+- name: alpine | Installing MySQL Pre-Reqs
+  apk:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'py-mysqldb'
+    - 'mysql-client'
+
+- name: alpine | Installing MySQL
+  apk:
+    name: "mysql"
+    state: "present"
+  register: "_alpine_mysql_installed"
+  become: true
+
+- name: alpine | Ensuring /var/log/mysql Exists
+  file:
+    path: "/var/log/mysql"
+    owner: "mysql"
+    group: "mysql"
+    state: "directory"
+  become: true
+
+- name: alpine | Checking If MySQL Has Already Been Setup
+  stat:
+    path: "/var/lib/mysql/mysql"
+  register: "_alpine_mysql_setup"
+
+- name: alpine | Setting Up MySQL
+  command: "/etc/init.d/mariadb setup"
+  become: true
+  when: not _alpine_mysql_setup['stat']['exists']
+
+- name: alpine | Configuring MySQL
+  template:
+    src: "etc/mysql/my.cnf.j2"
+    dest: "/etc/mysql/my.cnf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  register: "mariadb_reconfigured_alpine"
+  become: true
+  notify: "restart mariadb"

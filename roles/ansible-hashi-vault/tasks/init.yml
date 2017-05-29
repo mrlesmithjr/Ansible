@@ -1,0 +1,42 @@
+---
+# We need to wait for the listen port to come up
+- name: init | Waiting For HashiCorp Vault Listen Port
+  wait_for:
+    port: "{{ hashi_vault_listen_port }}"
+    delay: 10
+  when: not ansible_check_mode
+
+# We make the API call to check if vault has already been initialized
+- name: init | Checking If HashiCorp Vault Has Been Initialized
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/init"
+  check_mode: no
+  register: "_hashi_vault_initialized"
+
+# We initialize vault if it has already not been
+- name: init | Initializing HashiCorp Vault
+  uri:
+    url: "{{ hashi_vault_server_url }}/v1/sys/init"
+    body:
+      secret_shares: '{{ hashi_vault_secret_shares }}'
+      secret_threshold: '{{ hashi_vault_secret_threshold }}'
+    body_format: "json"
+    method: "PUT"
+  register: "_hashi_vault_init"
+  changed_when: true
+  no_log: true
+  when: not _hashi_vault_initialized['json']['initialized']
+
+# We generate a JSON parsable file which contains the init info so we do not
+# lose the info and also have it available to use in other tasks
+# **** This might need to have more stringent controls around it other than the
+# permissions set here.
+- name: init | Generating {{ hashi_vault_init_output_file }}
+  template:
+    src: "vault_init.json.j2"
+    dest: "{{ hashi_vault_init_output_file }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o="
+  become: true
+  when: _hashi_vault_init['changed']

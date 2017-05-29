@@ -1,7 +1,33 @@
 ---
-- hosts: all
-  become: true
+- hosts: squid_proxy
   vars:
+    haproxy_config: true
+    haproxy_configs:
+      - name: 'squid-3128'
+        backend_checks: true
+        backend_name: 'squid-servers'
+        backend_servers_bind_port: '3128'
+        backend_servers:
+          - '192.168.250.10'
+          - '192.168.250.11'
+        balance: 'roundrobin'
+        default_server_options:
+          - name: 'maxconn'
+            value: '256'
+          - name: 'maxqueue'
+            value: '128'
+          - name: 'weight'
+            value: '100'
+        enabled: true
+        frontend_bind_address: '{{ haproxy_lb_vip }}'
+        frontend_bind_port: '8080'
+        frontend_name: 'squid-in'
+        mode: 'tcp'
+        options:
+          - 'tcplog'
+          # - 'httpchk'
+    haproxy_lb_vip: '192.168.250.50'
+    pri_domain_name: 'test.vagrant.local'
   roles:
     - role: ansible-haproxy
   tasks:

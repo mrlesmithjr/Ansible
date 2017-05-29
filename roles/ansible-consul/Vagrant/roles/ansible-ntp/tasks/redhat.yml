@@ -2,7 +2,8 @@
 - name: redhat | installing packages
   yum:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items:
     - ntp
   when: >
@@ -11,7 +12,8 @@
 - name: redhat | installing packages
   dnf:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items:
     - ntp
   when: >
@@ -21,13 +23,15 @@
   template:
     src: "etc/ntp.conf.j2"
     dest: "/etc/ntp.conf"
-    owner: root
-    group: root
-    mode: 0644
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
   notify: restart ntpd
 
 - name: redhat | ensuring ntpd service is started and enabled on boot
   service:
     name: "ntpd"
-    state: started
+    state: "started"
     enabled: yes
+  become: true

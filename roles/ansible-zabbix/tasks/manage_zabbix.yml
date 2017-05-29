@@ -1,8 +1,9 @@
 ---
 - name: manage_zabbix | adding ansible groups
   zabbix_group:
-    server_url: "{{ zabbix_server_info.url }}"
-    login_user: "{{ zabbix_server_info.login_user }}"
-    login_password: "{{ zabbix_server_info.login_password }}"
+    server_url: "{{ zabbix_server_info['url'] }}"
+    login_user: "{{ zabbix_server_info['login_user'] }}"
+    login_password: "{{ zabbix_server_info['login_password'] }}"
     host_groups: "{{ zabbix_host_groups }}"
-    state: present
+    state: "present"
+  become: true

@@ -1,0 +1,59 @@
+---
+# We create the consul group
+- name: config | creating consul group
+  group:
+    name: "{{ consul_group }}"
+    state: present
+  become: true
+
+# We create the consul user and add it to the consul group
+- name: config | creating consul user
+  user:
+    name: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    system: yes
+  become: true
+
+# We create the required consul configuration folders
+- name: config | creating consul configuration folders
+  file:
+    path: "{{ item }}"
+    owner: "root"
+    group: "root"
+    state: "directory"
+  become: true
+  with_items:
+    - '{{ consul_config_dir }}'
+#    - '{{ consul_config_dir }}/bootstrap'
+    - '{{ consul_config_dir }}/client'
+    - '{{ consul_config_dir }}/scripts'
+#    - '{{ consul_config_dir }}/server'
+
+# We create the consul data folder
+- name: config | creating consul data folder
+  file:
+    path: "{{ consul_data_dir }}"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    state: "directory"
+  become: true
+
+- include: cluster.yml
+  when: consul_cluster
+
+- include: standalone.yml
+  when: not consul_cluster
+
+- name: config | configuring consul
+  template:
+    src: "etc/consul.d/config.json.j2"
+    dest: "{{ consul_config_dir }}/config.json"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "consul_reconfigured"
+  no_log: true
+  become: true
+  notify:
+    - "restart consul"
+  when: not ansible_check_mode

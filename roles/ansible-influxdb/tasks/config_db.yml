@@ -3,28 +3,33 @@
   pip:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ influxdb_python_modules }}'
 
-- name: config_db | Ensuring InfluxDB Is Running
+- name: config_db | Ensuring InfluxDB Is Running And Enabled On Boot
   service:
     name: "influxdb"
     state: "started"
+    enabled: true
+  become: true
 
 - name: config_db | Creating InfluxDB(s)
   influxdb_database:
-    hostname: "{{ item.host }}"
-    database_name: "{{ item.name }}"
-    state: "{{ item.state }}"
+    hostname: "{{ item['host'] }}"
+    database_name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  become: true
   with_items: '{{ influxdb_databases }}'
 
 - name: config_db | Creating InfluxDB Retention Policies
   influxdb_retention_policy:
-    hostname: "{{ item.host }}"
-    database_name: "{{ item.name }}"
-    policy_name: "{{ item.retention_policy.name }}"
-    duration: "{{ item.retention_policy.duration }}"
-    replication: "{{ item.retention_policy.replication }}"
+    hostname: "{{ item['host'] }}"
+    database_name: "{{ item['name'] }}"
+    policy_name: "{{ item['retention_policy']['name'] }}"
+    duration: "{{ item['retention_policy']['duration'] }}"
+    replication: "{{ item['retention_policy']['replication'] }}"
+  become: true
   with_items: '{{ influxdb_databases }}'
   when: >
-        item.retention_policy is defined and
-        item.retention_policy.enabled
+        item['retention_policy'] is defined and
+        item['retention_policy']['enabled']

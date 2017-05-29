@@ -1,0 +1,55 @@
+****************Ansible Managed MOTD****************
+{% if motd_default_message is defined %}
+{{ motd_default_message }}
+{% endif %}
+
+System Information For Hostname: {{ inventory_hostname }}
+
+Distribution: {{ ansible_distribution }}
+Distribution Release: {{ ansible_distribution_release }}
+Distribution Version: {{ ansible_distribution_version }}
+{% if ansible_dns.search is defined %}
+DNS Search: {{ ansible_dns.search|join (" ") }}
+{% endif %}
+{% if ansible_dns.nameservers is defined %}
+DNS Server(s): {{ ansible_dns.nameservers|join (" ") }}
+{% endif %}
+{% if ansible_interfaces is defined %}
+Interfaces:
+{%   for int in ansible_interfaces %}
+    Interface: {{ int }}
+{%     if hostvars[inventory_hostname]['ansible_'+int] is defined %}
+{%       if hostvars[inventory_hostname]['ansible_'+int]['ipv4'] is defined %}
+{%         if hostvars[inventory_hostname]['ansible_'+int]['ipv4']['address'] is defined %}
+      ip: {{ hostvars[inventory_hostname]['ansible_'+int]['ipv4']['address'] }}
+{%         endif %}
+{%       endif %}
+{%       if hostvars[inventory_hostname]['ansible_'+int]['macaddress'] is defined %}
+      mac: {{ hostvars[inventory_hostname]['ansible_'+int]['macaddress'] }}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+Kernel: {{ ansible_kernel }}
+{% if ansible_lsb is defined %}
+LSB: {{ ansible_lsb.description }}
+{% endif %}
+Memory Installed: {{ (ansible_memtotal_mb / 1024) | round(1) }}GB
+Memory Swapfile: {{ (ansible_swaptotal_mb / 1024) | round(1) }}GB
+Mounts:
+{% for mnt in ansible_mounts %}
+{%   if mnt.size_total != none %}
+    Mount: {{ mnt.device }}({{ mnt.mount }})({{ (mnt.size_total / 1024 / 1024 / 1024)| round(1) }}GB)
+{%   endif %}
+{% endfor %}
+Processors: {{ ansible_processor_vcpus }}
+Python Version: {{ ansible_python_version }}
+Timezone: {{ ansible_date_time.tz }}({{ ansible_date_time.tz_offset }})
+{% if ansible_virtualization_role is defined %}
+Virtualization Role: {{ ansible_virtualization_role }}
+{% endif %}
+{% if ansible_virtualization_type is defined %}
+Virtualization Type: {{ ansible_virtualization_type }}
+{% endif %}
+
+************End Of Ansible Managed MOTD*************

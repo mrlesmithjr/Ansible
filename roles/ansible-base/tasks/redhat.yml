@@ -3,6 +3,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ base_redhat_packages }}'
   when: ansible_distribution != "Fedora"
 
@@ -10,5 +11,6 @@
   dnf:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ base_redhat_packages }}'
   when: ansible_distribution == "Fedora"

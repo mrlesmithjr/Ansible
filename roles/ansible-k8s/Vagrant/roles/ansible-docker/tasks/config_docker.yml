@@ -1,0 +1,31 @@
+---
+- name: config_docker | Configuring Docker Service (Debian)
+  template:
+    src: "etc/default/docker.j2"
+    dest: "/etc/default/docker"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: "restart docker"
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: config_docker | Ensuring /etc/docker Folder Exists
+  file:
+    path: "/etc/docker"
+    state: "directory"
+  become: true
+
+- name: config_docker | Configuring Docker
+  template:
+    src: "etc/docker/daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+  notify: "restart docker"
+  become: true
+
+- name: config_docker | Ensuring Docker Service Is Started And Enabled On Boot
+  service:
+    name: "docker"
+    state: "started"
+    enabled: yes
+  become: true

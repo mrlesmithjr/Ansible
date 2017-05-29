@@ -1,0 +1,10 @@
+backend "{{ hashi_vault_backend }}" {
+    address = "{{ hashi_vault_backend_listen_address }}"
+}
+
+listener "tcp" {
+ address = "{{ hashi_vault_listen_address }}:{{ hashi_vault_listen_port}}"
+{% if not hashi_vault_tls_enabled %}
+ tls_disable = 1
+{% endif %}
+}

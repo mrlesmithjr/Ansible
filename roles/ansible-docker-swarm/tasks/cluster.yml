@@ -4,12 +4,14 @@
   register: "docker_info"
   changed_when: false
   check_mode: no
+  become: true
 
 - name: cluster | Init Docker Swarm Mode On First Manager
   command: >
           docker swarm init
           --listen-addr {{ docker_swarm_addr }}:{{ docker_swarm_port }}
           --advertise-addr {{ docker_swarm_addr }}
+  become: true
   when: >
         'Swarm: inactive' in docker_info.stdout and
         inventory_hostname == docker_swarm_primary_manager
@@ -18,6 +20,7 @@
   command: "docker swarm join-token -q worker"
   changed_when: false
   register: "docker_swarm_worker_token"
+  become: true
   when: >
         inventory_hostname == docker_swarm_primary_manager
 
@@ -25,6 +28,7 @@
   command: "docker swarm join-token -q manager"
   changed_when: false
   register: "docker_swarm_manager_token"
+  become: true
   when: >
         inventory_hostname == docker_swarm_primary_manager
 
@@ -63,6 +67,7 @@
           --advertise-addr {{ docker_swarm_addr }}
           --token {{ docker_swarm_manager_token.stdout }}
           {{ docker_swarm_manager_address }}
+  become: true
   when: >
         inventory_hostname != docker_swarm_primary_manager and
         inventory_hostname not in groups[docker_swarm_workers_ansible_group] and
@@ -76,6 +81,7 @@
          --advertise-addr {{ docker_swarm_addr }}
          --token {{ docker_swarm_worker_token.stdout }}
          {{ docker_swarm_manager_address }}
+  become: true
   when: >
         inventory_hostname in groups[docker_swarm_workers_ansible_group] and
         'Swarm: active' not in docker_info.stdout and

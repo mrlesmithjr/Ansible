@@ -1,48 +1,45 @@
+# ACLS
+{% if squid_acl is defined and squid_acl != [] %}
+{%   for item in squid_acl %}
+acl {{ item['name'] }} {{ item['type'] }} {{ item['arg'] }}
+{%   endfor %}
+{% endif %}
+
+# Local Networks
 {% if squid_acl_localnet is defined and squid_acl_localnet != [] %}
 {%   for item in squid_acl_localnet %}
 acl localnet src {{ item }}
 {%   endfor %}
 {% endif %}
 
-acl SSL_ports port 443
-acl Safe_ports port 80		# http
-acl Safe_ports port 21		# ftp
-acl Safe_ports port 443		# https
-acl Safe_ports port 70		# gopher
-acl Safe_ports port 210		# wais
-acl Safe_ports port 1025-65535	# unregistered ports
-acl Safe_ports port 280		# http-mgmt
-acl Safe_ports port 488		# gss-http
-acl Safe_ports port 591		# filemaker
-acl Safe_ports port 777		# multiling http
-acl CONNECT method CONNECT
+{% if squid_acl_safeports is defined and squid_acl_safeports != [] %}
+{%   for item in squid_acl_safeports %}
+acl Safe_ports port {{ item['port'] }}{% if item['comment'] is defined %} #{{ item['comment'] }} {% endif %}
 
-http_access deny !Safe_ports
-http_access deny CONNECT !SSL_ports
-{% if ((ansible_distribution == "Ubuntu" and ansible_distribution_version >= '14.04') or
-  (ansible_distribution == "CentOS" and ansible_distribution_major_version|int > 6) or
-  (ansible_distribution == "Debian" and ansible_distribution_major_version|int >7) or
-  (ansible_distribution != "Ubuntu" and ansible_distribution != "CentOS" and
-  ansible_distribution != "Debian")) %}
-http_access allow localhost manager
-http_access deny manager
-http_access allow localhost
+{%   endfor %}
 {% endif %}
-{% if squid_acl_localnet is defined and squid_acl_localnet != [] %}
-http_access allow localnet
+
+{% if squid_http_access is defined and squid_http_access != [] %}
+{%   for item in squid_http_access %}
+http_access {{ item['action'] }} {{ item['acl']|join(' ') }}
+{%   endfor %}
 {% endif %}
-http_access deny all
+
+{% if squid_refresh_patterns is defined and squid_refresh_patterns != [] %}
+{%   for item in squid_refresh_patterns %}
+refresh_pattern {{ item['regex'] }} {{ item['min'] }} {{ item['percent'] }} {{ item['max'] }}
+{%   endfor %}
+{% endif %}
 
 {% if squid_cache_peering %}
 icp_access allow {{ squid_icp_access }}
+icp_port {{ squid_icp_port }}
 {% endif %}
-
 {% if (squid_transparent_proxy is defined and not squid_transparent_proxy) or squid_transparent_proxy is not defined %}
 http_port {{ squid_http_port }}
 {% elif squid_transparent_proxy is defined and squid_transparent_proxy %}
 http_port {{ squid_http_port }} transparent
 {% endif %}
-
 {% if squid_cache_peering %}
 {%   for item in squid_cache_peer %}
 {%     if item.host != ansible_hostname and item.domain is defined %}
@@ -51,17 +48,4 @@ cache_peer {{ item.host }}.{{ item.domain}} {{ item.type }} {{ item.proxy_port}}
 cache_peer {{ item.host }} {{ item.type }} {{ item.proxy_port}} {{ item.icp_port }} {{ item.options }}
 {%     endif %}
 {%   endfor %}
-{% endif %}
-
-refresh_pattern ^ftp:		1440	20%	10080
-refresh_pattern ^gopher:	1440	0%	1440
-refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
-refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
-# example lin deb packages
-#refresh_pattern (\.deb|\.udeb)$   129600 100% 129600
-refresh_pattern .		0	20%	4320
-
-
-{% if squid_cache_peering %}
-icp_port {{ squid_icp_port }}
 {% endif %}

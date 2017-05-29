@@ -6,3 +6,4 @@
     line: "dns-nameservers {{ base_dns_nameservers|join (' ') }}"
     state: "{{ base_dns_nameservers_state }}"
   notify: "update resolvconf"
+  become: true

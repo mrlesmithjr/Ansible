@@ -13,28 +13,297 @@ Role Variables
 
 ```
 ---
+influxdb_admin:
+  # Determines whether the admin service is enabled.
+  enabled: false
+  # The default bind address used by the admin service.
+  bind_address: ''
+  # The default bind port used by the admin service.
+  bind_port: '8083'
+  # The SSL certificate used when HTTPS is enabled.
+  https_certificate: '/etc/ssl/influxdb.pem'
+  # Whether the admin service should use HTTPS.
+  https_enabled: false
+
+influxdb_collectd:
+  auth_file: '/etc/collectd/auth_file'
+  # Number of batches that may be pending in memory
+  batch_pending: '10'
+  # Flush if this many points get buffered
+  batch_size: '5000'
+  # Flush at least this often even if we haven't hit buffer limit
+  batch_timeout: '10s'
+  bind_address: ''
+  bind_port: '25826'
+  database: 'collectd'
+  enabled: false
+  # UDP Read buffer size, 0 means OS default. UDP listener will fail if set
+  # above OS max.
+  read_buffer: '0'
+  retention_policy: ''
+  security_level: 'none'
+  # The collectd service supports either scanning a directory for multiple types
+  # db files, or specifying a single db file.
+  typesdb: '/usr/local/share/collectd'
+
+# Defines if InfluxDB is configured
+influxdb_config: false
+
 # defaults file for ansible-influxdb
 influxdb_config_databases: true
+
+influxdb_continuous_queries:
+  # Determiens whether the continuous query service is enabled.
+  enabled: true
+  # Controls whether queries are logged when executed by the CQ service.
+  log_enabled: true
+  # interval for how often continuous queries will be checked if they need to run
+  run_interval: '1s'
+
+influxdb_coordinator:
+  # The the time threshold when a query will be logged as a slow query.  This
+  # limit can be set to help discover slow or resource intensive queries.
+  # Setting the value to 0 disables the slow query logging.
+  log_queries_after: '0s'
+  # The maximum number of concurrent queries allowed to be executing at one time.
+  # If a query is executed and exceeds this limit, an error is returned to the
+  # caller.  This limit can be disabled by setting it to 0.
+  max_concurrent_queries: '0'
+  # The maxium number of group by time bucket a SELECt can create.  A value of
+  # zero will max the maximum number of buckets unlimited.
+  max_select_buckets: '0'
+  # The maximum number of points a SELECT can process.  A value of 0 will make
+  # the maximum point count unlimited.
+  max_select_point: '0'
+  # The maximum number of series a SELECT can run. A value of zero will make
+  # the maximum series count unlimited.
+  max_select_series: '0'
+  # The maximum time a query will is allowed to execute before being killed
+  # by the system.  This limit can help prevent run away queries.  Setting the
+  # value to 0 disables the limit.
+  query_timeout: '0s'
+  # The default time a write request will wait until a "timeout" error is
+  # returned to the caller.
+  write_timeout: '10s'
+
+influxdb_data:
+  # CacheMaxMemorySize is the maximum size a shard's cache can
+  # reach before it starts rejecting writes.
+  cache_max_memory_size: '1048576000'
+  # CacheSnapshotMemorySize is the size at which the engine will
+  # snapshot the cache and write it to a TSM file, freeing up memory
+  cache_snapshot_memory_size: '26214400'
+  # CacheSnapshotWriteColdDuration is the length of time at
+  # which the engine will snapshot the cache and write it to
+  # a new TSM file if the shard hasn't received writes or deletes
+  cache_snapshot_write_cold_duration: '10m'
+  # CompactFullWriteColdDuration is the duration at which the engine
+  # will compact all TSM files in a shard if it hasn't received a
+  # write or delete
+  compact_full_write_cold_duration: '4h'
+  # The directory where the TSM storage engine stores TSM files.
+  dir: '/var/lib/influxdb/data'
+  # The maximum series allowed per database before writes are dropped.  This
+  # limit can prevent high cardinality issues at the database level.  This limit
+  # can be disabled by setting it to 0.
+  max_series_per_database: '1000000'
+  # The maximum number of tag values per tag that are allowed before writes are
+  # dropped.  This limit can prevent high cardinality tag values from being
+  # written to a measurement.  This limit can be disabled by setting it to 0.
+  max_values_per_tag: '100000'
+  # Whether queries should be logged before execution. Very useful for troubleshooting, but will
+  # log any sensitive data contained within a query.
+  query_log_enabled: true
+  # Trace logging provides more verbose output around the tsm engine. Turning
+  # this on can provide more useful output for debugging tsm engine issues.
+  trace_logging_enabled: false
+  # The directory where the TSM storage engine stores WAL files.
+  wal_dir: '/var/lib/influxdb/wal'
+
 influxdb_databases:
   - host: 'localhost'
     name: 'site'
     state: 'present'
-    retention_policy: # Defines the retention policy
+ # Defines the retention policy
+    retention_policy:
       enabled: true
       name: 'test-1w'
-      duration: '1w' # Define in hour(h), days(d), weeks(w) or Infinite(INF)
+ # Define in hour(h), days(d), weeks(w) or Infinite(INF)
+      duration: '1w'
       replication: '1'
+
 influxdb_debian_pre_reqs:
   - 'apt-transport-https'
   - 'python-pip'
+
 influxdb_debian_repo: 'deb https://repos.influxdata.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} stable'
+
 influxdb_debian_repo_key: 'https://repos.influxdata.com/influxdb.key'
+
+influxdb_graphite:
+  # number of batches that may be pending in memory
+  batch_pending: '10'
+  # Flush if this many points get buffered
+  batch_size: '5000'
+  # Flush at least this often even if we haven't hit buffer limit
+  batch_timeout: '1s'
+  bind_address: ''
+  bind_port: '2003'
+  consistency_level: 'one'
+  database: 'graphite'
+  #Determines whether the graphite endpoint is enabled.
+  enabled: false
+  protocol: 'tcp'
+  retention_policy: ''
+  ### This string joins multiple matching 'measurement' values providing more control over the final measurement name.
+  separator: '.'
+  ### Default tags that will be added to all metrics.  These can be overridden at the template level
+  ### or by tags extracted from metric
+  tags:
+    - 'region=us-east'
+    - 'zone=1c'
+  ### Each template line requires a template pattern.  It can have an optional
+  ### filter before the template and separated by spaces.  It can also have optional extra
+  ### tags following the template.  Multiple tags should be separated by commas and no spaces
+  ### similar to the line protocol format.  There can be only one default template.
+  # templates: [
+  #   "*.app env.service.resource.measurement",
+  #   # Default template
+  #   "server.*",
+  # ]
+  # UDP Read buffer size, 0 means OS default. UDP listener will fail if set above OS max.
+  udp_read_buffer: '0'
+
+influxdb_http:
+  # Determines whether HTTP authentication is enabled.
+  auth_enabled: false
+  # The bind address used by the HTTP service.
+  bind_address: ''
+  # The bind port used by the HTTP service.
+  bind_port: '8086'
+  # The path of the unix domain socket.
+  bind_socket: '/var/run/influxdb.sock'
+  # Determines whether HTTP endpoint is enabled.
+  enabled: true
+  https_certificate: '/etc/ssl/influxdb.pem'
+  # Determines whether HTTPS is enabled.
+  https_enabled: false
+  # Use a separate private key location.
+  https_private_key: ''
+  # Determines whether HTTP request logging is enabled
+  log_enabled: true
+  # The maximum number of HTTP connections that may be open at once.  New
+  # connections that would exceed this limit are dropped.  Setting this value
+  # to 0 disables the limit.
+  max_connection_limit: '0'
+  # The default chunk size for result sets that should be chunked.
+  max_row_limit: '0'
+  # Determines whether the pprof endpoint is enabled.  This endpoint is used for
+  # troubleshooting and monitoring.
+  pprof_enabled: true
+  # The default realm sent back when issuing a basic auth challenge.
+  realm: 'InfluxDB'
+  # Not implemented yet
+  # relay:
+  #   - name: 'local1'
+  #     location: 'http://127.0.0.1:8086/write'
+  #     timeout: '10s'
+  # The JWT auth shared secret to validate requests using JSON web tokens.
+  shared_secret: ''
+  # Enable http service over unix domain socket
+  unix_socket_enabled: false
+  # Determines whether detailed write logging is enabled.
+  write_tracing: false
+
+influxdb_meta:
+  # Where the metadata/raft database is stored
+  dir: '/var/lib/influxdb/meta'
+  # If log messages are printed for the meta service
+  logging_enabled: true
+  # Automatically create a default retention policy when creating a database
+  retention_autocreate: true
+
+influxdb_monitor:
+  # Whether to record statistics internally.
+  store_enabled: true
+  # The destination database for recorded statistics
+  store_database: '_internal'
+  # The interval at which to record statistics
+  store_interval: '10s'
+
+influxdb_opentsdb:
+  # Number of batches that may be pending in memory
+  batch_pending: '5'
+  # Flush if this many points get buffered
+  batch_size: '1000'
+  # Flush at least this often even if we haven't hit buffer limit
+  batch_timeout: '1s'
+  bind_address: ''
+  bind_port: '4242'
+  certificate: '/etc/ssl/influxdb.pem'
+  consistency_level: 'one'
+  database: 'opentsdb'
+  enabled: false
+  # Log an error for every malformed point.
+  log_point_errors: true
+  retention_policy: ''
+  tls_enabled: false
+
 influxdb_python_modules:
   - 'influxdb'
 influxdb_redhat_pre_reqs:
   - 'python-pip'
 influxdb_redhat_repo: 'https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable'
 influxdb_redhat_repo_key: 'https://repos.influxdata.com/influxdb.key'
+
+influxdb_retention:
+  # The interval of time when retention policy enforcement checks run.
+  check_interval: '30m'
+  # Determines whether retention policy enforcment enabled.
+  enabled: true
+
+influxdb_rpc_port: '8088'
+
+influxdb_shard_precreation:
+  # The default period ahead of the endtime of a shard group that its successor
+  # group is created.
+  advance_period: '30m'
+  # The interval of time when the check to pre-create new shards runs.
+  check_interval: '10m'
+  # Determines whether shard pre-creation service is enabled.
+  enabled: true
+
+influxdb_subscriber:
+  # The path to the PEM encoded CA certs file. If the empty string, the
+  # default system certs will be used
+  ca_certs: ''
+  # Determines whether the subscriber service is enabled.
+  enabled: true
+  # The default timeout for HTTP writes to subscribers.
+  http_timeout: '30s'
+  # Allows insecure HTTPS connections to subscribers.  This is useful when testing with self-
+  # signed certificates.
+  insecure_skip_verify: false
+  # The number of in-flight writes buffered in the write channel.
+  write_buffer_size: '1000'
+  # The number of writer goroutines processing the write channel.
+  write_concurrency: '40'
+
+influxdb_udp:
+  # Number of batches that may be pending in memory
+  batch_pending: '10'
+  # Flush if this many points get buffered
+  batch_size: '5000'
+  # Will flush at least this often even if we haven't hit buffer limit
+  batch_timeout: '1s'
+  bind_address: ''
+  bind_port: '8089'
+  database: 'udp'
+  enabled: false
+  # UDP Read buffer size, 0 means OS default. UDP listener will fail if set
+  # above OS max.
+  read_buffer: '0'
+  retention_policy: ''
 ```
 
 Dependencies

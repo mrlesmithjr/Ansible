@@ -1,0 +1,49 @@
+---
+# We run this play against app servers in order to gather facts prior to
+# setting up Landscape DB servers
+- hosts: landscape_app
+
+- hosts: landscape_db
+  vars:
+    landscape_db_master: "{{ groups[postgresql_replication_group][0] }}"
+    landscape_db_postgresql_version: '{{ postgresql_version }}'
+    landscape_replicated_db: true
+    postgresql_config: true
+    postgresql_enable_replication: true
+    postgresql_listen_addresses:
+      # - 'localhost'
+      - '*'
+    postgresql_max_connections: 400
+    postgresql_max_prepared_transactions: 400
+    postgresql_replication:
+      interface: 'enp0s8'
+      master: "{{ groups[postgresql_replication_group][0] }}"
+      # master: 'node0'
+      user: 'repluser'
+    postgresql_replication_group: 'landscape_db'
+    postgresql_version: 9.5
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-postgresql
+    - role: ansible-landscape-db
+      tags:
+        - landscape
+
+- hosts: landscape_app
+  vars:
+    landscape_db_host: "{{ hostvars[landscape_db_master]['ansible_' + landscape_db_replication_interface]['ipv4']['address'] }}"
+    landscape_db_master: "{{ groups[postgresql_replication_group][0] }}"
+    postgresql_replication_group: 'landscape_db'
+    rabbitmq_config_service: true
+    rabbitmq_listeners:
+      - 127.0.0.1
+  roles:
+    - role: ansible-apache2
+      become: true
+    - role: ansible-rabbitmq
+      tags:
+        - rabbitmq
+      become: true
+    - role: ansible-landscape-app
+      tags:
+        - landscape

@@ -5,17 +5,14 @@
   check_mode: no
   changed_when: false
   failed_when: false
-
-# - name: hw_virtualization_check | fail if hardware virtualization not supported
-#   fail: msg="Hardware Virtualization Not Supported on this platform!!!!"
-#   when: hw_check.stdout == "0"
+  become: true
 
 - name: hw_virtualization_check | Setting kvm_domain_type == qemu
   set_fact:
     kvm_domain_type: 'qemu'
-  when: hw_check.stdout == '0'
+  when: hw_check['stdout'] == '0'
 
 - name: hw_virtualization_check | Setting kvm_domain_type == kvm
   set_fact:
     kvm_domain_type: 'kvm'
-  when: hw_check.stdout != '0'
+  when: hw_check['stdout'] != '0'

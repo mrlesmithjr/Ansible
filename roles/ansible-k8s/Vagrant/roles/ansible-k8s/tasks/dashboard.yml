@@ -1,0 +1,19 @@
+---
+- name: dashboard | Checking For Existing Dashboard
+  shell: >
+           kubectl --kubeconfig {{ k8s_admin_config }} \
+           get pods --all-namespaces | grep dashboard
+  become: true
+  register: "_k8s_dashboard"
+  failed_when: (_k8s_dashboard['rc'] > 1)
+  changed_when: false
+  when: inventory_hostname == k8s_master
+
+- name: dashboard | Loading K8s Dashboard
+  command: >
+           kubectl --kubeconfig {{ k8s_admin_config }} \
+           create -f {{ k8s_dashboard }}
+  become: true
+  when: >
+        (inventory_hostname == k8s_master) and
+        (_k8s_dashboard['rc'] == 1)

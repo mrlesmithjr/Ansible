@@ -4,12 +4,14 @@
     repo: "{{ haproxy_debian_repo }}"
     state: "present"
     update_cache: yes
+  become: true
   when: ansible_distribution == "Ubuntu"
 
 - name: debian | installing haproxy and socat
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'haproxy'
     - 'hatop'
@@ -19,4 +21,5 @@
   service:
     name: "haproxy"
     enabled: yes
+  become: true
   when: not ansible_check_mode

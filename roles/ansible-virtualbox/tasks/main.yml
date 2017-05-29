@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-virtualbox
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: ext_pack.yml

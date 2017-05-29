@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-bro-ids
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config.yml
+
+- include: criticalstack.yml
+  when: bro_ids_install_criticalstack

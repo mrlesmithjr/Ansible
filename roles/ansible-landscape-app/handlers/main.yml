@@ -1,0 +1,11 @@
+---
+# handlers file for ansible-landscape-app
+- name: restart apache2
+  service:
+    name: "apache2"
+    state: "restarted"
+  become: true
+
+- name: restart landscape services
+  command: "lsctl restart"
+  become: true

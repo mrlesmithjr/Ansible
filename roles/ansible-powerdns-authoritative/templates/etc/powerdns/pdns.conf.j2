@@ -30,7 +30,7 @@ disable-axfr=yes
 {%   if pdns_server_version != "4.x" %}
 experimental-api-key={{ pdns_api_key }}
 {%   elif pdns_server_version == "4.x" %}
-api={{ pdns_api_key }}
+api-key={{ pdns_api_key }}
 {%   endif %}
 {% endif %}
 {% if pdns_allow_ddns_updates %}

@@ -1,6 +1,6 @@
 galaxy_info:
   author: Larry Smith Jr.
-  description: Installs NodeJS (https://nodejs.org/en/)
+  description: An [Ansible] role to install [NodeJS]
   #company: your company (optional)
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -32,12 +32,12 @@ galaxy_info:
   # platform on this list, let us know and we'll get it added!
   #
   platforms:
-  #- name: EL
-  #  versions:
+  - name: EL
+    versions:
   #  - all
   #  - 5
-  #  - 6
-  #  - 7
+      - 6
+      - 7
   #- name: GenericUNIX
   #  versions:
   #  - all
@@ -121,7 +121,7 @@ galaxy_info:
   #  - maverick
   #  - natty
   #  - oneiric
-  #  - precise
+    - precise
   #  - quantal
   #  - raring
   #  - saucy
@@ -129,7 +129,7 @@ galaxy_info:
     - utopic
     - vivid
     - wily
-  #  - xenial
+    - xenial
   #- name: SLES
   #  versions:
   #  - all
@@ -165,7 +165,7 @@ galaxy_info:
     # NOTE: A tag is limited to a single word comprised of
     # alphanumeric characters. Maximum 20 tags per role.
     - development
-    
+
 dependencies: []
   # List your role dependencies here, one per line.
   # Be sure to remove the '[]' above if you add dependencies

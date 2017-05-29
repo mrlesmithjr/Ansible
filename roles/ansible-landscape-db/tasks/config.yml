@@ -1,0 +1,11 @@
+---
+- name: config | Configuring Postgresql (pg_hba.conf)
+  template:
+    src: "etc/postgresql/pg_hba.conf.j2"
+    dest: "/etc/postgresql/{{ landscape_db_postgresql_version }}/main/pg_hba.conf"
+    owner: "postgres"
+    group: "postgres"
+    mode: "u=rw,g=r,o=r"
+  register: "_pg_hba_conf_reconfigured"
+  become: true
+  notify: "restart postgresql"

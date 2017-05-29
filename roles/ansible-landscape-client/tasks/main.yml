@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-landscape-client
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config.yml

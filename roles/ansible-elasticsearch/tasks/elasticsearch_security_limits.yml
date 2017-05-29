@@ -4,6 +4,7 @@
     dest: /etc/security/limits.conf
     line: "{{ item }}"
     state: present
+  become: true
   with_items:
     - 'elasticsearch soft nofile 65536'
     - 'elasticsearch hard nofile 65536'

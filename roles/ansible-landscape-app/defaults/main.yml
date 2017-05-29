@@ -1,0 +1,62 @@
+---
+# defaults file for ansible-landscape-app
+landscape_app_deployment_mode: 'standalone'
+
+landscape_app_ha: true
+
+landscape_app_primary: "{{ groups['landscape_app'][0] }}"
+
+landscape_app_repo: 'ppa:landscape/{{ landscape_app_version }}'
+
+landscape_app_rabbitmq_host: 127.0.0.1
+landscape_app_rabbitmq_port: 5672
+
+landscape_app_rabbitmq_user:
+  name: 'landscape'
+  password: 'landscape'
+  vhost: 'landscape'
+  configure_priv: '.*'
+  read_priv: '.*'
+  write_priv: '.*'
+  tags: 'administrator'
+
+landscape_app_services:
+# To run all Landscape services (including cron jobs) set this to "yes"
+# Alternatively, set this to a number between 1 and 9 to have that number
+# of services to start for each kind that supports this (currently, only
+# msg, ping and app support multiple instances)
+  run_all: 'no'
+# To run only specific Landscape services set RUN_ALL to "no" and then
+# set the services you want to run to "yes"
+# If you want to start more than one copy of each service, use a number
+# instead of "yes" or "no".
+# Currently, only msg, app and ping support this.
+  run_apiserver: 'yes'
+  run_appserver: 'yes'
+  run_async_frontend: 'yes'
+  run_jobhandler: 'yes'
+  run_juju_sync: 'yes'
+  run_msgserver: 'yes'
+  run_packagesearch: 'no'
+  run_packageuploadserver: 'yes'
+  run_pingserver: 'yes'
+# To run cron jobs on this server when RUN_ALL="no" set RUN_CRON to "yes".
+  run_cron: 'yes'
+
+landscape_app_ssl_cert_chain_file: '/etc/apache2/ssl.crt/server-ca.crt'
+landscape_app_ssl_cert_file: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+landscape_app_ssl_cert_key_file: '/etc/ssl/private/ssl-cert-snakeoil.key'
+
+landscape_app_user_info:
+  name: 'landscape'
+  password: 'landscape'
+
+landscape_app_version: 17.03
+
+landscape_db_host: 127.0.0.1
+
+landscape_db_replication_interface: 'enp0s8'
+
+landscape_db_superuser_info:
+  name: 'landscape_superuser'
+  password: 'landscape'

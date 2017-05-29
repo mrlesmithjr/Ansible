@@ -1,56 +1,62 @@
 ---
 - name: config_vms | Defining VM(s)
   virt:
-    name: "{{ item.name }}"
+    name: "{{ item['name'] }}"
     command: "define"
     xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
+  become: true
   with_items: '{{ kvm_vms }}'
-  when: item.host is not defined
+  when: item['host'] is not defined
 
 - name: config_vms | Defining VM(s)
   virt:
-    name: "{{ item.name }}"
+    name: "{{ item['name'] }}"
     command: "define"
     xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
+  become: true
   with_items: '{{ kvm_vms }}'
   when: >
-        item.host is defined and
-        inventory_hostname == item.host
+        item['host'] is defined and
+        inventory_hostname == item['host']
 
 - name: config_vms | Creating VM Disk(s)
   qemu_img:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
-    size: "{{ item[1].size }}"
+    size: "{{ item[1]['size'] }}"
     format: "{{ kvm_images_format_type }}"
+  become: true
   with_subelements:
     - '{{ kvm_vms }}'
     - disks
-  when: item[0].host is not defined
+  when: item[0]['host'] is not defined
 
 - name: config_vms | Creating VM Disk(s)
   qemu_img:
     dest: "{{ kvm_images_path }}/{{ item[1]['name'] }}.{{ kvm_images_format_type }}"
-    size: "{{ item[1].size }}"
+    size: "{{ item[1]['size'] }}"
     format: "{{ kvm_images_format_type }}"
+  become: true
   with_subelements:
     - '{{ kvm_vms }}'
     - disks
   when: >
-        item[0].host is defined and
-        inventory_hostname == item[0].host
+        item[0]['host'] is defined and
+        inventory_hostname == item[0]['host']
 
 - name: config_vms | Setting VM State
   virt:
-    name: "{{ item.name }}"
-    state: "{{ item.state }}"
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  become: true
   with_items: '{{ kvm_vms }}'
-  when: item.host is not defined
+  when: item['host'] is not defined
 
 - name: config_vms | Setting VM State
   virt:
-    name: "{{ item.name }}"
-    state: "{{ item.state }}"
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  become: true
   with_items: '{{ kvm_vms }}'
   when: >
-        item.host is defined and
-        inventory_hostname == item.host
+        item['host'] is defined and
+        inventory_hostname == item['host']

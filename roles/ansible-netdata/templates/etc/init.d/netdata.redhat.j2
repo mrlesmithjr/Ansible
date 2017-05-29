@@ -1,0 +1,91 @@
+#!/bin/sh
+#
+# netdata	Real-time performance monitoring, done right
+# chkconfig: 345 99 01
+# description:  Netdata is a daemon that collects data in real-time (per second)
+#               and presents a web site to view and analyze them. The presentation
+#               is also real-time and full of interactive charts that precisely
+#               render all collected values.
+# processname:	netdata
+
+# Source functions
+. /etc/rc.d/init.d/functions
+
+DAEMON="netdata"
+DAEMON_PATH=/usr/sbin
+PIDFILE=/var/run/$DAEMON.pid
+DAEMONOPTS="-P $PIDFILE"
+STOP_TIMEOUT="10"
+
+[ -e /etc/sysconfig/$DAEMON ] && . /etc/sysconfig/$DAEMON
+
+LOCKFILE=/var/lock/subsys/$DAEMON
+
+service_start()
+{
+	[ -x $DAEMON_PATH ] || exit 5
+	echo -n "Starting $DAEMON..."
+	daemon $DAEMON_PATH/$DAEMON $DAEMONOPTS
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch $LOCKFILE
+	return $RETVAL
+}
+
+service_stop()
+{
+	printf "%-50s" "Stopping $DAEMON..."
+	killproc -p ${PIDFILE} -d ${STOP_TIMEOUT} $DAEMON
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f ${PIDFILE} ${LOCKFILE}
+	return $RETVAL
+}
+
+condrestart()
+{
+	if ! service_status > /dev/null; then
+		RETVAL=$1
+		return $RETVAL
+	fi
+
+	service_stop
+	service_start
+}
+
+service_status()
+{
+	status -p ${PIDFILE} $DAEMON_PATH/$DAEMON
+}
+
+service_status_quiet()
+{
+	status -p ${PIDFILE} $DAEMON_PATH/$DAEMON >/dev/null 2>&1
+}
+
+case "$1" in
+start)
+	service_status_quiet && exit 0
+	service_start
+;;
+stop)
+	service_status_quiet || exit 0
+	service_stop
+;;
+restart)
+	service_stop
+	service_start
+;;
+try-restart)
+	condrestart 0
+	;;
+force-reload)
+	condrestart 7
+;;
+status)
+	service_status
+;;
+*)
+	echo "Usage: $0 {start|stop|restart|try-restart|force-reload|status}"
+	exit 3
+esac

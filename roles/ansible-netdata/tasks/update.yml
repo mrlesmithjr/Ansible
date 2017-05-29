@@ -1,0 +1,7 @@
+---
+- name: update | Updating Netdata ({{ netdata_updater }}) From {{ netdata_source_dir }}
+  command: "{{ netdata_updater }}"
+  args:
+    chdir: "{{ netdata_source_dir }}"
+  become: true
+  notify: "restart netdata"

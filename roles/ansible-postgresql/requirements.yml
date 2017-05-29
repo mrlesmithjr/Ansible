@@ -1,2 +1,3 @@
 ---
 - src: https://github.com/mrlesmithjr/ansible-postgresql.git
+- src: https://github.com/mrlesmithjr/ansible-users.git

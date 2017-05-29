@@ -4,3 +4,4 @@
   service:
     name: filebeat
     state: restarted
+  become: true

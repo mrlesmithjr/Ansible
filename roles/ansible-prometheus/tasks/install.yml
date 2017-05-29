@@ -1,0 +1,22 @@
+---
+- name: install | Downloading Prometheus {{ prometheus_version }}
+  get_url:
+    url: "{{ prometheus_download }}"
+    dest: "{{ prometheus_source_dir }}/"
+  become: true
+
+- name: install | Extracting Prometheus From {{ prometheus_source_dir }} To {{ prometheus_install_dir }}
+  unarchive:
+    src: "{{ prometheus_source_dir }}/{{ prometheus_download|basename }}"
+    dest: "{{ prometheus_install_dir }}"
+    copy: false
+  args:
+    creates: "{{ prometheus_install_dir }}/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+  become: true
+
+- name: install | Creating Symlink For Prometheus ({{ prometheus_install_dir }}/prometheus)
+  file:
+    src: "{{ prometheus_install_dir }}/prometheus-{{ prometheus_version }}.linux-amd64"
+    dest: "{{ prometheus_install_dir }}/prometheus"
+    state: "link"
+  become: true

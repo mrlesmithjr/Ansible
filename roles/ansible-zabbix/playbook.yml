@@ -1,42 +1,25 @@
 ---
-- hosts: all
-  become: true
+- hosts: zabbix_server
   vars:
-    - pri_domain_name: 'test.vagrant.local'
+    apache2_config_php: true
+    apache2_install_php: true
+    apache2_php_max_execution_time: 300
+    apache2_php_max_input_time: 300
+    apache2_php_max_memory: 128M
+    apache2_php_post_max_size: 16M
+    php_debian_packages:
+      - 'php{{ php_version_debian }}-bcmath'
+      - 'php{{ php_version_debian }}-mbstring'
+      - 'php{{ php_version_debian }}-xmlreader'
+      - 'php{{ php_version_debian }}-xmlwriter'
+    pri_domain_name: 'test.vagrant.local'
   roles:
-  tasks:
-    - name: pre-reqs
-      dnf:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - libselinux-python
-      when: >
-            (ansible_os_family == "RedHat" and
-            ansible_distribution == "Fedora")
-
-    - name: pre-reqs
-      yum:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - libselinux-python
-      when: >
-            (ansible_os_family == "RedHat" and
-            ansible_distribution != "Fedora")
-
-    - name: updating /etc/hosts
-      lineinfile:
-        dest: /etc/hosts
-        regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
-        line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
-        state: present
-      with_items: groups['all']
-
-- hosts: all
-  become: true
-  vars:
-    - pri_domain_name: 'test.vagrant.local'
-  roles:
+    - role: ansible-apache2
+      become: true
+    - role: ansible-php
+      become: true
+    - role: ansible-mysql
     - role: ansible-zabbix
+      tags:
+        - zabbix
   tasks:

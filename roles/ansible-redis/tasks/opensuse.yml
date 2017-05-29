@@ -3,6 +3,7 @@
   zypper:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'python-devel'
     - 'python-pip'
@@ -11,6 +12,7 @@
   zypper:
     name: "redis"
     state: "present"
+  become: true
   notify:
     - 'start redis'
   when: not redis_install_from_source

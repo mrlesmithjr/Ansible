@@ -1,0 +1,57 @@
+[INCLUDES]
+{% if ansible_os_family == "Debian" %}
+before = paths-debian.conf
+{% elif ansible_os_family == "RedHat" %}
+{%   if ansible_distribution == "Fedora" %}
+before = paths-fedora.conf
+{%   endif %}
+{% endif %}
+
+[DEFAULT]
+action = %(action_)s
+action_ = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+action_mw = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+            %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", protocol="%(protocol)s", chain="%(chain)s"]
+action_mwl = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+             %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s"]
+action_xarf = %(banaction)s[name=%(__name__)s, bantime="%(bantime)s", port="%(port)s", protocol="%(protocol)s", chain="%(chain)s"]
+             xarf-login-attack[service=%(__name__)s, sender="%(sender)s", logpath=%(logpath)s, port="%(port)s"]
+action_cf_mwl = cloudflare[cfuser="%(cfemail)s", cftoken="%(cfapikey)s"]
+                %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s, chain="%(chain)s"]
+action_blocklist_de  = blocklist_de[email="%(sender)s", service=%(filter)s, apikey="%(blocklist_de_apikey)s"]
+action_badips = badips.py[category="%(name)s", banaction="%(banaction)s"]
+backend = auto
+{% if ansible_os_family == "Debian" %}
+banaction = iptables-multiport
+{% elif ansible_os_family == "RedHat" %}
+banaction = firewallcmd-ipset
+{% endif %}
+bantime  = {{ fail2ban_bantime }}
+chain = {{ fail2ban_chain|upper }}
+destemail = {{ fail2ban_destemail }}
+enabled = false
+filter = %(__name__)s
+findtime  = {{ fail2ban_findtime }}
+ignorecommand =
+ignoreip = {{ fail2ban_ignore_ips|join (' ') }}
+logencoding = auto
+maxretry = {{ fail2ban_maxretry }}
+mta = {{ fail2ban_mta }}
+port = 0:65535
+protocol = {{ fail2ban_protocol }}
+sender = {{ fail2ban_sender }}
+sendername = {{ fail2ban_sendername }}
+usedns = warn
+
+{% if fail2ban_jails is defined %}
+{%   for item in fail2ban_jails %}
+[{{ item.jail }}]
+enabled = true
+port = {{ item.port|join (',') }}
+log = {{ item.logpath }}
+{%     if item.maxretry is defined %}
+maxretry = {{ item.maxretry }}
+{%     endif %}
+
+{%   endfor %}
+{% endif %}

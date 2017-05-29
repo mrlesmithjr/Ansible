@@ -3,6 +3,7 @@
   template:
     src: "etc/redis/redis.conf.j2"
     dest: "{{ redis_conf }}"
+  become: true
   notify: "restart {{ redis_service }}"
 
 - name: config | Configuring Sysctl Settings
@@ -11,5 +12,6 @@
     value: "{{ item.value }}"
     state: "present"
     reload: yes
+  become: true
   notify: "restart {{ redis_service }}"
   with_items: '{{ redis_sysctl_settings }}'

@@ -1,25 +1,35 @@
 ---
 # defaults file for ansible-grafana
 grafana_analytics:
-  check_for_updates: 'true'
-  reporting_enabled: 'true'
+  check_for_updates: true
+  reporting_enabled: true
   google_analytics_ua_id: ''
+
 grafana_anonymous_auth_info:
-  enabled: 'false' # enable anonymous access
-  org_name: 'Main Org.' # specify organization name that should be used for unauthenticated users
-  org_role: 'Viewer' # specify role for unauthenticated users
+  # enable anonymous access
+  enabled: false
+  # specify organization name that should be used for unauthenticated users
+  org_name: 'Main Org.'
+  # specify role for unauthenticated users
+  org_role: 'Viewer'
+
 grafana_apt_key: 'https://packagecloud.io/gpg.key'
 grafana_apt_repo: 'deb https://packagecloud.io/grafana/stable/debian/ wheezy main'
 grafana_auth_basic: true
 grafana_auth_ldap: false
 grafana_auth_ldap_config_file: '/etc/grafana/ldap.toml'
 grafana_config: true
-grafana_db_info: # Only required if not using sqlite3 as grafana_db_type
+
+# Only required if not using sqlite3 as grafana_db_type
+grafana_db_info:
   host: '127.0.0.1:3306'
   name: 'grafana'
   user: 'root'
   password: 'root'
-grafana_db_type: 'sqlite3' # Either "mysql", "postgres" or "sqlite3"
+
+# Either "mysql", "postgres" or "sqlite3"
+grafana_db_type: 'sqlite3'
+
 grafana_debian_pre_reqs:
   - 'git'
   - 'maven'
@@ -27,29 +37,35 @@ grafana_debian_pre_reqs:
   - 'unzip'
 grafana_enable_plugins: false
 grafana_enable_vsphere_support: false
-grafana_github_auth_info: # http://docs.grafana.org/installation/configuration/#auth-github
-  allow_sign_up: 'false'
+
+# http://docs.grafana.org/installation/configuration/#auth-github
+grafana_github_auth_info:
+  allow_sign_up: false
   allowed_organizations: ''
   api_url: 'https://api.github.com/user'
   auth_url: 'https://github.com/login/oauth/authorize'
   client_id: 'some_id'
   client_secret: 'some_secret'
-  enabled: 'false'
+  enabled: false
   scopes: 'user:email,read:org'
   team_ids: ''
   token_url: 'https://github.com/login/oauth/access_token'
-grafana_google_auth_info: # http://docs.grafana.org/installation/configuration/#auth-google
-  allow_sign_up: 'false'
+
+# http://docs.grafana.org/installation/configuration/#auth-google
+grafana_google_auth_info:
+  allow_sign_up: false
   allowed_domains: ''
   api_url: 'https://www.googleapis.com/oauth2/v1/userinfo'
   auth_url: 'https://accounts.google.com/o/oauth2/auth'
   client_id: 'some_client_id'
   client_secret: 'some_client_secret'
-  enabled: 'false'
+  enabled: false
   scopes: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
   token_url: 'https://accounts.google.com/o/oauth2/token'
+
+# Either "trace", "debug", "info", "warn", "error", "critical", default is "info"
 grafana_logging_info:
-  level: 'info' # Either "trace", "debug", "info", "warn", "error", "critical", default is "info"
+  level: 'info'
   mode:
     - 'console'
     - 'file'
@@ -57,35 +73,47 @@ grafana_logging_info:
   syslog_info:
     address: 'syslog.{{ pri_domain_name }}'
     enabled: false
-    facility: '' # Syslog facility. user, daemon and local0 through local7 are valid.
-    format: 'text' # log line format, valid options are text, console and json
-    network: 'udp' # udp, tcp or unix
+    # Syslog facility. user, daemon and local0 through local7 are valid.
+    facility: ''
+    # log line format, valid options are text, console and json
+    format: 'text'
+    # udp, tcp or unix
+    network: 'udp'
     tag: ''
-grafana_paths: # Define paths for each grafana source
+
+# Define paths for each grafana source
+grafana_paths:
   data: '/var/lib/grafana'
   logs: '/var/log/grafana'
   plugins: '/var/lib/grafana/plugins'
+
 grafana_plugins:
   - name: 'grafana-clock-panel'
-    state: "present" # absent|present
+    # absent|present
+    state: 'present'
+
 grafana_security_info:
   admin_password: 'admin'
   admin_user: 'admin'
   cookie_remember_name: 'grafana_remember'
   cookie_username: 'grafana_user'
-  data_source_proxy_whitelist: '' # data source proxy whitelist (ip_or_domain:port separated by spaces)
-  disable_gravatar: 'false' # disable gravatar profile images
-  login_remember_days: '7' # Auto-login remember days
-  secret_key: 'SW2YcwTIb9zpOOhoPsMm' # used for signing
+  # data source proxy whitelist (ip_or_domain:port separated by spaces)
+  data_source_proxy_whitelist: ''
+  # disable gravatar profile images
+  disable_gravatar: false
+  # Auto-login remember days
+  login_remember_days: '7'
+  secret_key: 'SW2YcwTIb9zpOOhoPsMm'
+
 grafana_server_info:
   domain: 'localhost'
-  enable_gzip: 'false'
-  enforce_domain: 'false'
+  enable_gzip: false
+  enforce_domain: false
   http_addr: ''
   http_port: '3000'
   protocol: 'http'
   root_url: '%(protocol)s://%(domain)s:%(http_port)s/'
-  router_logging: 'false'
+  router_logging: false
   static_root_path: 'public'
 
 # Provider config options
@@ -94,32 +122,48 @@ grafana_server_info:
 # redis: config like redis server e.g. `addr=127.0.0.1:6379,pool_size=100,db=grafana`
 # mysql: go-sql-driver/mysql dsn config string, e.g. `user:password@tcp(127.0.0.1:3306)/database_name`
 # postgres: user=a password=b host=localhost port=5432 dbname=c sslmode=disable
-grafana_session_info: # Either "memory", "file", "redis", "mysql", "postgres", default is "file"
-  cookie_name: 'grafana_sess' # Session cookie name
-  cookie_secure: 'false' # If you use session in https only, default is false
+
+# Either "memory", "file", "redis", "mysql", "postgres", default is "file"
+grafana_session_info:
+  # Session cookie name
+  cookie_name: 'grafana_sess'
+  # If you use session in https only, default is false
+  cookie_secure: false
   provider: 'file'
-  provider_config: 'sessions' # File based
+  # File based
+  provider_config: 'sessions'
   # provider_config: 'addr=127.0.0.1:6379,pool_size=100,db=grafana' # Redis based
-  session_life_time: '86400' # Session life time, default is 86400
+  # Session life time, default is 86400
+  session_life_time: '86400'
+
 grafana_smtp_info:
   cert_file: ''
-  enabled: 'false'
+  enabled: false
   from_address: 'admin@grafana.localhost'
   host: 'localhost:25'
   key_file: ''
   password: ''
-  skip_verify: 'false'
+  skip_verify: false
   user: ''
+
 grafana_snapshots_info:
-  external_enabled: 'true'
+  external_enabled: true
   external_snapshot_name: 'Publish to snapshot.raintank.io'
   external_snapshot_url: 'https://snapshots-origin.raintank.io'
 grafana_users_info:
-  allow_org_create: 'true' # Allow non admin users to create organizations
-  allow_sign_up: 'true' # disable user signup / registration
-  auto_assign_org_role: 'Viewer' # Default role new users will be automatically assigned (if disabled above is set to true)
-  auto_assign_org: 'true' # Set to true to automatically assign new users to the default organization (id 1)
-  default_theme: 'dark' # Default UI theme ("dark" or "light")
-  login_hint: 'email or username' # Background text for the user field on the login page
+  # Allow non admin users to create organizations
+  allow_org_create: true
+  # disable user signup / registration
+  allow_sign_up: true
+  # Default role new users will be automatically assigned
+  # (if disabled above is set to true)
+  auto_assign_org_role: 'Viewer'
+  # Set to true to automatically assign new users to the default
+  # organization (id 1)
+  auto_assign_org: true
+  # Default UI theme ("dark" or "light")
+  default_theme: 'dark'
+  # Background text for the user field on the login page
+  login_hint: 'email or username'
 grafana_welcome_emails: false
 pri_domain_name: 'example.org'

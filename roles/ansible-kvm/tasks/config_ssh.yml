@@ -5,3 +5,4 @@
     regexp: "^PermitRootLogin"
     line: "PermitRootLogin yes"
   notify: "restart ssh"
+  become: true

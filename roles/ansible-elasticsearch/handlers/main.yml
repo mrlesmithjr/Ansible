@@ -2,6 +2,8 @@
 # handlers file for ansible-elasticsearch
 - name: init elasticsearch
   command: update-rc.d elasticsearch defaults 95 10
+  become: true
 
 - name: restart elasticsearch
   service: name=elasticsearch state=restarted
+  become: true

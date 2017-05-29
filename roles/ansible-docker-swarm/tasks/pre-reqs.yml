@@ -3,6 +3,7 @@
   pip:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'docker-py'
 
@@ -10,3 +11,4 @@
   service:
     name: "docker"
     state: "started"
+  become: true

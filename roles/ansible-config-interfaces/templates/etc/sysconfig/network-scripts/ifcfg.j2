@@ -1,0 +1,57 @@
+BOOTPROTO={{ item['method']|lower }}
+DEVICE={{ item['name'] }}
+{% if item['method']|lower == 'static' %}
+{% if dns_nameservers is defined %}
+{%   for ns in dns_nameservers %}
+DNS{{ loop.index }}={{ ns }}
+{%   endfor %}
+{% endif %}
+{%   if item['gateway'] is defined %}
+GATEWAY={{ item['gateway'] }}
+{%   endif %}
+{%   if item['address'] is defined %}
+IPADDR={{ item['address'] }}
+{%   endif %}
+{%   if item['netmask'] is defined %}
+NETMASK={{ item['netmask'] }}
+{%   endif %}
+{% endif %}
+{% if config_network_bonds %}
+{%   if network_bonds is defined %}
+{%     for nb in network_bonds %}
+{%       for slave in nb['slaves'] %}
+{%         if slave == item['name'] %}
+MASTER={{ nb['name'] }}
+SLAVE=yes
+TYPE=Ethernet
+{%         endif %}
+{%       endfor %}
+{%         if nb['name'] == item['name'] %}
+BONDING_MASTER=yes
+BONDING_OPTS={% for opt in nb['parameters'] %}{{ opt['param'] }}={{ opt['val'] }}{% if not loop.last %} {% endif %}{% endfor %}
+
+TYPE=Bond
+{%         endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+{% if config_network_bridges %}
+{%   if network_bridges is defined %}
+{%     for nbr in network_bridges %}
+{%       for port in nbr['ports'] %}
+{%         if port == item['name'] %}
+BRIDGE={{ nbr['name'] }}
+DELAY=0
+TYPE=Ethernet
+{%         endif %}
+{%       endfor %}
+{%       if nbr['name'] == item['name'] %}
+TYPE=Bridge
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+NAME={{ item['name'] }}
+NETBOOT={{ item['netboot']|default('yes') }}
+ONBOOT={{ item['onboot']|default('yes') }}
+PEERDNS=yes

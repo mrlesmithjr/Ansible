@@ -8,6 +8,19 @@
     mode: 0644
   notify:
     - restart nginx
+  become: true
+
+- name: config_nginx | configuring default site
+  template:
+    src: "etc/nginx/sites-available/default.j2"
+    dest: "/etc/nginx/conf.d/default.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nginx
+  become: true
+  when: ansible_os_family == "Alpine"
 
 - name: config_nginx | configuring default site
   template:
@@ -18,3 +31,5 @@
     mode: 0644
   notify:
     - restart nginx
+  become: true
+  when: ansible_os_family != "Alpine"

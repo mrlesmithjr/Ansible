@@ -1,0 +1,24 @@
+---
+- hosts: k8s
+  # become: true
+  vars:
+    # Define Docker version to install
+    docker_version: '1.12.6'
+    # Defines if all nodes in play should be added to each hosts /etc/hosts
+    etc_hosts_add_all_hosts: true
+    etc_hosts_pri_dns_name: '{{ pri_domain_name }}'
+    # Defines if node has static IP.
+    etc_hosts_static_ip: true
+    # Defines if ansible_default_ipv4.address is used for defining hosts
+    etc_hosts_use_default_ip_address: false
+    # Defines if ansible_ssh_host is used for defining hosts
+    etc_hosts_use_ansible_ssh_host: true
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-change-hostname
+    - role: ansible-etc-hosts
+    - role: ansible-timezone
+    - role: ansible-ntp
+    - role: ansible-docker
+    - role: ansible-k8s
+  tasks:

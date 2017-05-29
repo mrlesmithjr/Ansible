@@ -6,6 +6,7 @@
     host: "%"
     priv: "*.*:REPLICATION SLAVE"
     state: "present"
+  become: true
   with_items: '{{ mysql_replication_nodes }}'
   when: >
         item.role == "master" and
@@ -15,6 +16,7 @@
   mysql_db:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items: '{{ mysql_replication_dbs }}'
 
 - name: setup_replication | restarting mysql if reconfigured
@@ -22,6 +24,7 @@
     name: "mysql"
     state: "restarted"
   register: "mysql_restarted"
+  become: true
   when: >
         ansible_os_family == "Debian" and
         (mysql_reconfigured_14_04.changed or
@@ -33,6 +36,7 @@
     name: "mariadb"
     state: "restarted"
   register: "mariadb_restarted"
+  become: true
   when: >
         ansible_os_family == "RedHat" and
         mariadb_reconfigured_redhat.changed
@@ -41,6 +45,7 @@
   wait_for:
     port: "{{ mysql_port }}"
     delay: 10
+  become: true
   when: >
         mysql_restarted.changed or
         mariadb_reconfigured_redhat.changed
@@ -49,6 +54,7 @@
   mysql_replication:
     mode: "getmaster"
   register: "mysql_master_status"
+  become: true
   when: inventory_hostname == mysql_replication_master_node
 
 - name: setup_replication | changing master
@@ -60,6 +66,7 @@
     master_password: "{{ mysql_replication_account_info.password }}"
     master_user: "{{ mysql_replication_account_info.user }}"
   ignore_errors: true  #setting this for now to get around the initial setup
+  become: true
   with_items: '{{ mysql_replication_nodes }}'
   when: >
         item.role == "slave" and
@@ -68,6 +75,7 @@
 - name: setup_replication | start slave
   mysql_replication:
     mode: "startslave"
+  become: true
   with_items: '{{ mysql_replication_nodes }}'
   when: >
         item.role == "slave" and

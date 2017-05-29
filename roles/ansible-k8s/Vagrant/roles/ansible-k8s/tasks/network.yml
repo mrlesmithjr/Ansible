@@ -1,0 +1,76 @@
+---
+- name: network | Applying Pod Network
+  command: >
+           kubectl --kubeconfig {{ k8s_admin_config }} \
+           apply -f {{ k8s_pod_network_config }}
+  become: true
+  register: "_k8s_pod_network_applied"
+  when: >
+        (inventory_hostname == k8s_master) and
+        not k8s_cluster_init
+
+- name: network | Waiting For Kube-DNS To Be Running
+  shell: >
+           kubectl --kubeconfig {{ k8s_admin_config }} \
+           get pods --all-namespaces | grep kube-dns
+  become: true
+  register: "_k8s_kube_dns_running"
+  until: ("Running" in _k8s_kube_dns_running['stdout'])
+  retries: 30
+  delay: 10
+  changed_when: false
+  when: >
+        (inventory_hostname == k8s_master)
+
+- debug: msg="Kube-DNS Is Up and Running"
+  when: >
+        (inventory_hostname == k8s_master) and
+        ("Running" in _k8s_kube_dns_running['stdout'])
+
+- name: network | Capturing Cluster-IP On Master
+  command: "kubectl --kubeconfig {{ k8s_admin_config }} get svc -o json"
+  register: "_k8s_cluster_ip"
+  become: true
+  changed_when: false
+  tags:
+    - 'k8s_cluster_ip'
+  when: inventory_hostname == k8s_master
+
+- name: network | Setting Cluster-IP On Master
+  set_fact:
+    k8s_cluster_ip: "{{ (_k8s_cluster_ip['stdout']|from_json)['items'][0]['spec']['clusterIP'] }}"
+  tags:
+    - 'k8s_cluster_ip'
+  when: inventory_hostname == k8s_master
+
+- name: network | Setting Cluster-IP On Non-Master(s)
+  set_fact:
+    k8s_cluster_ip: "{{ hostvars[k8s_master]['k8s_cluster_ip'] }}"
+  tags:
+    - 'k8s_cluster_ip'
+  when: inventory_hostname != k8s_master
+
+- name: network | Showing Cluster-IP
+  debug: var=k8s_cluster_ip
+  tags:
+    - 'k8s_cluster_ip'
+
+- name: network | Checking For Cluster-IP Route On Hosts
+  shell: "route -n | awk '{print $1}' | grep {{ k8s_cluster_ip }}"
+  register: "_k8s_cluster_ip_route"
+  failed_when: "(_k8s_cluster_ip_route['rc'] > 1)"
+  changed_when: false
+  tags:
+    - 'k8s_cluster_ip'
+  when: inventory_hostname != k8s_master
+
+- name: network | Setting IP Route To Reach Cluster-IP On Master
+  command: >
+           route add {{ k8s_cluster_ip }} gw \
+           {{ hostvars[k8s_master]['k8s_advertise_address'] }}
+  become: true
+  when: >
+        inventory_hostname != k8s_master and
+        _k8s_cluster_ip_route['rc'] == 1
+  tags:
+    - 'k8s_cluster_ip'

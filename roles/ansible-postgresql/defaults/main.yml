@@ -1,2 +1,110 @@
 ---
 # defaults file for ansible-postgresql
+postgresql_config: false
+
+postgresql_data_dir: '/var/lib/postgresql/{{ postgresql_version }}/main'
+
+postgresql_debian_pre_reqs:
+  - 'libpq-dev'
+  - 'python-dev'
+  - 'python-pip'
+
+postgresql_debian_repo_info:
+  key: 'https://www.postgresql.org/media/keys/ACCC4CF8.asc'
+  repo: 'deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release|lower }}-pgdg main'
+
+postgresql_dynamic_shared_memory_type: 'posix'
+
+# Enables advertising the server's existence via Bonjour.
+postgresql_enable_bonjour: false
+
+postgresql_enable_replication: false
+
+postgresql_enable_ssl: true
+
+postgresql_external_pid_file: '/var/run/postgresql/{{ postgresql_version }}-main.pid'
+
+postgresql_hba_file: '/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf'
+
+postgresql_ident_file: '/etc/postgresql/{{ postgresql_version }}/main/pg_ident.conf'
+
+# Specifies the TCP/IP address(es) on which the server is to listen for
+# connections from client applications.
+# The special entry * corresponds to all available IP interfaces.
+# The entry 0.0.0.0 allows listening for all IPv4 addresses and :: allows
+# listening for all IPv6 addresses.
+# The default value is localhost, which allows only local TCP/IP
+# "loopback" connections to be made
+postgresql_listen_addresses:
+  - 'localhost'
+  # - '*'
+
+# The TCP port the server listens on; 5432 by default.
+postgresql_listen_port: 5432
+
+# Determines the maximum number of concurrent connections to the database
+# server. The default is typically 100 connections
+postgresql_max_connections: 100
+
+# Sets the maximum number of transactions that can be in the "prepared"
+# state simultaneously. Setting this parameter to zero (which is the default)
+# disables the prepared-transaction feature
+postgresql_max_prepared_transactions: 0
+
+# Maximum size to let the WAL grow to between automatic WAL checkpoints.
+# This is a soft limit; WAL size can exceed max_wal_size under special
+# circumstances, like under heavy load, a failing archive_command, or a
+# high wal_keep_segments setting.
+# The default is 1 GB
+postgresql_max_wal_size: 1GB
+
+# As long as WAL disk usage stays below this setting, old WAL files are
+# always recycled for future use at a checkpoint, rather than removed. This
+# can be used to ensure that enough WAL space is reserved to handle spikes in
+# WAL usage, for example when running large batch jobs.
+# The default is 80 MB
+postgresql_min_wal_size: 80MB
+
+postgresql_replication:
+  interface: 'enp0s8'
+  # master: "{{ groups[postgresql_replication_group][0] }}"
+  master: 'node0'
+  user: 'repluser'
+
+# Define Ansible group which contains the hosts to setup replication
+postgresql_replication_group: 'postgres_replication'
+
+# Sets the amount of memory the database server uses for shared memory buffers.
+# The default is typically 128 megabytes (128MB)
+postgresql_shared_buffers: >
+                           {% if ansible_memtotal_mb > 1024 %}{{ (ansible_memtotal_mb|int * 0.25)|round|int }}MB
+                           {% else %}128MB
+                           {% endif %}
+
+# Specifies the directory of the Unix-domain socket(s) on which the server
+# is to listen for connections from client applications
+postgresql_unix_socket_directories:
+  - '/var/run/postgresql'
+
+# Define any db users to create
+postgresql_users: []
+  # - name: 'test'
+  #   # db: 'test'
+  #   password: 'test'
+  #   # priv: ''
+  #   state: 'present'
+
+# Define version to be installed
+postgresql_version: 9.6
+
+# The amount of shared memory used for WAL data that has not yet been written
+# to disk. The default setting of -1 selects a size equal to 1/32nd (about 3%)
+# of shared_buffers, but not less than 64kB nor more than the size of one WAL
+# segment, typically 16MB.
+postgresql_wal_buffers: -1
+
+# When this parameter is on, the PostgreSQL server compresses a full page image
+# written to WAL when full_page_writes is on or during a base backup. A
+# compressed page image will be decompressed during WAL replay.
+# The default value is off.
+postgresql_wal_compression: 'off'

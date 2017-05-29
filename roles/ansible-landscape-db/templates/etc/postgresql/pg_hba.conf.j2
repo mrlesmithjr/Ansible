@@ -1,0 +1,31 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Database administrative login by Unix domain socket
+local   all             postgres                                peer
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     peer
+
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+
+# Replication connections:
+{% if landscape_replicated_db %}
+{%   if inventory_hostname == landscape_db_master %}
+{%     for host in groups[landscape_db_replication_group] %}
+{%       set repl_ip = (hostvars[host]['ansible_' + landscape_db_replication_interface]['ipv4']['address']) %}
+{%       if host != landscape_db_master %}
+host    replication    {{ landscape_db_replication_user }}    {{ repl_ip }}/32    trust
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+
+# Allow Landscape app servers:
+{% for host in groups[landscape_app_group] %}
+{%   set repl_ip = (hostvars[host]['ansible_' + landscape_app_interface]['ipv4']['address']) %}
+host all landscape,landscape_maintenance,landscape_superuser {{ repl_ip }}/32 md5
+{% endfor %}

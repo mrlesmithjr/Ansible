@@ -3,6 +3,7 @@
   yum:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
     - epel-release
     - wget
@@ -11,30 +12,36 @@
   yum:
     name: "erlang"
     state: present
+  become: true
 
 - name: redhat | adding RabbitMQ public GPG key
   rpm_key:
     key: "{{ rabbitmq_redhat_repo_key }}"
     state: present
+  become: true
 
 - name: redhat | downloading RabbitMQ
   get_url:
     url: "{{ rabbitmq_redhat_url }}/{{ rabbitmq_redhat_package }}"
     dest: "/opt/{{ rabbitmq_redhat_package }}"
+  become: true
 
 - name: redhat | installing RabbitMQ
   yum:
     name: "/opt/{{ rabbitmq_redhat_package }}"
     state: present
+  become: true
 
 - name: redhat | starting and enabling RabbitMQ service
   service:
     name: "rabbitmq-server"
     state: started
     enabled: yes
+  become: true
 
 - name: redhat | enabling the RabbitMQ Management Console
   rabbitmq_plugin:
     names: rabbitmq_management
     state: enabled
   notify: restart rabbitmq-server
+  become: true

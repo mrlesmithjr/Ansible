@@ -1,0 +1,12 @@
+---
+- name: criticalstack | Adding Critical Stack Intel Repo Key
+  apt_key:
+    url: "{{ bro_ids_criticalstack_intel_deb_info['key'] }}"
+    state: "present"
+  become: true
+
+- name: criticalstack | Installing Critical Stack Intel
+  apt:
+    deb: "http://intel.criticalstack.com/client/critical-stack-intel-amd64.deb"
+    state: "present"
+  become: true

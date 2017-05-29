@@ -1,0 +1,9 @@
+---
+- name: reset_cluster | Resetting Cluster
+  command: "kubeadm reset"
+  become: true
+  tags:
+    - 'k8s_reset'
+  when: >
+        k8s_reset_cluster and
+        inventory_hostname in groups[k8s_cluster_group]

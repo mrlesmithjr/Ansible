@@ -60,9 +60,7 @@ redis_replication_ansible_group: 'redis'
 # Define the interface which should be used for replication
 # ex. eth1|enp0s3|enp0s8
 redis_replication_interface: 'enp0s3'
-# Define the node which should act as primary
-# By default it will choose the first node listed in the redis_replication_ansible_group
-redis_replication_master: "{{ groups[redis_replication_ansible_group][0] }}"
+
 # How frequently to snapshot the database to disk
 # ex. "900 1" => 900 seconds if at least 1 key changed
 redis_save_to_disk:

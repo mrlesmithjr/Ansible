@@ -1,0 +1,7 @@
+---
+- name: users | Creating Percona Backup User
+  mysql_user:
+    name: "{{ percona_xtrabackup_user.name }}"
+    password: "{{ percona_xtrabackup_user.password }}"
+    state: "present"
+    priv: "*.*:RELOAD,LOCK TABLES,PROCESS,REPLICATION CLIENT"

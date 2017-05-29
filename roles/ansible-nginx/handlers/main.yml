@@ -4,13 +4,16 @@
   service:
     name: "nginx"
     state: "restarted"
+  become: true
 
 - name: "restart php5-fpm"
   service:
     name: "php5-fpm"
     state: "restarted"
+  become: true
 
 - name: "restart php7.0-fpm"
   service:
     name: "php7.0-fpm"
     state: "restarted"
+  become: true

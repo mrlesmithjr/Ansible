@@ -3,11 +3,13 @@
   get_url:
     url: "{{ pdns_recursor_download_url }}/rpm/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
     dest: "/opt/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
+  become: true
   when: pdns_recursor_version != "4.x"
 
 - name: redhat_pdns_recursor | installing powerdns recursor
   yum:
     name: "/opt/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
+  become: true
   notify: restart pdns recursor
   when: pdns_recursor_version != "4.x"
 
@@ -15,6 +17,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'epel-release'
     - 'yum-plugin-priorities'
@@ -31,10 +34,12 @@
     includepkgs: "pdns*"
     priority: 90
     state: "present"
+  become: true
   when: pdns_recursor_version == "4.x"
 
 - name: redhat_pdns_recursor | Installing PowerDNS 4.x
   yum:
     name: "pdns-recursor"
     state: "present"
+  become: true
   when: pdns_recursor_version == "4.x"

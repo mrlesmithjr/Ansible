@@ -1,0 +1,6 @@
+---
+# defaults file for ansible-landscape-client
+landscape_client_data_path: '/var/lib/landscape/client'
+landscape_client_log_level: 'info'
+landscape_client_ping_url: 'http://landscape.canonical.com/ping'
+landscape_client_url: 'https://landscape.canonical.com/message-system'

@@ -1,0 +1,4 @@
+---
+- src: https://www.github.com/mrlesmithjr/ansible-etc-hosts.git
+- src: https://www.github.com/mrlesmithjr/ansible-change-hostname.git
+- src: https://www.github.com/mrlesmithjr/ansible-docker.git

@@ -3,11 +3,13 @@
   command: "docker network ls"
   changed_when: false
   register: "docker_networks"
+  become: true
   when: >
         inventory_hostname == docker_swarm_primary_manager
 
 - name: networks | Creating Docker Swarm Networks
   command: "docker network create --driver {{ item.driver }} {{ item.name }}"
+  become: true
   with_items: '{{ docker_swarm_networks }}'
   when: >
         inventory_hostname == docker_swarm_primary_manager and
@@ -16,6 +18,7 @@
 
 - name: networks | Removing Docker Swarm Networks
   command: "docker network rm {{ item.name }}"
+  become: true
   with_items: '{{ docker_swarm_networks }}'
   when: >
         inventory_hostname == docker_swarm_primary_manager and

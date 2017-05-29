@@ -1,0 +1,14 @@
+---
+# We read the generated {{ hashi_vault_init_output_file }}
+- name: unseal_keys | Read HashiCorp Vault Secrets From {{ hashi_vault_init_output_file }}
+  slurp:
+    src: "{{ hashi_vault_init_output_file }}"
+  register: "_hashi_vault_secrets_vars"
+  become: true
+
+# We set the fact to hold an array of our unseal_keys and hide them from logging
+- name: unseal_keys | Capturing HashiCorp Vault Unseal Keys
+  set_fact:
+    _hashi_vault_unseal_keys: "{{ _hashi_vault_secrets_vars['content']|b64decode|from_json }}"
+  no_log: true
+  become: true

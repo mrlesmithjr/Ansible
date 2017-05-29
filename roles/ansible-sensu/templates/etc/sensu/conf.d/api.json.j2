@@ -1,10 +1,10 @@
-{
-  "api":{
-    "host": "{{ sensu_host }}",
-    "port": 4567
-{% if sensu_api_auth %}
-    "user": "{{ sensu_api_user }}"
-    "pass": "{{ sensu_api_pass }}"
+{% set api = {} %}
+{% set _api = {} %}
+{% set _opts = _api.update({"host": sensu_api_info['host']}) %}
+{% set _opts = _api.update({"port": sensu_api_info['port']|int}) %}
+{% if sensu_api_info['auth'] %}
+{% set _opts = _api.update({"user": sensu_api_info['user']}) %}
+{% set _opts = _api.update({"pass": sensu_api_info['pass']}) %}
 {% endif %}
-  }
-}
+{% set __api = api.update({"api": _api}) %}
+{{ api|to_nice_json }}
