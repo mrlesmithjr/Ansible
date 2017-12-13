@@ -48,7 +48,7 @@ fi
 
 while read line
 do
-    printf "%s ansible_ssh_private_key_file=.ssh/$user_account\n" "$line" >> $site_hosts_inventory
+  printf "%s ansible_ssh_private_key_file=.ssh/$user_account\n" "$line" >> $site_hosts_inventory
 done < $host_inventory
 
 # add hosts to dns
