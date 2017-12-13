@@ -1,0 +1,14 @@
+---
+- name: set-facts | Setting Debian Facts
+  set_fact:
+    _nfs_server_group: "nogroup"
+    _nfs_server_owner: "nobody"
+    _nfs_server_service: "nfs-kernel-server"
+  when: ansible_os_family == "Debian"
+
+- name: set-facts | Setting RedHat Facts
+  set_fact:
+    _nfs_server_group: "nfsnobody"
+    _nfs_server_owner: "nfsnobody"
+    _nfs_server_service: "nfs-server"
+  when: ansible_os_family == "RedHat"

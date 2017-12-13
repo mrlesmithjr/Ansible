@@ -1,0 +1,5 @@
+---
+- name: install | Installing Docker
+  win_chocolatey:
+    name: "docker"
+    state: "present"

@@ -1,0 +1,12 @@
+---
+- name: archlinux | Refresh Package Lists
+  pacman:
+    update_cache: true
+  become: true
+
+- name: archlinux | Installing Base Packages
+  pacman:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ base_arch_packages }}'

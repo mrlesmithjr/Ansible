@@ -1,0 +1,63 @@
+---
+- hosts: all
+  vars:
+    etc_hosts_add_all_hosts: true
+  roles:
+    - role: ansible-etc-hosts
+
+- hosts: load_balancers
+  vars:
+    keepalived_config: true
+    keepalived_router_info:
+      - name: vrrp_1
+        check_script:
+          - name: chk_nginx
+            script: 'pidof nginx'
+            interval: 2
+            weight: 2
+        master_node: "{{ groups['load_balancers'][0] }}"
+        router_id: 51
+        router_pri_backup: 100
+        router_pri_master: 150
+        vip_int: 'enp0s8'
+        vip_addresses:
+          - 192.168.250.200
+    nginx_load_balancer_configs:
+      - name: 'web_app'
+        frontend_listen_port: 80
+        location: '/'
+        method: 'round_robin'
+        protocol: 'http'
+        server_name:
+          - 'test.vagrant.local'
+        # ssl: true
+        upstream:
+          - servers: "{{ groups['web_servers'] }}"
+            backend_listen_port: 80
+            options:
+              - 'fail_timeout=10s'
+              - 'max_conns=0'
+              - 'max_fails=1'
+              - 'weight=1'
+    nginx_load_balancer_headers:
+      - 'Host $host'
+      - 'X-Real-IP $remote_addr'
+      - 'X-Forwarded-For $remote_addr'
+      - 'X-Forwarded-Host $remote_addr'
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-keepalived
+    - role: ansible-nginx-load-balancer
+  tasks:
+
+- hosts: web_servers
+  vars:
+    config_nginx: true
+    nginx_headers:
+      - 'set_real_ip_from 192.168.250.0/24'
+      - 'real_ip_header X-Real-IP'
+      - 'real_ip_recursive on'
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-nginx
+  tasks:

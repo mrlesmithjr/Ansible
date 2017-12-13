@@ -1,0 +1,16 @@
+---
+# This task will always run in order to alway keep passwords up to do and etc.
+- name: creds | Adding Credential Store Items vSphere Hosts
+  win_shell: |
+    New-VICredentialStoreItem -Host {{ hostvars[item]['ansible_host'] }} -User {{ vsphere_user_info['username'] }} -Password {{ vsphere_user_info['password'] }}
+    New-VICredentialStoreItem -Host {{ hostvars[item]['inventory_hostname'] }} -User {{ vsphere_user_info['username'] }} -Password {{ vsphere_user_info['password'] }}
+  with_items: "{{ groups['vsphere_hosts'] }}"
+
+- name: creds | Adding Credential Store Items vCenter
+  win_shell: |
+    New-VICredentialStoreItem -Host {{ hostvars[item]['ansible_host'] }} -User {{ vsphere_vcsa_sso_user_info['username'] }} -Password {{ vsphere_vcsa_sso_user_info['password'] }}
+    New-VICredentialStoreItem -Host {{ hostvars[item]['inventory_hostname'] }} -User {{ vsphere_vcsa_sso_user_info['username'] }} -Password {{ vsphere_vcsa_sso_user_info['password'] }}
+  with_items: "{{ groups['vsphere_vcenter'] }}"
+  when: >
+        groups['vsphere_vcenter'] is defined and
+        groups['vsphere_vcenter']|length > 0

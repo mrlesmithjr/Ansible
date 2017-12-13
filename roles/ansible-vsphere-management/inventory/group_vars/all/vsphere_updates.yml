@@ -1,0 +1,14 @@
+---
+vsphere_updates: []
+  # - build: 4192238
+  #   path: /vmfs/volumes/Datastore_1/ESXi600-201608001
+  #   version: 6.0.0
+  # - build: 5050593
+  #   path: /vmfs/volumes/Datastore_1/update-from-esxi6.0-6.0_update03
+  #   version: 6.0.0
+  # # - build: 5050593
+  # #   path: /vmfs/volumes/Datastore_1/VMware-ESXi-6.0.0-Update3-5224934-HPE-600.10.1.0.73-Jul2017-depot
+  # #   version: 6.0.0
+  # - build: 5572656
+  #   path: /vmfs/volumes/Datastore_1/ESXi600-201706001
+  #   version: 6.0.0

@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install [Windows - IIS](https://www.iis.net/)
+
+  license: license (MIT)
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+    - windows
+    - webserver
+
+dependencies: []

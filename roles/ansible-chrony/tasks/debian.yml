@@ -3,3 +3,4 @@
   apt:
     name: "chrony"
     state: "present"
+  become: true

@@ -1,15 +1,11 @@
 ---
 # tasks file for ansible-es-packetbeat
-- include: debian.yml
+- include_tasks: debian.yml
   when: ansible_os_family == "Debian"
 
-- include: redhat.yml
+- include_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include: config_packetbeat.yml
+- include_tasks: config_packetbeat.yml
 
-- name: Ensuring Packetbeat Is Started And Enabled On Boot
-  service:
-    name: "packetbeat"
-    state: "started"
-    enabled: yes
+- include_tasks: service.yml

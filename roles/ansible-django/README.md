@@ -1,45 +1,62 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-Installs Django web framework https://www.djangoproject.com/  
+- [ansible-django](#ansible-django)
+  - [Requirements](#requirements)
+  - [Vagrant](#vagrant)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-django
+
+An [Ansible](https://www.ansible.com) role to install [Django](https://www.djangoproject.com)
+web framework
 
 [![Build Status](https://travis-ci.org/mrlesmithjr/ansible-django.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-django)
 
-Requirements
-------------
+## Requirements
 
 None
 
-Vagrant
--------
+## Vagrant
+
 Spin up Environment under Vagrant to test.
-````
+
+```bash
 vagrant up
-````
+```
 
-Role Variables
---------------
+## Role Variables
 
-````
+```yaml
 ---
 # defaults file for ansible-django
-django_db_type: sqlite  #defines DB type to use...sqlite or mysql
-django_version: latest  #defines django version to install. set to latest for the latest version or use version number...ex. (1.8.7, 1.8.8, 1.9, 1.9.1)
-````
 
-Dependencies
-------------
+# defines DB type to use...sqlite or mysql
+django_db_type: sqlite
+
+# Defines django version to install. set to latest for the latest version or
+# use version number...ex. (1.8.7, 1.8.8, 1.9, 1.9.1)
+django_version: latest
+```
+
+## Dependencies
 
 Install required dependencies as below:
-````
+
+```bash
 sudo ansible-galaxy install -r requirements.yml
-````
+```
 
-Example Playbook
-----------------
+## Example Playbook
 
-#### GitHub
-````
+```yaml
 ---
 - name: Install Django
   hosts: all
@@ -51,32 +68,17 @@ Example Playbook
       when: >
             (django_db_type is defined and django_db_type == "mysql")
   tasks:
-````
+```
 
-#### Galaxy
-````
----
-- name: Install Django
-  hosts: all
-  sudo: true
-  vars:
-  roles:
-    - role: mrlesmithjr.django
-    - role: mrlesmithjr.mysql
-      when: >
-            (django_db_type is defined and django_db_type == "mysql")
-  tasks:
-````
+## License
 
-License
--------
+MIT
 
-BSD
-
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
+
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [mrlesmithjr.com](http://mrlesmithjr.com)
+-   mrlesmithjr [at] gmail.com

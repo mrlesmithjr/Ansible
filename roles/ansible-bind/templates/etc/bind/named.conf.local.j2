@@ -1,10 +1,10 @@
 {% for item in bind_forward_zones %}
-zone "{{ item.zone }}" {
+zone "{{ item['zone'] }}" {
 {%   if inventory_hostname in groups[bind_masters_group] %}
   type master;
-  file "{{ bind_zones_dir }}/db.{{ item.zone }}";
+  file "{{ bind_zones_dir }}/db.{{ item['zone'] }}";
   allow-transfer {
-{%     for slave in item.slaves %}
+{%     for slave in item['slaves'] %}
     {{ slave }};
 {%     endfor %}
   };
@@ -12,21 +12,21 @@ zone "{{ item.zone }}" {
 {%   if inventory_hostname in groups[bind_slaves_group] %}
   type slave;
   masters {
-{%     for master in item.masters %}
+{%     for master in item['masters'] %}
     {{ master }};
 {%     endfor %}
   };
-  file "/var/cache/bind/db.{{ item.zone }}";
+  file "/var/cache/bind/db.{{ item['zone'] }}";
 {%   endif %}
 };
 {% endfor %}
 {% for item in bind_reverse_zones %}
-zone "{{ item.zone }}.in-addr.arpa" {
+zone "{{ item['zone'] }}.in-addr.arpa" {
 {%   if inventory_hostname in groups[bind_masters_group] %}
   type master;
-  file "{{ bind_zones_dir }}/db.{{ item.zone }}";
+  file "{{ bind_zones_dir }}/db.{{ item['zone'] }}";
   allow-transfer {
-{%     for slave in item.slaves %}
+{%     for slave in item['slaves'] %}
     {{ slave }};
 {%     endfor %}
   };
@@ -34,11 +34,11 @@ zone "{{ item.zone }}.in-addr.arpa" {
 {%   if inventory_hostname in groups[bind_slaves_group] %}
   type slave;
   masters {
-{%     for master in item.masters %}
+{%     for master in item['masters'] %}
     {{ master }};
 {%     endfor %}
   };
-  file "/var/cache/bind/db.{{ item.zone }}";
+  file "/var/cache/bind/db.{{ item['zone'] }}";
 {%   endif %}
 };
 {% endfor %}

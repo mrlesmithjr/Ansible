@@ -1,0 +1,11 @@
+---
+terraform_pdns_records:
+  - name: kibana
+    type: A
+    records: "{{ vsphere_lb_vips[2] }}"
+  - name: portainer
+    type: A
+    records: "{{ vsphere_lb_vips[2] }}"
+  - name: syslog
+    type: A
+    records: "{{ vsphere_lb_vips[2] }}"

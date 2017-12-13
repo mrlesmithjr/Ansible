@@ -1,2 +1,1 @@
----
-- src: https://github.com/mrlesmithjr/ansible-mariadb-galera-cluster.git
+../requirements.yml

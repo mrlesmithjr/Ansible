@@ -1,0 +1,9 @@
+---
+- name: plugins | Managing Kibana Plugins
+  kibana_plugin:
+    name: "{{ item['key'] }}"
+    plugin_bin: "{{ kibana['home_dir'] }}"
+    plugin_dir: "{{ kibana['plugin_dir'] }}"
+    state: "{{ item['value']['state'] }}"
+  become: true
+  with_dict: "{{ kibana['plugins'] }}"

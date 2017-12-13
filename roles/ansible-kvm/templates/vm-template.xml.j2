@@ -19,7 +19,7 @@
 {% endif %}
 {% for hd in item.disks %}
     <disk type='file' device='disk'>
-      <driver name='qemu' type='{{ kvm_images_format_type }}'/>
+      <driver name='qemu' type='{{ kvm_images_format_type }}' cache='{{ kvm_images_cache_mode }}'/>
       <source file='{{ kvm_images_path }}/{{ hd.name }}.{{ kvm_images_format_type }}'/>
 {%   if hd.disk_driver|lower == 'virtio' %}
       <target dev='vd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd.disk_driver }}'/>
@@ -30,7 +30,11 @@
 {% endfor %}
 {% for int in item.network_interfaces %}
     <interface type='{{ int.type }}'>
+{%   if int['portgroup'] is not defined %}
       <source {{ int.type }}='{{ int.source }}'/>
+{%   elif int['portgroup'] is defined %}
+      <source {{ int.type }}='{{ int.source }}' portgroup='{{ int['portgroup'] }}'/>
+{%   endif %}
       <model type='{{ int.network_driver }}'/>
     </interface>
 {% endfor %}

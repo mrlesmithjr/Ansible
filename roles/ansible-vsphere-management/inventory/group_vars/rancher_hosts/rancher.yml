@@ -1,0 +1,5 @@
+---
+# v1|v2-beta
+rancher_cattle_agent_interface: "{{ ansible_primary_interface }}"
+rancher_external_db_host: "{{ rancher_lb_vip }}"
+rancher_external_db: true

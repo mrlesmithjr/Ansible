@@ -1,18 +1,32 @@
 ---
+- name: debian | updating apt cache
+  apt:
+    update_cache: true
+  become: true
+
+- name: debian | install apt-transport-https
+  apt:
+    name: "apt-transport-https"
+    state: "present"
+  become: true
+
 - name: debian | adding nodejs repo key
   apt_key:
     id: "{{ nodejs_debian_repo_info.id }}"
     url: "{{ nodejs_debian_repo_info.repo_key }}"
-    state: present
+    state: "present"
+  become: true
 
 - name: debian | adding nodejs repos
   apt_repository:
     repo: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items: '{{ nodejs_debian_repo_info.repos }}'
 
 - name: debian | installing nodejs packages
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items: '{{ nodejs_debian_packages }}'

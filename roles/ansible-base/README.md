@@ -1,21 +1,40 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-An [Ansible] role to define a base configuration state.
-Should be ran after mrlesmithjr.bootstrap role.
-- Configure/update dhcp client,update dns servers
+- [ansible-base](#ansible-base)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Requirements
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-base
+
+An [Ansible](https://www.ansible.com) role to define a base configuration state.
+
+-   Configure/update dhcp client,update dns servers
+
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-```
+```yaml
 ---
 # defaults file for ansible-base
+
+base_arch_packages:
+  - 'base-devel'
+  - 'curl'
+  - 'git'
+  - 'git-core'
+  - 'ntp'
+  - 'sg3_utils'
 
 base_debian_packages:
   - 'build-essential'
@@ -63,15 +82,13 @@ base_update_dns_nameservers: false
 base_update_dns_search: false
 ```
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 ---
 - hosts: all
   become: true
@@ -82,17 +99,15 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [mrlesmithjr.com](http://mrlesmithjr.com)
+-   mrlesmithjr [at] gmail.com

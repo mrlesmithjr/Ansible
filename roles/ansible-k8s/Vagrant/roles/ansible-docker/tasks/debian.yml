@@ -11,27 +11,49 @@
     state: present
   become: true
   with_items:
-    - apt-transport-https
-  when: ansible_distribution == "Debian"
+    - 'apt-transport-https'
+    - 'ca-certificates'
+    - 'software-properties-common'
+
+# We are removing the old Docker info
+- name: debian | Removing Legacy Docker apt-key
+  apt_key:
+    keyserver: "hkp://p80.pool.sks-keyservers.net:80"
+    id: "58118E89F3A912897C070ADBF76221572C52609D"
+    state: "absent"
+  become: true
+
+# We are removing the old Docker info
+- name: debian | Removing Legacy Docker Repo
+  apt_repository:
+    repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main"
+    state: "absent"
+  become: true
 
 - name: debian | adding docker apt-key
   apt_key:
-    keyserver: "{{ docker_ubuntu_repo_info.keyserver }}"
-    id: "{{ docker_ubuntu_repo_info.id }}"
+    url: "{{ docker_ubuntu_repo_info['url'] }}"
+    id: "{{ docker_ubuntu_repo_info['id'] }}"
+    state: "present"
   become: true
 
 - name: debian | adding docker repo
   apt_repository:
-    repo: "{{ docker_ubuntu_repo_info.repo }}"
+    repo: "{{ docker_ubuntu_repo_info['repo'] }}"
     state: present
   become: true
 
+# We remove docker-engine as this is old package to install. The new package is
+# docker-ce
 - name: debian | uninstalling old docker package (if exists)
   apt:
-    name: lxc-docker
-    state: absent
+    name: "{{ item }}"
+    state: "absent"
     purge: yes
   become: true
+  with_items:
+    - 'docker-engine'
+    - 'lxc-docker'
 
 - name: debian | installing docker pre-reqs
   apt:
@@ -44,7 +66,7 @@
 
 - name: debian | installing docker
   apt:
-    name: "docker-engine={{ docker_version_debian }}"
+    name: "docker-ce={{ docker_version_debian }}"
     state: "present"
   become: true
 
@@ -62,7 +84,7 @@
 - name: debian | updating grub (if updated)
   command: update-grub
   become: true
-  when: grub_updated.changed
+  when: grub_updated['changed']
 
 - name: debian | installing additonal packages
   apt:

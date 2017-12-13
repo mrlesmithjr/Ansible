@@ -6,23 +6,11 @@ mysql_allow_remote_connections: false
 
 # Defines hosts where root can login from
 mysql_allow_root_access_from_hosts:
-  - '{{ ansible_hostname }}'
+  - "{{ ansible_hostname }}"
   - 127.0.0.1
-  - '::1'
-  - 'localhost'
-#  - '%'
-
-# Defines cacti db password for monitoring (If Used)
-mysql_cacti_db_password: 'cactiuser'
-
-# Defines cacti db user for monitoring (If Used)
-mysql_cacti_db_user: 'cactiuser'
-
-# Defines fqdn of cacti server for monitoring (If Used)
-mysql_cacti_server_fqdn: 'cacti.{{ mysql_pri_domain_name }}'
-
-# Defines hostname of cacti server for monitoring (If Used)
-mysql_cacti_server: 'cacti'
+  - "::1"
+  - localhost
+#  - "%"
 
 # Defines if replication should be configured
 mysql_config_replication: false
@@ -30,12 +18,37 @@ mysql_config_replication: false
 # Defines if mysqlchk scripts should be configured for load balancer monitoring
 mysql_config_mysqlchk: false
 
+# Defines database users to manage. Under privs you may define specific db
+# permissions for the user.
+mysql_db_users: []
+  # - name: test-user
+  #   password: testpass
+  #   state: present
+  #   privs:
+  #     - db: test-db
+  #       append_privs: true
+  #       host: localhost
+  #       table: "*"
+  #       priv: ALL
+  #     - db: test-db
+  #       append_privs: true
+  #       host: 127.0.0.1
+  #       table: "*"
+  #       priv: ALL
+  #     - db: test-db
+  #       append_privs: true
+  #       host: "%"
+  #       table: "*"
+  #       priv: ALL
+
+# Defines databases to manage
+mysql_dbs: []
+  # - name: test-db
+  #   state: present
+
 # Defines debian db password
 # generate using echo password | mkpasswd -s -m sha-512
-mysql_deb_db_password: '{{ mysql_root_password }}'
-
-# Defines if cacti monitoring should be configured
-mysql_enable_cacti_monitoring: false
+mysql_deb_db_password: "{{ mysql_root_password }}"
 
 # Defines the percentage of memory to use for memory calculations.
 mysql_mem_multiplier: .25
@@ -44,37 +57,37 @@ mysql_mem_multiplier: .25
 mysql_port: 3306
 
 mysql_replication_account_info:
-  user: 'replicator'
-  password: 'mysqlreplication'
+  user: replicator
+  password: mysqlreplication
 mysql_replication_dbs:
-  - 'test1'
-  - 'test2'
-mysql_replication_master_node: 'node0'
+  - test1
+  - test2
+mysql_replication_master_node: node0
 mysql_replication_nodes:
-  - name: 'node0'
-    role: 'master'
+  - name: node0
+    role: master
     server_id: 1
-  - name: 'node1'
-    role: 'slave'
+  - name: node1
+    role: slave
     server_id: 2
 
 # Defines mysql root password
 # generate using echo password | mkpasswd -s -m sha-512
-mysql_root_password: 'root'
+mysql_root_password: root
 
 mysql_settings:
-  collation_server: 'latin1_swedish_ci'
-  character_set_client: 'latin1'
+  collation_server: latin1_swedish_ci
+  character_set_client: latin1
   expire_logs_days: 10
   # ON|OFF
   innodb_buffer_pool_size: 128M
-  innodb_doublewrite: 'ON'
+  innodb_doublewrite: "ON"
   innodb_flush_log_at_timeout: 1
   innodb_read_io_threads: 4
   innodb_write_io_threads: 4
   join_buffer_size: 1M
   #Default is 16M
-  key_buffer_size: '{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M'
+  key_buffer_size: "{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M"
   max_allowed_packet: 16M
   max_binlog_size: 100M
   max_connections: 150
@@ -89,12 +102,12 @@ mysql_settings:
 mysql_mysqlchk_host: 127.0.0.1
 
 # Defines mysqlchk options to pass
-mysql_mysqlchk_opts: '-N -q -A'
+mysql_mysqlchk_opts: "-N -q -A"
 
 # Defines mysqlchk user
-mysql_mysqlchk_user: 'cmon'
+mysql_mysqlchk_user: cmon
 
 # Defines mysqlchk user password
-mysql_mysqlchk_pass: 'cmon'
+mysql_mysqlchk_pass: cmon
 
-mysql_pri_domain_name: 'example.org'
+mysql_pri_domain_name: example.org

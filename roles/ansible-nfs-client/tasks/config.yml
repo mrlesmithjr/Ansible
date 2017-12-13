@@ -1,0 +1,11 @@
+---
+- name: config | Mounting NFS Exports
+  mount:
+    fstype: "{{ item['fstype'] }}"
+    opts: "{{ (item['opts']|join(','))|default(omit) }}"
+    path: "{{ item['path'] }}"
+    src: "{{ item['src'] }}"
+    state: "{{ item['state'] }}"
+  become: true
+  with_items: '{{ nfs_client_mounts }}'
+  when: nfs_client_mounts is defined

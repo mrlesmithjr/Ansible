@@ -1,0 +1,9 @@
+---
+- name: create_shares | creating shared directories
+  file:
+    path: "{{ samba_share_path }}/{{ item['name'] }}"
+    owner: "{{ item['owner']|default(omit) }}"
+    group: "{{ item['group'] }}"
+    mode: "{{ item['folder_perms'] }}"
+    state: directory
+  with_items: '{{ samba_shares }}'

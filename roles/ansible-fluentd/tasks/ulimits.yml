@@ -1,8 +1,9 @@
 ---
 - name: ulimits | setting ulimit values
   pam_limits:
-    domain: "{{ item.domain }}"
-    limit_type: "{{ item.limit_type }}"
-    limit_item: "{{ item.limit_item }}"
-    value: "{{ item.value }}"
+    domain: "{{ item['domain'] }}"
+    limit_type: "{{ item['limit_type'] }}"
+    limit_item: "{{ item['limit_item'] }}"
+    value: "{{ item['value'] }}"
+  become: true
   with_items: '{{ fluentd_ulimits }}'

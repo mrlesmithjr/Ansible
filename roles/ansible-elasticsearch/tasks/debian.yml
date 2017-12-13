@@ -1,13 +1,49 @@
 ---
 - name: debian | Installing Pre-Reqs
   apt:
-    name: "apt-transport-https"
-    state: "present"
+    name: apt-transport-https
+    state: present
+  become: true
+  with_items:
+    - apt-transport-https
+    - software-properties-common
+
+- name: debian | Adding Elasticsearch Repo Key
+  apt_key:
+    url: "{{ elasticsearch_repo_key }}"
+    state: present
   become: true
 
-- include: debian_lvm.yml
-  tags:
-    - es_config_lvm
-  when: es_config_lvm is defined and es_config_lvm
+- name: debian | Adding Elasticsearch Repo
+  apt_repository:
+    repo: "deb {{ elasticsearch_repo_url }}/packages/{{ elasticsearch['version_major_version'] }}/apt stable main"
+    state: present
+  become: true
 
-- include: debian_elasticsearch.yml
+- name: debian | Enabling deb http://http.debian.net/debian jessie-backports main
+  apt_repository:
+    repo: deb http://http.debian.net/debian jessie-backports main
+    state: present
+  become: true
+  when: >
+        ansible_distribution == "Debian" and
+        ansible_distribution_release == "jessie"
+
+- name: debian | Adding OpenJDK PPA
+  apt_repository:
+    repo: ppa:openjdk-r/ppa
+    state: present
+  become: true
+  when: ansible_distribution == "Ubuntu"
+
+- name: debian | Installing Java
+  apt:
+    name: openjdk-8-jre-headless
+    state: present
+  become: true
+
+- name: debian | Installing Elasticsearch {{ elasticsearch['version_minor_version'] }}
+  apt:
+    name: "elasticsearch={{ elasticsearch['version_minor_version'] }}"
+    state: present
+  become: true

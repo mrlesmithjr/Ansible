@@ -1,0 +1,20 @@
+---
+# defaults file for ansible-windows-updates
+
+# Defines categories to update
+windows_updates_categories:
+  # - 'Application'
+  # - 'Connectors'
+  - 'CriticalUpdates'
+  # - 'DefinitionUpdates'
+  # - 'DeveloperKits'
+  # - 'FeaturePacks'
+  # - 'Guidance'
+  - 'SecurityUpdates'
+  # - 'ServicePacks'
+  # - 'Tools'
+  - 'UpdateRollups'
+  # - 'Updates'
+
+# Defines whether to reboot after updates or not
+windows_updates_reboot: false

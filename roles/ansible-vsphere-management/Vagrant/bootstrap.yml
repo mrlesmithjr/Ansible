@@ -1,0 +1,157 @@
+---
+- hosts: all
+  vars:
+    alpine_packages:
+      - 'alpine-sdk'
+      - 'libffi-dev'
+      - 'openssl-dev'
+      - 'py-setuptools'
+    ansible_ver: 2.2.0.0
+    debian_packages:
+      - 'build-essential'
+      - 'libffi-dev'
+      - 'libssl-dev'
+      - 'python-dev'
+      - 'python-pip'
+      - 'python-setuptools'
+    pri_domain_name: 'vagrant.local'
+    redhat_packages:
+      - 'gmp-devel'
+      - 'libffi-devel'
+      - 'openssl-devel'
+      - 'python-crypto'
+      - 'python-devel'
+      - 'python-pip'
+      - 'python-setuptools'
+      - 'redhat-rpm-config'
+    ssh_key_path: '.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key'
+    suse_packages:
+      - 'gmp-devel'
+      - 'libffi-devel'
+      - 'openssl-devel'
+      - 'python-crypto'
+      - 'python-devel'
+      - 'python-pip'
+      - 'python-setuptools'
+    update_host_vars: true
+  roles:
+  tasks:
+# Update apt-cache to ensure up to date
+    - name: Updating Apt Cache (Debian)
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      become: true
+      when: ansible_os_family == "Debian"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Alpine)
+      apk:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items: '{{ alpine_packages }}'
+      when: ansible_os_family == "Alpine"
+
+    - name: Installing Python Packages (Alpine)
+      apk:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+        - 'py-pip'
+        - 'python-dev'
+      when: >
+            ansible_os_family == "Alpine" and
+            ansible_distribution_version < '3.5'
+
+    - name: Installing Python Packages (Alpine)
+      apk:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+        - 'py2-pip'
+        - 'python2-dev'
+      when: >
+            ansible_os_family == "Alpine" and
+            ansible_distribution_version >= '3.5'
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Debian)
+      apt:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items: '{{ debian_packages }}'
+      when: ansible_os_family == "Debian"
+
+    - name: Installing EPEL Repo (RedHat)
+      yum:
+        name: "epel-release"
+        state: "present"
+      become: true
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (RedHat)
+      yum:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items: '{{ redhat_packages }}'
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Fedora)
+      dnf:
+        name: "python-dnf"
+        state: "present"
+      become: true
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution == "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Fedora)
+      dnf:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items: '{{ redhat_packages }}'
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution == "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (openSUSE)
+      zypper:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items: '{{ suse_packages }}'
+      when: ansible_os_family == "Suse"
+
+# Upgrading these packages to ensure a successful Ansible install
+    - name: Updating Python Modules
+      pip:
+        name: "{{ item }}"
+        state: "latest"
+      become: true
+      with_items:
+        - 'pip'
+        - 'cffi'
+      when: ansible_os_family != "Windows"
+
+# Install Ansible to run Ansible related tasks within guest
+    - name: Installing Ansible
+      pip:
+        name: "ansible"
+        state: "present"
+        version: "{{ ansible_ver }}"
+      become: true
+      when: ansible_os_family != "Windows"

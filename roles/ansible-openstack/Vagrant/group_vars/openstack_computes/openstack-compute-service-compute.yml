@@ -1,0 +1,23 @@
+---
+openstack_compute_service_compute_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+
+# Management IP Info
+openstack_compute_service_compute_management_interface: '{{ openstack_management_interface }}'
+openstack_compute_service_compute_management_ip: '{{ openstack_management_ip }}'
+
+# Define memcached servers
+openstack_compute_service_compute_memcached_servers: '{{ groups[openstack_controllers_group] }}'
+
+## Define Neutron user password
+openstack_compute_service_compute_neutron_user_pass: '{{ openstack_neutron_pass }}'
+
+## Nova user password
+openstack_compute_service_compute_nova_user: '{{ openstack_nova_pass }}'
+
+## Placement user password
+openstack_compute_service_compute_placement_user_pass: '{{ openstack_placement_pass }}'
+
+# RabbitMQ Connection Info
+openstack_compute_service_compute_rabbit_host: '{{ groups[openstack_controllers_group][0] }}'
+openstack_compute_service_compute_rabbit_pass: '{{ openstack_rabbit_pass }}'
+openstack_compute_service_compute_rabbit_user: '{{ openstack_rabbit_user }}'

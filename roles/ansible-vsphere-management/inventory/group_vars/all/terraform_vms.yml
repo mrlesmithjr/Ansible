@@ -1,0 +1,20 @@
+---
+terraform_vms:
+  - group: rancher_lbs
+    count: 2
+    inventory_parent_folder: Rancher
+    memory_mb: 512
+    naming: rancher-lb
+    vcpu: 1
+  - group: rancher_db_cluster
+    count: 3
+    inventory_parent_folder: Rancher
+    memory_mb: 1024
+    naming: rancher-db
+    vcpu: 1
+  - group: rancher_hosts
+    count: 6
+    inventory_parent_folder: Rancher
+    memory_mb: 4096
+    naming: rancher
+    vcpu: 4

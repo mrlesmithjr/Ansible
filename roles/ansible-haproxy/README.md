@@ -1,37 +1,48 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-An [Ansible] role to install/configure [HAProxy]
+- [ansible-haproxy](#ansible-haproxy)
+  - [Build Status](#build-status)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [Example `haproxy.cfg` (from default vars):](#example-haproxycfg-from-default-vars)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Build Status
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-haproxy
+
+An [Ansible](https://www.ansible.com) role to install/configure [HAProxy](http://www.haproxy.org/)
+
+## Build Status
 
 [![Build Status](https://travis-ci.org/mrlesmithjr/ansible-haproxy.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-haproxy)
 
-Requirements
-------------
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-[Role Defaults](./defaults/main.yml)
+[defaults/main.yml](defaults/main.yml)
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
 [Example Playbook](./playbook.yml)
 
-Example `haproxy.cfg` (from default vars):
----------------------------------------
+## Example `haproxy.cfg` (from default vars):
 
-```
+```bash
+# Ansible managed
+
 global
     log /dev/log local0
     log /dev/log local1 notice
@@ -88,32 +99,28 @@ listen stats
     acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
     stats http-request auth realm stats unless AuthOkay_ReadOnly
 
-frontend squid-in-8080
-    mode tcp
-    bind 192.168.250.50:8080
-    default_backend squid-servers-3128
+frontend web-in-80
+    mode http
+    bind 192.168.250.10:80
+    default_backend web-servers-80
 
-backend squid-servers-3128
-    mode tcp
+backend web-servers-80
+    mode http
     balance roundrobin
-    option tcplog
+    cookie HA_BACKEND_ID insert indirect nocache
     default-server maxconn 256 maxqueue 128 weight 100
-    server 192.168.250.10 192.168.250.10:3128 check
-    server 192.168.250.11 192.168.250.11:3128 check
+    server 192.168.250.11 192.168.250.11:80 check cookie 1
+    server 192.168.250.12 192.168.250.12:80 check cookie 2
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
-[HAProxy]: <http://www.haproxy.org/>
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   mrlesmithjr [at] gmail.com

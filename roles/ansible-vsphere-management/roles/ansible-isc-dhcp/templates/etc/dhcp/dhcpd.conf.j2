@@ -1,0 +1,95 @@
+{% if isc_dhcp_ddns_updates %}
+ddns-updates on;
+ddns-update-style {{ isc_dhcp_ddns_update_style|lower }};
+update-static-leases on;
+allow unknown-clients;
+use-host-decl-names on;
+{% elif not isc_dhcp_ddns_updates %}
+ddns-update-style none;
+{% endif %}
+
+{% for item in isc_dhcp_options %}
+option {{ item.name }} {{ item.value }};
+{% endfor %}
+
+default-lease-time 600;
+max-lease-time 7200;
+
+{% if isc_dhcp_authoritative %}
+authoritative;
+{% endif %}
+
+log-facility local7;
+
+{% if isc_dhcp_enable_dhcp_failover %}
+{%   if inventory_hostname == isc_dhcp_failover_info.primary %}
+failover peer "failover" {
+  primary;
+  address {{ isc_dhcp_failover_info.failover_address }};
+  port 519;
+{%     for host in groups[isc_dhcp_failover_info.failover_group] %}
+{%       if inventory_hostname != host %}
+  peer address {{ host }};
+{%       endif %}
+{%     endfor %}
+  peer port 520;
+  mclt 3600;
+  split 128;
+  load balance max seconds 3;
+}
+{%   endif %}
+
+{%   if inventory_hostname == isc_dhcp_failover_info.secondary %}
+failover peer "failover" {
+  secondary;
+  address {{ isc_dhcp_failover_info.failover_address }};
+  port 520;
+{%     for host in groups[isc_dhcp_failover_info.failover_group] %}
+{%       if inventory_hostname != host %}
+  peer address {{ host }};
+{%       endif %}
+{%     endfor %}
+  peer port 519;
+  load balance max seconds 3;
+}
+{%   endif %}
+{% endif %}
+
+{% if isc_dhcp_scopes is defined %}
+{%   for item in isc_dhcp_scopes %}
+subnet {{ item.subnet }} netmask {{ item.netmask }} {
+  pool {
+{%     if isc_dhcp_enable_dhcp_failover %}
+    failover peer "failover";
+{%     endif %}
+    range {{ item.range }};
+	}
+{%     for option in item.options %}
+    option {{ option.name }} {{ option.value }};
+{%     endfor %}
+{%     if isc_dhcp_enable_pxe_boot %}
+    option bootfile-name "{{ isc_dhcp_pxe_boot_file }}";
+    next-server {{ isc_dhcp_pxe_boot_server }};
+{%     endif %}
+
+    default-lease-time {{ item.default_lease_time }};
+    max-lease-time {{ item.max_lease_time }};
+}
+{%   endfor %}
+{% endif %}
+
+{% if isc_dhcp_dns_fwd_zones is defined %}
+{%   for item in isc_dhcp_dns_fwd_zones %}
+zone {{ item.zone }}. {
+  primary {{ item.primary }};
+}
+{%   endfor %}
+{% endif %}
+
+{% if isc_dhcp_dns_rev_zones is defined %}
+{%   for item in isc_dhcp_dns_rev_zones %}
+zone {{ item.zone }}.in-addr.arpa. {
+  primary {{ item.primary }};
+}
+{%   endfor %}
+{% endif %}

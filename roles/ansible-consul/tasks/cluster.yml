@@ -1,148 +1,68 @@
 ---
-# We check for an existing encryption key
-# This is not the most secure and probably should be handled differently
-- name: cluster | Checking If Consul Encryption Key Has Already Been Generated
+# Check if a local keyring file is present
+- name: cluster | Check if node has already been bootstrapped
   stat:
-    path: "{{ consul_key_file }}"
-  register: "_consul_key_file"
-  when: inventory_hostname == consul_master
-
-# We generate the encryption key if it does not already exist
-- name: cluster | Generating Consul Encryption Key
-  command: "consul keygen"
-  register: "_consul_encryption_key"
+    path: "{{ consul_data_dir}}/serf/local.keyring"
+  register: keyring_exists
+  ignore_errors: true
   become: true
-  no_log: true
-  when: >
-        inventory_hostname == consul_master and
-        not _consul_key_file['stat']['exists']
 
-# We do this when consul encryption key has already been generated and stored
-- name: cluster | Capturing Existing Consul Encryption Key
-  command: "cat {{ consul_key_file }}"
-  register: "_consul_encryption_key_read"
-  no_log: true
-  changed_when: false
+- block:
+  # Gather the currently used encryption key of the cluster
+  - name: cluster | Fetch active encryption key
+    slurp:
+      src: "{{ consul_data_dir}}/serf/local.keyring"
+    register: keyring_value
+    become: true
+
+  # Set consul_encryption_key_active to allow comparison in next step
+  - name: cluster | Set fact consul_encryption_key_active
+    set_fact:
+      consul_encryption_key_active: "{{ keyring_value['content'] | b64decode | from_json | first }}"
+    no_log: true
+    become: true
+
+  # Inform the user the the node's key does not match his given key in consul_encryption_key and remove the host from play
+  - name: cluster | Compare active key with consul_encryption_key
+    fail:
+      msg: >
+          "ATTENTION: This node uses another encryption key then defined in consul_encryption_key!
+          The active key can be found locally in {{ consul_data_dir}}/serf/local.keyring"
+          Update the variable consul_encryption_key!
+          Removing node from play.
+    become: true
+    when: consul_encryption_key_active != consul_encryption_key
+
+  when: keyring_exists.stat.exists
+
+- block:
+    - name: cluster | retrieve node ID
+      slurp:
+        src: "{{ consul_data_dir }}/node-id"
+      register: consul_node_id_b64
+      become: true
+
+    - name: cluster | Set consul_node_id fact
+      set_fact:
+        consul_node_id: "{{ consul_node_id_b64['content'] | b64decode }}"
+
+    - name: cluster | deploy peers.json_prepared
+      template:
+        src: "templates/var/consul/peers.json_prepared.j2"
+        dest: "{{ consul_peers_json_prepared_path }}/peers.json_prepared"
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+        mode: "0640"
+      become: true
+      when: not ansible_check_mode
+
+  when: consul_peers_json_prepared and
+        inventory_hostname in groups[consul_servers_group]
+
+- name: cluster | ensure absence of peers.json_prepared if desired
+  file:
+    path: "{{ consul_peers_json_prepared_path }}/peers.json_prepared"
+    state: absent
   become: true
-  when: >
-        inventory_hostname == consul_master and
-        _consul_key_file['stat']['exists']
-
-# We do this when we generate a new encryption key
-- name: cluster | Settting consul_encryption_key Fact On Consul Master
-  set_fact:
-    consul_encryption_key: "{{ _consul_encryption_key['stdout'] }}"
-  no_log: true
-  when: >
-        inventory_hostname == consul_master and
-        _consul_encryption_key['changed'] and
-        not ansible_check_mode
-
-# We do this when consul encryption key has already been generated and stored
-- name: cluster | Settting consul_encryption_key Fact On Consul Master
-  set_fact:
-    consul_encryption_key: "{{ _consul_encryption_key_read['stdout'] }}"
-  no_log: true
-  when: >
-        inventory_hostname == consul_master and
-        _consul_key_file['stat']['exists'] and
-        not ansible_check_mode
-
-- name: cluster | Setting consul_encryption_key Fact On Non Consul Master
-  set_fact:
-     consul_encryption_key: "{{ hostvars[consul_master]['consul_encryption_key'] }}"
-  no_log: true
-  when: >
-        inventory_hostname != consul_master and
-        not ansible_check_mode
-
-# We store the encryption key on all of consul servers group in order to
-# preserve the key if for any reason consul_master were to disappear or crash
-# This is not the most secure and probably should be handled differently
-- name: cluster | Storing Consul Encryption Key
-  template:
-    src: "etc/consul.key.j2"
-    dest: "{{ consul_key_file }}"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o="
-  no_log: true
-  become: true
-  when: >
-        inventory_hostname in groups[consul_servers_group] and
-        not ansible_check_mode
-
-# This is not the most secure and probably should be handled differently
-- name: cluster | Checking For Existing acl_master_token
-  stat:
-    path: "{{ consul_acl_master_token_file }}"
-  register: "_consul_acl_master_token_file"
-  changed_when: false
-  when: >
-        consul_enable_acls and
-        inventory_hostname == consul_master
-
-- name: cluster | Generating consul_acl_master_token_file
-  command: "uuidgen"
-  register: "_consul_acl_master_token"
-  no_log: true
-  when: >
-        inventory_hostname == consul_master and
-        consul_enable_acls and
-        not _consul_acl_master_token_file['stat']['exists']
-
-# We do this when consul encryption key has already been generated and stored
-# This is not the most secure and probably should be handled differently
-- name: cluster | Capturing Existing consul_acl_master_token_file
-  command: "cat {{ consul_acl_master_token_file }}"
-  register: "_consul_acl_master_token_read"
-  no_log: true
-  changed_when: false
-  become: true
-  when: >
-        inventory_hostname == consul_master and
-        _consul_acl_master_token_file['stat']['exists']
-
-- name: cluster | Setting consul_acl_master_token On Consul Master
-  set_fact:
-    consul_acl_master_token: "{{ _consul_acl_master_token['stdout'] }}"
-  no_log: true
-  when: >
-        consul_enable_acls and
-        inventory_hostname == consul_master and
-        _consul_acl_master_token['changed']
-
-- name: cluster | Setting consul_acl_master_token On Consul Master
-  set_fact:
-    consul_acl_master_token: "{{ _consul_acl_master_token_read['stdout'] }}"
-  no_log: true
-  when: >
-        consul_enable_acls and
-        inventory_hostname == consul_master and
-        _consul_acl_master_token_file['stat']['exists'] and
-        not ansible_check_mode
-
-- name: cluster | Setting consul_acl_master_token On Non Consul Master
-  set_fact:
-    consul_acl_master_token: "{{ hostvars[consul_master]['consul_acl_master_token'] }}"
-  no_log: true
-  when: >
-        consul_enable_acls and
-        inventory_hostname != consul_master and
-        not ansible_check_mode
-
-# We store the ACL Master Token on all of consul servers group in order to
-# preserve the key if for any reason consul_master were to disappear or crash
-# This is not the most secure and probably should be handled differently
-- name: cluster | Storing Consul ACL Master Token
-  template:
-    src: "etc/consul_acl_master_token.j2"
-    dest: "{{ consul_acl_master_token_file }}"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o="
-  no_log: true
-  become: true
-  when: >
-        inventory_hostname in groups[consul_servers_group] and
+  when: not consul_peers_json_prepared and
         not ansible_check_mode

@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+STATDOPTS={% if nfs_server_statdopts is defined %}{{ nfs_server_statdopts|join(' ') }}{% endif %}
+
+
+# Do you want to start the gssd daemon? It is required for Kerberos mounts.
+NEED_GSSD=

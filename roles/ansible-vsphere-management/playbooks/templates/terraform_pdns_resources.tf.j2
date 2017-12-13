@@ -1,0 +1,9 @@
+{% for record in terraform_pdns_records %}
+resource "powerdns_record" "{{ record['name'] }}" {
+  zone    = "${var.pri_domain_name}."
+  name    = "{{ record['name'] }}.${var.pri_domain_name}."
+  type    = "{{ record['type'] }}"
+  ttl     = 300
+  records = ["{{ record['records'] }}"]
+}
+{% endfor %}

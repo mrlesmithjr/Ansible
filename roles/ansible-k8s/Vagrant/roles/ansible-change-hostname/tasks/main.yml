@@ -19,7 +19,13 @@
         hostname_status.changed
 
 - name: main | waiting for server to come back
-  local_action: wait_for port=22 host="{{ ansible_ssh_host  | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+  wait_for:
+    host: "{{ ansible_host | default(inventory_hostname) }}"
+    port: 22
+    search_regex: OpenSSH
+    delay: 10
+  vars:
+    ansible_connection: local
   become: false
   when: >
         (change_hostname_reboot is defined and

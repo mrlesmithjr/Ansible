@@ -18,14 +18,22 @@
 {%         endif %}
 {%       endif %}
 {%     elif etc_hosts_static_ip %}
+{%       if ansible_ssh_host is defined %}
 {{ ansible_ssh_host }} {{ ansible_fqdn }} {{ ansible_hostname }}
+{%       elif ansible_host is defined %}
+{{ ansible_host }} {{ ansible_fqdn }} {{ ansible_hostname }}
+{%       endif %}
 {%     endif %}
 {%   elif (ansible_domain != etc_hosts_pri_dns_name) and ansible_domain != '' %}
 {%     if (ansible_fqdn == inventory_hostname) and (inventory_hostname != inventory_hostname_short) %}
 {%       if not etc_hosts_static_ip %}
 127.0.1.1 {{ inventory_hostname }} {{ ansible_hostname }}
 {%       elif etc_hosts_static_ip %}
+{%         if ansible_ssh_host is defined %}
 {{ ansible_ssh_host }} {{ inventory_hostname }} {{ ansible_hostname }}
+{%         elif ansible_host is defined %}
+{{ ansible_host }} {{ inventory_hostname }} {{ ansible_hostname }}
+{%         endif %}
 {%       endif %}
 {%     endif %}
 {%   endif %}
@@ -36,9 +44,17 @@
 {{ hostvars[host]['ansible_default_ipv4']['address'] }} {{ hostvars[host]['ansible_fqdn'] }}.{{ etc_hosts_pri_dns_name }} {{ hostvars[host]['ansible_hostname'] }}
 {%       elif not etc_hosts_use_default_ip_address and etc_hosts_use_ansible_ssh_host %}
 {%         if hostvars[host]['ansible_fqdn'] != (hostvars[host]['ansible_hostname']+ '.' + etc_hosts_pri_dns_name) %}
+{%           if hostvars[host]['ansible_ssh_host'] is defined %}
 {{ hostvars[host]['ansible_ssh_host'] }} {{ hostvars[host]['ansible_hostname'] }}.{{ etc_hosts_pri_dns_name }} {{ hostvars[host]['ansible_hostname'] }}
+{%           elif hostvars[host]['ansible_host'] is defined %}
+{{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['ansible_hostname'] }}.{{ etc_hosts_pri_dns_name }} {{ hostvars[host]['ansible_hostname'] }}
+{%           endif %}
 {%         elif hostvars[host]['ansible_fqdn'] == (hostvars[host]['ansible_hostname']+ '.' + etc_hosts_pri_dns_name) %}
+{%           if hostvars[host]['ansible_ssh_host'] is defined %}
 {{ hostvars[host]['ansible_ssh_host'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
+{%           elif hostvars[host]['ansible_host'] is defined %}
+{{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
+{%           endif %}
 {%         endif %}
 {%       endif %}
 {%     elif (hostvars[host]['ansible_domain'] != etc_hosts_pri_dns_name) and ansible_domain != '' %}
@@ -46,7 +62,11 @@
 {%         if etc_hosts_use_default_ip_address and not etc_hosts_use_ansible_ssh_host %}
 {{ hostvars[host]['ansible_default_ipv4']['address'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
 {%         elif not etc_hosts_use_default_ip_address and etc_hosts_use_ansible_ssh_host %}
+{%           if hostvars[host]['ansible_ssh_host'] is defined %}
 {{ hostvars[host]['ansible_ssh_host'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
+{%           elif hostvars[host]['ansible_host'] is defined %}
+{{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
+{%           endif %}
 {%         endif %}
 {%       endif %}
 {%     endif %}

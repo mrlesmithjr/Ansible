@@ -1,0 +1,126 @@
+---
+- hosts: all
+  gather_facts: false
+  vars:
+    host_vars_directory: './host_vars'
+    host_vars_file: "{{ host_vars_directory }}/{{ item['name'] }}.yml"
+    ssh_key_path: ".vagrant/machines/{{ item['name'] }}/virtualbox/private_key"
+  tasks:
+    - name: Ensuring host_vars Directory Exists
+      file:
+        path: "{{ host_vars_directory }}"
+        state: "directory"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Ensuring Host File Exists In host_vars
+      stat:
+        path: "{{ host_vars_file }}"
+      delegate_to: localhost
+      run_once: true
+      register: "host_var"
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+
+    - name: Creating Missing host_vars
+      file:
+        path: "{{ host_vars_directory }}/{{ item['item']['name'] }}.yml"
+        state: "touch"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ host_var['results'] }}"
+      when: not item['stat']['exists']
+
+    - name: Updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ item['interfaces'][0]['ip'] }}"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      when: >
+            item['interfaces'] is defined and
+            item['interfaces'][0]['auto_config']
+
+    - name: Updating ansible_ssh_port
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_port{{ ':' }}"
+        line: "ansible_ssh_port{{ ':' }} 22"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      when: >
+            (item['interfaces'] is defined and
+            item['interfaces'][0]['auto_config']) and
+            ((item['windows'] is defined and
+            not item['windows']) or
+            item['windows'] is not defined)
+
+    - name: Updating ansible_ssh_port
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_port{{ ':' }}"
+        line: "ansible_ssh_port{{ ':' }} 5986"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      when: >
+            (item['interfaces'] is defined and
+            item['interfaces'][0]['auto_config']) and
+            (item['windows'] is defined and
+            item['windows'])
+
+    - name: Updating ansible_ssh_key
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_private_key_file{{ ':' }}"
+        line: "ansible_ssh_private_key_file{{ ':' }} {{ ssh_key_path }}"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+
+    - name: Updating ansible_connection
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_connection{{ ':' }}"
+        line: "ansible_connection{{ ':' }} winrm"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      when: >
+            (item['windows'] is defined and
+            item['windows'])
+
+    - name: Updating ansible_winrm_server_cert_validation
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_winrm_server_cert_validation{{ ':' }}"
+        line: "ansible_winrm_server_cert_validation{{ ':' }} ignore"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      when: >
+            (item['windows'] is defined and
+            item['windows'])
+
+    - name: Updating ansible_user
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_user{{ ':' }}"
+        line: "ansible_user{{ ':' }} vagrant"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+
+    - name: Updating ansible_password
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_password{{ ':' }}"
+        line: "ansible_password{{ ':' }} vagrant"
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      when: >
+            (item['windows'] is defined and
+            item['windows'])

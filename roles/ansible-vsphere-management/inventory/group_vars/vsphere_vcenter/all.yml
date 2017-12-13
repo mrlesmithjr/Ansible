@@ -1,0 +1,3 @@
+---
+ansible_user: "{{ vsphere_vcsa_user_info['username'] }}"
+ansible_password: "{{ vsphere_vcsa_user_info['password'] }}"

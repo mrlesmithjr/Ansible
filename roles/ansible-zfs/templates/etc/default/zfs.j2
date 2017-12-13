@@ -4,16 +4,20 @@
 # before attempting import and starting mountall.
 ZFS_AUTOIMPORT_TIMEOUT='30'
 
+
+{% if (zfs_enable_nfs is defined and not zfs_enable_nfs) or zfs_enable_nfs is not defined %}
 # Run `zfs share -a` during system start?
 # nb: The shareiscsi, sharenfs, and sharesmb dataset properties.
-{% if (zfs_enable_nfs is defined and not zfs_enable_nfs) or zfs_enable_nfs is not defined %}
 ZFS_SHARE='no'
-{% elif zfs_enable_nfs is defined and zfs_enable_nfs %}
-ZFS_SHARE='yes'
-{% endif %}
-
 # Run `zfs unshare -a` during system stop?
 ZFS_UNSHARE='no'
+{% elif zfs_enable_nfs is defined and zfs_enable_nfs %}
+# Run `zfs share -a` during system start?
+# nb: The shareiscsi, sharenfs, and sharesmb dataset properties.
+ZFS_SHARE='yes'
+# Run `zfs unshare -a` during system stop?
+ZFS_UNSHARE='yes'
+{% endif %}
 
 # Build kernel modules with the --enable-debug switch?
 ZFS_DKMS_ENABLE_DEBUG='no'

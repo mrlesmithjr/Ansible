@@ -1,0 +1,6 @@
+---
+- hosts: rex_host
+  vars:
+  roles:
+    - role: ansible-rexify
+  tasks:

@@ -1,0 +1,14 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-controller-install.html
+- name: debian | Installing Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'nova-api'
+    - 'nova-conductor'
+    - 'nova-consoleauth'
+    - 'nova-novncproxy'
+    - 'nova-scheduler'
+    - 'nova-placement-api'

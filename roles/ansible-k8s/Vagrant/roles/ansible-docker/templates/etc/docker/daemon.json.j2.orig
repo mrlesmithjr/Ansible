@@ -1,0 +1,66 @@
+{% set docker_options = {} %}
+{% if docker_opts.bridge is defined %}
+{%   set _opts = docker_options.update({"bridge": docker_opts.bridge}) %}
+{% endif %}
+{% if docker_opts.bridge_ip is defined %}
+{%   set _opts = docker_options.update({"bip": docker_opts.bridge_ip}) %}
+{% endif %}
+{% if docker_opts.dns is defined %}
+{%   set _dns_servers = [] %}
+{%   for item in docker_opts.dns %}
+{%     set _opts = _dns_servers.append(item) %}
+{%   endfor %}
+{%   set _opts = docker_options.update({"dns": _dns_servers}) %}
+{% endif %}
+{% if docker_opts.dns_search is defined %}
+{%   set _dns_search = [] %}
+{%   for item in docker_opts.dns_search %}
+{%     set _opts = _dns_search.append(item) %}
+{%   endfor %}
+{%   set _opts = docker_options.update({"dns-search": _dns_search}) %}
+{% endif %}
+{% if docker_opts.insecure_registries is defined %}
+{%   set _insecure_registries = [] %}
+{%   for item in docker_opts.insecure_registries %}
+{%     set _opts = _insecure_registries.append(item) %}
+{%   endfor %}
+{%   set _opts = docker_options.update({"insecure-registries": _insecure_registries}) %}
+{% endif %}
+{% if docker_opts.ip is defined %}
+{%   set _opts = docker_options.update({"ip": docker_opts.ip}) %}
+{% endif %}
+{% if docker_opts.ip_forward is defined %}
+{%   set _opts = docker_options.update({"ip-forward": docker_opts.ip_forward}) %}
+{% endif %}
+{% if docker_opts.ip_masq is defined %}
+{%   set _opts = docker_options.update({"ip-masq": docker_opts.ip_masq}) %}
+{% endif %}
+{% if docker_opts.iptables is defined %}
+{%   set _opts = docker_options.update({"iptables": docker_opts.iptables}) %}
+{% endif %}
+{% if docker_opts.labels is defined %}
+{%   set _labels = [] %}
+{%   for item in docker_opts.labels %}
+{%     set _opts = _labels.append(item.key+"="+item.value) %}
+{%   endfor %}
+{%   set _opts = docker_options.update({"labels": _labels}) %}
+{% endif %}
+{% if docker_opts.log_driver is defined %}
+{%   set _opts = docker_options.update({"log-driver": docker_opts.log_driver}) %}
+{% endif %}
+{% if docker_opts.log_level is defined %}
+{%   set _opts = docker_options.update({"log-level": docker_opts.log_level}) %}
+{% endif %}
+{% if docker_opts.max_concurrent_downloads is defined %}
+{%   set _opts = docker_options.update({"max-concurrent-downloads": docker_opts.max_concurrent_downloads|int}) %}
+{% endif %}
+{% if docker_opts.max_concurrent_uploads is defined %}
+{%   set _opts = docker_options.update({"max-concurrent-uploads": docker_opts.max_concurrent_uploads|int}) %}
+{% endif %}
+{% if docker_opts.storage_driver is defined %}
+{%   set _opts = docker_options.update({"storage-driver": docker_opts.storage_driver}) %}
+{% endif %}
+{% if docker_opts.tls is defined %}
+{%   set _opts = docker_options.update({"tls": docker_opts.tls}) %}
+{% endif %}
+{{ docker_options| to_nice_json }}

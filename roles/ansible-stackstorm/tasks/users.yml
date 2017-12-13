@@ -4,21 +4,21 @@
     name: "{{ stackstorm_ssh_info.user }}"
     generate_ssh_key: yes
     ssh_key_file: "{{ stackstorm_ssh_info.key_file }}"
-    state: "present"
+    state: present
   tags:
-    - "stackstorm-ssh-keys"
-    - "stackstorm-user"
+    - stackstorm-ssh-keys
+    - stackstorm-user
   become: true
 
 - name: users | Configuring Sudoers For User {{ stackstorm_ssh_info.user }}
   template:
-    src: "etc/sudoers.d/st2.j2"
-    dest: "/etc/sudoers.d/st2"
-    owner: "root"
-    group: "root"
+    src: etc/sudoers.d/st2.j2
+    dest: /etc/sudoers.d/st2
+    owner: root
+    group: root
     mode: 0440
   tags:
-    - "stackstorm-user"
+    - stackstorm-user
   become: true
 
 # Download SSH Pub Key for SSH User
@@ -29,6 +29,6 @@
     dest: "./{{ stackstorm_ssh_info.user }}@{{ ansible_hostname }}.pub"
     flat: yes
   tags:
-    - "stackstorm-ssh-keys"
-    - "stackstorm-user"
+    - stackstorm-ssh-keys
+    - stackstorm-user
   become: true

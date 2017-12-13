@@ -1,0 +1,27 @@
+---
+- name: ntp | Managing NTP Servers
+  win_shell: |
+    $vmHost="{{ hostvars[item]['ansible_host'] }}"
+    Connect-VIServer -Server $vmHost
+    $CurrentNtpServers=@($(Get-VMHostNtpServer -Server $vmHost))
+    $NewNtpServers=@($("{{ vsphere_ntp_servers|join('", "') }}"))
+    Foreach ($i in $NewNtpServers){
+      if ($CurrentNtpServers -notcontains $i) {
+        Add-VmHostNtpServer -Server $vmHost -NtpServer $i -Confirm:$false
+        $RestartNtp="true"
+      }
+    }
+    Foreach ($i in $CurrentNtpServers) {
+      if ($NewNtpServers -notcontains $i) {
+        Remove-VmHostNtpServer -Server $vmHost -NtpServer $i -Confirm:$false
+        $RestartNtp="true"
+      }
+    }
+    if ($RestartNtp) {
+      if ($RestartNtp -eq "true") {
+        Get-VMHostService -Server $vmHost | Where-Object { $_.Key -eq 'ntpd' } | Restart-VMHostService -Confirm:$false
+      }
+    }
+    Disconnect-VIServer * -Confirm:$false
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: vsphere_ntp_servers is defined

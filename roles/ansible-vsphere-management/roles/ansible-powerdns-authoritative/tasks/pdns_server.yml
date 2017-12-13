@@ -1,0 +1,150 @@
+---
+- include: debian_pdns_server.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat_pdns_server.yml
+  when: ansible_os_family == "RedHat"
+
+- name: pdns_server | configuring powerdns
+  template:
+    src: "etc/powerdns/pdns.conf.j2"
+    dest: "/etc/powerdns/pdns.conf"
+    owner: "root"
+    group: "root"
+  become: true
+  register: "pdns_configured_1"
+  when: >
+        ansible_os_family == "Debian" or
+        (ansible_os_family == "RedHat" and
+        pdns_server_version != "4.x")
+
+- name: pdns_server | Configuring PowerDNS
+  template:
+    src: "etc/powerdns/pdns.conf.j2"
+    dest: "/etc/pdns/pdns.conf"
+    owner: "root"
+    group: "root"
+  become: true
+  notify: restart pdns
+  register: "pdns_configured_2"
+  when: >
+        (ansible_os_family == "RedHat" and
+        pdns_server_version == "4.x")
+
+- name: pdns_server | ensuring pdns service is enabled
+  service:
+    name: "pdns"
+    enabled: yes
+  become: true
+
+- name: pdns_server | stopping pdns
+  service:
+    name: "pdns"
+    state: "stopped"
+  register: "_pdns_stopped"
+  become: true
+  when: >
+        pdns_configured_1['changed'] or
+        pdns_configured_2['changed']
+
+- name: pdns_server | waiting to stop
+  pause:
+    seconds: 5
+  when: _pdns_stopped['changed']
+
+- name: pdns_server | starting powerdns
+  service:
+    name: "pdns"
+    state: "started"
+  become: true
+  when: >
+        pdns_configured_1['changed'] or
+        pdns_configured_2['changed']
+
+- name: pdns_server | creating powerdns db
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: "present"
+  become: true
+  when: not pdns_db_cluster
+
+- name: pdns_server | creating powerdns db
+  mysql_db:
+    name: "{{ pdns_db_name }}"
+    state: "present"
+  become: true
+  run_once: true
+  when: pdns_db_cluster
+
+- name: pdns_server | creating powerdns user
+  mysql_user:
+    name: "{{ pdns_db_user }}"
+    password: "{{ pdns_db_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    host: "{{ item }}"
+    state: present
+  become: true
+  with_items: '{{ pdns_db_allow_access_from_hosts }}'
+  when: not pdns_db_cluster
+
+- name: pdns_server | creating powerdns user
+  mysql_user:
+    name: "{{ pdns_db_user }}"
+    password: "{{ pdns_db_pass }}"
+    priv: "{{ pdns_db_name }}.*:ALL"
+    host: "{{ item }}"
+    state: present
+  become: true
+  run_once: true
+  with_items: '{{ pdns_db_allow_access_from_hosts }}'
+  when: pdns_db_cluster
+
+- name: pdns_server | copying db schema file
+  copy:
+    src: "db_schema"
+    dest: "/tmp"
+
+- name: pdns_server | Checking If DB Tables Exist
+  command: >
+           mysql
+           -u {{ pdns_db_user }}
+           --password={{ pdns_db_pass }}
+           -h {{ pdns_db_host }}
+           -e "show tables from {{ pdns_db_name }};"
+  become: true
+  changed_when: false
+  register: "pdns_tables"
+
+- name: pdns_server | importing db schema
+  mysql_db:
+    login_host: "{{ pdns_db_host }}"
+    login_password: "{{ pdns_db_pass }}"
+    login_user: "{{ pdns_db_user }}"
+    name: "{{ pdns_db_name }}"
+    state: "import"
+    target: "/tmp/db_schema"
+  become: true
+  when: >
+        not pdns_db_cluster and
+        ('domains' not in pdns_tables['stdout_lines'])
+
+- name: pdns_server | importing db schema
+  mysql_db:
+    login_host: "{{ pdns_db_host }}"
+    login_password: "{{ pdns_db_pass }}"
+    login_user: "{{ pdns_db_user }}"
+    name: "{{ pdns_db_name }}"
+    state: "import"
+    target: "/tmp/db_schema"
+  become: true
+  run_once: true
+  when: >
+        pdns_db_cluster and
+        ('domains' not in pdns_tables['stdout_lines'])
+
+- name: pdns_server | ensuring pdns server is running and enabled on boot
+  service:
+    name: "pdns"
+    state: "started"
+    enabled: yes
+  become: true

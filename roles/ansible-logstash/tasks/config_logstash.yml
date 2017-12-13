@@ -3,6 +3,7 @@
   file:
     path: "{{ logstash_config_dir }}"
     state: "absent"
+  become: true
   when: >
         clear_logstash_config is defined and
         clear_logstash_config
@@ -15,11 +16,13 @@
     group: "logstash"
     recurse: no
     mode: 0775
+  become: true
 
 - name: config_logstash | removing original logstash config if it exists
   file:
     path: "{{ logstash_config_dir }}/logstash.conf"
     state: "absent"
+  become: true
   notify: "restart logstash"
 
 - name: config_logstash | configuring logstash
@@ -30,6 +33,7 @@
     group: "logstash"
     mode: 0644
     #validate: "/opt/logstash/bin/logstash -tf %s" # commented due to error during tests with file not found.
+  become: true
   notify: "restart logstash"
   with_items: '{{ logstash_base_configs }}'
 
@@ -41,11 +45,13 @@
     group: "logstash"
     mode: 0775
     recurse: yes
+  become: true
   with_items:
     - '/opt/logstash/lib/logstash/outputs/elasticsearch'
     - '/opt/logstash/patterns'
 
 - name: config_logstash | test logstash configuration
   shell: "{{ logstash_bin }} -t -f {{ logstash_config_dir }} --path.settings /etc/logstash/"
+  become: true
   changed_when: false
   when: logstash_major_ver == '5.x'

@@ -29,7 +29,7 @@ gerrit_http_listen_port: 8080
 gerrit_init: "java -jar {{ gerrit_install_dir }}/gerrit.war init --batch --no-auto-start -d {{ gerrit_site_dir }} --install-plugin reviewnotes --install-plugin replication --install-plugin download-commands --install-plugin singleusergroup --install-plugin commit-message-length-validator"
 gerrit_install_dir: /opt/gerrit
 gerrit_install_plugins: false  #setting to false for now until plugin install method works...
-gerrit_java_home: /usr/lib/jvm/java-7-openjdk-amd64/jre
+gerrit_java_home: /usr/lib/jvm/java-8-openjdk-amd64/jre
 gerrit_ldap_info:
   - server: 'ldap://dc01.{{ pri_domain_name }}'
     accountbase: 'DC=example,DC=org'

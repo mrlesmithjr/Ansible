@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-windows-domain
+
+# Checks for existence of domain and creates it if not found
+- name: Ensuring Domain {{ windows_domain_info['dns_domain_name'] }} Exists
+  win_domain:
+    dns_domain_name: "{{ windows_domain_info['dns_domain_name'] }}"
+    safe_mode_password: "{{ windows_domain_info['safe_mode_password'] }}"
+  register: _windows_domain
+  failed_when: >
+               _windows_domain['rc'] is defined and
+               ((_windows_domain['rc'] == 1) and
+               "already in use on this network" not in _windows_domain['module_stderr'])
+
+- include: reboot.yml
+
+- include: features.yml

@@ -1,0 +1,13 @@
+---
+# defaults file for ansible-spinnaker-halyard
+spinnaker_halyard_docker_registry: 'gcr.io/spinnaker-marketplace'
+spinnaker_halyard_gce_project: 'marketplace-spinnaker-release'
+spinnaker_halyard_release: 'stable'
+spinnaker_halyard_repo_key: 'https://bintray.com/user/downloadSubjectPublicKey?username={{ spinnaker_halyard_repo_org }}'
+spinnaker_halyard_repo_org: 'spinnaker-releases'
+spinnaker_halyard_repo: 'https://dl.bintray.com/{{ spinnaker_halyard_repo_org }}/debians'
+spinnaker_halyard_debian_repo: 'deb {{ spinnaker_halyard_repo }} {{ ansible_distribution_release|lower }}-{{ spinnaker_halyard_release }} spinnaker'
+spinnaker_halyard_user_info:
+  name: "spinnaker"
+  group: "spinnaker"
+spinnaker_halyard_halconfig_dir: "/home/{{ spinnaker_halyard_user_info['name'] }}/.hal"

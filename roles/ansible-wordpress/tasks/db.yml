@@ -1,0 +1,20 @@
+---
+- name: db | Creating {{ wordpress_db }} on {{ wordpress_db_host }}
+  mysql_db:
+    name: "{{ wordpress_db }}"
+    state: present
+  become: true
+  delegate_to: "{{ wordpress_db_host }}"
+
+- name: db | Creating {{ wordpress_db_user }} on {{ wordpress_db_host }}
+  mysql_user:
+    host: "{{ item }}"
+    name: "{{ wordpress_db_user }}"
+    password: "{{ wordpress_db_password }}"
+    priv: "{{ wordpress_db }}.*:ALL"
+    state: present
+  become: true
+  delegate_to: "{{ wordpress_db_host }}"
+  with_items:
+    - 127.0.0.1
+    - "%"

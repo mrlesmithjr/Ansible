@@ -1,0 +1,7 @@
+---
+phpipam_db_cluster: true
+
+# Defines if cron jobs for scanning and etc. should be defined.
+phpipam_define_cron_jobs: true
+
+phpipam_primary: "{{ groups[vsphere_ddi_vms_group][0] }}"

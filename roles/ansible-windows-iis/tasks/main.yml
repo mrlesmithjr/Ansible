@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-windows-iis
+
+- include: set_facts.yml
+  when: windows_iis_role is defined
+
+- include: features.yml
+  when: windows_iis_role is defined
+
+- include: websites.yml
+  when: >
+        windows_iis_role is defined and
+        windows_iis_websites is defined and
+        windows_iis_web_server
+
+- include: reboot.yml
+  when: windows_iis_role is defined

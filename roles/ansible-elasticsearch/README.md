@@ -1,239 +1,54 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-An [Ansible] role to install [Elasticsearch]
+- [ansible-elasticsearch](#ansible-elasticsearch)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Build Status
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-elasticsearch.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-elasticsearch)
+# ansible-elasticsearch
 
-Requirements
-------------
+An [Ansible](https://www.ansible.com) role to install/configure [Elasticsearch](https://www.elastic.co/products/elasticsearch)
 
-None
+> NOTE: This role has been completely rewritten and replaces my original
+> `ansible-elasticsearch` role which has been renamed to [ansible-elasticsearch-old](https://github.com/mrlesmithjr/ansible-elasticsearch-old.git).
+> I decided to rewrite this role as the original had a lot of residuals from years
+> of different usages. The original will remain for historical purposes.
 
-Role Variables
---------------
-
-```
----
-# defaults file for ansible-elasticsearch
-
-# Defines if remote connections should be allowed
-es_allow_remote_connections: false
-
-# Defines es_cluster_name
-es_cluster_name: 'ansible-test'
-
-# Defines if elasticsearch will be setup as a cluster of nodes
-es_cluster_setup: false
-
-# Defines if additional lvm volume is to be created
-es_config_lvm: false
-
-# Define Ansible inventory group to configure as master nodes
-# if same as es_config_unicast_group leave as is or change to another
-# (ex.es-master-nodes)
-es_config_master_group: 'es-cluster-nodes'
-
-# Defines if an NFS mountpoint is to be mounted
-es_config_nfs: false
-
-# Defines if elasticsearch should be configured to store data in
-# different data paths
-es_config_path_data: false
-
-# Defines if unicast discovery should be configured
-# ES 2.x
-es_config_unicast: false
-
-# Define inventory group to configure unicast discovery.
-es_config_unicast_group: 'es-cluster-nodes'
-
-# Defines the number of days before closing indexes
-es_curator_close_after_days: '14'
-es_curator_debian_repo: 'deb http://packages.elastic.co/curator/{{ es_curator_version }}/debian stable main'
-
-# Define the host(s) to run curator against
-es_curator_elasticsearch_hosts:
-  - 'localhost'
-
-# Defines the max number of days to keep indexes
-es_curator_max_keep_days: '30'
-
-es_curator_version: '4'
-
-# Defines if node should be a data node in the cluster
-# default is true
-es_data_node: true
-
-# Define disk device names to add to LVM VG if using
-es_disks: []
-  # - '/dev/sdb'
-  # - '/dev/sdc'
-
-# Defines if settings defined in es_network_tweaks are managed
-es_enable_network_tweaks: false
-es_fqdn: 'localhost'
-
-# Defines the amount of memory to allocate
-# Heap Size (defaults to 256m min, 1g max)
-# 50% of max memory is good.
-es_heap_size: '{{ (ansible_memtotal_mb | int * es_heap_size_multiplier) | round | int }}m'
-
-# Defines multiplier for determining the amount of memory to allocate to ES
-es_heap_size_multiplier: 0.5
-
-# Defines if Elasticsearch Curator plugin is installed
-es_install_curator: true
-
-# Define options to pass to lvextend for extending LVM if used
-es_lvextend_options: '-l +100%FREE'
-
-# Define LVM Logical Volume to create in VG Name if using
-es_lvname: 'elasticsearch-lv'
-
-# Defines Elasticsearch Major release (1.7|2.x|5.x)
-es_major_version: '5.x'
-
-# Defines if node should be a master node in the cluster
-# Default is true
-es_master_node: true
-
-# Defines Elasticsearch Minor release
-es_minor_version: '5.2.2'
-
-# These settings help eliminate OOM conditions
-# (More memory should be used in most cases but these settings can help)
-es_memory_tuning:
-  - name: 'indices.breaker.fielddata.limit'
-    set: false
-    # default 60%
-    value: '60%'
-  - name: 'indices.breaker.request.limit'
-    set: false
-    # default 40%
-    value: '40%'
-  - name: 'indices.breaker.total.limit'
-    set: false
-    # Default 40%
-    value: '40%'
-  - name: 'indices.fielddata.cache.size'
-    set: false
-    # Default undefined
-    value: '40%'
-
-# Define mountpoint for LVM (If used)
-es_mntp: '/var/lib/elasticsearch'
-
-# Define a specific interface to bind elasticsearch on for clustering
-# Usually not required
-# Vagrant instances requires this...
-# examples....(_eth1_|_enp0s8_)
-# es_network_publish_host: []
-
-es_network_tweaks:
-  - name: 'net.ipv4.tcp_keepalive_time'
-    state: present
-    value: '600'
-  - name: 'net.ipv4.tcp_keepalive_intvl'
-    state: present
-    value: '60'
-  - name: 'net.ipv4.tcp_keepalive_probes'
-    state: present
-    value: '3'
-
-es_nfs:
-  - mount: []
-    opts: 'defaults'
-    mountpoint: []
-
-# Define disk devices and mountpoint path if elasticsearch should be
-# configured to store data in different data paths
-es_path_data_info: []
-  # - disk: '/dev/sdc'
-  #   path: '{{ es_path_data_root }}/0'
-  # - disk: '/dev/sdd'
-  #   path: '{{ es_path_data_root }}/1'
-  # - disk: '/dev/sde'
-  #   path: '{{ es_path_data_root }}/2'
-  # - disk: '/dev/sdf'
-  #   path: '{{ es_path_data_root }}/3'
-  # - disk: '/dev/sdg'
-  #   path: '{{ es_path_data_root }}/4'
-  # - disk: '/dev/sdh'
-  #   path: '{{ es_path_data_root }}/5'
-
-# Defines root path for disks to be mounted if elasticsearch should be
-# configured to store data in different data paths
-es_path_data_root: '/es_data'
-
-# Define plugins to install
-# naming is strange due to the way plugins are listed after installed
-es_plugins:
-  - plugin: 'x-pack'
-    state: 'absent'
-es_port: '9200'
-
-# Defines the number of replicas per shard in cluster
-# default is 1
-es_replicas: '1'
-
-# Defines if lvm should be resized (If used)
-es_resize_lvm: false
-
-# Defines the number of primary shards per index
-# default is 5
-es_shards: '5'
-
-# Defines if installed plugins should be uninstalled
-# pass as cli var or other
-es_uninstall_plugins: false
-
-# Define LVM VG name if setting up lvm for elasticsearch data
-es_vgname: 'elasticsearch-vg'
-
-# Elasticsearch x-pack plugin settings
-es_xpack_graph_enabled: true
-es_xpack_monitoring_enabled: true
-es_xpack_reporting_enabled: true
-
-# https://github.com/elastic/kibana/issues/9369
-es_xpack_security_enabled: false
-
-es_xpack_watcher_enabled: true
-```
-
-Dependencies
-------------
+## Requirements
 
 None
 
-Example Playbook
-----------------
+## Role Variables
 
-```
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: ansible-elasticsearch
-  tasks:
-```
+[defaults/main.yml](defaults/main.yml)
 
-License
--------
+If you would like to add additional Elasticsearch parameters you only need to add
+them to the `elasticsearch_configuration:` section. These variables are added as
+YAML using the template. So there is no need to reconfigure the template either.
 
-BSD
+## Dependencies
 
-Author Information
-------------------
+None
+
+## Example Playbook
+
+[playbook.yml](playbook.yml)
+
+## License
+
+MIT
+
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://ansible.com>
-[Elasticsearch]: <https://www.elastic.co/>
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   mrlesmithjr [at] gmail.com

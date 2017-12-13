@@ -2,7 +2,7 @@
 - name: config_interfaces | Configuring Loopback Interfaces
   template:
     src: "etc/network/interfaces.d/int.cfg.j2"
-    dest: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    dest: "/etc/network/interfaces.d/{{ item.int|replace(':', '_') }}"
   register: "loopback_interfaces_configured"
   with_items: '{{ quagga_interfaces_lo }}'
   when: >
@@ -25,7 +25,7 @@
 
 - name: config_interfaces | Removing Loopback Interfaces (Un-Configured)
   file:
-    path: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    path: "/etc/network/interfaces.d/{{ item.int|replace(':', '_') }}"
     state: "absent"
   with_items: '{{ quagga_interfaces_lo }}'
   when: loopback_interfaces_shutdown.changed
@@ -33,7 +33,7 @@
 - name: config_interfaces | Configuring Interfaces
   template:
     src: "etc/network/interfaces.d/int.cfg.j2"
-    dest: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    dest: "/etc/network/interfaces.d/{{ item.int|replace(':', '_') }}"
   register: "interfaces_configured"
   with_items: '{{ quagga_interfaces }}'
   when: >
@@ -61,7 +61,7 @@
 
 - name: config_interfaces | Removing Interfaces (Un-Configured)
   file:
-    path: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    path: "/etc/network/interfaces.d/{{ item.int|replace(':', '_') }}"
     state: "absent"
   with_items: '{{ quagga_interfaces }}'
   when: >
@@ -72,7 +72,7 @@
 - name: config_interfaces | Configuring Bonded Interfaces
   template:
     src: "etc/network/interfaces.d/int.cfg.j2"
-    dest: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    dest: "/etc/network/interfaces.d/{{ item.int|replace(':', '_') }}"
   register: "bonded_interfaces_configured"
   with_items: '{{ quagga_interfaces_bonds }}'
   when: >
@@ -100,7 +100,7 @@
 
 - name: config_interfaces | Removing Bonded Interfaces (Un-Configured)
   file:
-    path: "/etc/network/interfaces.d/{{ item.int }}.cfg"
+    path: "/etc/network/interfaces.d/{{ item.int|replace(':', '_') }}"
     state: "absent"
   with_items: '{{ quagga_interfaces_bonds }}'
   when: >

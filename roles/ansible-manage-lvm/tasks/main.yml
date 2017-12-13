@@ -7,4 +7,6 @@
   when: ansible_os_family == "RedHat"
 
 - include: manage_lvm.yml
-  when: manage_lvm is defined and manage_lvm
+  when: >
+        manage_lvm and
+        lvm_groups is defined

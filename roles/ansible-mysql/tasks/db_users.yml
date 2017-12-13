@@ -1,0 +1,24 @@
+---
+- name: db_users | Managing Database Users
+  mysql_user:
+    name: "{{ item['name'] }}"
+    password: "{{ item['password'] }}"
+    state: "{{ item['state'] }}"
+  become: true
+  with_items: "{{ mysql_db_users }}"
+  when: item['privs'] is not defined
+
+- name: db_users | Managing Database Users
+  mysql_user:
+    append_privs: "{{ item[1]['append_privs']|default(omit) }}"
+    host: "{{ item[1]['host']|default(omit) }}"
+    name: "{{ item[0]['name'] }}"
+    password: "{{ item[0]['password'] }}"
+    priv: "{{ item[1]['db'] }}.{{ item[1]['table'] }}:{{ item[1]['priv'] }}"
+    state: "{{ item[0]['state'] }}"
+  become: true
+  with_subelements:
+    - "{{ mysql_db_users }}"
+    - privs
+  when: >
+        item[1] is defined

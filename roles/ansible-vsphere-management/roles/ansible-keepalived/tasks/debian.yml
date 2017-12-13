@@ -1,0 +1,16 @@
+---
+- name: debian_keepalived | installing packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'keepalived'
+
+- name: debian_keepalived | allowing VIP to come up on both nodes
+  sysctl:
+    name: "net.ipv4.ip_nonlocal_bind"
+    value: 1
+    state: "present"
+    reload: yes
+  become: true

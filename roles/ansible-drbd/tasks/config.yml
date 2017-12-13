@@ -1,0 +1,91 @@
+---
+- name: config | Configuring DRBD
+  template:
+    src: etc/drbd.d/global_common.conf.j2
+    dest: /etc/drbd.d/global_common.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: config | Loading DRBD Kernel Module
+  modprobe:
+    name: drbd
+    state: present
+  become: true
+
+- name: config | Checking DRBD Mirror Devices Creation Status
+  stat:
+    path: "/etc/drbd.d/.{{ item['resource'] }}.created"
+  register: _drbd_mirror_device_creation_status
+  with_items: "{{ drbd_disks }}"
+
+- name: config | Creating DRBD Mirror Devices
+  command: drbdadm create-md {{ item['item']['resource'] }}
+  become: true
+  register: _drbd_mirror_device_created
+  with_items: "{{ _drbd_mirror_device_creation_status['results'] }}"
+  when: not item['stat']['exists']
+
+- name: config | Marking DRDB Mirror Devices Created
+  file:
+    path: "/etc/drbd.d/.{{ item['item']['item']['resource'] }}.created"
+    state: touch
+  become: true
+  with_items: "{{ _drbd_mirror_device_created['results'] }}"
+  when: item['changed']
+
+- name: config | Bringing DRBD Mirror Devices Up
+  command: drbdadm up {{ item['resource'] }}
+  become: true
+  register: _drbd_mirror_device_up
+  with_items: "{{ drbd_disks}}"
+  when: >
+        _drbd_mirror_device_created['changed']
+
+- name: config | Defining DRBD Primary
+  command: drbdadm -- --overwrite-data-of-peer primary {{ item['resource'] }}/0
+  become: true
+  register: _drbd_primary
+  with_items: "{{ drbd_disks }}"
+  when: >
+        _drbd_mirror_device_up['changed'] and
+        inventory_hostname == groups[drbd_group][0]
+
+- name: config | Waiting For DRBD Sync To Complete
+  command: drbd-overview
+  become: true
+  register: _drbd_sync
+  until: ('Inconsistent' not in _drbd_sync['stdout'])
+  retries: 100
+  delay: 30
+  when: >
+        _drbd_primary['changed'] and
+        inventory_hostname == groups[drbd_group][0]
+
+- name: config | Partitioning DRBD Device
+  filesystem:
+    fstype: "{{ item['filesystem'] }}"
+    dev: "{{ item['device'] }}"
+  become: true
+  with_items: "{{ drbd_disks }}"
+  when: >
+        inventory_hostname == groups[drbd_group][0] and
+        _drbd_sync['changed']
+
+- name: config | Creating DRBD Mountpoint
+  file:
+    path: "{{ item['mountpoint'] }}"
+    state: directory
+  become: true
+  with_items: "{{ drbd_disks }}"
+
+- name: config | Updating /etc/fstab Mounts
+  mount:
+    path: "{{ item['mountpoint'] }}"
+    src: "{{ item['device'] }}"
+    fstype: "{{ item['filesystem'] }}"
+    state: present
+  become: true
+  with_items: "{{ drbd_disks }}"

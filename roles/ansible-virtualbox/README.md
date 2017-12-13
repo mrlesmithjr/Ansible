@@ -1,38 +1,65 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-A brief description of the role goes here.
+- [ansible-virtualbox](#ansible-virtualbox)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Requirements
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+# ansible-virtualbox
 
-Role Variables
---------------
+An [Ansible](https://www.ansible.com) role to install [Virtualbox](https://www.virtualbox.org/)
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Requirements
 
-Dependencies
-------------
+None
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Role Variables
 
-Example Playbook
-----------------
+```yaml
+---
+# defaults file for ansible-virtualbox
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+virtualbox_build_ver: 115126
+virtualbox_debian_package: 'virtualbox-{{ virtualbox_major_ver }}_{{ virtualbox_minor_ver }}-{{ virtualbox_build_ver }}~{{ ansible_distribution }}~{{ ansible_distribution_release|lower }}_amd64.deb'
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+virtualbox_dl_url: 'http://download.virtualbox.org/virtualbox/{{ virtualbox_minor_ver }}'
 
-License
--------
+virtualbox_ext_pack: 'Oracle_VM_VirtualBox_Extension_Pack-{{ virtualbox_minor_ver }}-{{ virtualbox_build_ver }}.vbox-extpack'
+virtualbox_ext_pack_license_agreement: '715c7246dc0f779ceab39446812362b2f9bf64a55ed5d3a905f053cfab36da9e'
+virtualbox_major_ver: 5.1
+virtualbox_minor_ver: 5.1.22
+```
 
-BSD
+## Dependencies
 
-Author Information
-------------------
+None
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+## Example Playbook
+
+```yaml
+---
+- hosts: all
+  vars:
+  roles:
+    - role: ansible-virtualbox
+  tasks:
+```
+
+## License
+
+MIT
+
+## Author Information
+
+Larry Smith Jr.
+
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   mrlesmithjr [at] gmail.com

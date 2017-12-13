@@ -1,0 +1,14 @@
+---
+- name: redhat | Installing Telegraf
+  yum:
+    name: "{{ telegraf_dl_uri }}/{{ telegraf_redhat_file }}"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Telegraf
+  dnf:
+    name: "{{ telegraf_dl_uri }}/{{ telegraf_redhat_file }}"
+    state: "present"
+  become: true
+  when: ansible_distribution == "Fedora"

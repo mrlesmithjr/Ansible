@@ -1,0 +1,49 @@
+{% if es_cluster_name is defined %}
+cluster.name: {{ es_cluster_name }}
+{% if es_replicas is defined and es_major_version != "5.x" %}
+index.number_of_replicas: {{ es_replicas }}
+{% endif %}
+{% if es_shards is defined and es_major_version != "5.x" %}
+index.number_of_shards: {{ es_shards }}
+{% endif %}
+{% endif %}
+{% if es_data_node is defined %}
+node.data: {{ es_data_node|lower }}
+{% endif %}
+{% if es_master_node is defined %}
+node.master: {{ es_master_node|lower }}
+{% endif %}
+node.name: {{ ansible_hostname }}
+{% if es_major_version != "5.x" %}
+bootstrap.mlockall: true
+{% endif %}
+{% if es_network_publish_host is defined %}
+network.publish_host: {{ es_network_publish_host }}
+{% endif %}
+{% if es_cluster_setup is defined and es_cluster_setup %}
+discovery.zen.minimum_master_nodes: {{ ( groups[es_config_master_group]|count /2 ) | round (0, 'ceil') | int }}
+{% endif %}
+{% if es_memory_tuning is defined %}
+{%   for item in es_memory_tuning %}
+{%     if item.set %}
+{{ item.name }}: {{ item.value }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if (es_allow_remote_connections is defined and es_allow_remote_connections) %}
+network.host: 0.0.0.0
+{% endif %}
+{% if es_config_unicast is defined and es_config_unicast %}
+discovery.zen.ping.unicast.hosts: [{% for host in groups[es_config_unicast_group] %}"{{ host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endif %}
+{% if es_config_path_data %}
+path.data: [{% for item in es_path_data_info %}"{{ item.path }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+
+{% endif %}
+{% if es_xpack_plugin_installed %}
+xpack.security.enabled: {{ es_xpack_security_enabled|lower }}
+xpack.monitoring.enabled: {{ es_xpack_monitoring_enabled|lower }}
+#xpack.graph.enabled: {{ es_xpack_graph_enabled|lower }}
+#xpack.watcher.enabled: {{ es_xpack_watcher_enabled|lower }}
+#xpack.reporting.enabled: {{ es_xpack_reporting_enabled|lower }}
+{% endif %}

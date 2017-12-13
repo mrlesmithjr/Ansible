@@ -1,0 +1,8 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/glance-install.html
+
+- name: debian | Installing Glance
+  apt:
+    name: "glance"
+    state: "present"
+  become: true

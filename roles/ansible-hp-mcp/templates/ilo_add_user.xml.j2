@@ -1,0 +1,36 @@
+<RIBCL VERSION="2.0">
+  <LOGIN USER_LOGIN="adminname" PASSWORD="password">
+    <USER_INFO MODE="write">
+      <ADD_USER
+        USER_NAME="{{ item['item']['user_name'] }}"
+        USER_LOGIN="{{ item['item']['user_name'] }}"
+        PASSWORD="{{ item['item']['password'] }}">
+{%     if item['item']['admin_priv'] %}
+        <ADMIN_PRIV VALUE="Yes"/>
+{%     elif not item['item']['admin_priv'] %}
+        <ADMIN_PRIV VALUE="No"/>
+{%     endif %}
+{%     if item['item']['remote_cons_priv'] %}
+        <REMOTE_CONS_PRIV VALUE="Yes"/>
+{%     elif not item['item']['remote_cons_priv'] %}
+        <REMOTE_CONS_PRIV VALUE="No"/>
+{%     endif %}
+{%     if item['item']['reset_server_priv'] %}
+        <RESET_SERVER_PRIV VALUE="Yes"/>
+{%     elif not item['item']['reset_server_priv'] %}
+        <RESET_SERVER_PRIV VALUE="No"/>
+{%     endif %}
+{%     if item['item']['virtual_media_priv'] %}
+        <VIRTUAL_MEDIA_PRIV VALUE="Yes"/>
+{%     elif not item['item']['virtual_media_priv'] %}
+        <VIRTUAL_MEDIA_PRIV VALUE="No"/>
+{%     endif %}
+{%     if item['item']['config_ilo_priv'] %}
+        <CONFIG_ILO_PRIV VALUE="Yes"/>
+{%     elif not item['item']['config_ilo_priv'] %}
+        <CONFIG_ILO_PRIV VALUE="No"/>
+{%     endif %}
+      </ADD_USER>
+    </USER_INFO>
+  </LOGIN>
+</RIBCL>

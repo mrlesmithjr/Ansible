@@ -1,0 +1,10 @@
+---
+_ssh_keys_distribution:
+{% for host in play_hosts %}
+  - host: '{{ host }}'
+    keys:
+{%   for _keys in hostvars[host]['_ssh_pub_key']['results'] %}
+      - user: '{{ _keys['item'] }}'
+        key: '{{ _keys['stdout'] }}'
+{%   endfor %}
+{% endfor %}

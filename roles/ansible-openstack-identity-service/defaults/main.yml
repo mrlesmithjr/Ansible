@@ -1,0 +1,56 @@
+---
+# defaults file for ansible-openstack-identity-service
+
+# Defines the default OpenStack admin user info
+# Generate password with:
+# openssl rand -hex 10
+openstack_identity_service_admin_info:
+  pass: '{{ openstack_identity_service_admin_pass }}'
+  user: 'admin'
+  admin_url: '{{ openstack_identity_service_keystone_endpoint_url }}:35357/v3/'
+  internal_url: '{{ openstack_identity_service_keystone_endpoint_url }}:5000/v3/'
+  public_url: '{{ openstack_identity_service_keystone_endpoint_url }}:5000/v3/'
+  region_id: 'RegionOne'
+
+# Define admin pass
+openstack_identity_service_admin_pass: []
+
+# HA info
+## Define as true if using HA
+openstack_identity_service_ha: false
+
+## Define IP addresses for each
+openstack_identity_service_ha_admin_bind_host: '{{ openstack_identity_service_management_ip }}'
+openstack_identity_service_ha_bind_host: '{{ openstack_identity_service_management_ip }}'
+openstack_identity_service_ha_public_bind_host: '{{ openstack_identity_service_management_ip }}'
+
+## Define host which should be identified as HA master
+openstack_identity_service_ha_master: 'controller01'
+
+# Defines Keystone DB info
+openstack_identity_service_keystone_db_info:
+  db: 'keystone'
+  pass: 'keystone'
+  host: 'localhost'
+  user: 'keystone'
+
+# Defines the default Keystone endpoint url
+# Do not append the port or api version
+openstack_identity_service_keystone_endpoint_url: 'http://{{ inventory_hostname }}'
+
+# Management IP Info
+openstack_identity_service_management_interface: 'enp0s8'
+openstack_identity_service_management_ip: "{{ hostvars[inventory_hostname]['ansible_'+openstack_compute_service_compute_management_interface]['ipv4']['address'] }}"
+
+# RabbitMQ Connection Info
+openstack_identity_service_rabbit_hosts:
+  - 127.0.0.1
+openstack_identity_service_rabbit_pass: 'openstack'
+openstack_identity_service_rabbit_user: 'openstack'
+
+# https://docs.openstack.org/ocata/config-reference/identity/token-provider.html
+#
+# uuid/fernet
+#
+# TODO: Implement fernet keys
+openstack_identity_service_token_provider: 'uuid'

@@ -1,9 +1,10 @@
 ---
 - name: config | Configuring Cassandra
   template:
-    src: "etc/cassandra/cassandra.yaml.j2"
-    dest: "{{ cassandra_root_dir }}/cassandra.yaml"
-    owner: "root"
-    group: "root"
+    src: etc/cassandra/cassandra.yaml.j2
+    dest: "{{ cassandra['root_dir'] }}/cassandra.yaml"
+    owner: root
+    group: root
     mode: 0644
-  notify: "restart cassandra"
+  become: true
+  notify: restart cassandra

@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to apply [Windows](https://www.microsoft.com/en-us/windows) updates.
+
+  license: license (MIT)
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+    - system
+    - security
+
+dependencies: []

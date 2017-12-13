@@ -1,0 +1,28 @@
+---
+# Define admin pass
+openstack_identity_service_admin_pass: '{{ openstack_admin_pass }}'
+
+# HA info
+## Define as true if using HA
+openstack_identity_service_ha: '{{ openstack_ha }}'
+## Define host which should be identified as HA master
+openstack_identity_service_ha_master: '{{ groups[openstack_controllers_group][0] }}'
+
+# Defines Keystone DB info
+openstack_identity_service_keystone_db_info:
+  db: 'keystone'
+  pass: '{{ openstack_keystone_db_pass }}'
+  host: '{{ openstack_vip }}'
+  user: 'keystone'
+
+# Defines the default Keystone endpoint url
+# Do not append the port or api version
+openstack_identity_service_keystone_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+
+# Management IP Info
+openstack_identity_service_management_interface: '{{ openstack_management_interface }}'
+openstack_identity_service_management_ip: '{{ openstack_management_ip }}'
+
+# RabbitMQ Connection Info
+openstack_identity_service_rabbit_hosts: '{{ groups[openstack_controllers_group] }}'
+openstack_identity_service_rabbit_pass: '{{ openstack_rabbit_pass }}'

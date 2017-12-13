@@ -1,0 +1,7 @@
+---
+- name: debian | Installing Guacamole Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ guacamole_debian_pre_reqs }}"

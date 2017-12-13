@@ -1,0 +1,43 @@
+---
+- hosts: test_nodes
+  vars:
+    apache2_config: true
+    apache2_config_php: true
+    apache2_config_virtual_hosts: true
+    apache2_install_php: true
+    apache2_virtual_hosts:
+      - documentroot: /var/www/html/opencart
+        default_site: true
+        port: 80
+        serveradmin: "{{ apache2_server_admin }}"
+        servername: ""
+    php_debian_packages:
+      - "libapache2-mod-php{{ php_version_debian }}"
+      - "php{{ php_version_debian }}"
+      - "php{{ php_version_debian }}-cli"
+      - "php{{ php_version_debian }}-cgi"
+      - "php{{ php_version_debian }}-curl"
+      - "php{{ php_version_debian }}-gd"
+      - "php{{ php_version_debian }}-json"
+      - "php{{ php_version_debian }}-ldap"
+      - "php{{ php_version_debian }}-mcrypt"
+      - "php{{ php_version_debian }}-mysql"
+      - "php{{ php_version_debian }}-zip"
+    php_redhat_packages:
+      - php
+      - php-cli
+      - php-curl
+      - php-gd
+      - php-json
+      - php-ldap
+      - php-mcrypt
+      - php-mysql
+      - php-zip
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-mysql
+    - role: ansible-apache2
+    - role: ansible-php
+      become: true
+    - role: ansible-opencart
+  tasks:

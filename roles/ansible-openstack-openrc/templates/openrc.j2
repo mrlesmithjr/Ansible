@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+
+export OS_AUTH_URL={{ item['auth_url'] }}
+export OS_ENDPOINT_TYPE={{ item['endpoint_type'] }}
+export OS_IDENTITY_API_VERSION={{ item['identity_api_version'] }}
+export OS_INTERFACE={{ item['interface'] }}
+export OS_PASSWORD={{ item['password'] }}
+export OS_PROJECT_DOMAIN_NAME={{ item['project_domain_name'] }}
+export OS_PROJECT_NAME={{ item['project_name'] }}
+export OS_REGION_NAME={{ item['region_name'] }}
+export OS_TENANT_NAME={{ item['tenant_name'] }}
+export OS_USER_DOMAIN_NAME={{ item['user_domain_name'] }}
+export OS_USERNAME={{ item['username'] }}

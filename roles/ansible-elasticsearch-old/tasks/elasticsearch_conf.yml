@@ -1,0 +1,52 @@
+---
+- name: elasticsearch_conf | configuring elasticsearch
+  template:
+    src: etc/elasticsearch/elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0750
+  become: true
+  register: "_es_configured"
+  notify: restart elasticsearch
+
+- name: elasticsearch_conf | configuring elasticsearch service
+  template:
+    src: etc/default/elasticsearch.j2
+    dest: /etc/default/elasticsearch
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  register: "_es_service_configured"
+  notify: restart elasticsearch
+
+- name: elasticsearch_conf | setting permissions on directories (if using data paths)
+  file:
+    path: "{{ es_path_data_root }}"
+    owner: "elasticsearch"
+    group: "elasticsearch"
+    mode: 0775
+    recurse: yes
+    state: directory
+  become: true
+
+- name: elasticsearch_conf | Setting vm.max_map_count
+  sysctl:
+    name: "vm.max_map_count"
+    value: "262144"
+    state: "present"
+  notify: "restart elasticsearch"
+  become: true
+
+# We need to do this here in order to apply specifically memory constraints
+# to allow further configurations and etc. to not run out of memory when host is
+# low on memory resources
+- name: elasticsearch_conf | Restarting Elasticsearch
+  service:
+    name: "elasticsearch"
+    state: "restarted"
+  become: true
+  when: >
+        _es_configured['changed'] or
+        _es_service_configured['changed']

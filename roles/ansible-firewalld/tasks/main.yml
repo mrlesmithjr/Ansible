@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-firewalld
+# Does not work for Debian at this time
+# - include: debian.yml
+#   when: ansible_os_family == "Debian"
+
+- block:
+
+    - include: redhat.yml
+
+    - include: custom_zones.yml
+      when: firewalld_custom_zones is defined
+
+    - include: zones.yml
+      when: firewalld_zones is defined
+
+    - include: rules.yml
+      when: firewalld_rules is defined
+
+  when: ansible_os_family == "RedHat"

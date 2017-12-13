@@ -1,0 +1,41 @@
+---
+
+# Defines Neutron DB info
+openstack_networking_service_controller_db_info:
+  db: 'neutron'
+  user: 'neutron'
+  pass: '{{ openstack_neutron_db_pass }}'
+  host: '{{ openstack_vip }}'
+
+# HA info
+## Define as true if using HA
+openstack_networking_service_controller_ha: '{{ openstack_ha }}'
+## Define host which should be identified as HA master
+openstack_networking_service_controller_ha_master: '{{ groups[openstack_controllers_group][0] }}'
+
+# Defines the default Keystone endpoint url
+# Do not append the port or api version
+openstack_networking_service_controller_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+
+# Management IP Info
+openstack_networking_service_controller_management_interface: '{{ openstack_management_interface }}'
+openstack_networking_service_controller_management_ip: '{{ openstack_management_ip }}'
+
+# Define memcached servers
+openstack_networking_service_controller_memcached_servers: '{{ groups[openstack_controllers_group] }}'
+
+# Define a suitable secret for the metadata proxy.
+openstack_networking_service_controller_metadata_secret: '{{ openstack_metadata_secret }}'
+
+# Define the metadata host
+openstack_networking_service_controller_nova_metadata_ip: '{{ openstack_vip }}'
+
+# Neutron info
+openstack_networking_service_controller_neutron_user_pass: '{{ openstack_neutron_pass }}'
+
+# Nova info
+openstack_networking_service_controller_nova_user_pass: '{{ openstack_nova_pass }}'
+
+# RabbitMQ Connection Info
+openstack_networking_service_controller_rabbit_hosts: '{{ groups[openstack_controllers_group] }}'
+openstack_networking_service_controller_rabbit_pass: '{{ openstack_rabbit_pass }}'

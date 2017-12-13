@@ -1,0 +1,5 @@
+---
+- src: https://www.github.com/mrlesmithjr/ansible-apache2
+- src: https://www.github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://www.github.com/mrlesmithjr/ansible-mysql
+- src: https://www.github.com/mrlesmithjr/ansible-php

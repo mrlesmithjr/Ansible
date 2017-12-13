@@ -1,0 +1,64 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Creating vsphere_ddi_vms Dynamic Group
+      add_host:
+        groups: vsphere_ddi_vms
+        hostname: "{{ item['vm_name'] }}"
+        cpus: "{{ item['cpus'] }}"
+        datastore: "{{ item['datastore'] }}"
+        ip: "{{ item['ip']|default(omit) }}"
+        gateway: "{{ item['gateway']|default(omit) }}"
+        memory_mb: "{{ item['memory_mb'] }}"
+        netmask: "{{ item['netmask']|default(omit) }}"
+        netmask_cidr: "{{ item['netmask_cidr']|default(omit) }}"
+        network_name: "{{ item['network_name'] }}"
+        vapp_source_path: "{{ item['vapp_source_path'] }}"
+      changed_when: false
+      # tags:
+      #   - vsphere_ddi_vms_info
+      with_items: "{{ vsphere_ddi_vms }}"
+      when: item['deploy']
+
+- hosts: vsphere_ddi_vms:!vsphere_destroy_vms
+  tasks:
+    - name: Gathering Info
+      setup:
+      register: _vsphere_ddi_vms_info
+      # tags:
+      #   - vsphere_ddi_vms_info
+
+    - name: Updating Inventory For vsphere_ddi_vms
+      template:
+        src: ../templates/ddi_vms.inv.j2
+        dest: "{{ vsphere_ddi_vms_inventory_file }}"
+      become: false
+      delegate_to: localhost
+      # tags:
+      #   - vsphere_ddi_vms_info
+
+- hosts: vsphere_ddi_vms:!vsphere_destroy_vms
+  roles:
+    - role: ansible-config-interfaces
+    - role: ansible-change-hostname
+    - role: ansible-etc-hosts
+    - role: ansible-sshd
+      become: true
+    - role: ansible-ntp
+    - role: ansible-rsyslog
+      become: true
+    - role: ansible-mariadb-galera-cluster
+    - role: ansible-powerdns-authoritative
+    - role: ansible-powerdns-recursor
+    - role: ansible-apache2
+    - role: ansible-phpipam
+      become: true
+
+- hosts: vsphere_dhcp_vms:!vsphere_destroy_vms
+  roles:
+    - role: ansible-isc-dhcp
+      become: true
+      tags:
+        - vsphere_dhcp

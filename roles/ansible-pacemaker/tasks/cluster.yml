@@ -1,0 +1,110 @@
+---
+- name: cluster | Capturing Cluster Properties
+  command: "pcs property show"
+  become: true
+  register: "_pcs_property_show"
+  changed_when: false
+
+- name: cluster | Capturing Cluster Resources
+  command: "pcs resource show --full"
+  become: true
+  register: "_pcs_resource_show"
+  changed_when: false
+
+- name: cluster | Capturing Cluster Constraints
+  command: "pcs constraint show --full"
+  become: true
+  register: "_pcs_constraint_show"
+  changed_when: false
+
+- name: cluster | Setting Stonith
+  command: >
+           pcs property set stonith-enabled=false
+  become: true
+  when: >
+        pacemaker_disable_stonith and
+        ('stonith-enabled: false' not in _pcs_property_show['stdout']) and
+        (inventory_hostname == pacemaker_primary_server)
+
+- name: cluster | Setting Cluster Settings
+  command: >
+           pcs property set {{ item['property'] }}={{ item['value'] }}
+  become: true
+  with_items: '{{ pacemaker_cluster_settings }}'
+  when: >
+        pacemaker_cluster_settings is defined and
+        (inventory_hostname == pacemaker_primary_server) and
+        ("{{ item['property'] }}: {{ item['value'] }}" not in _pcs_property_show['stdout'])
+
+- name: cluster | Creating Cluster Resources
+  command: >
+           pcs resource create {{ item['resource_id'] }}
+           {{ item['provider'] }} {{ item['options']|join(' ') }}
+           {% if item['op'] is defined %}op {{ item['op'] }}{% endif %}
+           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
+  become: true
+  with_items: '{{ pacemaker_cluster_resources }}'
+  when: >
+        (pacemaker_cluster_resources is defined and
+        inventory_hostname == pacemaker_primary_server) and
+        (item['options'] is defined and
+        (item['resource_id'] not in _pcs_resource_show['stdout'] and
+        item['options']|join(' ') not in _pcs_resource_show['stdout'])) and
+        item['action']|lower == 'create'
+
+- name: cluster | Creating Cluster Resources
+  command: >
+           pcs resource create {{ item['resource_id'] }}
+           {{ item['provider'] }}
+           {% if item['op'] is defined %}op {{ item['op'] }}{% endif %}
+           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
+  become: true
+  with_items: '{{ pacemaker_cluster_resources }}'
+  when: >
+        pacemaker_cluster_resources is defined and
+        (inventory_hostname == pacemaker_primary_server) and
+        item['options'] is not defined and
+        (item['resource_id'] not in _pcs_resource_show['stdout'] and
+        item['action']|lower == 'create')
+
+- name: cluster | Adding Cluster colocation Constraints
+  command: >
+           pcs constraint colocation add
+           {% if item['source_resource_id'] is defined %}
+           {{ item['source_resource_id'] }}
+           {% endif %}
+           {% if item['target_resource_id'] is defined %}
+           {{ item['target_resource_id'] }}
+           {% endif %}
+           {{ item['score']|default('INFINITY') }}
+  become: true
+  with_items: '{{ pacemaker_cluster_constraints }}'
+  when: >
+        pacemaker_cluster_constraints is defined and
+        (inventory_hostname == pacemaker_primary_server) and
+        (((item['action'] is defined and
+        item['action']|lower == 'add') and
+        item['constraint']|lower == 'colocation') and
+        (item['source_resource_id'] and
+        item['target_resource_id'] not in _pcs_constraint_show['stdout']))
+
+- name: cluster | Cluster order Constraints
+  command: >
+           pcs constraint order
+           {{ item['order']['first_resource_action'] }}
+           {{ item['order']['first_resource'] }}
+           then
+           {% if item['order']['second_resource_action'] is defined %}
+           {{ item['order']['second_resource_action'] }}
+           {% endif %}
+           {{ item['order']['second_resource'] }}
+           {% if item['op_options'] is defined %}{{ item['op_options']|join(' ') }}{% endif %}
+  become: true
+  with_items: '{{ pacemaker_cluster_constraints }}'
+  when: >
+        pacemaker_cluster_constraints is defined and
+        (inventory_hostname == pacemaker_primary_server) and
+        ((item['constraint']|lower == 'order') and
+        item['order'] is defined) and
+        ((item['second_resource_action'] is defined and item['order']['first_resource_action']+" "+item['order']['first_resource']+" then "+item['order']['second_resource_action']+" "+item['order']['second_resource'] not in _pcs_constraint_show['stdout']) or
+        (item['second_resource_action'] is not defined and item['order']['first_resource_action']+" "+item['order']['first_resource'] and item['order']['second_resource'] not in _pcs_constraint_show['stdout']))

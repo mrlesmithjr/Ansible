@@ -1,0 +1,31 @@
+---
+# tasks file for ansible-openstack-image-service
+# https://docs.openstack.org/ocata/install-guide-ubuntu/common/get-started-image-service.html
+
+# We need to flush handlers here in order to restart any previously configured
+# services such as MySQL configrurations. rabbitmq, memcached
+#
+- meta: flush_handlers
+  tags:
+    - 'openstack_image_service'
+
+- include: db.yml
+  tags:
+    - 'openstack_image_service'
+
+- include: users.yml
+  tags:
+    - 'openstack_image_service'
+
+- include: services.yml
+  tags:
+    - 'openstack_image_service'
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - 'openstack_image_service'
+
+- include: config.yml
+  tags:
+    - 'openstack_image_service'

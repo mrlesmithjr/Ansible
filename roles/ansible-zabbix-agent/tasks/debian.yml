@@ -5,9 +5,18 @@
     state: "present"
   become: true
   register: "package_added"
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '<=', strict=true)
 
 - name: debian | updating apt-cache (If zabbix package added)
   apt:
     update_cache: true
   become: true
   when: package_added['changed']
+
+- name: debian | installing agent package
+  apt:
+    name: "zabbix-agent"
+    state: "present"
+  become: true

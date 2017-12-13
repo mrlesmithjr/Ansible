@@ -1,0 +1,126 @@
+---
+- name: destroy_vms | Creating Dynamic Group vsphere_do_not_destroy_vms
+  add_host:
+    groups: vsphere_do_not_destroy_vms
+    hostname: "{{ item['vm_name'] }}"
+  changed_when: false
+  tags:
+    - vsphere_destroy_vms_check
+  with_items: "{{ vsphere_vm_services_groups }}"
+  when: >
+        item is defined and
+        (item['deploy'] is defined and
+        item['deploy'])
+
+- name: destroy_vms | Creating Dynamic Group vsphere_destroy_vms
+  add_host:
+    groups: vsphere_destroy_vms
+    hostname: "{{ hostvars[item['vm_name']]['inventory_hostname'] }}"
+    hw_product_uuid: "{{ hostvars[item['vm_name']]['hw_product_uuid'] }}"
+  changed_when: false
+  tags:
+    - vsphere_destroy_vms_check
+  with_items: "{{ vsphere_vm_services_groups }}"
+  when: >
+        item is defined and
+        (hostvars[item['vm_name']] is defined and
+        hostvars[item['vm_name']]['hw_product_uuid'] is defined and
+        (item['deploy'] is defined and
+        not item['deploy']))
+
+- name: destroy_vms | Displaying VMs To Be Destroyed
+  debug: msg="The following VMs are about to be destroyed {{ groups['vsphere_destroy_vms'] }}"
+  when: groups['vsphere_destroy_vms'] is defined
+
+- name: destroy_vms | Checking State Of VMs And Powering Off If Currently Powered On
+  vmware_guest:
+    hostname: "{{ hostvars[item[1]]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    name: "{{ hostvars[item[0]]['inventory_hostname'] }}"
+    uuid: "{{ hostvars[item[0]]['hw_product_uuid'] }}"
+    state: poweredoff
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  register: _vsphere_destroy_vms_state_check
+  # We allow failed here because the VM may not reside on the host being checked
+  failed_when: false
+  with_nested:
+    - "{{ groups['vsphere_destroy_vms'] }}"
+    - "{{ groups['vsphere_hosts'] }}"
+  when: >
+        vsphere_destroy_vms and
+        groups['vsphere_destroy_vms'] is defined and
+        not _vsphere_vcenter_available
+
+- name: destroy_vms | Checking State Of VMs And Powering Off If Currently Powered On
+  vmware_guest:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    name: "{{ hostvars[item]['inventory_hostname'] }}"
+    uuid: "{{ hostvars[item]['hw_product_uuid'] }}"
+    state: poweredoff
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  register: _vsphere_destroy_vms_state_check
+  failed_when: >
+               _vsphere_destroy_vms_state_check['msg'] is defined and
+               ('current state (Powered on)' in _vsphere_destroy_vms_state_check['msg'])
+  with_items: "{{ groups['vsphere_destroy_vms'] }}"
+  when: >
+        vsphere_destroy_vms and
+        groups['vsphere_destroy_vms'] is defined and
+        _vsphere_vcenter_available
+
+- name: destroy_vms | Destroy All VMs
+  vmware_guest:
+    hostname: "{{ hostvars[item[1]]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    name: "{{ hostvars[item[0]]['inventory_hostname'] }}"
+    uuid: "{{ hostvars[item[0]]['hw_product_uuid'] }}"
+    state: absent
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  register: _vsphere_destroy_vms
+  failed_when: >
+               _vsphere_destroy_vms['msg'] is defined and
+               ('current state (Powered on)' in _vsphere_destroy_vms['msg'])
+  with_nested:
+    - "{{ groups['vsphere_destroy_vms'] }}"
+    - "{{ groups['vsphere_hosts'] }}"
+  when: >
+        vsphere_destroy_vms and
+        groups['vsphere_destroy_vms'] is defined and
+        not _vsphere_vcenter_available
+
+- name: destroy_vms | Destroy All VMs
+  vmware_guest:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    name: "{{ hostvars[item]['inventory_hostname'] }}"
+    uuid: "{{ hostvars[item]['hw_product_uuid'] }}"
+    state: absent
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  register: _vsphere_destroy_vms
+  failed_when: >
+               _vsphere_destroy_vms['msg'] is defined and
+               ('current state (Powered on)' in _vsphere_destroy_vms['msg'])
+  with_items: "{{ groups['vsphere_destroy_vms'] }}"
+  when: >
+        vsphere_destroy_vms and
+        groups['vsphere_destroy_vms'] is defined and
+        _vsphere_vcenter_available
+
+- name: destroy_vms | Creating Inventory For vsphere_destroy_vms
+  template:
+    src: destroy_vms.inv.j2
+    dest: "{{ vsphere_destroy_vms_inventory_file }}"
+  become: false
+  delegate_to: localhost
+  tags:
+    - vsphere_destroy_vms_check
+  when: vsphere_vms_generate_inventory

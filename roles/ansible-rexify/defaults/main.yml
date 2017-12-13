@@ -1,0 +1,10 @@
+---
+# defaults file for ansible-rexify
+rexify_debian_pre_reqs:
+  - 'apt-transport-https'
+
+rexify_debian_repo_info:
+  key: '{{ rexify_repo_url }}/DPKG-GPG-KEY-REXIFY-REPO'
+  repo: 'deb {{ rexify_repo_url }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} rex'
+
+rexify_repo_url: 'https://rex.linux-files.org'

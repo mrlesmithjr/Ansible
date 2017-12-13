@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Creating vsphere_lb_vms Dynamic Group
+      add_host:
+        groups: vsphere_lb_vms
+        hostname: "{{ item['vm_name'] }}"
+        cpus: "{{ item['cpus'] }}"
+        datastore: "{{ item['datastore'] }}"
+        ip: "{{ item['ip']|default(omit) }}"
+        gateway: "{{ item['gateway']|default(omit) }}"
+        memory_mb: "{{ item['memory_mb'] }}"
+        netmask: "{{ item['netmask']|default(omit) }}"
+        netmask_cidr: "{{ item['netmask_cidr']|default(omit) }}"
+        network_name: "{{ item['network_name'] }}"
+        vapp_source_path: "{{ item['vapp_source_path'] }}"
+      changed_when: false
+      with_items: "{{ vsphere_lb_vms }}"
+      when: item['deploy']
+
+- hosts: vsphere_lb_vms:!vsphere_destroy_vms
+  tasks:
+    - name: Gathering Info
+      setup:
+      register: _vsphere_lb_vms_info
+      # tags:
+      #   - vsphere_lb_vms_info
+
+    - name: Updating Inventory For vsphere_lb_vms
+      template:
+        src: ../templates/lb_vms.inv.j2
+        dest: "{{ vsphere_lb_vms_inventory_file }}"
+      become: false
+      delegate_to: localhost
+      # tags:
+      #   - vsphere_lb_vms_info
+
+- hosts: vsphere_ddi_vms:vsphere_lb_vms:!vsphere_destroy_vms
+  roles:
+    - role: ansible-etc-hosts
+
+- hosts: vsphere_lb_vms:!vsphere_destroy_vms
+  roles:
+    - role: ansible-config-interfaces
+    - role: ansible-change-hostname
+    - role: ansible-sshd
+      become: true
+    - role: ansible-keepalived
+    - role: ansible-haproxy
+    - role: ansible-ntp
+    - role: ansible-rsyslog
+      become: true

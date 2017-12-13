@@ -1,0 +1,11 @@
+---
+# tasks file for ansible-nfs-server
+- include: set-facts.yml
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config.yml

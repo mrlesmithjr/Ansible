@@ -1,0 +1,12 @@
+---
+- name: alpine | Installing Apache2
+  apk:
+    name: "apache2"
+    state: "present"
+  become: true
+
+- name: alpine | Ensuring Apache2 Service Is Started And Enabled On Boot
+  service:
+    name: "apache2"
+    state: "started"
+    enabled: true

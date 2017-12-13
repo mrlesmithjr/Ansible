@@ -1,0 +1,30 @@
+---
+- name: storage | Capturing controller config details
+  command: "hpssacli ctrl all show config detail"
+  become: true
+  register: "_hp_mcp_controller_config_detail"
+  changed_when: false
+
+- name: storage | Capturing controller status
+  command: "hpssacli ctrl all show status"
+  become: true
+  register: "_hp_mcp_controller_status"
+  changed_when: false
+
+- name: storage | Capturing controller detail
+  command: "hpssacli ctrl all show detail"
+  become: true
+  register: "_hp_mcp_controller_detail"
+  changed_when: false
+
+- name: storage | Capturing physicaldisk details
+  shell: hpssacli ctrl slot=0 pd all show detail |grep -v "Native Block Size" | grep  -E "physicaldrive|Drive Type|Interface Type|Size|Firmware Revision|Serial Number"
+  become: true
+  register: "_hp_mcp_pd_details"
+  changed_when: false
+
+- debug: var=_hp_mcp_controller_config_detail['stdout_lines']
+
+- debug: var=_hp_mcp_controller_status['stdout_lines']
+
+- debug: var=_hp_mcp_controller_detail['stdout_lines']

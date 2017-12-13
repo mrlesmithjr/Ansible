@@ -1,0 +1,19 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/horizon-install.html
+
+- name: config | Configuring /etc/openstack-dashboard/local_settings.py
+  template:
+    src: "etc/openstack-dashboard/local_settings.py.j2"
+    dest: "/etc/openstack-dashboard/local_settings.py"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "reload apache2"
+
+- name: config | Setting Permissions On /var/lib/openstack-dashboard/secret_key
+  file:
+    dest: "/var/lib/openstack-dashboard/secret_key"
+    owner: "www-data"
+    group: "www-data"
+  become: true

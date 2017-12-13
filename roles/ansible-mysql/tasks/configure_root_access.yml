@@ -51,7 +51,7 @@
     host: "{{ item }}"
     password: "{{ mysql_root_password }}"
   become: true
-  with_items: '{{ mysql_allow_root_access_from_hosts }}'
+  with_items: "{{ mysql_allow_root_access_from_hosts }}"
   when: not ansible_check_mode
 
 - name: configure_root | configuring root my.cnf

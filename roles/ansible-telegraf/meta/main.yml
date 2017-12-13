@@ -1,0 +1,25 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install/configure [Telegraf](https://www.influxdata.com/time-series-platform/telegraf)
+
+  license: MIT
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Fedora
+      versions:
+        - 24
+        - 25
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+    - name: EL
+      versions:
+        - 7
+
+  galaxy_tags:
+    - monitoring
+
+dependencies: []

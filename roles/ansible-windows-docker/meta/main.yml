@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible] role to install [Docker](https://www.docker.com) on [Windows - 2016](https://www.microsoft.com/en-us/cloud-platform/windows-server)
+
+  license: license (MIT)
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+   - Docker
+
+dependencies: []

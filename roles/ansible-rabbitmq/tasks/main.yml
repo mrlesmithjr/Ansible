@@ -5,7 +5,8 @@
 - include: redhat.yml
   when: >
         ansible_distribution == "CentOS" or
-        ansible_distribution == "Red Hat Enterprise Linux"
+        ansible_distribution == "Red Hat Enterprise Linux" or
+        ansible_distribution == "OracleLinux"
 
 - include: fedora.yml
   when: ansible_distribution == "Fedora"

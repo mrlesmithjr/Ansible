@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% if kibana_configuration is defined and kibana_configuration != [] %}
+{{ kibana_configuration|to_nice_yaml }}
+{% endif %}

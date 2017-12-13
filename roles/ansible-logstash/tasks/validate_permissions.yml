@@ -6,4 +6,5 @@
     recurse: yes
     owner: "logstash"
     group: "logstash"
+  become: true
   notify: "restart logstash"

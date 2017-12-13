@@ -1,0 +1,41 @@
+---
+- name: config | Adding td-agent User To Admin Group
+  user:
+    name: "td-agent"
+    groups: "adm"
+    append: true
+  become: true
+  notify: "restart td-agent"
+
+- name: config | Configuring fluentd
+  template:
+    src: "etc/td-agent/td-agent.conf.j2"
+    dest: "/etc/td-agent/td-agent.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart td-agent"
+
+# Check status of existence of any defined pos_file
+- name: config | Checking For pos_file
+  stat:
+    path: "{{ item['pos_file'] }}"
+  register: "_fluentd_pos_file"
+  with_items: '{{ fluentd_inputs }}'
+  when: >
+        fluentd_inputs is defined and
+        item['pos_file'] is defined
+
+# Create any defined pos_file that are missing
+- name: config | Creating pos_file
+  file:
+    path: "{{ item['item']['pos_file'] }}"
+    owner: "td-agent"
+    group: "td-agent"
+    state: "touch"
+  become: true
+  with_items: "{{ _fluentd_pos_file['results'] }}"
+  when: >
+        item['stat'] is defined and
+        not item['stat']['exists']

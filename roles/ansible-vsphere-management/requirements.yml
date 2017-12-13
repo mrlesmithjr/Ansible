@@ -1,0 +1,23 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-apache2.git
+- src: https://github.com/mrlesmithjr/ansible-change-hostname.git
+- src: https://github.com/mrlesmithjr/ansible-config-interfaces.git
+- src: https://github.com/mrlesmithjr/ansible-docker-swarm.git
+- src: https://github.com/mrlesmithjr/ansible-docker.git
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts.git
+- src: https://github.com/mrlesmithjr/ansible-haproxy.git
+- src: https://github.com/mrlesmithjr/ansible-isc-dhcp.git
+- src: https://github.com/mrlesmithjr/ansible-k8s.git
+- src: https://github.com/mrlesmithjr/ansible-keepalived.git
+- src: https://github.com/mrlesmithjr/ansible-mariadb-galera-cluster.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-phpipam.git
+- src: https://github.com/mrlesmithjr/ansible-powerdns-authoritative.git
+- src: https://github.com/mrlesmithjr/ansible-powerdns-dnsdist.git
+- src: https://github.com/mrlesmithjr/ansible-powerdns-recursor.git
+- src: https://github.com/mrlesmithjr/ansible-rsyslog.git
+- src: https://github.com/mrlesmithjr/ansible-samba.git
+- src: https://github.com/mrlesmithjr/ansible-sshd.git
+- src: https://github.com/mrlesmithjr/ansible-timezone.git
+- src: https://github.com/mrlesmithjr/ansible-windows-powercli.git
+- src: https://github.com/mrlesmithjr/ansible-windows-remote-desktop.git

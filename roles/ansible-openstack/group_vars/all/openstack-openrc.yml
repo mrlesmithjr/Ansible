@@ -1,0 +1,14 @@
+---
+openstack_openrc_clouds:
+  - name: 'default'
+    auth_url: '{{ openstack_keystone_endpoint_url }}:35357/v3'
+    endpoint_type: 'internalURL'
+    identity_api_version: 3
+    interface: 'internal'
+    password: '{{ openstack_admin_pass }}'
+    project_domain_name: 'Default'
+    project_name: 'admin'
+    region_name: 'RegionOne'
+    tenant_name: 'admin'
+    user_domain_name: 'Default'
+    username: 'admin'

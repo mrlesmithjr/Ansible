@@ -1,0 +1,5 @@
+---
+- hosts: influxdb_servers
+  vars:
+  roles:
+    - role: ansible-kapacitor

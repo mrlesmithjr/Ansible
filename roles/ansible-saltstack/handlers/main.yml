@@ -1,0 +1,13 @@
+---
+# handlers file for ansible-saltstack
+- name: restart salt-master
+  service:
+    name: salt-master
+    state: restarted
+  become: true
+
+- name: restart salt-minion
+  service:
+    name: salt-minion
+    state: restarted
+  become: true

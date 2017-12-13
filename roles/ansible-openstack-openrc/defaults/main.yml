@@ -1,0 +1,23 @@
+---
+# defaults file for ansible-openstack-openrc
+
+# Define openrc clouds definitions
+# These will be used to generate the following:
+# $HOME/username-openrc
+# $HOME/.config/openstack/clouds.yaml
+#
+# Generate passwords using:
+# openssl rand -hex 10
+openstack_openrc_clouds:
+  - name: 'default'
+    auth_url: 'http://127.0.0.1:35357/v3'
+    endpoint_type: 'internalURL'
+    identity_api_version: 3
+    interface: 'internal'
+    password: []
+    project_domain_name: 'Default'
+    project_name: 'admin'
+    region_name: 'RegionOne'
+    tenant_name: 'admin'
+    user_domain_name: 'Default'
+    username: 'admin'

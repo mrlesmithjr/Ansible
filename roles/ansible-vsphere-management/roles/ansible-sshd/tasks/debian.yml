@@ -1,0 +1,7 @@
+---
+# This obviously is already installed if using Ansible
+# However, could be useful as an ansible-pull task
+- name: debian | Installing SSHD
+  apt:
+    name: "openssh-server"
+    state: "present"

@@ -1,38 +1,85 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
 
-A brief description of the role goes here.
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-Requirements
-------------
+**Table of Contents**  _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+-   [ansible-gitlab-runner](#ansible-gitlab-runner)
+    -   [Requirements](#requirements)
+    -   [Role Variables](#role-variables)
+    -   [Dependencies](#dependencies)
+    -   [Example Playbook](#example-playbook)
+    -   [License](#license)
+    -   [Author Information](#author-information)
 
-Role Variables
---------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+# ansible-gitlab-runner
 
-Dependencies
-------------
+An [Ansible](https://www.ansible.com) role to install/configure [GitLab Runner](https://docs.gitlab.com/runner/)
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Requirements
 
-Example Playbook
-----------------
+Replace GitLab token in `defaults/main.yml`
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+gitlab_runner_config:
+  url: https://gitlab.com/ci
+  # runner token needs to be replaced
+  token: TOKEN
+  executor: shell
+```
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+## Role Variables
 
-License
--------
+```yaml
+---
+# defaults file for ansible-gitlab-runner
+gitlab_runner_check_interval: 0
+gitlab_runner_concurrent_jobs: 1
 
-BSD
+gitlab_runner_config:
+  url: https://gitlab.com/ci
+  # runner token needs to be replaced
+  token: TOKEN
+  executor: shell
 
-Author Information
-------------------
+gitlab_runner_debian_package:
+  key: '{{ gitlab_runner_uri }}/gpgkey'
+  package: '{{ gitlab_runner_uri }}/packages/{{ ansible_distribution|lower }}/{{ ansible_distribution_release|lower }}/gitlab-ci-multi-runner_{{ gitlab_runner_version }}_amd64.deb'
+  repos:
+    - 'deb {{ gitlab_runner_uri }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
+    - 'deb-src {{ gitlab_runner_uri }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+gitlab_runner_uri: https://packages.gitlab.com/runner/gitlab-ci-multi-runner
+
+gitlab_runner_version: 9.5.0
+```
+
+## Dependencies
+
+None
+
+## Example Playbook
+
+```yaml
+---
+- hosts: gitlab_runner
+  vars:
+  roles:
+    - role: ansible-gitlab-runner
+  tasks:
+```
+
+## License
+
+MIT
+
+## Author Information
+
+Larry Smith Jr.
+
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [mrlesmithjr.com](http://mrlesmithjr.com)
+-   mrlesmithjr [at] gmail.com

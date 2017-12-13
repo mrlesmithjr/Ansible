@@ -1,0 +1,30 @@
+---
+openstack_image_service_glance_db_info:
+  db: 'glance'
+  user: 'glance'
+  pass: '{{ openstack_glance_db_pass }}'
+  host: '{{ openstack_vip }}'
+
+openstack_image_service_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+
+## Define Glance user password
+openstack_image_service_glance_user_pass: '{{ openstack_glance_pass }}'
+
+# HA info
+## Define as true if using HA
+openstack_image_service_ha: '{{ openstack_ha }}'
+## Define host which should be identified as HA master
+openstack_image_service_ha_master: '{{ groups[openstack_controllers_group][0] }}'
+## Define VIP
+openstack_image_service_ha_vip: '{{ openstack_ha }}'
+
+# Management IP Info
+openstack_image_service_management_interface: '{{ openstack_management_interface }}'
+openstack_image_service_management_ip: '{{ openstack_management_ip }}'
+
+# Define memcached servers
+openstack_image_service_memcached_servers: '{{ groups[openstack_controllers_group] }}'
+
+# RabbitMQ Connection Info
+openstack_image_service_rabbit_hosts: '{{ groups[openstack_controllers_group] }}'
+openstack_image_service_rabbit_pass: '{{ openstack_rabbit_pass }}'

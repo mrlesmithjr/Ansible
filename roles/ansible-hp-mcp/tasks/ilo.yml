@@ -1,0 +1,101 @@
+---
+- name: ilo | Generating ILO user check configurations
+  template:
+    src: "ilo_get_user.xml.j2"
+    dest: "/tmp/ilo_get_user_{{ item['user_name'] }}.xml"
+  changed_when: false
+  with_items: '{{ hp_mcp_ilo_users }}'
+  when: hp_mcp_ilo_users is defined
+
+- name: ilo | Checking for existing ILO users
+  hponcfg:
+    src: "/tmp/ilo_get_user_{{ item['user_name'] }}.xml"
+  become: true
+  register: "_hp_mcp_get_users"
+  changed_when: false
+  failed_when: false
+  with_items: '{{ hp_mcp_ilo_users }}'
+  when: hp_mcp_ilo_users is defined
+
+- name: ilo | Generating ILO users to add
+  template:
+    src: "ilo_add_user.xml.j2"
+    dest: "/tmp/ilo_add_user_{{ item['item']['user_name'] }}.xml"
+  with_items: "{{ _hp_mcp_get_users['results'] }}"
+  when: >
+        hp_mcp_ilo_users is defined and
+        item['rc'] is defined and
+        (item['rc'] == 1) and
+        (item['item']['state'] == 'present')
+
+- name: ilo | Adding ILO users
+  hponcfg:
+    src: "/tmp/ilo_add_user_{{ item['item']['user_name'] }}.xml"
+  become: true
+  with_items: "{{ _hp_mcp_get_users['results'] }}"
+  when: >
+        hp_mcp_ilo_users is defined and
+        item['rc'] is defined and
+        (item['rc'] == 1) and
+        (item['item']['state'] == 'present')
+
+- name: ilo | Generating ILO users to delete
+  template:
+    src: "ilo_del_user.xml.j2"
+    dest: "/tmp/ilo_del_user_{{ item['item']['user_name'] }}.xml"
+  with_items: "{{ _hp_mcp_get_users['results'] }}"
+  when: >
+        hp_mcp_ilo_users is defined and
+        (item['rc'] is not defined or
+        (item['rc'] is defined and
+        (item['rc'] != 1))) and
+        (item['item']['state'] == 'absent')
+
+- name: ilo | Deleting ILO users
+  hponcfg:
+    src: "/tmp/ilo_del_user_{{ item['item']['user_name'] }}.xml"
+  become: true
+  with_items: "{{ _hp_mcp_get_users['results'] }}"
+  when: >
+        hp_mcp_ilo_users is defined and
+        (item['rc'] is not defined or
+        (item['rc'] is defined and
+        (item['rc'] != 1))) and
+        (item['item']['state'] == 'absent')
+
+- name: ilo | Generating ILO configuration
+  template:
+    src: "ilo.xml.j2"
+    dest: "{{ hp_mcp_ilo_config_dir }}/ilo.xml"
+  become: true
+  register: "_hp_mcp_ilo_config"
+
+- name: ilo | Applying ILO configuration
+  hponcfg:
+    src: "{{ hp_mcp_ilo_config_dir }}/ilo.xml"
+  become: true
+  when: _hp_mcp_ilo_config['changed']
+
+- name: ilo | Cleaning up ILO add user configurations
+  file:
+    path: "/tmp/ilo_add_user_{{ item['item']['user_name'] }}.xml"
+    state: "absent"
+  changed_when: false
+  with_items: "{{ _hp_mcp_get_users['results'] }}"
+  when: hp_mcp_ilo_users is defined
+
+- name: ilo | Cleaning up ILO delete user configurations
+  file:
+    path: "/tmp/ilo_del_user_{{ item['item']['user_name'] }}.xml"
+    state: "absent"
+  changed_when: false
+  with_items: "{{ _hp_mcp_get_users['results'] }}"
+  when: hp_mcp_ilo_users is defined
+
+- name: ilo | Cleaning up ILO user check configurations
+  file:
+    path: "/tmp/ilo_get_user_{{ item['user_name'] }}.xml"
+    state: "absent"
+  changed_when: false
+  with_items: '{{ hp_mcp_ilo_users }}'
+  when: hp_mcp_ilo_users is defined

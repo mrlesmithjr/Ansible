@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+metadata_proxy_shared_secret = {{ openstack_networking_service_controller_metadata_secret }}
+nova_metadata_ip = {{ openstack_networking_service_controller_nova_metadata_ip }}
+
+[agent]
+
+[cache]

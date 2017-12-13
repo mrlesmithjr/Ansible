@@ -1,0 +1,6 @@
+---
+- name: service | Ensuring td-agent Is Enabled On Boot
+  service:
+    name: "td-agent"
+    enabled: true
+  become: true

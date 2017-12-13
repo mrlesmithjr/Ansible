@@ -1,0 +1,5 @@
+---
+docker_swarm_interface: "{{ ansible_primary_interface }}"
+# docker_swarm_managers_ansible_group: docker_swarm_managers
+# docker_swarm_workers_ansible_group: docker_swarm_workers
+docker_version: 17.06.2

@@ -1,0 +1,22 @@
+---
+- hosts: powercli_host
+  roles:
+    - role: ansible-windows-powercli
+    - role: ansible-windows-remote-desktop
+    - role: ansible-vsphere-management
+  tasks:
+    - name: Install NET-Framework-Core
+      win_feature:
+        name: NET-Framework-Core
+        state: present
+
+    - name: Rebooting Server
+      win_reboot:
+        shutdown_timeout: 3600
+        reboot_timeout: 3600
+      when: ansible_reboot_pending
+
+    - name: Install vmwarevsphereclient
+      win_chocolatey:
+        name: vmwarevsphereclient
+        state: present

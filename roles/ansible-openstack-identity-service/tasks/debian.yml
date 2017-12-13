@@ -1,0 +1,9 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/keystone-install.html#
+
+# Install Keystone
+- name: debian | Installing Keystone Package
+  apt:
+    name: "keystone"
+    state: "present"
+  become: true

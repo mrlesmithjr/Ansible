@@ -9,10 +9,8 @@
   become: true
   with_items:
     - '{{ consul_config_dir }}'
-#    - '{{ consul_config_dir }}/bootstrap'
     - '{{ consul_config_dir }}/client'
     - '{{ consul_config_dir }}/scripts'
-#    - '{{ consul_config_dir }}/server'
 
 # We create the consul data folder
 - name: config | creating consul data folder
@@ -24,11 +22,7 @@
     state: "directory"
   become: true
 
-- include: cluster.yml
-  when: consul_cluster
-
-- include: standalone.yml
-  when: not consul_cluster
+- import_tasks: cluster.yml
 
 - name: config | configuring consul
   template:

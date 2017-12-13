@@ -1,0 +1,7 @@
+---
+- name: redhat | Installing Monit
+  yum:
+    name: "monit"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"

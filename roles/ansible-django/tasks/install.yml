@@ -3,20 +3,26 @@
   pip:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
     - virtualenv
     - virtualenvwrapper
-    
+
 - name: install | installing django
   pip:
     name: "django"
     state: present
+  become: true
   when: >
-        (django_version is defined and django_version == "latest") or
+        (django_version is defined and
+          django_version == "latest") or
         django_version is not defined
 
 - name: install | installing django
   pip:
     name: "django=={{ django_version }}"
     state: present
-  when: django_version is defined and django_version != "latest"
+  become: true
+  when: >
+        django_version is defined and
+        django_version != "latest"

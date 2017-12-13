@@ -12,6 +12,10 @@
     state: "present"
   become: true
   register: "package_added"
+  when: >
+        ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '<=', strict=true))
 
 - name: debian | updating apt-cache (If zabbix package added)
   apt:

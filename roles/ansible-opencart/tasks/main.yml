@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-opencart
+- include_tasks: set_facts.yml
+
+- include_tasks: db.yml
+
+- include_tasks: install.yml
+
+- include_tasks: config.yml

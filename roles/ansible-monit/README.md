@@ -1,143 +1,285 @@
-Role Name
-=========
+# Role Name
 
-Installs monit https://mmonit.com/monit/ for monitoring of processes and services. Configuration ready with some defaults.
+An [Ansible](https://www.ansible.com) role to install/configure [monit](https://mmonit.com/monit/)
 
-Requirements
-------------
+## Requirements
 
 None.
 
-Role Variables
---------------
+## Role Variables
 
-````
+```yaml
 ---
 # defaults file for ansible-monit
-config_monit: false  #defines if monit should be configured after installed
-monit_alerts_to_syslog: false  #defines if monit should send alerts to syslog...if false the default is /var/log/monit.log
-monit_email_from: monit@$HOST
-monit_email_to: root@localhost
-monit_email_server: localhost
-monit_enable_email_notifications: false  #defines if monit email notifications are to be sent.
-monit_enable_web_server: false  #defines if monit web server is enabled.
-monit_monitor_services:  #default for all nodes if not specific settings for node groups
-  - name: apache2
-#    cpu_checks:
-#      - name: cpu
-#        percentage: 40%
-#        cycles: 2
-#        action: alert
-#      - name: totalcpu
-#        percentage: 60%
-#        cycles: 2
-#        action: alert
-#      - name: totalcpu
-#        percentage: 80%
-#        cycles: 5
-#        action: restart
-    action: restart
-    failed_host: 127.0.0.1
-    failed_host_port: 80
-    failed_host_protocol: http
-    failed_host_type:
-      - tcp
-#    groups:  # https://mmonit.com/monit/documentation/monit.html#SERVICE-GROUPS
-#      - www
-#      - apache
-    monitored: true
-    pidfile: /var/run/apache2/apache2.pid
-    start_program: /usr/sbin/service apache2 start
-    stop_program: /usr/sbin/service apache2 stop
-  - name: cron
-    monitored: true
-    pidfile: /var/run/crond.pid
-    start_program: /usr/sbin/service cron start
-    stop_program: /usr/sbin/service cron stop
-#  - name: mysql
-#    action: restart
-#    failed_host: 127.0.0.1
-#    failed_host_port: 3306
-#    failed_host_type:
-#      - tcp
-#    monitored: true
-#    pidfile: /var/run/mysqld/mysqld.pid
-#    start_program: /usr/sbin/service mysql start
-#    stop_program: /usr/sbin/service mysql stop
-  - name: ntp
-    action: restart
-    failed_host: 127.0.0.1
-    failed_host_port: 123
-    failed_host_type:
-      - udp
-    monitored: true
-    pidfile: /var/run/ntpd.pid
-    start_program: /usr/sbin/service ntp start
-    stop_program: /usr/sbin/service ntp stop
-  - name: postfix
-    action: restart
-    failed_host: 127.0.0.1
-    failed_host_port: 25
-    failed_host_protocol: smtp
-    failed_host_type:
-      - tcp
-    monitored: true
-    pidfile: /var/spool/postfix/pid/master.pid
-    start_program: /usr/sbin/service postfix start
-    stop_program: /usr/sbin/service postfix stop
-  - name: rsyslogd
-    monitored: true
-    pidfile: /var/run/rsyslogd.pid
-    start_program: /usr/sbin/service rsyslog start
-    stop_program: /usr/sbin/service rsyslog stop
-  - name: snmpd
-    action: restart
-    failed_host: 127.0.0.1
-    failed_host_port: 161
-    failed_host_type:
-      - udp
-    monitored: true
-    pidfile: /var/run/snmpd.pid
-    start_program: /usr/sbin/service snmpd start
-    stop_program: /usr/sbin/service snmpd stop
-  - name: sshd
-    failed_host: 127.0.0.1
-    failed_host_port: 22
-    monitored: true
-    pidfile: /var/run/sshd.pid
-    start_program: /usr/sbin/service ssh start
-    stop_program: /usr/sbin/service ssh stop
-monit_web_server_allow_list:
-  - 10.0.0.0/8
-  - 172.16.0.0/16
-  - 192.168.0.0/16
-  - localhost
-monit_web_server_local_only: true  #defines if web server gui is allowed from only the localhost otherwise defined web_server_allow_list above.
-monit_web_server_password: monit
-monit_web_server_username: admin
-````
+# Defines if monit should be configured after installed
+config_monit: true
 
-Dependencies
-------------
+# Defines if monit should send alerts to syslog
+# If false the default is /var/log/monit.log
+monit_alerts_to_syslog: false
+
+monit_allow_web_users:
+  - '{{ monit_web_server_username }}:{{ monit_web_server_password }}'
+  - '@monit'
+  - '@users readonly'
+
+# Defines the interval in which check services execute
+monit_daemon_check_interval: 120
+
+monit_email_from: 'monit@$HOST'
+monit_email_to: 'root@localhost'
+monit_email_server: 'localhost'
+
+# Defines if monit email notifications are to be sent.
+monit_enable_email_notifications: false
+
+# Defines if monit web server is enabled.
+# Note that if HTTP support is disabled, the Monit CLI interface will have
+# reduced functionality, as most CLI commands (such as "monit status") needs
+# to communicate with the Monit background process via the HTTP interface.
+monit_enable_web_server: true
+
+# Defines space usage tests
+#
+# operator is a choice of "<",">","!=","=="
+#
+# unit is a choice of "B","KB","MB","GB", "%" or long alternatives "byte",
+# "kilobyte", "megabyte", "gigabyte", "percent".
+#
+# action is a choice of "ALERT", "RESTART", "START", "STOP", "EXEC" or "UNMONITOR".
+monit_filesystem_space_usage_checks:
+  - name: 'rootfs'
+    path: '/'
+    operator: '>'
+    unit: 90%
+    action: 'alert'
+
+monit_httpd_port: 2812
+
+monit_idfile: '/var/lib/monit/id'
+
+monit_logfile: '/var/log/monit.log'
+
+# Define services to monitor
+monit_monitor_services: []
+  # - name: apache2
+  #   # cpu_checks:
+  #   #  - name: cpu
+  #   #    percentage: 40%
+  #   #    cycles: 2
+  #   #    action: alert
+  #   #  - name: totalcpu
+  #   #    percentage: 60%
+  #   #    cycles: 2
+  #   #    action: alert
+  #   #  - name: totalcpu
+  #   #    percentage: 80%
+  #   #    cycles: 5
+  #   #    action: restart
+  #   action: restart
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 80
+  #   failed_host_protocol: http
+  #   failed_host_type:
+  #     - tcp
+  #   # https://mmonit.com/monit/documentation/monit.html#SERVICE-GROUPS
+  #   groups:
+  #     - www
+  #     - apache
+  #   monitored: true
+  #   pidfile: /var/run/apache2/apache2.pid
+  #   start_program: /usr/sbin/service apache2 start
+  #   stop_program: /usr/sbin/service apache2 stop
+  # - name: cron
+  #   monitored: true
+  #   pidfile: /var/run/crond.pid
+  #   start_program: /usr/sbin/service cron start
+  #   stop_program: /usr/sbin/service cron stop
+  # - name: mysql
+  #   action: restart
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 3306
+  #   failed_host_type:
+  #     - tcp
+  #   monitored: true
+  #   pidfile: /var/run/mysqld/mysqld.pid
+  #   start_program: /usr/sbin/service mysql start
+  #   stop_program: /usr/sbin/service mysql stop
+  # - name: ntp
+  #   action: restart
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 123
+  #   failed_host_type:
+  #     - udp
+  #   monitored: true
+  #   pidfile: /var/run/ntpd.pid
+  #   start_program: /usr/sbin/service ntp start
+  #   stop_program: /usr/sbin/service ntp stop
+  # - name: postfix
+  #   action: restart
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 25
+  #   failed_host_protocol: smtp
+  #   failed_host_type:
+  #     - tcp
+  #   monitored: true
+  #   pidfile: /var/spool/postfix/pid/master.pid
+  #   start_program: /usr/sbin/service postfix start
+  #   stop_program: /usr/sbin/service postfix stop
+  # - name: rsyslogd
+  #   monitored: true
+  #   pidfile: /var/run/rsyslogd.pid
+  #   start_program: /usr/sbin/service rsyslog start
+  #   stop_program: /usr/sbin/service rsyslog stop
+  # - name: snmpd
+  #   action: restart
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 161
+  #   failed_host_type:
+  #     - udp
+  #   monitored: true
+  #   pidfile: /var/run/snmpd.pid
+  #   start_program: /usr/sbin/service snmpd start
+  #   stop_program: /usr/sbin/service snmpd stop
+  # - name: sshd
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 22
+  #   monitored: true
+  #   pidfile: /var/run/sshd.pid
+  #   start_program: /usr/sbin/service ssh start
+  #   stop_program: /usr/sbin/service ssh stop
+
+# Set the location of the Monit id file which stores the unique id for the
+# Monit instance.
+monit_statefile: '/var/lib/monit/state'
+
+# Check general system resources such as load average, cpu and memory
+# usage. Each test specifies a resource, conditions and the action to be
+# performed should a test fail.
+#
+# resource is a choice of "CPU", "TOTAL CPU", "CPU([user|system|wait])",
+# "MEMORY", "SWAP", "THREADS", "CHILDREN", "TOTAL MEMORY",
+# "LOADAVG([1min|5min|15min])"
+#
+# operator is a choice of "<", ">", "!=", "=="
+#
+# value is either an integer or a real number. For CPU, TOTAL CPU, MEMORY and
+# TOTAL MEMORY you need to specify a unit. This could be "%" or if
+# applicable "B" (Byte), "kB" (1024 Byte), "MB" (1024 KiloByte) or
+# "GB" (1024 MegaByte).
+#
+# action is a choice of "ALERT", "RESTART", "START", "STOP", "EXEC" or "UNMONITOR".
+monit_system_checks:
+  - resource: 'loadavg (1min)'
+    operator: '>'
+    value: 4
+    action: 'alert'
+  - resource: 'loadavg (5min)'
+    operator: '>'
+    value: 2
+    action: 'alert'
+  - resource: 'memory usage'
+    operator: '>'
+    value: 75%
+    action: 'alert'
+  - resource: 'swap usage'
+    operator: '>'
+    value: 25%
+    action: 'alert'
+  - resource: 'cpu usage (user)'
+    operator: '>'
+    value: 70%
+    action: 'alert'
+  - resource: 'cpu usage (system)'
+    operator: '>'
+    value: 30%
+    action: 'alert'
+  - resource: 'cpu usage (wait)'
+    operator: '>'
+    value: 20%
+    action: 'alert'
+
+monit_web_server_allow_list:
+  # - 10.0.0.0/8
+  # - 172.16.0.0/16
+  # - 192.168.0.0/16
+  - localhost
+
+# Defines if web server gui is allowed from only the localhost otherwise
+# defined web_server_allow_list above.
+monit_web_server_local_only: true
+
+monit_web_server_password: 'monit'
+
+monit_web_server_username: 'admin'
+```
+
+## Dependencies
 
 None.
 
-Example Playbook
-----------------
+## Example Playbook
 
-    - hosts: servers
-      roles:
-         - { role: mrlesmithjr.monit }
+```yaml
+---
+- hosts: test-nodes
+  vars:
+    config_monit: true
+    monit_enable_web_server: true
+    monit_monitor_services:
+      - name: 'cron'
+        monitored: true
+        pidfile: '/var/run/crond.pid'
+        start_program: '/usr/sbin/service cron start'
+        stop_program: '/usr/sbin/service cron stop'
+      - name: 'docker'
+        monitored: true
+        pidfile: '/var/run/docker.pid'
+        start_program: '/usr/sbin/service docker start'
+        stop_program: '/usr/sbin/service docker stop'
+      - name: 'ntp'
+        action: 'restart'
+        failed_host: 127.0.0.1
+        failed_host_port: 123
+        failed_host_type:
+          - 'udp'
+        monitored: true
+        pidfile: '/var/run/ntpd.pid'
+        start_program: '/usr/sbin/service ntp start'
+        stop_program: '/usr/sbin/service ntp stop'
+      - name: 'rsyslogd'
+        monitored: true
+        pidfile: '/var/run/rsyslogd.pid'
+        start_program: '/usr/sbin/service rsyslog start'
+        stop_program: '/usr/sbin/service rsyslog stop'
+      - name: 'sshd'
+        failed_host: 127.0.0.1
+        failed_host_port: 22
+        monitored: true
+        pidfile: '/var/run/sshd.pid'
+        start_program: '/usr/sbin/service ssh start'
+        stop_program: '/usr/sbin/service ssh stop'
+    monit_web_server_allow_list:
+      - 192.168.0.0/16
+      - localhost
+    monit_web_server_local_only: false
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - name: Install/Configure Monitoring Of Services
+      role: ansible-monit
+    - name: Install Docker
+      role: ansible-docker
+  tasks:
+```
 
-License
--------
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
+
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   <http://everythingshouldbevirtual.com>
+-   mrlesmithjr [at] gmail.com

@@ -3,12 +3,14 @@
   yum:
     name: "epel-release"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Installing Pre-Reqs
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'pwgen'
   when: ansible_distribution != "Fedora"
@@ -17,6 +19,7 @@
   yum:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'java-1.8.0-openjdk-headless'
   when: >
@@ -27,10 +30,12 @@
   yum:
     name: "{{ graylog_redhat_package_info.url }}/{{ graylog_redhat_package_info.file }}"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Installing Graylog Server
   yum:
     name: "graylog-server"
     state: "present"
+  become: true
   when: ansible_distribution != "Fedora"

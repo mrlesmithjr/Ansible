@@ -1,0 +1,8 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-compute-install.html#
+
+- name: debian | Installing nova-compute
+  apt:
+    name: "nova-compute"
+    state: "present"
+  become: true

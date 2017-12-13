@@ -1,0 +1,105 @@
+---
+- name: pdns_records | checking that pdns_zones_dir exists
+  stat:
+    path: "{{ pdns_zones_dir }}"
+  register: "pdns_zones_dir_check"
+  delegate_to: "localhost"
+  run_once: true
+  become: false
+
+- name: pdns_records | creating pdns_zones_dir if it does not exist
+  file:
+    path: "{{ pdns_zones_dir }}"
+    state: "directory"
+  delegate_to: "localhost"
+  run_once: true
+  become: false
+  when: not pdns_zones_dir_check['stat']['exists']
+
+- name: pdns_records | creating pdns zones folders
+  file:
+    path: "{{ pdns_zones_dir }}/{{ item['zone'] }}"
+    state: "directory"
+  delegate_to: "localhost"
+  run_once: true
+  become: false
+  with_items: '{{ pdns_records }}'
+
+- name: pdns_records | creating pdns records in zones folders
+  template:
+    src: pdns_records.j2
+    dest: "{{ pdns_zones_dir }}/{{ item['zone'] }}/{{ item['name'] }}_{{ item['type'] }}"
+  delegate_to: "localhost"
+  run_once: true
+  become: false
+  register: "pdns_records_created"
+  with_items: '{{ pdns_records }}'
+  when: item['type'] != "SRV"
+
+- name: pdns_records | creating pdns SRV records in zones folders
+  template:
+    src: "pdns_records.j2"
+    dest: "{{ pdns_zones_dir }}/{{ item['zone'] }}/{{ item['dc_name'] }}{{ item['name'] }}_{{ item['type'] }}"
+  delegate_to: "localhost"
+  run_once: true
+  become: false
+  register: "pdns_srv_records_created"
+  with_items: '{{ pdns_records }}'
+  when: item['type'] == "SRV"
+
+- name: pdns_records | creating pdns records script
+  template:
+    src: pdns_records.sh.j2
+    dest: /tmp/pdns_records.sh
+    owner: root
+    group: root
+    mode: 0770
+  when: >
+        pdns_records_created['changed'] or
+        pdns_srv_records_created['changed']
+
+- name: pdns_records | creating pdns records script
+  template:
+    src: pdns_records.sh.j2
+    dest: /tmp/pdns_records.sh
+    owner: root
+    group: root
+    mode: 0770
+  when: >
+        force is defined and
+        force
+
+- name: pdns_records | creating pdns records
+  shell: /tmp/pdns_records.sh
+  run_once: true
+  when: >
+        pdns_db_cluster and
+        (pdns_records_created['changed'] or
+        pdns_srv_records_created['changed'])
+
+- name: pdns_records | creating pdns records
+  shell: /tmp/pdns_records.sh
+  when: >
+        not pdns_db_cluster and
+        (pdns_records_created['changed'] or
+        pdns_srv_records_created['changed'])
+
+- name: pdns_records | creating pdns records
+  shell: /tmp/pdns_records.sh
+  run_once: true
+  when: >
+        pdns_db_cluster and
+        (force is defined and
+        force)
+
+- name: pdns_records | creating pdns records
+  shell: /tmp/pdns_records.sh
+  when: >
+        not pdns_db_cluster and
+        (force is defined and
+        force)
+
+- name: pdns_records | cleaning up pdns records script
+  file:
+    path: /tmp/pdns_records.sh
+    state: absent

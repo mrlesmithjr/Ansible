@@ -1,0 +1,23 @@
+---
+- name: redhat | installing pre-req packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - fping
+    - MySQL-python
+    - php
+    - php-cli
+    - php-gmp
+    - php-pear
+    - php-mysqlnd
+    - php-ldap
+    - php-mcrypt
+    - php-curl
+    - wget
+
+- name: redhat | setting php timezone
+  lineinfile:
+    dest: "/etc/php.ini"
+    line: "date.timezone = {{ phpipam_timezone }}"
+  notify: restart httpd

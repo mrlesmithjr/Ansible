@@ -1,18 +1,10 @@
-############# config ##################
-#
+# {{ ansible_managed }}
 {% if apt_mirror_dir is defined %}
 set base_path    {{ apt_mirror_dir }}
 {% elif apt_mirror_dir is not defined %}
 set base_path    /var/spool/apt-mirror
 {% endif %}
-#
-# set mirror_path  $base_path/mirror
-# set skel_path    $base_path/skel
-# set var_path     $base_path/var
-# set cleanscript $var_path/clean.sh
-# set defaultarch  <running host architecture>
-# set postmirror_script $var_path/postmirror.sh
-# set run_postmirror 0
+
 {% if apt_mirror_nthreads is defined %}
 set nthreads     {{ apt_mirror_nthreads }}
 {% elif apt_mirror_nthreads is not defined %}
@@ -25,10 +17,11 @@ set limit_rate {{ apt_mirror_limit_rate }}k
 {%   endif %}
 {% endif %}
 #
-############# end config ##############
 
-{% for item in apt_mirror_repos %}
+{% if apt_mirror_repos is defined and apt_mirror_repos != [] %}
+{%   for item in apt_mirror_repos %}
 {{ item }}
-{% endfor %}
+{%   endfor %}
+{% endif %}
 
 clean http://{{ apt_mirror_ubuntu_mirror }}

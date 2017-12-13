@@ -1,0 +1,12 @@
+---
+- name: debian | Installing Neutron Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'neutron-server'
+    - 'neutron-plugin-ml2'
+    - 'neutron-linuxbridge-agent'
+    - 'neutron-dhcp-agent'
+    - 'neutron-metadata-agent'

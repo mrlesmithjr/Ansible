@@ -1,21 +1,34 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
 
-An [Ansible] bootstrap role
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- useful for adding initial post deployment tasks
-- creating initial users
-- setting initial user passwords
+**Table of Contents**  _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
-Requirements
-------------
+-   [ansible-bootstrap](#ansible-bootstrap)
+    -   [Requirements](#requirements)
+    -   [Role Variables](#role-variables)
+    -   [Dependencies](#dependencies)
+    -   [Example Playbook](#example-playbook)
+    -   [License](#license)
+    -   [Author Information](#author-information)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-bootstrap
+
+An [Ansible](https://www.ansible.com) bootstrap role
+
+-   useful for adding initial post deployment tasks
+-   creating initial users
+-   setting initial user passwords
+
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-```
+```yaml
 ---
 # Only set to true if desired to set root password...for Debian/Ubuntu systems
 
@@ -32,15 +45,13 @@ bootstrap_root_password: '$6$8tMUxKP33/$Fb/hZBaYvyzGubO9nrlRJMjUnt3aajXZwxCifH9N
 bootstrap_set_root_pw: false
 ```
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 - hosts: all
   become: true
   vars:
@@ -49,17 +60,15 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [mrlesmithjr.com](http://mrlesmithjr.com)
+-   mrlesmithjr [at] gmail.com

@@ -1,0 +1,18 @@
+---
+- name: debian | installing packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'ntp'
+
+- name: debian | configuring ntp
+  template:
+    src: "etc/ntp.conf.j2"
+    dest: "/etc/ntp.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  notify: restart ntp
+  become: true

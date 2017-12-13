@@ -1,0 +1,32 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/glance-install.html
+
+# Create default Glance user
+- name: users | Creating Glance User
+  os_user:
+    name: "{{ openstack_image_service_glance_user_info['name'] }}"
+    password: "{{ openstack_image_service_glance_user_info['password'] }}"
+    cloud: "default"
+    email: "{{ openstack_image_service_glance_user_info['email']|default(omit) }}"
+    domain: "{{ openstack_image_service_glance_user_info['domain_id'] }}"
+    default_project: "{{ openstack_image_service_glance_user_info['default_project']|default(omit) }}"
+    state: "{{ openstack_image_service_glance_user_info['state'] }}"
+  no_log: true
+  when: >
+        not openstack_image_service_ha or
+        (openstack_image_service_ha and
+          inventory_hostname == openstack_image_service_ha_master)
+
+# Create default Glance user role
+- name: users | Creating Glance User Role
+  os_user_role:
+    cloud:  "default"
+    user: "{{ openstack_image_service_glance_user_info['name'] }}"
+    role: "{{ openstack_image_service_glance_user_info['role'] }}"
+    project: "{{ openstack_image_service_glance_user_info['project'] }}"
+    state: "{{ openstack_image_service_glance_user_info['state'] }}"
+  no_log: true
+  when: >
+        not openstack_image_service_ha or
+        (openstack_image_service_ha and
+          inventory_hostname == openstack_image_service_ha_master)

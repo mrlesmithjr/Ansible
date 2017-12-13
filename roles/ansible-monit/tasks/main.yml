@@ -1,11 +1,16 @@
 ---
 # tasks file for ansible-monit
+- include: set_facts.yml
+
 - include: debian.yml
   tags:
     - monit
   when: ansible_os_family == "Debian"
 
-- include: centos.yml
+- include: redhat.yml
   tags:
     - monit
   when: ansible_os_family == "RedHat"
+
+- include: config_monit.yml
+  when: config_monit

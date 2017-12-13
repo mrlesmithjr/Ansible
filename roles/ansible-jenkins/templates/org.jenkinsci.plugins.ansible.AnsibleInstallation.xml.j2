@@ -2,8 +2,8 @@
 <org.jenkinsci.plugins.ansible.AnsibleInstallation_-DescriptorImpl plugin="ansible@0.4">
   <installations class="org.jenkinsci.plugins.ansible.AnsibleInstallation-array">
     <org.jenkinsci.plugins.ansible.AnsibleInstallation>
-      <name>{{ jenkins_ansible_info.name }}</name>
-      <home>{{ jenkins_ansible_info.home }}</home>
+      <name>{{ jenkins_ansible_info['name'] }}</name>
+      <home>{{ jenkins_ansible_info['home'] }}</home>
       <properties/>
     </org.jenkinsci.plugins.ansible.AnsibleInstallation>
   </installations>

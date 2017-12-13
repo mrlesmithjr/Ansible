@@ -1,0 +1,31 @@
+---
+# These define the IP addresses for the DNSDist VMs
+vsphere_dnsdist_vm_ips:
+  - "{{ vsphere_vm_services_subnet }}.40"
+  - "{{ vsphere_vm_services_subnet }}.41"
+
+vsphere_dnsdist_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_dnsdist_vms.inv"
+
+vsphere_dnsdist_vms:
+  - vm_name: "dnsdist-00.{{ vsphere_pri_domain_name }}"
+    cpus: "{{ vsphere_dnsdist_vms_cpu }}"
+    deploy: "{{ vsphere_dnsdist_vms_deploy }}"
+    datastore: "{{ vsphere_vm_services_datastore }}"
+    gateway: "{{ vsphere_vm_services_subnet }}.1"
+    ip: "{{ vsphere_dnsdist_vm_ips[0] }}"
+    memory_mb: "{{ vsphere_dnsdist_vms_memory }}"
+    netmask: "{{ vsphere_vm_services_subnet_mask }}"
+    netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+    network_name: "{{ vsphere_vm_services_vswitch }}"
+    vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  - vm_name: "dnsdist-01.{{ vsphere_pri_domain_name }}"
+    cpus: "{{ vsphere_dnsdist_vms_cpu }}"
+    deploy: "{{ vsphere_dnsdist_vms_deploy }}"
+    datastore: "{{ vsphere_vm_services_datastore }}"
+    gateway: "{{ vsphere_vm_services_subnet }}.1"
+    ip: "{{ vsphere_dnsdist_vm_ips[1] }}"
+    memory_mb: "{{ vsphere_dnsdist_vms_memory }}"
+    netmask: "{{ vsphere_vm_services_subnet_mask }}"
+    netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+    network_name: "{{ vsphere_vm_services_vswitch }}"
+    vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"

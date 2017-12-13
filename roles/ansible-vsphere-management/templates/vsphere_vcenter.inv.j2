@@ -1,0 +1,12 @@
+{% if _vsphere_vcsa_appliance_info is defined %}
+[vsphere_vcenter]
+{%   for item in _vsphere_vcsa_appliance_info['results'] %}
+{%     if item['instance'] is defined and item['instance']['hw_name'] is defined %}
+{%       if item['instance']['hw_name'] == vsphere_vcsa_appliance_name %}
+{{ item['instance']['hw_name'] }} ansible_host={{ item['instance']['ipv4'] }} hw_product_uuid={{ item['instance']['hw_product_uuid'] }}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% elif _vsphere_vcsa_appliance_info is not defined %}
+[vsphere_vcenter]
+{% endif %}

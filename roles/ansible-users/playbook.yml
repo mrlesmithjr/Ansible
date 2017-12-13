@@ -1,0 +1,26 @@
+---
+- hosts: test_nodes
+  vars:
+    pri_domain_name: test.vagrant.local
+    users:
+      demo-user-01:
+        comment: Demo user 01
+        generate_keys: true
+        # home: /home/demo-user-01
+        password: demo_password
+        # shell: /bin/bash
+        state: present
+        sudo: false
+        system_account: false
+      demo-user-02:
+        comment: Demo user 02
+        generate_keys: true
+        # home: /home/demo-user-02
+        password: demo_password
+        # shell: /bin/bash
+        state: absent
+        sudo: false
+        system_account: false
+  roles:
+    - role: ansible-users
+  tasks:

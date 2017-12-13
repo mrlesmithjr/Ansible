@@ -1,0 +1,16 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install/configure [DRBD](https://docs.linbit.com/)
+  license: license (MIT)
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+
+  galaxy_tags:
+    - clustering
+
+dependencies: []

@@ -1,0 +1,32 @@
+---
+- name: dns | Setting DNS Servers
+  set_fact:
+    vsphere_dns_nameservers: "{{ vsphere_dns_servers|join(',') }}"
+  when: >
+        ((groups['vsphere_ddi_vms'] is not defined or
+        groups['vsphere_ddi_vms'] is defined) and
+        (vsphere_dns_servers is defined and
+          vsphere_dns_servers != []))
+
+
+- name: dns | Setting DNS Servers (PowerDNS)
+  set_fact:
+    vsphere_dns_nameservers: "{% for item in groups['vsphere_ddi_vms'] %}{{ hostvars[item]['ansible_host'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+  when: >
+        (groups['vsphere_ddi_vms'] is defined and
+        ((vsphere_dns_servers is defined and
+          vsphere_dns_servers == []) or
+          vsphere_dns_servers is not defined))
+
+- name: dns | Configuring DNS
+  vmware_dns_config:
+    hostname: "{{ hostvars[item]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    change_hostname_to: "{{ hostvars[item]['inventory_hostname_short'] }}"
+    domainname: "{{ vsphere_pri_domain_name }}"
+    dns_servers: "{{ vsphere_dns_nameservers }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: vsphere_dns_nameservers is defined

@@ -1,0 +1,76 @@
+---
+pdns_api_vip: "{{ vsphere_lb_vips[0] }}"
+
+pdns_load_balanced: true
+
+pdns_records:
+  - hostname: lb
+    content: "{{ vsphere_lb_vips[0] }}"
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_lb_vips[0] }}"
+    type: A
+  - hostname: db
+    content: "lb.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_lb_vips[0] }}"
+    type: CNAME
+  - hostname: dns-00
+    content: "dnsdist-00.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_dnsdist_vm_ips[0] }}"
+    type: CNAME
+  - hostname: dns-01
+    content: "dnsdist-01.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_dnsdist_vm_ips[1] }}"
+    type: CNAME
+  - hostname: ipam
+    content: "lb.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_lb_vips[0] }}"
+    type: CNAME
+  - hostname: nas01
+    content: 10.0.101.50
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: 10.0.101.50
+    type: A
+  - hostname: nas02
+    content: 10.0.101.51
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: 10.0.101.51
+    type: A
+  - hostname: ntp-00
+    content: "ddi-00.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_ddi_vm_ips[0] }}"
+    type: CNAME
+  - hostname: ntp-01
+    content: "ddi-01.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_ddi_vm_ips[1] }}"
+    type: CNAME
+  - hostname: ntp-02
+    content: "ddi-02.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_ddi_vm_ips[2] }}"
+    type: CNAME
+  - hostname: pdns-api
+    content: "lb.{{ vsphere_pri_domain_name }}."
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_lb_vips[0] }}"
+    type: CNAME
+  - hostname: "{{ vsphere_vcsa_network_hostname }}"
+    content: "{{ vsphere_vcsa_network_ip }}"
+    domain: "{{ vsphere_pri_domain_name }}"
+    ip: "{{ vsphere_vcsa_network_ip }}"
+    type: A
+
+pdns_webserver_password: changeme
+
+pdns_webserver_port: 8081
+
+pdns_zones:
+  - "{{ vsphere_pri_domain_name }}"
+  - 168.192.in-addr.arpa
+  - 16.172.in-addr.arpa
+  - 10.in-addr.arpa

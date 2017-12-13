@@ -60,3 +60,26 @@
   when: >
         item['host'] is defined and
         inventory_hostname == item['host']
+
+- name: config_vms | Setting autostart status
+  virt:
+    name: "{{ item['name'] }}"
+    autostart: "{{ item['autostart']|default(omit) }}"
+    command: "info"
+  become: true
+  with_items: '{{ kvm_vms }}'
+  when: >
+        item['host'] is not defined and
+        (ansible_version.full | version_compare('2.3', '>='))
+
+- name: config_vms | Setting autostart status
+  virt:
+    name: "{{ item['name'] }}"
+    autostart: "{{ item['autostart']|default(omit) }}"
+    command: "info"
+  become: true
+  with_items: '{{ kvm_vms }}'
+  when: >
+        item['host'] is defined and
+        inventory_hostname == item['host'] and
+        (ansible_version.full | version_compare('2.3', '>='))

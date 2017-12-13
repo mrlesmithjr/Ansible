@@ -1,31 +1,38 @@
 ---
 # tasks file for ansible-consul
-- include: set_facts.yml
+- import_tasks: set_facts.yml
   tags:
     - consul_facts
 
-- include: debian.yml
+- import_tasks: debian.yml
   when: ansible_os_family == "Debian"
 
-- include: redhat.yml
+- import_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include: accounts.yml
+- import_tasks: accounts.yml
 
-- include: install.yml
+- import_tasks: install.yml
 
-- include: config.yml
+- import_tasks: config.yml
 
-- include: services.yml
+- import_tasks: services.yml
 
-- include: app_services.yml
+- import_tasks: app_services.yml
   tags:
     - consul-app-services
   when: >
         consul_services is defined and
         consul_services
 
-- include: dnsmasq.yml
+- import_tasks: acl.yml
+  tags:
+    - consul-acl
+  when: consul_acl is defined and
+        consul_acl and
+        consul_datacenter == consul_acl_datacenter
+
+- import_tasks: dnsmasq.yml
   when: >
         consul_enable_dnsmasq is defined and
         consul_enable_dnsmasq

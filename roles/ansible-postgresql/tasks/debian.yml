@@ -33,7 +33,7 @@
   become: true
   with_items:
     - 'postgresql-{{ postgresql_version }}-debversion'
-    - 'postgresql-client={{ postgresql_version }}*'
-    - 'postgresql-contrib={{ postgresql_version }}*'
+    - 'postgresql-client-{{ postgresql_version }}'
+    - 'postgresql-contrib-{{ postgresql_version }}'
     - 'postgresql-plpython-{{ postgresql_version }}'
-    - 'postgresql={{ postgresql_version }}*'
+    - 'postgresql-{{ postgresql_version }}'

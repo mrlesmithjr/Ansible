@@ -1,0 +1,12 @@
+---
+# Define VIPs to use for Keepalived for services such as dns, ntp, and etc.
+
+vsphere_lb_router_ids:
+  - 50
+  - 51
+  - 52
+
+vsphere_lb_vips:
+  - "{{ vsphere_vm_services_subnet }}.100"
+  - "{{ vsphere_vm_services_subnet }}.101"
+  - "{{ vsphere_vm_services_subnet }}.102"

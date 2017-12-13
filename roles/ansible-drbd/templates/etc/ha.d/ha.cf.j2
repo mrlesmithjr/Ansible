@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+keepalive 1
+
+deadtime 10
+
+initdead 60
+
+auto_failback off
+
+bcast {{ drbd_interface }}
+
+{% for host in groups[drbd_group] %}
+node {{ hostvars[host]['inventory_hostname_short'] }}
+{% endfor %}

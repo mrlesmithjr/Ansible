@@ -1,0 +1,36 @@
+---
+- hosts: jenkins
+  vars:
+    config_jenkins: true
+    jenkins_config_info:
+      auth_strategy: 'FullControlOnceLoggedInAuthorizationStrategy'
+      disable_remember_me: false
+      disable_setup_wizard: true
+      num_executors: 2
+      system_message: 'Welcome to the Jenkins lab'
+      use_security: false
+    jenkins_fqdn: 'http://192.168.250.10:{{ jenkins_port }}'
+    jenkins_manage_plugins: true
+    jenkins_plugins:
+      # - 'active-directory'
+      - 'ansible'
+      - 'build-pipeline-plugin'
+      - 'docker-plugin'
+      - 'git'
+      - 'gitlab-plugin'
+      - 'job-dsl'
+      # - 'ldap'
+      # - 'logstash'
+      # - 'PowerShell'
+      # - 'rundeck'
+      - 'ssh'
+      # - 'travis-yml'
+      - 'vagrant'
+      # - 'vmware-vrealize-automation-plugin'
+      # - 'vmware-vrealize-codestream'
+      # - 'vsphere-cloud'
+      - 'workflow-aggregator'
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-jenkins
+  tasks:

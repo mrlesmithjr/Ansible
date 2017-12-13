@@ -1,0 +1,6 @@
+---
+- name: debian | Installing syslog-ng
+  apt:
+    name: "syslog-ng"
+    state: "present"
+  become: true

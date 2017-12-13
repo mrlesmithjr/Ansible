@@ -1,0 +1,194 @@
+---
+- name: vCenter | Managing vCenter Datacenter
+  vmware_datacenter:
+    datacenter_name: "{{ vsphere_vcenter_datacenter['name'] }}"
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    state: "{{ vsphere_vcenter_datacenter['state'] }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+
+- name: vCenter | Managing vCenter Cluster
+  vmware_cluster:
+    cluster_name: "{{ vsphere_vcenter_cluster['name'] }}"
+    datacenter_name: "{{ vsphere_vcenter_datacenter['name'] }}"
+    enable_drs: "{{ vsphere_vcenter_cluster['enable_drs'] }}"
+    enable_ha: "{{ vsphere_vcenter_cluster['enable_ha'] }}"
+    enable_vsan: "{{ vsphere_vcenter_cluster['enable_vsan'] }}"
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+
+- name: vCenter | Managing vCenter EVC Mode
+  win_shell: |
+    $vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+    Connect-VIServer $vCenterHost
+    $vCenter = Get-VC $vCenterHost
+    $Cluster = Get-Cluster -Server $vCenter
+    $ClusterEVCMode = $Cluster.EVCMode
+    $EVCMode = "{{ vsphere_vcenter_cluster['evc_mode'] }}"
+    if ($ClusterEVCMode -ne $EVCMode) {
+      $Cluster | Set-Cluster -EVCMode $EVCMode -Confirm:$false
+    }
+    Disconnect-VIServer * -Confirm:$false
+  when: vsphere_vcenter_cluster['evc_enabled']
+
+- name: vCenter | Managing vCenter Hosts
+  vmware_host:
+    cluster_name: "{{ vsphere_vcenter_cluster['name'] }}"
+    datacenter_name: "{{ vsphere_vcenter_datacenter['name'] }}"
+    esxi_hostname: "{{ hostvars[item]['inventory_hostname'] }}"
+    esxi_password: "{{ vsphere_user_info['password'] }}"
+    esxi_username: "{{ vsphere_user_info['username'] }}"
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    state: "{{ hostvars[item]['vcenter_state'] }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: hostvars[item]['inventory_hostname'] != vsphere_bootstrap_host
+
+- name: vCenter | Generating vCenter vsphere_bootstrap_host {{ vsphere_bootstrap_host }} Script
+  win_template:
+    src: vsphere_vcenter_management.ps1.j2
+    dest: c:\tmp\vsphere_vcenter_management.ps1
+
+- name: vCenter | Executing vCenter vsphere_bootstrap_host {{ vsphere_bootstrap_host }} Script
+  win_shell: c:\tmp\vsphere_vcenter_management.ps1
+  failed_when: _vsphere_vcenter_management_script_execution['stderr_lines'] != []
+  register: _vsphere_vcenter_management_script_execution
+
+- name: vCenter | Waiting for SSH
+  wait_for:
+    host: "{{ vsphere_vcsa_network_ip }}"
+    port: 22
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 600
+  vars:
+    ansible_connection: local
+  when: vsphere_vcsa_os_ssh_enabled
+
+- name: vCenter | Checking If vCenter Is Available
+  win_shell: |
+    $vCenterHost = "{{ vsphere_vcsa_network_ip }}"
+    $vc = Connect-VIServer $vCenterHost
+    $vc.IsConnected
+    Disconnect-VIServer * -Confirm:$false
+  register: _vsphere_vcenter_check_1
+  delay: 30
+  retries: 20
+  until: ('True' in _vsphere_vcenter_check_1['stdout_lines'])
+
+- name: vCenter | Managing vCenter Hosts
+  vmware_host:
+    cluster_name: "{{ vsphere_vcenter_cluster['name'] }}"
+    datacenter_name: "{{ vsphere_vcenter_datacenter['name'] }}"
+    esxi_hostname: "{{ hostvars[item]['inventory_hostname'] }}"
+    esxi_password: "{{ vsphere_user_info['password'] }}"
+    esxi_username: "{{ vsphere_user_info['username'] }}"
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    state: "{{ hostvars[item]['vcenter_state'] }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  register: _vsphere_bootstrap_host_vcenter_joined
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: hostvars[item]['inventory_hostname'] == vsphere_bootstrap_host
+
+- name: vCenter | Exiting Maintenance Mode
+  vmware_maintenancemode:
+    esxi_hostname: "{{ hostvars[item]['inventory_hostname'] }}"
+    hostname: "{{ hostvars[item]['inventory_hostname'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    state: absent
+    username: "{{ vsphere_user_info['username'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+  delegate_to: localhost
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: >
+        _vsphere_bootstrap_host_vcenter_joined['changed'] and
+        hostvars[item]['inventory_hostname'] == vsphere_bootstrap_host
+
+- name: vCenter | Generating vCenter Cluster Management Script
+  win_template:
+    src: vsphere_vcenter_cluster_management.ps1.j2
+    dest: c:\tmp\vsphere_vcenter_cluster_management.ps1
+
+- name: vCenter | Executing vCenter Cluster Management Script
+  win_shell: c:\tmp\vsphere_vcenter_cluster_management.ps1
+  failed_when: _vsphere_vcenter_cluster_management_script_execution['stderr_lines'] != []
+  register: _vsphere_vcenter_cluster_management_script_execution
+
+- name: vcenter | Generating vCenter Folder Management Script
+  win_template:
+    src: vsphere_vcenter_folder_management.ps1.j2
+    dest: c:\tmp\vsphere_vcenter_folder_management.ps1
+
+- name: vcenter | Executing vCenter Folder Management Script
+  win_shell: c:\tmp\vsphere_vcenter_folder_management.ps1
+  failed_when: _vsphere_vcenter_folder_management_script_execution['stderr_lines'] != []
+  register: _vsphere_vcenter_folder_management_script_execution
+
+- name: vcenter | Generating vCenter Resource Pool Management Script
+  win_template:
+    src: vsphere_vcenter_resource_pool_management.ps1.j2
+    dest: c:\tmp\vsphere_vcenter_resource_pool_management.ps1
+
+- name: vcenter | Executing vCenter Resource Pool Management Script
+  win_shell: c:\tmp\vsphere_vcenter_resource_pool_management.ps1
+  failed_when: _vsphere_vcenter_resource_pool_management_script_execution['stderr_lines'] != []
+  register: _vsphere_vcenter_resource_pool_management_script_execution
+
+- name: vcenter | Generating Template Management Script
+  win_template:
+    src: vsphere_vcenter_template_management.ps1.j2
+    dest: c:\tmp\vsphere_vcenter_template_management.ps1
+  when: vsphere_vcenter_create_template_from_ovf
+
+- name: vcenter | Executing Template Management Script
+  win_shell: c:\tmp\vsphere_vcenter_template_management.ps1
+  failed_when: _vsphere_vcenter_template_management_script_execution['stderr_lines'] != []
+  register: _vsphere_vcenter_template_management_script_execution
+  when: vsphere_vcenter_create_template_from_ovf
+
+- name: vcenter | Managing OS Customization Specs (Adding)
+  win_shell: |
+    $vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+    Connect-VIServer $vCenterHost
+    $vCenter = Get-VC $vCenterHost
+    $OSCustomizationSpecs = Get-OSCustomizationSpec -Server $vCenter
+    $OSSpecDescription = "{{ item['description']|default(omit) }}"
+    $OSSpecDnsSuffix = "{{ item['dns_suffix'] }}"
+    $OSSpecDomain = "{{ item['domain'] }}"
+    $OSSpecName = "{{ item['name'] }}"
+    $OSSpecType = "{{ item['os_type'] }}"
+    if ($OSCustomizationSpecs.Name -notcontains $OSSpecName) {
+      New-OSCustomizationSpec –Name $OSSpecName -Description $OSSpecDescription –Domain $OSSpecDomain -OSType $OSSpecType -Server $vCenter -DnsSuffix $OSSpecDnsSuffix {% if item['dns_server'] is defined %}-DnsServer "{{ item['dns_server']|join('","') }}"{% endif %} -Confirm:$false
+    }
+    Disconnect-VIServer * -Confirm:$false
+  with_items: "{{ vsphere_vcenter_customization_specs }}"
+  when: >
+        vsphere_vcenter_customization_specs is defined and
+        item['state']|lower == "present"
+
+- name: vcenter | Managing OS Customization Specs (Removing)
+  win_shell: |
+    $vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+    Connect-VIServer $vCenterHost
+    $vCenter = Get-VC $vCenterHost
+    $OSCustomizationSpecs = Get-OSCustomizationSpec -Server $vCenter
+    $OSSpecName = "{{ item['name'] }}"
+    if ($OSCustomizationSpecs.Name -contains $OSSpecName) {
+      Remove-OSCustomizationSpec $OSSpecName -Server $vCenter -Confirm:$false
+    }
+    Disconnect-VIServer * -Confirm:$false
+  with_items: "{{ vsphere_vcenter_customization_specs }}"
+  when: >
+        vsphere_vcenter_customization_specs is defined and
+        item['state']|lower == "absent"

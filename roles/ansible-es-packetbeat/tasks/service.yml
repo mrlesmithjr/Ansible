@@ -1,0 +1,7 @@
+---
+- name: service | Ensuring Packetbeat Is Started And Enabled On Boot
+  service:
+    name: packetbeat
+    state: started
+    enabled: true
+  become: true

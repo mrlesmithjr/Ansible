@@ -1,0 +1,8 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/horizon-install.html
+
+- name: debian | Installing openstack-dashboard
+  apt:
+    name: "openstack-dashboard"
+    state: "present"
+  become: true

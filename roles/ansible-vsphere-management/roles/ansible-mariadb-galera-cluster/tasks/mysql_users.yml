@@ -1,0 +1,15 @@
+---
+- name: Create MySQL users
+  mysql_user:
+    name: "{{ item.0.name }}"
+    host: "{{ item.1 }}"
+    password: "{{ item.0.password }}"
+    encrypted: "{{ item.0.encrypted | default('no') }}"
+    priv: "{{ item.0.priv | default('*.*:USAGE') }}"
+    state: "{{ item.0.state | default('present') }}"
+    append_privs: "{{ item.0.append_privs | default('no') }}"
+  become: true
+  with_subelements:
+    - "{{ mariadb_mysql_users }}"
+    - hosts
+  no_log: true

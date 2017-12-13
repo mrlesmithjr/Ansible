@@ -8,7 +8,11 @@
     mode: "o=rw,g=r,o=r"
   become: true
   notify: "restart apache2"
-  when: ansible_os_family == "Debian"
+  when: >
+        ansible_os_family == "Debian" and
+        ((ansible_distribution != "Ubuntu") or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '<=', strict=true)))
 
 - name: configure_zabbix_frontend | Configuring Zabbix Frontend
   file:
@@ -17,6 +21,21 @@
     state: "link"
   become: true
   notify: "restart apache2"
+  when: >
+        ((ansible_distribution != "Ubuntu") or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '<=', strict=true)))
+
+- name: configure_zabbix_frontend | Configuring Zabbix Frontend
+  file:
+    src: "/etc/apache2/conf-available/zabbix-frontend-php.conf"
+    dest: "/etc/apache2/conf-enabled/zabbix-frontend-php.conf"
+    state: "link"
+  become: true
+  notify: "restart apache2"
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '>', strict=true))
 
 - name: configure_zabbix_frontend | configuring server web
   template:
@@ -25,4 +44,8 @@
     owner: www-data
     group: www-data
   become: true
-  when: ansible_os_family == "Debian"
+  when: >
+        ansible_os_family == "Debian" and
+        ((ansible_distribution != "Ubuntu") or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '<=', strict=true)))

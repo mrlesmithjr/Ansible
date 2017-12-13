@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+
+{% for item in drbd_disks %}
+{{ hostvars[groups[drbd_group][0]]['inventory_hostname_short'] }} {{ drbd_vip }} drbddisk::{{ item['resource'] }} Filesystem::{{ item['device'] }}::{{ item['mountpoint'] }}::{{ item['filesystem'] }}::noatime
+{% endfor %}

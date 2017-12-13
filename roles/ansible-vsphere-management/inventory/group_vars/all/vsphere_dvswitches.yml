@@ -1,0 +1,44 @@
+---
+vsphere_dvswitches:
+- name: dvSwitch0
+  active_uplinks:
+    - dvUplink1
+    - dvUplink2
+    - dvUplink3
+    - dvUplink4
+  datacenter: "{{ vsphere_vcenter_datacenter['name'] }}"
+  discovery_protocol:
+    status: enabled
+    type: LLDP
+    operation: both
+  hosts: "{{ groups['vsphere_hosts'] }}"
+  load_balancing_policy: LoadBalanceSrcId
+  mtu: 1500
+  nics:
+    - vmnic2
+    - vmnic3
+    - vmnic4
+    - vmnic5
+  port_groups:
+    - name: VDS-VLAN-101
+      num_ports: 128
+      state: present
+      type: earlyBinding
+      vlan_id: 101
+    - name: VDS-VLAN-102
+      num_ports: 128
+      state: present
+      type: earlyBinding
+      vlan_id: 102
+    - name: VDS-VLAN-201
+      num_ports: 128
+      state: present
+      type: earlyBinding
+      vlan_id: 201
+  standby_uplinks: []
+    # - dvUplink3
+    # - dvUplink4
+  state: present
+  unused_uplinks: []
+    # - dvUplink4
+  uplink_ports: 4

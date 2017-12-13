@@ -1,0 +1,9 @@
+---
+# Configuring Kibana
+- name: kibana | Configuring Kibana
+  template:
+    src: etc/kibana/kibana.yml.j2
+    dest: "{{ kibana['config_dir'] }}/kibana.yml"
+    mode: "u=rw,g=rw,o=r"
+  become: true
+  notify: restart kibana

@@ -1,5 +1,10 @@
 {% for item in nginx_server_block %}
 server {
+{%   if nginx_headers is defined %}
+{%     for item2 in nginx_headers %}
+	{{ item2 }};
+{%     endfor %}
+{%   endif %}
 {%   for la in item.listen_address %}
 	listen {{ la }}:{{ item.listen_port }}{% if item.default_server is defined and item.default_server %} default_server{% endif %};
 {%   endfor %}

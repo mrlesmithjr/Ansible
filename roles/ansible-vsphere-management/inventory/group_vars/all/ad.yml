@@ -1,0 +1,7 @@
+---
+vsphere_ad_dns_domain_name: "{{ vsphere_ad_netbios_name|lower }}.{{ vsphere_pri_domain_name }}"
+
+vsphere_ad_primary_domain_controller: "{{ groups[samba_domain_controllers_group][0] }}"
+
+# Defines if hosts should be joined to domain
+vsphere_hosts_join_domain: true

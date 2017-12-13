@@ -1,0 +1,13 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/keystone-install.html#
+
+# Configure Apache2
+- name: apache | Configuring Apache2
+  template:
+    src: "etc/apache2/apache2.conf.j2"
+    dest: "/etc/apache2/apache2.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart apache2"

@@ -1,0 +1,7 @@
+---
+# tasks file for ansible-windows-updates
+
+- include: updates.yml
+
+- include: reboot.yml
+  when: windows_updates_reboot

@@ -1,0 +1,107 @@
+# {{ ansible_managed }}
+
+hostname = "{{ kapacitor_hostname }}"
+data_dir = "{{ kapacitor_data_dir }}"
+
+skip-config-overrides = {{ kapacitor_skip_config_overrides|lower }}
+
+default-retention-policy = "{{ kapacitor_default_retention_policy }}"
+
+[http]
+  bind-address = "{{ kapacitor_http['bind_address'] }}"
+  log-enabled = {{ kapacitor_http['log_enabled']|lower }}
+  write-tracing = {{ kapacitor_http['write_tracing']|lower }}
+  pprof-enabled = {{ kapacitor_http['ppof_enabled']|lower }}
+  https-enabled = {{ kapacitor_http['https_enabled']|lower }}
+  https-certificate = "{{ kapacitor_http['https_certificate'] }}"
+
+[config-override]
+  enabled = {{ kapacitor_config_override['enabled']|lower }}
+
+[logging]
+    file = "{{ kapacitor_logging['file'] }}"
+    level = "{{ kapacitor_logging['level'] }}"
+
+[replay]
+  dir = "{{ kapacitor_replay['dir'] }}"
+
+[task]
+  dir = "{{ kapacitor_task['dir'] }}"
+  snapshot-interval = "{{ kapacitor_task['snapshot_interval'] }}"
+
+[storage]
+  boltdb = "{{ kapacitor_storage['boltdb'] }}"
+
+[deadman]
+  global = {{ kapacitor_deadman['global']|lower }}
+  threshold = {{ kapacitor_deadman['threshold'] }}
+  interval = "{{ kapacitor_deadman['interval'] }}"
+  id = "node 'NODE_NAME' in task '{% raw %}{{ .TaskName }}{% endraw %}'"
+  message = "{% raw %}{{ .ID }} is {{ if eq .Level \"OK\" }}alive{{ else }}dead{{ end }}: {{ index .Fields \"collected\" | printf \"%0.3f\" }} points/INTERVAL.{% endraw %}"
+
+{% if kapacitor_influxdb is defined %}
+{%   for item in kapacitor_influxdb %}
+[[influxdb]]
+  enabled = {{ item['enabled']|lower }}
+  default = {{ item['default']|lower }}
+  name = "{{ item['name'] }}"
+  urls = ["{{ item['urls']|join ('", "') }}"]
+  username = "{{ item['username'] }}"
+  password = "{{ item['password'] }}"
+  timeout = {{ item['timeout'] }}
+  insecure-skip-verify = {{ item['insecure_skip_verify']|lower }}
+  startup-timeout = "{{ item['startup_timeout'] }}"
+  disable-subscriptions = {{ item['disable_subscriptions']|lower }}
+  subscription-protocol = "{{ item['subscription_protocol'] }}"
+  subscriptions-sync-interval = "{{ item['subscriptions_sync_interval'] }}"
+  kapacitor-hostname = "{{ item['kapacitor_hostname'] }}"
+  http-port = {{ item['http_port'] }}
+  udp-bind = "{{ item['udp_bind'] }}"
+  udp-buffer = {{ item['udp_buffer'] }}
+  udp-read-buffer = {{ item['udp_read_buffer'] }}
+
+  [influxdb.subscriptions]
+    # Set of databases and retention policies to subscribe to.
+    # If empty will subscribe to all, minus the list in
+    # influxdb.excluded-subscriptions
+    #
+    # Format
+    # db_name = <list of retention policies>
+    #
+    # Example:
+    # my_database = [ "default", "longterm" ]
+  [influxdb.excluded-subscriptions]
+    # Set of databases and retention policies to exclude from the subscriptions.
+    # If influxdb.subscriptions is empty it will subscribe to all
+    # except databases listed here.
+    #
+    # Format
+    # db_name = <list of retention policies>
+    #
+    # Example:
+    # my_database = [ "default", "longterm" ]
+{%   endfor %}
+{% endif %}
+
+[smtp]
+  enabled = {{ kapacitor_smtp['enabled']|lower }}
+  host = "{{ kapacitor_smtp['host'] }}"
+  port = {{ kapacitor_smtp['port'] }}
+  username = "{{ kapacitor_smtp['username'] }}"
+  password = "{{ kapacitor_smtp['password'] }}"
+  from = "{{ kapacitor_smtp['from'] }}"
+  to = ["{{ kapacitor_smtp['to']|join('", "') }}"]
+  no-verify = {{ kapacitor_smtp['no_verify']|lower }}
+  idle-timeout = "{{ kapacitor_smtp['idle_timeout'] }}"
+  global = {{ kapacitor_smtp['global']|lower }}
+  state-changes-only = {{ kapacitor_smtp['state_changes_only']|lower }}
+
+[reporting]
+  enabled = {{ kapacitor_reporting['enabled']|lower }}
+  url = "{{ kapacitor_reporting['url'] }}"
+
+[stats]
+  enabled = {{ kapacitor_stats['enabled']|lower }}
+  stats-interval = "{{ kapacitor_stats['stats_interval'] }}"
+  database = "{{ kapacitor_stats['database'] }}"
+  retention-policy= "{{ kapacitor_stats['retention_policy'] }}"

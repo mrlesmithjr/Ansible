@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% if saltstack_master_configuration is defined and saltstack_master_configuration != [] %}
+{{ saltstack_master_configuration|to_nice_yaml }}
+{% endif %}

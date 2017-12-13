@@ -1,34 +1,52 @@
 ---
+- name: debian | update package list
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: true
+
 - name: debian | Installing Pre-Reqs
   apt:
     name: "{{ item }}"
-    state: "present"
+    state: present
+  become: true
   with_items:
-    - 'apt-transport-https'
-    - 'ca-certificates'
-    - 'python-pip'
+    - apt-transport-https
+    - ca-certificates
+    - libssl-dev
+    - python-pip
+
+- name: debian |  Upgrade pip
+  pip:
+    name: pip
+    extra_args: --upgrade
+  become: true
 
 - name: debian | Installing Python Modules
   pip:
     name: "{{ item }}"
-    state: "present"
+    state: present
+  become: true
   with_items:
-    - 'urllib3'
-    - 'pyopenssl'
-    - 'ndg-httpsclient'
-    - 'pyasn1'
+    - ndg-httpsclient
+    - pyasn1
+    - pyopenssl
+    - urllib3
 
 - name: debian | Adding Cassandra Debian Repo Key
   apt_key:
-    url: "{{ cassandra_debian_repo_info.repo_key }}"
-    state: "present"
+    url: "{{ cassandra_debian_repo_info['repo_key'] }}"
+    state: present
+  become: true
 
 - name: debian | Adding Cassandra Debian Repo
   apt_repository:
-    repo: "{{ cassandra_debian_repo_info.repo }}"
-    state: "present"
+    repo: "{{ cassandra_debian_repo_info['repo'] }}"
+    state: present
+  become: true
 
 - name: debian | Installing Cassandra
   apt:
-    name: "cassandra"
-    state: "present"
+    name: cassandra
+    state: present
+  become: true

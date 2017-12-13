@@ -1,0 +1,75 @@
+{% for host in groups['vsphere_hosts'] %}
+$vmHost = "{{ hostvars[host]['ansible_host'] }}"
+Connect-VIServer -Server $vmHost
+
+$vmServer = Get-VMHost $vmHost
+
+{%   if vsphere_nfs_datastores is defined %}
+$vmServer | Get-Datastore -refresh
+$CurrentNFSDataStores = $vmServer | Get-Datastore | Where {$_.type -eq "NFS"}
+{%     for datastore in vsphere_nfs_datastores %}
+{%       if datastore['type']|lower == 'nfs' %}
+if ($CurrentNFSDataStores.Name -notcontains '{{ datastore['name'] }}'){
+  New-Datastore -Server $vmServer -Nfs -Name '{{ datastore['name'] }}' -Path '{{ datastore['path'] }}' -NfsHost {{ datastore['host'] }}
+{%       endif %}
+}
+{%     endfor %}
+{%  endif %}
+
+{%  if vsphere_auto_create_datastores %}
+$AllLuns = $vmServer | Get-ScsiLun -LunType disk
+$Datastores = $vmServer | Get-Datastore
+foreach ($lun in $AllLuns) {
+  $Datastore = $Datastores | Where-Object {$_.extensiondata.info.vmfs.extent.Diskname -Match $lun.CanonicalName}
+  if ($Datastore.Name -eq $null) {
+    $lunPath = $lun | Get-ScsiLunPath
+    $DatastoreName = $lunPath.SanId | ForEach-Object {$_.split(':')[1]} | ForEach-Object {$_.split('.')[1]} | Get-Unique
+    $CanonicalName = $lunPath.ScsiCanonicalName
+    $vmServer | New-Datastore -name $DatastoreName -Path $CanonicalName -Vmfs
+  }
+}
+{%   endif %}
+Disconnect-VIServer * -Confirm:$false
+{% endfor %}
+
+{% if _vsphere_vcenter_available and vsphere_iscsi_datastore_cluster is defined%}
+$vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+Connect-VIServer $vCenterHost
+
+$vCenter = Get-VC $vCenterHost
+
+$Datacenter = "{{ vsphere_vcenter_datacenter['name'] }}"
+$Datastores = Get-Datastore -Server $vCenter
+$DatastoreClusters = Get-DatastoreCluster -Server $vCenter
+$DatastoreClusterName = "{{ vsphere_iscsi_datastore_cluster['name'] }}"
+$DatastoreClusterAutomationLevel = "{{ vsphere_iscsi_datastore_cluster['automation_level'] }}"
+$DatastoreClusterIOLoadBalance = ${{ vsphere_iscsi_datastore_cluster['io_load_balance'] }}
+{%   if vsphere_iscsi_datastore_cluster['state']|lower == "present" %}
+if ($DatastoreClusters.Name -notcontains $DatastoreClusterName) {
+  New-DatastoreCluster -Name $DatastoreClusterName -Location $Datacenter
+}
+
+$DatastoreCluster = Get-DatastoreCluster -Name $DatastoreClusterName
+if ($DatastoreCluster.SdrsAutomationLevel -ne $DatastoreClusterAutomationLevel) {
+  $DatastoreCluster | Set-DatastoreCluster -SdrsAutomationLevel $DatastoreClusterAutomationLevel -Confirm:$false
+}
+if ($DatastoreCluster.IOLoadBalanceEnabled -ne $DatastoreClusterIOLoadBalance) {
+  $DatastoreCluster | Set-DatastoreCluster -IOLoadBalanceEnabled $DatastoreClusterIOLoadBalance -Confirm:$false
+}
+
+$iSCSICanonicalNames = Get-VMHost -Server $vCenter | Get-VMHostHba -Type IScsi | Where {$_.Model -eq "iSCSI Software Adapter"} | Get-ScsiLun | Select-Object -ExpandProperty CanonicalName | Sort-Object | Get-Unique
+
+foreach ($iSCSICanonicalName in $iSCSICanonicalNames) {
+  $ClusterDatastores = Get-DatastoreCluster -Name $DatastoreClusterName -Location $Datacenter | Get-Datastore
+  $Datastore = $Datastores | Where-Object {$_.extensiondata.info.vmfs.extent.Diskname -Match $iSCSICanonicalName}
+  if ($ClusterDatastores.Name -notcontains $Datastore) {
+    Move-Datastore -Datastore $Datastore -Destination $DatastoreClusterName -Confirm:$false
+  }
+}
+{%   elif vsphere_iscsi_datastore_cluster['state']|lower == "absent" %}
+if ($DatastoreClusters.Name -contains $DatastoreClusterName) {
+  Get-DatastoreCluster -Name $DatastoreClusterName -Location $Datacenter | Remove-DatastoreCluster -Confirm:$false
+}
+{%   endif %}
+Disconnect-VIServer * -Confirm:$false
+{% endif %}

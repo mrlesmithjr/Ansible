@@ -1,0 +1,19 @@
+#!/bin/bash
+{% if pdns_fwd_zones is defined %}
+{%   for item in pdns_fwd_zones %}
+{%     if pdns_zone_types == "Native" or pdns_zone_types == "Master" %}
+curl -X POST -d '{"name": "{{ item }}", "kind": "{{ pdns_zone_types }}"{% if pdns_config_soa_edit_api %}, "soa_edit_api": "{{ pdns_soa_edit_api }}"{% endif %}, "masters": [], "nameservers": ["{{ pdns_nameservers|join ('\", \"') }}"]}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{%     elif pdns_zone_types == "Slave" %}
+curl -X POST -d '{"name": "{{ item }}", "kind": "{{ pdns_zone_types }}", "masters": ["{{ pdns_nameservers|join ('\", \"') }}"], "nameservers": []}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if pdns_rev_zones is defined %}
+{%   for item in pdns_rev_zones %}
+{%     if pdns_zone_types == "Native" or pdns_zone_types == "Master" %}
+curl -X POST -d '{"name": "{{ item }}", "kind": "{{ pdns_zone_types }}"{% if pdns_config_soa_edit_api %}, "soa_edit_api": "{{ pdns_soa_edit_api }}"{% endif %}, "masters": [], "nameservers": ["{{ pdns_nameservers|join ('\", \"') }}"]}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{%     elif pdns_zone_types == "Slave" %}
+curl -X POST -d '{"name": "{{ item }}", "kind": "{{ pdns_zone_types }}", "masters": ["{{ pdns_nameservers|join ('\", \"') }}"], "nameservers": []}' {{ pdns_curl_header }} {{ pdns_api_url }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

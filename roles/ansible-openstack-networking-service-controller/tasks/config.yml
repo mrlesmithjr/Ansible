@@ -1,0 +1,107 @@
+---
+- name: config | Configuring /etc/neutron/neutron.conf
+  template:
+    src: "etc/neutron/neutron.conf.j2"
+    dest: "/etc/neutron/neutron.conf"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o="
+  become: true
+  notify:
+    - "restart neutron-server"
+
+- name: config | Configuring /etc/neutron/plugins/ml2/ml2_conf.ini
+  template:
+    src: "etc/neutron/plugins/ml2/ml2_conf.ini.j2"
+    dest: "/etc/neutron/plugins/ml2/ml2_conf.ini"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart neutron-server"
+
+- name: config | Configuring /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+  template:
+    src: "etc/neutron/plugins/ml2/linuxbridge_agent.ini.j2"
+    dest: "/etc/neutron/plugins/ml2/linuxbridge_agent.ini"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart neutron-linuxbridge-agent"
+
+- name: config | Configuring /etc/neutron/dhcp_agent.ini
+  template:
+    src: "etc/neutron/dhcp_agent.ini.j2"
+    dest: "/etc/neutron/dhcp_agent.ini"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart neutron-dhcp-agent"
+
+- name: config | Configuring /etc/neutron/metadata_agent.ini
+  template:
+    src: "etc/neutron/metadata_agent.ini.j2"
+    dest: "/etc/neutron/metadata_agent.ini"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart neutron-metadata-agent"
+
+- name: config | Checking If Neutron Database Has Been Populated
+  stat:
+    path: "/etc/neutron/.neutron_db_populated"
+  register: "_openstack_networking_service_controller_neutron_db_populated_check"
+  become: true
+
+- name: config | Populating Neutron Database
+  command: >
+           su -s /bin/sh -c "neutron-db-manage
+           --config-file /etc/neutron/neutron.conf
+           --config-file /etc/neutron/plugins/ml2/ml2_conf.ini
+           upgrade head" neutron
+  become: true
+  register: "_openstack_networking_service_controller_neutron_db_populated"
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master) and
+        not _openstack_networking_service_controller_neutron_db_populated_check['stat']['exists']
+
+- name: config | Marking Neutron Database As Populated
+  file:
+    dest: "/etc/neutron/.neutron_db_populated"
+    state: "touch"
+  become: true
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master) and
+        _openstack_networking_service_controller_neutron_db_populated['changed']
+
+- name: config | Setting Fact (_neutron_db_populated)
+  set_fact:
+    _neutron_db_populated: true
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master) and
+        (_openstack_networking_service_controller_neutron_db_populated['changed'] or
+        _openstack_networking_service_controller_neutron_db_populated_check['stat']['exists'])
+
+- name: config | Marking Neutron Database As Populated
+  file:
+    dest: "/etc/neutron/.neutron_db_populated"
+    state: "touch"
+  become: true
+  when: >
+        (openstack_networking_service_controller_ha and
+          inventory_hostname != openstack_networking_service_controller_ha_master) and
+        hostvars[openstack_networking_service_controller_ha_master]['_neutron_db_populated'] and
+        not _openstack_networking_service_controller_neutron_db_populated_check['stat']['exists']

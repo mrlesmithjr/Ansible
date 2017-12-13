@@ -1,0 +1,24 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-compute-install.html#
+
+- name: config | Configuring /etc/nova/nova.conf
+  template:
+    src: "etc/nova/nova.conf.j2"
+    dest: "/etc/nova/nova.conf"
+    owner: "nova"
+    group: "nova"
+    mode: "u=rw,g=r,o="
+  become: true
+  notify: "restart nova-compute"
+
+- name: config | Configuring /etc/nova/nova-compute.conf
+  template:
+    src: "etc/nova/nova-compute.conf.j2"
+    dest: "/etc/nova/nova-compute.conf"
+    owner: "nova"
+    group: "nova"
+    mode: "u=rw,g=r,o="
+  become: true
+  notify: "restart nova-compute"
+
+- meta: flush_handlers

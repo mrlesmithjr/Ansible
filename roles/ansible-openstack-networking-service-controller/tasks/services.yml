@@ -1,0 +1,32 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/neutron-controller-install.html
+
+- name: services | Creating Neutron Services
+  os_keystone_service:
+     cloud: "default"
+     name: "neutron"
+     service_type: "network"
+     state: "present"
+     description: "OpenStack Networking"
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master)
+
+- include: get-client-config.yml
+
+- include: get-token.yml
+
+- name: services | Creating Neutron Endpoint Service
+  keystone_service:
+    name: "neutron"
+    type: "network"
+    description: "Neutron Service"
+    url: "{{ openstack_networking_service_controller_keystone_service_endpoint_url }}:9696"
+    region: "{{ openstack_networking_service_controller_keystone_service_endpoint_region }}"
+    token: "{{ _os_auth['ansible_facts']['auth_token'] }}"
+  no_log: true
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master)

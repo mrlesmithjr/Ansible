@@ -1,0 +1,36 @@
+---
+- name: networks | Capturing Docker Swarm Networks
+  command: "docker network ls"
+  changed_when: false
+  register: "docker_networks"
+  become: true
+  when: >
+        inventory_hostname == docker_swarm_primary_manager
+
+- name: networks | Creating Docker Swarm Networks
+  command: "docker network create --driver {{ item.driver }} {{ item.name }}"
+  become: true
+  with_items: '{{ docker_swarm_networks }}'
+  when: >
+        inventory_hostname == docker_swarm_primary_manager and
+        item.state|lower == "present" and
+        item.name not in docker_networks.stdout
+
+- name: networks | Removing Docker Swarm Networks
+  command: "docker network rm {{ item.name }}"
+  become: true
+  with_items: '{{ docker_swarm_networks }}'
+  when: >
+        inventory_hostname == docker_swarm_primary_manager and
+        item.state|lower == "absent" and
+        item.name in docker_networks.stdout
+
+## Below is for Ansible 2.2
+    # - name: docker_swarm | Managing Docker Swarm Networks
+    #   docker_network:
+    #     name: "{{ item.name }}"
+    #     driver: "{{ item.driver }}"
+    #     state: "{{ item.state }}"
+    #   with_items: '{{ docker_swarm_networks }}'
+    #   when: >
+    #         inventory_hostname == docker_swarm_primary_manager

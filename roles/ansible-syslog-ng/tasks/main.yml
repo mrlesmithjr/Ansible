@@ -1,0 +1,7 @@
+---
+# tasks file for ansible-syslog-ng
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: config.yml
+  when: syslog_ng_config

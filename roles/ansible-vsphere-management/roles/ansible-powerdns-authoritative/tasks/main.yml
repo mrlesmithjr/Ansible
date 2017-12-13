@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-powerdns
+- include: pdns_accounts.yml
+
+- include: pdns_server.yml
+
+- include: pdns_zones.yml
+  tags:
+    - pdns_create_pdns_zones
+  when: >
+        pdns_create_pdns_zones is defined and
+        pdns_create_pdns_zones
+
+- include: pdns_records.yml
+  tags:
+    - pdns_create_pdns_records
+  when: >
+        (pdns_create_pdns_records is defined and
+        pdns_create_pdns_records) and
+        pdns_records is defined

@@ -4,7 +4,7 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - default-jre-headless
+    - openjdk-8-jre-headless
     - git
     - gitweb
     - python-mysqldb

@@ -1,0 +1,25 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+# Stops all services on standby node
+#/etc/init.d/isc-dhcp-server stop
+#/etc/init.d/dnsmasq stop
+service dnsmasq stop
+#/etc/init.d/nginx stop
+#/etc/init.d/haproxy stop
+service haproxy stop
+
+# shutting down interfaces on standby node
+{% for item in vlan_config %}
+ifdown {{ item.vlan }}
+{% endfor %}
+
+# Adds default route back on {{ quagga_mgmt_int }} when in standby mode
+#/sbin/route add default gw {{ quagga_mgmt_gateway }}
+
+# Reload KeepAliveD to make sure
+#/etc/init.d/keepalived reload
+
+service keepalived restart
+
+touch /var/log/faulted_node

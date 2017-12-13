@@ -1,0 +1,12 @@
+---
+- name: reboot | Rebooting Server
+  win_reboot:
+    reboot_timeout_sec: 3600
+    shutdown_timeout_sec: 3600
+  when: >
+        (_windows_remote_desktop_services_enabled is defined and
+          _windows_remote_desktop_services_enabled['restart_needed'] is defined and
+        _windows_remote_desktop_services_enabled['restart_needed']) or
+        (_windows_remote_desktop_services_not_enabled is defined and
+          _windows_remote_desktop_services_not_enabled['restart_needed'] is defined and
+        _windows_remote_desktop_services_not_enabled['restart_needed'])

@@ -1,7 +1,6 @@
 ---
 - hosts: localhost
   connection: local
-  become: false
   vars:
   vars_files:
     - ../defaults/main.yml
@@ -12,21 +11,30 @@
         state: present
       become: true
       with_items:
-        - python-httplib2
+        - 'python-httplib2'
       when: ansible_os_family == "Debian"
+
+    - name: Installing Fedora Pre-Reqs
+      dnf:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+        - 'libselinux-python'
+      when: ansible_distribution == "Fedora"
 
     - name: creating folder
       file:
-        path: "{{ github_repo_root }}/{{ item.user }}"
+        path: "{{ github_repo_root }}/{{ item['user'] }}"
         state: directory
       with_items: '{{ github_users }}'
 
     - name: gathering repos
       uri:
-        url: "https://api.github.com/users/{{ item.0.user }}/repos?per_page={{ return_items }}&page={{ item.1 }}"
+        url: "https://api.github.com/users/{{ item[0]['user'] }}/repos?per_page={{ return_items }}&page={{ item[1] }}"
       register: github_repos
       with_subelements:
-        - github_users
+        - '{{ github_users }}'
         - pages
 
     - name: creating repos vars file

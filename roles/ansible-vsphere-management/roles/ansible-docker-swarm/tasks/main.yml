@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-docker-swarm
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: pre-reqs.yml
+
+- include: cluster.yml
+
+- include: networks.yml
+  when: >
+        docker_swarm_config_networks and
+        docker_swarm_networks is defined
+
+- include: settings.yml
+  when: docker_swarm_config_settings

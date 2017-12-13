@@ -1,7 +1,12 @@
 ---
 # defaults file for ansible-clone-git-repos
-github_repo_root: ~/Git_Projects/GitHub  #define destination to store GitHub repos to be cloned
-github_users:  #define github user(s) to clone repos from and define pages to ensure all repos are gathered.
+
+# Define destination to store GitHub repos to be cloned
+github_repo_root: ~/Git_Projects/GitHub
+
+# Define GitHub user(s) to clone repos from and define pages to ensure all
+# repos are gathered.
+github_users:
   - user: bunchc
     pages:
       - 1
@@ -19,11 +24,17 @@ github_users:  #define github user(s) to clone repos from and define pages to en
     pages:
       - 1
       - 2
+      - 3
+      - 4
+      - 5
   - user: dstamen
     pages:
       - 1
   - user: phpipam
     pages:
       - 1
-repos_file: vars/git_repos.yml  #leave this as-is
-return_items: 100  #defines the number of items to return per-page on the uri API call to GitHub....This equates to the number of repos.
+repos_file: ../vars/git_repos.yml
+
+# Defines the number of items to return per-page on the uri API call to
+# GitHub....This equates to the number of repos.
+return_items: 100

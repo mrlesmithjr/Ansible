@@ -1,47 +1,50 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-An [Ansible] role to install/configure [MySQL]
+- [Role Name](#role-name)
+  - [Build Status](#build-status)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-- Configurable options and cacti monitoring ready.
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Build Status
-------------
+# Role Name
+
+An [Ansible](https://www.ansible.com) role to install/configure [MySQL](https://www.mysql.com)
+
+## Build Status
 
 [![Build Status](https://travis-ci.org/mrlesmithjr/ansible-mysql.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-mysql)
 
-Requirements
-------------
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
 [Role Defaults](./defaults/main.yml)
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
 [Example Playbook](./playbook.yml)
 
-License
--------
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
-[MySQL]: <https://www.mysql.com/>
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   mrlesmithjr [at] gmail.com

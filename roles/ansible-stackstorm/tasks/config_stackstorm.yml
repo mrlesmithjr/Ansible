@@ -1,26 +1,26 @@
 ---
 - name: config_stackstorm | Configuring Stackstorm
   template:
-    src: "etc/st2/st2.conf.j2"
-    dest: "/etc/st2/st2.conf"
-    owner: "root"
-    group: "root"
+    src: etc/st2/st2.conf.j2
+    dest: /etc/st2/st2.conf
+    owner: root
+    group: root
     mode: 0644
   become: true
   notify:
-    - "restart stackstorm"
-    - "reload stackstorm"
+    - restart stackstorm
+    - reload stackstorm
   when: stackstorm_config_stackstorm
 
 - name: config_stackstorm | Checking Stackstorm Services Status
-  command: "st2ctl status"
-  register: "st2_status"
+  command: st2ctl status
+  register: st2_status
   changed_when: false
   become: true
 
 - name: config_stackstorm | Ensuring Stackstorm Is Started
-  command: "st2ctl restart"
-  register: "stackstorm_started"
+  command: st2ctl restart
+  register: stackstorm_started
   become: true
   when: "'not running' in st2_status.stdout"
 
@@ -31,6 +31,6 @@
   when: stackstorm_started.changed
 
 - name: config_stackstorm | Reloading Stackstorm If First Started
-  command: "st2ctl reload"
+  command: st2ctl reload
   become: true
   when: stackstorm_started.changed

@@ -1,0 +1,16 @@
+---
+- name: config | Setting Facts
+  set_fact:
+    sshd_service: 'ssh'
+  when: ansible_os_family == "Debian"
+
+- name: config | Setting Facts
+  set_fact:
+    sshd_service: 'sshd'
+  when: ansible_os_family == "RedHat"
+
+- name: config | Configuring SSHD
+  template:
+    src: "etc/ssh/sshd_config.j2"
+    dest: "/etc/ssh/sshd_config"
+  notify: "restart {{ sshd_service }}"

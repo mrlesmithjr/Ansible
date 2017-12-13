@@ -1,0 +1,15 @@
+---
+- name: redhat | Enabling EPEL Repo
+  yum:
+    name: "epel-release"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Packages
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ network_tools_redhat }}'
+  when: ansible_distribution != "Fedora"

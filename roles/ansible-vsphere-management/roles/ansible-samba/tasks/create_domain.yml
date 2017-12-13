@@ -1,0 +1,65 @@
+---
+- name: create_domain | configuring samba
+  template:
+    src: etc/krb5.conf.j2
+    dest: /etc/krb5.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify:
+    - restart nmbd
+    - restart smbd
+    - restart samba-ad-dc
+
+- name: create_domain | checking if domain created
+  stat:
+    path: /var/log/.samba_ad_created
+  register: samba_ad_created_check
+
+- name: create_domain | configuring Active Directory
+  shell: "samba-tool domain provision --realm={{ samba_ad_info['kerberos_realm']|upper }} --domain={{ samba_ad_info['netbios_domain_name']|upper }} --adminpass='{{ samba_ad_info['adminpass'] }}' --server-role='domain controller' --use-rfc2307"
+  become: true
+  register: samba_ad_created
+  when: >
+        not samba_ad_created_check['stat']['exists'] and
+        (samba_create_domain_controller is defined and
+          samba_create_domain_controller) and
+        samba_server_role == "active directory domain controller" and
+        inventory_hostname == samba_primary_domain_controller
+
+- name: create_domain | marking domain as created
+  file:
+    dest: /var/log/.samba_ad_created
+    state: touch
+  become: true
+  register: _samba_domain_created
+  when: >
+        samba_ad_created['changed'] and
+        not samba_ad_created_check['stat']['exists'] and
+        inventory_hostname == samba_primary_domain_controller
+
+- name: create_domain | Setting Fact For Domain Creation Status For Primary Domain Controller
+  set_fact:
+    _samba_domain_exists: true
+  when: >
+        inventory_hostname == samba_primary_domain_controller and
+        (samba_ad_created_check['stat']['exists'] or
+        _samba_domain_created['changed'])
+
+- name: create_domain | Setting Fact For Domain Creation Status For Non Primary Domain Controller
+  set_fact:
+    _samba_domain_exists: true
+  when: >
+        hostvars[samba_primary_domain_controller]['_samba_domain_exists'] and
+        inventory_hostname in groups[samba_domain_controllers_group] and
+        inventory_hostname != samba_primary_domain_controller
+
+- name: create_domain | marking domain as created
+  file:
+    dest: /var/log/.samba_ad_created
+    state: touch
+  become: true
+  when: >
+        hostvars[inventory_hostname]['_samba_domain_exists'] and
+        not samba_ad_created_check['stat']['exists']

@@ -1,0 +1,70 @@
+variable "dns_servers" {
+  default = [
+{% for dns_server in vsphere_dns_servers %}
+    "{{ dns_server }}",
+{% endfor %}
+  ]
+}
+variable "dvSwitches" {
+  default = [
+    "{{ vsphere_dvswitches[0]['name'] }}",
+  ]
+}
+variable "esxi_hosts" {
+  default = [
+{% for host in groups['vsphere_hosts'] %}
+    "{{ host }}",
+{% endfor %}
+  ]
+}
+variable "linux_vm_template" {
+  default = "{{ vsphere_linux_vapp_template_name }}"
+}
+variable "pdns_api_key" {}
+variable "pdns_server_url" {
+  default = "http://{{ pdns_api_vip }}:{{ pdns_webserver_port }}/api/v1"
+}
+variable "pri_domain_name" {
+  default = "{{ vsphere_pri_domain_name }}"
+}
+{% for vms in terraform_vms %}
+variable "vms_{{ vms['group'] }}" {
+  default = [
+{%   for vm in range(vms['count']) %}
+{%     if loop.index < 10 %}
+    "{{ vms['naming'] }}-0{{ loop.index }}.{{ vsphere_pri_domain_name }}",
+{%     elif loop.index >= 10 %}
+    "{{ vms['naming'] }}-{{ loop.index }}.{{ vsphere_pri_domain_name }}",
+{%     endif %}
+{%   endfor %}
+  ]
+}
+{% endfor %}
+variable "vsphere_datacenter" {
+  default = "{{ vsphere_vcenter_datacenter['name'] }}"
+}
+variable "vsphere_datacenter_cluster" {
+  default = "{{ vsphere_vcenter_cluster['name'] }}"
+}
+variable "vsphere_default_vm_datastore" {
+  default = "{{ vsphere_vm_services_datastore }}"
+}
+variable "vsphere_default_vm_network" {
+  default = "{{ vsphere_vm_services_vswitch }}"
+}
+variable "vsphere_host_license_key" {}
+variable "vsphere_networks" {
+  default = [
+{% for switch in vsphere_dvswitches %}
+{%   for net in switch['port_groups'] %}
+    "{{ net['name'] }}",
+{%   endfor %}
+{% endfor %}
+  ]
+}
+variable "vsphere_password" {}
+variable "vsphere_server" {
+  default = "{{ vsphere_vcsa_network_ip }}"
+}
+variable "vsphere_username" {}
+variable "vsphere_vcenter_license_key" {}

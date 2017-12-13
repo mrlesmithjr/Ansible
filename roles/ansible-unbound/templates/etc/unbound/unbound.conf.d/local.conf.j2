@@ -29,7 +29,7 @@ server:
   #Cache Memory
   rrset-cache-size: {{ unbound_optimizations.rrset_cache_size }}
   msg-cache-size: {{ unbound_optimizations.msg_cache_size }}
-  
+
   ###<--- End Optimizations -->
 
 {% endif %}
@@ -48,7 +48,21 @@ server:
 {% if unbound_log_queries is defined and unbound_log_queries %}
   log-queries: yes
 {% endif %}
-{% if unbound_forward_zones is defined and unbound_setup_forward_zones %}
+{% if unbound_authoritative_zones is defined %}
+{%   for item in unbound_authoritative_zones %}
+  private-domain: "{{ item['zone'] }}"
+  local-zone: "{{ item['zone'] }}." static
+{%     for item2 in item['a_records'] %}
+  local-data: "{{ item2['name'] }}.{{ item['zone'] }}. IN A {{ item2['ip'] }}"
+{%     endfor %}
+{%     if item['create_ptr_records'] %}
+{%       for item2 in item['a_records'] %}
+  local-data-ptr: "{{ item2['ip'] }} {{ item2['name'] }}.{{ item['zone'] }}"
+{%       endfor %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if unbound_forward_zones is defined %}
 {%   for item in unbound_forward_zones %}
   forward-zone:
     name: "{{ item.zone }}"

@@ -1,0 +1,12 @@
+---
+- name: iscsi | Generating iSCSI Management Powershell Script
+  win_template:
+    src: vsphere_iscsi_management.ps1.j2
+    dest: c:\tmp\vsphere_iscsi_management.ps1
+
+- name: iscsi | Executing iSCSI Management Powershell Script
+  win_shell: c:\tmp\vsphere_iscsi_management.ps1
+  failed_when: _vsphere_iscsi_management_script_execution['stderr_lines'] != []
+  register: _vsphere_iscsi_management_script_execution
+
+- debug: var=_vsphere_iscsi_management_script_execution

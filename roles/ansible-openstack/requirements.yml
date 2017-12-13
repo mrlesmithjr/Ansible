@@ -1,1 +1,21 @@
-Vagrant/requirements.yml
+---
+- src: https://www.github.com/mrlesmithjr/ansible-chrony
+- src: https://www.github.com/mrlesmithjr/ansible-config-interfaces
+- src: https://www.github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://www.github.com/mrlesmithjr/ansible-haproxy
+- src: https://www.github.com/mrlesmithjr/ansible-mariadb-galera-cluster
+- src: https://www.github.com/mrlesmithjr/ansible-memcached
+- src: https://www.github.com/mrlesmithjr/ansible-motd
+- src: https://www.github.com/mrlesmithjr/ansible-mysql
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-base
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-compute-service-compute
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-compute-service-controller
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-dashboard
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-identity-service
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-image-service
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-networking-service-compute
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-networking-service-controller
+- src: https://www.github.com/mrlesmithjr/ansible-openstack-openrc
+- src: https://www.github.com/mrlesmithjr/ansible-pacemaker
+- src: https://www.github.com/mrlesmithjr/ansible-rabbitmq
+- src: https://www.github.com/mrlesmithjr/ansible-timezone

@@ -1,0 +1,51 @@
+<RIBCL VERSION="2.0">
+  <LOGIN USER_LOGIN="adminname" PASSWORD="password">
+    <RIB_INFO MODE="WRITE">
+{% if hp_mcp_ilo_license is defined %}
+      <LICENSE>
+        <ACTIVATE KEY="{{ hp_mcp_ilo_license }}"/>
+      </LICENSE>
+{% endif %}
+      <MOD_GLOBAL_SETTINGS>
+        <SESSION_TIMEOUT VALUE="{{ hp_mcp_ilo_config['session_timeout'] }}"/>
+{% if hp_mcp_ilo_config['enable_ssh'] %}
+        <SSH_STATUS VALUE="Y"/>
+{% elif not hp_mcp_ilo_config['enable_ssh'] %}
+        <SSH_STATUS VALUE="N"/>
+{% endif %}
+        <SSH_PORT VALUE="{{ hp_mcp_ilo_config['ssh_port'] }}"/>
+        <SERIAL_CLI_STATUS VALUE="{{ hp_mcp_ilo_config['serial_cli_status'] }}"/>
+        <SERIAL_CLI_SPEED VALUE="{{ hp_mcp_ilo_config['serial_cli_speed'] }}"/>
+      </MOD_GLOBAL_SETTINGS>
+     <MOD_NETWORK_SETTINGS>
+{% if not hp_mcp_ilo_config['enable_dhcp'] %}
+        <DHCP_DNS_SERVER VALUE="N"/>
+        <DHCP_DOMAIN_NAME VALUE="N"/>
+        <DHCP_ENABLE VALUE="N"/>
+        <DHCP_GATEWAY VALUE="N"/>
+        <DHCP_STATIC_ROUTE VALUE="N"/>
+        <DHCP_WINS_SERVER VALUE="N"/>
+        <DOMAIN_NAME VALUE="{{ hp_mcp_ilo_domain_name }}"/>
+        <GATEWAY_IP_ADDRESS VALUE="{{ hp_mcp_ilo_gateway }}"/>
+        <IP_ADDRESS VALUE="{{ hp_mcp_ilo_ip }}"/>
+        <PRIM_DNS_SERVER VALUE="{{ hp_mcp_ilo_prim_dns }}"/>
+        <SEC_DNS_SERVER VALUE="{{ hp_mcp_ilo_sec_dns }}"/>
+        <SUBNET_MASK VALUE="{{ hp_mcp_ilo_subnet_mask }}"/>
+{% elif hp_mcp_ilo_config['enable_dhcp'] %}
+        <DHCP_DNS_SERVER VALUE="Y"/>
+        <DHCP_DOMAIN_NAME VALUE="Y"/>
+        <DHCP_ENABLE VALUE="Y"/>
+        <DHCP_GATEWAY VALUE="Y"/>
+        <DHCP_STATIC_ROUTE VALUE="Y"/>
+        <DHCP_WINS_SERVER VALUE="Y"/>
+{% endif %}
+        <DNS_NAME VALUE="{{ hp_mcp_ilo_dns_name }}"/>
+     </MOD_NETWORK_SETTINGS>
+    </RIB_INFO>
+    <USER_INFO MODE="write">
+      <MOD_USER USER_LOGIN="Administrator">
+        <PASSWORD VALUE="{{ hp_mcp_ilo_default_admin_password }}"/>
+      </MOD_USER>
+    </USER_INFO>
+  </LOGIN>
+</RIBCL>

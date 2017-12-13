@@ -2,11 +2,13 @@
 - name: redhat | installing unbound
   yum:
     name: "unbound"
-    state: present
+    state: "present"
+  become: true
   when: ansible_os_family != "Fedora"
 
 - name: redhat | installing unbound
   dnf:
     name: "unbound"
-    state: present
+    state: "present"
+  become: true
   when: ansible_os_family == "Fedora"

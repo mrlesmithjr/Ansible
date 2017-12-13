@@ -1,0 +1,21 @@
+---
+# defaults file for ansible-nfs-client
+nfs_client_mounts: []
+  # - mount:
+  #   fstype: 'nfs'
+  #   opts:
+  #     - 'rsize=8192'
+  #     - 'wsize=8192'
+  #     - 'intr'
+  #   path: '/opt/nfs/test1'
+  #   src: '192.168.250.10:/opt/nfs/test1'
+  #   state: 'mounted'
+  # - mount:
+  #   fstype: 'nfs'
+  #   opts:
+  #     - 'rsize=8192'
+  #     - 'wsize=8192'
+  #     - 'intr'
+  #   path: '/opt/nfs/test2'
+  #   src: '192.168.250.10:/opt/nfs/test2'
+  #   state: 'mounted'

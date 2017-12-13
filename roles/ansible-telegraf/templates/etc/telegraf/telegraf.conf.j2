@@ -1,0 +1,175 @@
+[global_tags]
+{% if enable_telegraf_global_tags %}
+{%   for item in telegraf_global_tags %}
+  {{ item.key }} = "{{ item.value }}"
+{%   endfor %}
+{% endif %}
+
+[agent]
+  interval = "{{ telegraf_agent_info.interval }}"
+  round_interval = {{ telegraf_agent_info.round_interval|lower }}
+  metric_batch_size = {{ telegraf_agent_info.metric_batch_size }}
+  metric_buffer_limit = {{ telegraf_agent_info.metric_buffer_limit }}
+  collection_jitter = "{{ telegraf_agent_info.collection_jitter }}"
+  flush_interval = "{{ telegraf_agent_info.flush_interval }}"
+  flush_jitter = "{{ telegraf_agent_info.flush_jitter }}"
+  precision = "{{ telegraf_agent_info.precision }}"
+  debug = {{ telegraf_agent_info.debug|lower }}
+  quiet = {{ telegraf_agent_info.quiet|lower }}
+  hostname = "{{ telegraf_agent_info.hostname }}"
+  omit_hostname = {{ telegraf_agent_info.omit_hostname|lower }}
+
+###############################################################################
+#                            OUTPUT PLUGINS                                   #
+###############################################################################
+
+{% if telegraf_outputs.influxdb.enabled %}
+[[outputs.influxdb]]
+  urls = ["{{ telegraf_outputs.influxdb.urls|join ('", "')}}"]
+  database = "{{ telegraf_outputs.influxdb.database }}"
+  retention_policy = "{{ telegraf_outputs.influxdb.retention_policy }}"
+  write_consistency = "{{ telegraf_outputs.influxdb.write_consistency }}"
+  timeout = "{{ telegraf_outputs.influxdb.timeout }}"
+{%   if telegraf_outputs.influxdb.login_required %}
+  username = "{{ telegraf_outputs.influxdb.username }}"
+  password = "{{ telegraf_outputs.influxdb.password }}"
+{%   endif %}
+{% endif %}
+{% if telegraf_outputs['elasticsearch']['enabled'] %}
+[[outputs.elasticsearch]]
+  urls = ["{{ telegraf_outputs['elasticsearch']['urls']|join('", "') }}"]
+  timeout = "{{ telegraf_outputs['elasticsearch']['timeout'] }}"
+  enable_sniffer = {{ telegraf_outputs['elasticsearch']['enable_sniffer']|lower }}
+  health_check_interval = "{{ telegraf_outputs['elasticsearch']['health_check_interval'] }}"
+{%   if telegraf_outputs['elasticsearch']['auth']['enabled'] %}
+  username = "{{ telegraf_outputs['elasticsearch']['auth']['username'] }}"
+  password = "{{ telegraf_outputs['elasticsearch']['auth']['password'] }}"
+{%   endif %}
+  index_name = "{{ telegraf_outputs['elasticsearch']['index_name'] }}"
+  manage_template = {{ telegraf_outputs['elasticsearch']['manage_template']|lower }}
+  template_name = "{{ telegraf_outputs['elasticsearch']['template_name'] }}"
+  overwrite_template = {{ telegraf_outputs['elasticsearch']['overwrite_template']|lower }}
+{% endif %}
+{% if telegraf_outputs.graphite.enabled %}
+[[outputs.graphite]]
+  servers = ["{{ telegraf_outputs.graphite.servers|join ('", "')}}"]
+  prefix = "{{ telegraf_outputs.graphite.prefix }}"
+  template = "{{ telegraf_outputs.graphite.template }}"
+  timeout = {{ telegraf_outputs.graphite.timeout }}
+{% endif %}
+{% if telegraf_outputs.graylog.enabled %}
+[[outputs.graylog]]
+  servers = ["{{ telegraf_outputs.graylog.servers|join ('", "')}}"]
+{% endif %}
+{% if telegraf_outputs.prometheus_client.enabled %}
+[[outputs.prometheus_client]]
+#   ## Address to listen on
+  listen = "{{ telegraf_outputs.prometheus_client.listen }}"
+{% endif %}
+
+###############################################################################
+#                            INPUT PLUGINS                                    #
+###############################################################################
+
+{% if telegraf_inputs.cpu.enabled %}
+[[inputs.cpu]]
+  percpu = {{ telegraf_inputs.cpu.percpu|lower }}
+  totalcpu = {{ telegraf_inputs.cpu.totalcpu|lower }}
+  fielddrop = ["{{ telegraf_inputs.cpu.fielddrop }}"]
+{%   if telegraf_inputs['cpu']['tags'] is defined %}
+  [inputs.cpu.tags]
+{%     for item in telegraf_inputs['cpu']['tags'] %}
+{% set _key = item.split(': ')[0] %}
+{% set _val = telegraf_inputs['cpu']['tags'][_key] %}
+    {{ _key }} = "{{ _val }}"
+{%     endfor %}
+{%   endif %}
+{% endif %}
+{% if telegraf_inputs.disk.enabled %}
+[[inputs.disk]]
+  mount_points = ["{{ telegraf_inputs.disk.mount_points|join ('", "')}}"]
+  ignore_fs = ["{{ telegraf_inputs.disk.ignore_fs|join ('", "')}}"]
+{%   if telegraf_inputs['disk']['tags'] is defined %}
+  [inputs.disk.tags]
+{%     for item in telegraf_inputs['disk']['tags'] %}
+{% set _key = item.split(': ')[0] %}
+{% set _val = telegraf_inputs['disk']['tags'][_key] %}
+    {{ _key }} = "{{ _val }}"
+{%     endfor %}
+{%   endif %}
+{% endif %}
+{% for item in telegraf_basic_inputs %}
+[[inputs.{{ item }}]]
+{% endfor %}
+{% if telegraf_inputs.docker.enabled %}
+[[inputs.docker]]
+  endpoint = "{{ telegraf_inputs.docker.endpoint }}"
+  container_names = ["{{ telegraf_inputs.docker.container_names|join ('", "')}}"]
+  timeout = "{{ telegraf_inputs.docker.timeout }}"
+  perdevice = {{ telegraf_inputs.docker.perdevice|lower }}
+  total = {{ telegraf_inputs.docker.total|lower }}
+{% endif %}
+{% if telegraf_inputs.elasticsearch.enabled %}
+[[inputs.elasticsearch]]
+  servers = ["{{ telegraf_inputs.elasticsearch.servers|join ('", "')}}"]
+  local = {{ telegraf_inputs.elasticsearch.local|lower }}
+  cluster_health = {{ telegraf_inputs.elasticsearch.cluster_health|lower }}
+{% endif %}
+{% if telegraf_inputs.haproxy.enabled %}
+[[inputs.haproxy]]
+  servers = ["{{ telegraf_inputs.haproxy.servers|join ('", "')}}"]
+{% endif %}
+{% if telegraf_inputs.influxdb.enabled %}
+[[inputs.influxdb]]
+  urls = ["{{ telegraf_inputs.influxdb.urls|join ('", "')}}"]
+{% endif %}
+{% if telegraf_inputs.memcached.enabled %}
+[[inputs.memcached]]
+  servers = ["{{ telegraf_inputs.memcached.servers|join ('", "')}}"]
+  unix_sockets = ["{{ telegraf_inputs.memcached.unix_sockets|join ('", "')}}"]
+{% endif %}
+{% if telegraf_inputs.mongodb.enabled %}
+  servers = ["{{ telegraf_inputs.mongodb.servers|join ('", "')}}"]
+  gather_perdb_stats = {{ telegraf_inputs.mongodb.gather_perdb_stats|lower }}
+{% endif %}
+{% if telegraf_inputs.net.enabled %}
+[[inputs.net]]
+{%   if telegraf_inputs.net.interfaces is defined %}
+  interfaces = ["{{ telegraf_inputs.net.interfaces|join ('", "')}}"]
+{%   endif %}
+{% endif %}
+{% if telegraf_inputs.powerdns.enabled %}
+[[inputs.powerdns]]
+  unix_sockets = ["{{ telegraf_inputs.powerdns.unix_sockets|join ('", "')}}"]
+{% endif %}
+{% if telegraf_inputs.prometheus.enabled %}
+[[inputs.prometheus]]
+  urls = ["{{ telegraf_inputs.prometheus.urls|join ('", "')}}"]
+{%   if telegraf_inputs.prometheus.bearer_token is defined %}
+  bearer_token = {{ telegraf_inputs.prometheus.bearer_token }}
+{%   endif %}
+{% endif %}
+{% if telegraf_inputs.rabbitmq.enabled %}
+[[inputs.rabbitmq]]
+  url = "{{ telegraf_inputs.rabbitmq.url }}"
+{%   if telegraf_inputs.rabbitmq.name is defined %}
+  name = "rmq-server-1" # optional tag
+{%   endif %}
+  username = "{{ telegraf_inputs.rabbitmq.username }}"
+  password = "{{ telegraf_inputs.rabbitmq.password }}"
+  nodes = ["{{ telegraf_inputs.rabbitmq.nodes|join ('", "')}}"]
+{% endif %}
+{% if telegraf_inputs.redis.enabled %}
+[[inputs.redis]]
+  servers = ["{{ telegraf_inputs.redis.servers|join ('", "')}}"]
+{% endif %}
+{% if telegraf_inputs.zfs.enabled %}
+[[inputs.zfs]]
+  kstatPath = "{{ telegraf_inputs.zfs.kstatPath }}"
+  kstatMetrics = ["{{ telegraf_inputs.zfs/kstatMetrics|join ('", "')}}"]
+  poolMetrics = {{ telegraf_inputs.zfs.poolMetrics|lower }}
+{% endif %}
+{% if telegraf_inputs.zookeeper.enabled %}
+[[inputs.zookeeper]]
+  servers = ["{{ telegraf_inputs.zookeeper.servers|join ('", "')}}"]
+{% endif %}

@@ -2,39 +2,39 @@
 <hudson>
   <disabledAdministrativeMonitors/>
   <version>1.0</version>
-  <numExecutors>{{ jenkins_config_info.num_executors }}</numExecutors>
+  <numExecutors>{{ jenkins_config_info['num_executors'] }}</numExecutors>
   <mode>NORMAL</mode>
-  <useSecurity>{{ jenkins_config_info.use_security|lower }}</useSecurity>
-  <authorizationStrategy class="hudson.security.{{ jenkins_config_info.auth_strategy }}"/>
-{% if jenkins_ldap_info.enabled %}
+  <useSecurity>{{ jenkins_config_info['use_security']|lower }}</useSecurity>
+  <authorizationStrategy class="hudson.security.{{ jenkins_config_info['auth_strategy'] }}"/>
+{% if jenkins_ldap_info['enabled'] %}
   <securityRealm class="hudson.security.LDAPSecurityRealm" plugin="ldap@1.11">
-    <server>{{ jenkins_ldap_info.server }}:{{ jenkins_ldap_info.port }}</server>
-    <rootDN>{{ jenkins_ldap_info.root_dn }}</rootDN>
+    <server>{{ jenkins_ldap_info['server'] }}:{{ jenkins_ldap_info['port'] }}</server>
+    <rootDN>{{ jenkins_ldap_info['root_dn'] }}</rootDN>
     <inhibitInferRootDN>false</inhibitInferRootDN>
-    <userSearchBase>{{ jenkins_ldap_info.user_search_base }}</userSearchBase>
-{%   if jenkins_ldap_info.active_directory %}
+    <userSearchBase>{{ jenkins_ldap_info['user_search_base'] }}</userSearchBase>
+{%   if jenkins_ldap_info['active_directory'] %}
     <userSearch>sAMAccountName={0}</userSearch>
-{%   elif not jenkins_ldap_info.active_directory %}
+{%   elif not jenkins_ldap_info['active_directory'] %}
     <userSearch>uid={0}</userSearch>
 {%   endif %}
     <groupSearchFilter>(&amp;(objectclass=group)(cn={0}))</groupSearchFilter>
     <groupMembershipStrategy class="jenkins.security.plugins.ldap.FromGroupSearchLDAPGroupMembershipStrategy">
       <filter></filter>
     </groupMembershipStrategy>
-    <managerDN>{{ jenkins_ldap_info.manager_dn }}</managerDN>
-    <managerPasswordSecret>{{ jenkins_ldap_info.manager_password }}</managerPasswordSecret>
-    <disableMailAddressResolver>{{ jenkins_ldap_info.disable_email_address_resolver|lower }}</disableMailAddressResolver>
+    <managerDN>{{ jenkins_ldap_info['manager_dn'] }}</managerDN>
+    <managerPasswordSecret>{{ jenkins_ldap_info['manager_password'] }}</managerPasswordSecret>
+    <disableMailAddressResolver>{{ jenkins_ldap_info['disable_email_address_resolver']|lower }}</disableMailAddressResolver>
     <displayNameAttributeName>displayname</displayNameAttributeName>
     <mailAddressAttributeName>mail</mailAddressAttributeName>
     <userIdStrategy class="jenkins.model.IdStrategy$CaseInsensitive"/>
     <groupIdStrategy class="jenkins.model.IdStrategy$CaseInsensitive"/>
   </securityRealm>
 {% endif %}
-  <disableRememberMe>{{ jenkins_config_info.disable_remember_me|lower }}</disableRememberMe>
+  <disableRememberMe>{{ jenkins_config_info['disable_remember_me']|lower }}</disableRememberMe>
   <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
   <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
   <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
-  <systemMessage>{{ jenkins_config_info.system_message }}</systemMessage>
+  <systemMessage>{{ jenkins_config_info['system_message'] }}</systemMessage>
   <markupFormatter class="hudson.markup.EscapedMarkupFormatter"/>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>

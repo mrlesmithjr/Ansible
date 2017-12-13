@@ -1,40 +1,31 @@
-Role Name
-=========
+# ansible-users
 
-Manages local users on systems.
+An [Ansible](https://www.ansible.com) role to manage local users
 
-Build Status
-------------
-
-[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-users.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-users)
-
-Requirements
-------------
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-[Role Defaults](./defaults/main.yml)
+[defaults/main.yml](defaults/main.yml)
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-License
--------
+[playbook.yml](playbook.yml)
 
-BSD
+## License
 
-Author Information
-------------------
+MIT
+
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
+
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   mrlesmithjr [at] gmail.com

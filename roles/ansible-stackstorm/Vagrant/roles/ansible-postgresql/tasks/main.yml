@@ -2,3 +2,11 @@
 # tasks file for ansible-postgresql
 - include: debian.yml
   when: ansible_os_family == "Debian"
+
+- include: users.yml
+
+- include: config.yml
+  when: postgresql_config
+
+- include: replication.yml
+  when: postgresql_enable_replication

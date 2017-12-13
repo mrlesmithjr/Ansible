@@ -1,0 +1,96 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/keystone-install.html#
+
+# Configure Keystone
+- name: keystone | Configuring Keystone
+  template:
+    src: "etc/keystone/keystone.conf.j2"
+    dest: "/etc/keystone/keystone.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart apache2"
+
+# Check if Identity Service database has already been populated
+- name: keystone | Checking If Identity Service Database Has Already Been Populated
+  stat:
+    path: "/etc/keystone/.keystone_db_populated"
+  become: true
+  register: "_openstack_identity_service_keystone_db_populated_check"
+
+# Populate Identity Service database
+- name: keystone | Populating The Identity Service Database
+  command: su -s /bin/sh -c "keystone-manage db_sync" keystone
+  become: true
+  register: "_openstack_identity_service_keystone_db_populated"
+  when: >
+        not openstack_identity_service_ha or
+        (openstack_identity_service_ha and
+          inventory_hostname == openstack_identity_service_ha_master) and
+        not _openstack_identity_service_keystone_db_populated_check['stat']['exists']
+
+- name: keystone | Initialize Fernet key repositories
+  command: "{{ item }}"
+  become: true
+  with_items:
+    - 'keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone'
+    - 'keystone-manage credential_setup --keystone-user keystone --keystone-group keystone'
+  when: >
+        not openstack_identity_service_ha or
+        (openstack_identity_service_ha and
+          inventory_hostname == openstack_identity_service_ha_master) and
+        _openstack_identity_service_keystone_db_populated['changed'] and
+        openstack_identity_service_token_provider == "fernet"
+
+- name: keystone | Bootstrap the Identity service
+  command: >
+           keystone-manage bootstrap --bootstrap-password {{ openstack_identity_service_admin_info['pass'] }}
+           --bootstrap-admin-url {{ openstack_identity_service_admin_info['admin_url'] }}
+           --bootstrap-internal-url {{ openstack_identity_service_admin_info['internal_url'] }}
+           --bootstrap-public-url {{ openstack_identity_service_admin_info['public_url'] }}
+           --bootstrap-region-id {{ openstack_identity_service_admin_info['region_id'] }}
+  become: true
+  when: >
+        not openstack_identity_service_ha or
+        (openstack_identity_service_ha and
+          inventory_hostname == openstack_identity_service_ha_master) and
+        _openstack_identity_service_keystone_db_populated['changed']
+
+- name: keystone | Marking The Identity Service Database As Being Populated
+  file:
+    path: "/etc/keystone/.keystone_db_populated"
+    state: "touch"
+  become: true
+  when: >
+        not openstack_identity_service_ha or
+        (openstack_identity_service_ha and
+          inventory_hostname == openstack_identity_service_ha_master) and
+        _openstack_identity_service_keystone_db_populated['changed']
+
+- name: keystone | Setting Fact (_keystone_db_populated)
+  set_fact:
+    _keystone_db_populated: true
+  when: >
+        not openstack_identity_service_ha or
+        (openstack_identity_service_ha and
+          inventory_hostname == openstack_identity_service_ha_master) and
+        (_openstack_identity_service_keystone_db_populated['changed'] or
+        _openstack_identity_service_keystone_db_populated_check['stat']['exists'])
+
+- name: keystone | Marking The Identity Service Database As Being Populated
+  file:
+    path: "/etc/keystone/.keystone_db_populated"
+    state: "touch"
+  become: true
+  when: >
+        (openstack_identity_service_ha and
+          inventory_hostname != openstack_identity_service_ha_master) and
+        hostvars[openstack_identity_service_ha_master]['_keystone_db_populated'] and
+        not _openstack_identity_service_keystone_db_populated_check['stat']['exists']
+
+- name: keystone | Removing Default SQLite Database
+  file:
+    dest: "/var/lib/keystone/keystone.db"
+    state: "absent"
+  become: true

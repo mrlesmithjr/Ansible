@@ -1,7 +1,7 @@
 {% if bind_acls is defined %}
 {%   for acl in bind_acls %}
-acl {{ acl.name }} {
-{%     for net in acl.networks %}
+acl {{ acl['name'] }} {
+{%     for net in acl['networks'] %}
     {{ net }};
 {%     endfor %}
 };
@@ -10,7 +10,7 @@ acl {{ acl.name }} {
 options {
     directory "/var/cache/bind";
     recursion yes;
-    allow-query { {% for item in bind_acls %}{{ item.name }};{% if not loop.last %} {% endif %}{% endfor %} };
+    allow-query { {% for item in bind_acls %}{{ item['name'] }};{% if not loop.last %} {% endif %}{% endfor %} };
 {% if bind_forwarding_server %}
     forwarders {
 {%   for item in bind_forwarders %}

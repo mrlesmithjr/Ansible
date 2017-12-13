@@ -1,6 +1,20 @@
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7
+[docker-ce-{{ docker_release_channel }}]
+name=Docker CE {{ docker_release_channel }} - $basearch
+baseurl=https://download.docker.com/linux/{{ ansible_distribution|lower }}/{{ ansible_distribution_major_version }}/$basearch/{{ docker_release_channel }}
 enabled=1
 gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
+gpgkey=https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+
+[docker-ce-{{ docker_release_channel }}-debuginfo]
+name=Docker CE {{ docker_release_channel }} - Debuginfo $basearch
+baseurl=https://download.docker.com/linux/{{ ansible_distribution|lower }}/{{ ansible_distribution_major_version }}/debug-$basearch/{{ docker_release_channel }}
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+
+[docker-ce-{{ docker_release_channel }}-source]
+name=Docker CE {{ docker_release_channel }} - Sources
+baseurl=https://download.docker.com/linux/{{ ansible_distribution|lower }}/{{ ansible_distribution_major_version }}/source/{{ docker_release_channel }}
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg

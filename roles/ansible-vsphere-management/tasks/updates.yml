@@ -1,0 +1,52 @@
+---
+- name: updates | Managing Updates
+  win_shell: |
+    $vmHost="{{ hostvars[item]['ansible_host'] }}"
+    Connect-VIServer -Server $vmHost
+    $ESXCli=$(Get-EsxCli -Server $vmHost)
+    $SystemVersion=$($ESXCli.system.version.get().version)
+    $SystemVersionUpdate=$($ESXCli.system.version.get().update)
+    $SystemVersionBuild=$($ESXCli.system.version.get().build.Trim("Releasebuild-"))
+    $SystemAvailableUpdateBuilds=@($("{% for _build in vsphere_updates %}{{ _build['build'] }}{% if not loop.last %}", "{% endif %}{% endfor %}"))
+    $SystemAvailableUpdateBuilds=$SystemAvailableUpdateBuilds|sort
+    Foreach ($i in $SystemAvailableUpdateBuilds) {
+      if ($SystemVersionBuild -lt $i) {
+        $SystemUpdateBuild="$i"
+      }
+    }
+    {% if vsphere_updates is defined %}
+    {%   for update in vsphere_updates %}
+    if ($SystemVersion -eq '{{ update['version'] }}') {
+      if ($SystemUpdateBuild -eq '{{ update['build'] }}') {
+        Install-VMHostPatch -Server $vmHost -HostPath '{{ update['path'] }}/metadata.zip' -Confirm:$false
+        $RebootHost="true"
+      }
+    }
+    {%   endfor %}
+    {% endif %}
+    {% if vsphere_reboot_after_updates %}
+    if ($RebootHost) {
+      if ($RebootHost -eq "true") {
+        Restart-VMHost -Confirm:$false
+        # Wait 30 Seconds For Server To Stop Responding
+        if (Test-Connection -Cn {{ hostvars[host]['ansible_host'] }} -BufferSize 16 -Count 1 -ea 0 -quiet) {
+          sleep 30
+        }
+        # Wait 60 Seconds For Server To Stop Responding
+        if (Test-Connection -Cn {{ hostvars[host]['ansible_host'] }} -BufferSize 16 -Count 1 -ea 0 -quiet) {
+          sleep 60
+        }
+        # Wait 120 Seconds For Server To Stop Responding
+        if (Test-Connection -Cn {{ hostvars[host]['ansible_host'] }} -BufferSize 16 -Count 1 -ea 0 -quiet) {
+          sleep 120
+        }
+      }
+    }
+    {% endif %}
+    Disconnect-VIServer * -Confirm:$false
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: >
+        (hostvars[item]['vsphere_maintenance_mode'] is defined and
+        hostvars[item]['vsphere_maintenance_mode']) and
+        (vsphere_hosts_update is defined and
+        vsphere_hosts_update)

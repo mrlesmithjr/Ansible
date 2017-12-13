@@ -1,0 +1,16 @@
+---
+- name: firewall | Managing Remote Desktop Firewall Settings
+  win_firewall_rule:
+    action: "{{ item['action'] }}"
+    description: "{{ item['description']|default(omit) }}"
+    direction: "{{ item['direction'] }}"
+    enable: "{{ item['enable']|default(omit) }}"
+    force: "{{ item['force']|default(omit) }}"
+    localip: "{{ item['localip']|default(omit) }}"
+    localport: "{{ item['localport'] }}"
+    name: "{{ item['name'] }}"
+    profile: "{{ item['profile']|default(omit) }}"
+    protocol: "{{ item['protocol'] }}"
+    remoteip: "{{ item['remoteip']|default(omit) }}"
+    state: "{{ item['state'] }}"
+  with_items: "{{ windows_remote_desktop_firewall }}"

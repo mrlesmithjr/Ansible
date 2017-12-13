@@ -1,4 +1,19 @@
 ---
+- name: config | Capturing Landscape App Server Cert
+  slurp:
+    src: "{{ landscape_client_app_ssl_cert_file }}"
+  become: true
+  register: "_landscape_client_app_ssl_cert"
+  delegate_to: "{{ landscape_client_app_server }}"
+  when: landscape_client_app_server_config
+
+- name: config | Adding Landscape App Server Cert
+  template:
+    src: "etc/landscape/server.pem.j2"
+    dest: "{{ landscape_client_app_server_cert }}"
+  become: true
+  when: landscape_client_app_server_config
+
 - name: config | Configuring Landscape Client
   template:
     src: "etc/landscape/client.conf.j2"
@@ -9,3 +24,5 @@
   become: true
   notify:
     - "restart landscape-client"
+
+- meta: flush_handlers

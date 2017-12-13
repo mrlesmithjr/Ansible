@@ -1,0 +1,16 @@
+---
+# Defines all dns servers to configure
+dns_nameservers:
+  - "{{ vsphere_dns_servers[0] }}"
+  - "{{ vsphere_dns_servers[1] }}"
+
+# These should be defined as the DNSDist VM IPs
+vsphere_dns_servers:
+  - "{{ vsphere_dnsdist_vm_ips[0] }}"
+  - "{{ vsphere_dnsdist_vm_ips[1] }}"
+
+# These should be defined as the DDI VM IPs
+vsphere_dnsdist_dns_servers:
+  - "{{ vsphere_ddi_vm_ips[0] }}"
+  - "{{ vsphere_ddi_vm_ips[1] }}"
+  - "{{ vsphere_ddi_vm_ips[2] }}"

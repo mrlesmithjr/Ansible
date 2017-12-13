@@ -1,0 +1,78 @@
+---
+# Defines is HAProxy should be configured
+haproxy_config: true
+
+haproxy_configs:
+  - name: phpipam-80
+    backend_checks: true
+    backend_name: phpipam-hosts
+    backend_servers_bind_port: 80
+    backend_servers: "{{ groups[vsphere_ddi_vms_group] }}"
+    balance: source
+    default_server_options:
+      - name: maxconn
+        value: 256
+      - name: maxqueue
+        value: 128
+      - name: weight
+        value: 100
+    enabled: true
+    frontend_bind_address: "{{ haproxy_lb_vip }}"
+    frontend_bind_port: 80
+    frontend_name: phpipam-in
+    mode: http
+    options:
+      - httplog
+      # - httpchk
+#      - httpchk HEAD / HTTP/1.1\r\nHost:localhost  #Works for default NGINX health checks
+  - name: pdns_db_cluster-3306
+    backend_checks: true
+    backend_name: pdns-db-cluster-hosts
+    backend_backups: true
+    backend_backups_primary: "{{ groups[vsphere_ddi_vms_group][0] }}"
+    backend_servers_bind_port: 3306
+    backend_servers: "{{ groups[vsphere_ddi_vms_group] }}"
+    balance: source
+    default_server_options:
+      - name: inter
+        value: 2000
+      - name: rise
+        value: 2
+      - name: fall
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ haproxy_lb_vip }}'
+    frontend_bind_port: 3306
+    frontend_name: pdns-db-cluster-in
+  - name: "pdns_api-{{ pdns_webserver_port }}"
+    backend_checks: true
+    backend_name: pdns-api-hosts
+    backend_servers_bind_port: "{{ pdns_webserver_port }}"
+    backend_servers: "{{ groups[vsphere_ddi_vms_group] }}"
+    balance: source
+    default_server_options:
+      - name: maxconn
+        value: 256
+      - name: maxqueue
+        value: 128
+      - name: weight
+        value: 100
+    enabled: true
+    frontend_bind_address: "{{ pdns_api_vip }}"
+    frontend_bind_port: "{{ pdns_webserver_port }}"
+    frontend_name: pdns-api-in
+    mode: http
+    options:
+      - httplog
+      # - httpchk
+#      - httpchk HEAD / HTTP/1.1\r\nHost:localhost  #Works for default NGINX health checks
+
+haproxy_lb_vip: '{{ vsphere_lb_vips[0] }}'
+
+haproxy_pri_domain_name: '{{ vsphere_pri_domain_name }}'
+
+# Defines if using a highly available setup. i.e. multiple haproxy load balancers
+haproxy_load_balancer_ha: true
+
+# Defines the primary host when in HA mode
+haproxy_load_balancer_ha_primary: "{{ groups[vsphere_lb_vms_group][0] }}"

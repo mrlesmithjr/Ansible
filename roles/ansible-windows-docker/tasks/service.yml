@@ -1,0 +1,14 @@
+---
+- name: service | Checking For Docker Service
+  win_service:
+    name: "docker"
+  register: "docker_service_info"
+
+- name: service | Registering Docker Service
+  win_shell: "C:\\ProgramData\\chocolatey\\lib\\docker\\tools\\docker\\dockerd.exe --register-service"
+  when: not docker_service_info['exists']
+
+- name: service | Ensuring Docker Service Is Started
+  win_service:
+    name: "docker"
+    state: "started"

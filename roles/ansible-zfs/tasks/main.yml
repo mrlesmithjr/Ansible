@@ -15,3 +15,6 @@
   when: >
         zfs_enable_performance_tuning is defined and
         zfs_enable_performance_tuning
+
+- include: monitoring.yml
+  when: zfs_enable_monitoring

@@ -1,0 +1,308 @@
+{% if (_vsphere_vcenter_available and vsphere_networking_use_vss) or not _vsphere_vcenter_available %}
+{%   for host in groups['vsphere_hosts'] %}
+$vmHost = "{{ hostvars[host]['ansible_host'] }}"
+
+Connect-VIServer -Server $vmHost | Out-Null
+
+$vmServer = Get-VMHost -Server $vmHost
+
+{%     for vswitch in vsphere_vswitches %}
+$AllvSwitches = ($vmServer | Get-VirtualSwitch -Standard).Name
+$vSwitchName = "{{ vswitch['name'] }}"
+
+if ($AllvSwitches -contains $vSwitchName) {
+  "$vSwitchName already exists On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+}
+else {
+  "$vSwitchName does not exist On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+  New-VirtualSwitch -Server $vmHost -Name $vSwitchName -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%       if vswitch['active_nics'] is defined %}
+$DesiredActiveNics = @("{{ vswitch['active_nics']|join('", "') }}")
+{%       elif vswitch['active_nics'] is not defined %}
+$DesiredActiveNics = @()
+{%       endif %}
+{%       if vswitch['standby_nics'] is defined %}
+$DesiredStandbyNics = @("{{ vswitch['standby_nics']|join('", "') }}")
+{%       elif vswitch['standby_nics'] is not defined %}
+$DesiredStandbyNics = @()
+{%       endif %}
+{%       if vswitch['unused_nics'] is defined %}
+$DesiredUnusedNics = @("{{ vswitch['unused_nics']|join('", "') }}")
+{%       elif vswitch['unused_nics'] is not defined %}
+$DesiredUnusedNics = @()
+{%       endif %}
+
+$vSwitch = Get-VirtualSwitch -Server $vmHost -Name $vSwitchName -Standard
+$CurrentNics = ($vSwitch | Get-VMHostNetworkAdapter -Physical).Name
+
+if ($DesiredActiveNics -ne $null) {
+  Foreach ($i in $DesiredActiveNics){
+    if ($CurrentNics -notcontains $i){
+      "Adding $i to $vSwitch on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $Nic = Get-VMHostNetworkAdapter -Server $vmHost -Physical -Name $i
+      $vSwitch | Add-VirtualSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $Nic -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+if ($DesiredStandbyNics -ne $null) {
+  Foreach ($i in $DesiredStandbyNics){
+    if ($CurrentNics -notcontains $i){
+      "Adding $i to $vSwitch on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $Nic = Get-VMHostNetworkAdapter -Server $vmHost -Physical -Name $i
+      $vSwitch | Add-VirtualSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $Nic -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+if ($DesiredUnusedNics -ne $null) {
+  Foreach ($i in $DesiredUnusedNics){
+    if ($CurrentNics -notcontains $i){
+      "Adding $i to $vSwitch on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $Nic = Get-VMHostNetworkAdapter -Server $vmHost -Physical -Name $i
+      $vSwitch | Add-VirtualSwitchPhysicalNetworkAdapter -VMHostPhysicalNic $Nic -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+$vSwitch = Get-VirtualSwitch -Server $vmHost -Name $vSwitchName -Standard
+$CurrentNics = ($vSwitch | Get-VMHostNetworkAdapter -Physical).Name
+if ($CurrentNics -ne $null) {
+  Foreach ($i in $CurrentNics){
+    if ($DesiredActiveNics -notcontains $i -And $DesiredStandbyNics -notcontains $i -And $DesiredUnusedNics -notcontains $i){
+      "Removing $i from $vSwitch on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $vmServer | Get-VMHostNetworkAdapter -Physical -Name $i | Remove-VirtualSwitchPhysicalNetworkAdapter -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+$vSwitch = Get-VirtualSwitch -Server $vmHost -Name $vSwitchName -Standard
+$NicTeamingPolicy = $vSwitch | Get-NicTeamingPolicy
+$ActiveNics = ($NicTeamingPolicy).ActiveNic
+if ($DesiredActiveNics -ne $null) {
+  Foreach ($i in $DesiredActiveNics) {
+    if ($ActiveNics -notcontains $i){
+      "Making $i active for $vSwitchName on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $NicTeamingPolicy | Set-NicTeamingPolicy -MakeNicActive $i -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+$vSwitch = Get-VirtualSwitch -Server $vmHost -Name $vSwitchName -Standard
+$NicTeamingPolicy = $vSwitch | Get-NicTeamingPolicy
+$StandByNics = ($NicTeamingPolicy).StandbyNic
+if ($DesiredStandbyNics -ne $null) {
+  Foreach ($i in $DesiredStandbyNics) {
+    if ($StandByNics -notcontains $i){
+      "Making $i standby for $vSwitchName on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $NicTeamingPolicy | Set-NicTeamingPolicy -MakeNicStandby $i -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+$vSwitch = Get-VirtualSwitch -Server $vmHost -Name $vSwitchName -Standard
+$NicTeamingPolicy = $vSwitch | Get-NicTeamingPolicy
+$UnusedNics = ($NicTeamingPolicy).UnusedNic
+if ($DesiredUnusedNics -ne $null) {
+  Foreach ($i in $DesiredUnusedNics) {
+    if ($UnusedNics -notcontains $i){
+      "Making $i unused for $vSwitchName on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+      $NicTeamingPolicy | Set-NicTeamingPolicy -MakeNicUnused $i -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+
+{%     endfor %}
+
+{%     for vswitch in vsphere_vswitches %}
+{%       for portgroup in vswitch['portgroups'] %}
+$DesiredVswitch = "{{ vswitch['name'] }}"
+$ManagementNetwork = "{{ vsphere_vswitches_management_network }}"
+
+$dpg = "{{ portgroup['name'] }}"
+$pgVlanId = "{{ portgroup['vlan_id']|default(0) }}"
+if ($dpg -ne $ManagementNetwork) {
+  $AllPortGroups = ($vmServer | Get-VirtualPortGroup -Standard).Name
+  if ($AllPortGroups -contains $dpg) {
+    $dpgvs = ($vmServer | Get-VirtualPortGroup -Name $dpg -Standard | Get-VirtualSwitch).Name
+    if ($dpgvs -eq $DesiredVswitch) {
+      "$dpg Exists On The Correct vSwitch On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+      $CurrentPGVlanId = (Get-VirtualPortGroup -Server $vmHost -Name $dpg -Standard).VlanId
+      $DesiredPGVlanID = $pgVlanId
+      if ($CurrentPGVlanId -ne $DesiredPGVlanID) {
+        Get-VirtualPortGroup -Server $vmHost -Name $dpg -Standard| Set-VirtualPortGroup -VLanId $DesiredPGVlanID
+      }
+      $pgToBeRemoved = "$dpg-ToBeRemoved"
+      if ($AllPortGroups -contains $pgToBeRemoved) {
+        $dpgvsToBeRemoved = ($vmServer | Get-VirtualPortGroup -Name $pgToBeRemoved -Standard| Get-VirtualSwitch).Name
+        if ($dpgvsToBeRemoved -eq $dpgvs) {
+          "$pgToBeRemoved Already Exists On The Correct vSwitch On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+          $vmServer | Get-VM | Get-NetworkAdapter | Where-Object NetworkName -eq $pgToBeRemoved | Set-NetworkAdapter -Portgroup $dpg -Confirm:$false -RunAsync | Out-File -Append {{ vsphere_management_log }}
+          Get-VirtualPortGroup -Server $vmHost -Name $pgToBeRemoved | Remove-VirtualPortGroup -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        }
+      }
+    }
+    else {
+      "$dpg Does Not Exist On The Correct vSwitch On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+      $pgToBeRemoved = "$dpg-ToBeRemoved"
+      if ($AllPortGroups -notcontains $pgToBeRemoved) {
+        "$dpg-ToBeRemoved Does Not Exist So Creating It On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+        New-VirtualPortGroup -Server $vmHost -VirtualSwitch $DesiredVswitch -Name $pgToBeRemoved -VLanId $pgVlanId -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        $vmServer | Get-VM | Get-NetworkAdapter | Where-Object NetworkName -eq $dpg | Set-NetworkAdapter -Portgroup $pgToBeRemoved -Confirm:$false -RunAsync | Out-File -Append {{ vsphere_management_log }}
+        Get-VirtualPortGroup -Server $vmHost -Name $dpg | Remove-VirtualPortGroup -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        New-VirtualPortGroup -Server $vmHost -VirtualSwitch $DesiredVswitch -Name $dpg -VLanId $pgVlanId -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        $vmServer | Get-VM | Get-NetworkAdapter | Where-Object NetworkName -eq $pgToBeRemoved | Set-NetworkAdapter -Portgroup $dpg -Confirm:$false -RunAsync | Out-File -Append {{ vsphere_management_log }}
+        Get-VirtualPortGroup -Server $vmHost -Name $pgToBeRemoved | Remove-VirtualPortGroup -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      else {
+        "$dpgvsToBeRemoved Exists...Moving Any VMs Connected And Then Removing $dpgvsToBeRemoved On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+        $vmServer | Get-VM | Get-NetworkAdapter | Where-Object NetworkName -eq $pgToBeRemoved | Set-NetworkAdapter -Portgroup $dpg -Confirm:$false -RunAsync | Out-File -Append {{ vsphere_management_log }}
+        Get-VirtualPortGroup -Server $vmHost -Name $pgToBeRemoved | Remove-VirtualPortGroup -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+    }
+  }
+  else {
+    "$dpg Does Not Exist so creating it On $vmhost" | Out-File -Append {{ vsphere_management_log }}
+    $dpgvs = $DesiredVswitch
+    New-VirtualPortGroup -Server $vmHost -VirtualSwitch $dpgvs -Name $dpg -VLanId $pgVlanId -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+}
+{%       if portgroup['inherit_failover_order'] is defined %}
+$CurrentFailoverOrderInherited = ($vmServer | Get-VirtualPortGroup -Name $dpg | Get-NicTeamingPolicy).IsFailoverOrderInherited
+$DesiredFailoverOrderInherited = "{{ portgroup['inherit_failover_order'] }}"
+if ($CurrentFailoverOrderInherited -ne $DesiredFailoverOrderInherited) {
+  "Changing failover policy from $CurrentFailoverOrderInherited to $DesiredFailoverOrderInherited on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+  $Policy = ($vmServer | Get-VirtualPortGroup -Name $dpg| Get-NicTeamingPolicy)
+  Set-NicTeamingPolicy -VirtualPortGroupPolicy $Policy -InheritFailoverOrder ${{ portgroup['inherit_failover_order']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%       endif %}
+{%       if vswitch['load_balancing_policy'] is defined %}
+$NicTeamingPolicy = $vmServer | Get-VirtualSwitch -Name $vSwitchName | Get-NicTeamingPolicy
+$LoadBalancingPolicy = ($NicTeamingPolicy).LoadBalancingPolicy
+$vmSwitchLoadBalancingPolicy = "{{ vswitch['load_balancing_policy'] }}"
+If ($LoadBalancingPolicy -ne $vmSwitchLoadBalancingPolicy) {
+  "Setting $vSwitch Load Balancing Policy to $vmSwitchLoadBalancingPolicy on $vmHost" | Out-File -Append {{ vsphere_management_log }}
+  $NicTeamingPolicy | Set-NicTeamingPolicy -LoadBalancingPolicy $vmSwitchLoadBalancingPolicy -Confirm $false | Out-File -Append {{ vsphere_management_log }}
+}
+{%       endif %}
+{%     endfor %}
+{%   endfor %}
+
+$DesiredvSwitches = @("{% for vs in vsphere_vswitches %}{{ vs['name'] }}{% if not loop.last %}", "{% endif %}{% endfor %}")
+$AllvSwitches = ($vmServer | Get-VirtualSwitch -Standard).Name
+foreach ($vSwitch in $AllvSwitches) {
+  if ($DesiredvSwitches -notcontains $vSwitch) {
+{%     if vsphere_vswitches_remove_unmanaged_vswitches %}
+    "$vSwitch Is Not A Desired vSwitch On $vmhost...Removing $vSwitch" | Out-File -Append {{ vsphere_management_log }}
+    Remove-VirtualSwitch -Server $vmHost $vSwitch -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+{%     elif not vsphere_vswitches_remove_unmanaged_vswitches %}
+    "$vSwitch Is Not A Desired vSwitch On $vmhost...IT SHOULD BE REMOVED!!!!" | Out-File -Append {{ vsphere_management_log }}
+{%     endif %}
+  }
+  else {
+    "$vSwitch Is A Desired vSwitch On $vmhost...Not Removing $vSwitch" | Out-File -Append {{ vsphere_management_log }}
+  }
+}
+
+{%     if vsphere_vswitches_quarantine_unmanaged_portgroups %}
+$AllvSwitches = ($vmServer | Get-VirtualSwitch -Standard).Name
+$QuarantinevSwitch = "{{ vsphere_vswitches_quarantine_vswitch }}"
+if ($AllvSwitches -notcontains $QuarantinevSwitch) {
+  $vmServer | New-VirtualSwitch -Name $QuarantinevSwitch -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+
+{%       for vswitch in vsphere_vswitches %}
+$vSwitchName = "{{ vswitch['name'] }}"
+{%         if vswitch['portgroups'] is defined %}
+$SafePortGroups = @("{% for dpg in vswitch['portgroups'] %}{{ dpg['name'] }}{% if not loop.last %}", "{% endif %}{% endfor %}")
+{%         elif vswitch['portgroups'] is not defined %}
+$SafePortGroups = @()
+{%         endif %}
+$vSwitchPortGroups = ($vmServer | Get-VirtualSwitch -Name $vSwitchName -Standard | Get-VirtualPortGroup).Name
+if ($vSwitchPortGroups -ne $null) {
+  foreach ($pg in $vSwitchPortGroups) {
+    if ($SafePortGroups -notcontains $pg) {
+      $vms = ($vmServer | Get-VirtualPortGroup -Name $pg | Get-VM).Name
+      if ($vms.Count -ne 0 -and $vms -ne $null) {
+        foreach ($vm in $vms) {
+          $vm = $vmServer | Get-VM -Name $vm
+          $vmPowerState = $vm.PowerState
+          if ($vmPowerState -eq 'PoweredOn') {
+            $vm | Shutdown-VMGuest -Confirm:$false  | Out-File -Append {{ vsphere_management_log }}
+            do {
+              $vm = $vmServer | Get-VM -Name $vm
+              $vmPowerState = $vm.PowerState
+              sleep 3
+            } until ($vmPowerState -eq 'PoweredOff')
+          }
+          $QuarantinePG = "Quarantine_$pg"
+          $pgVlanId = (Get-VirtualPortGroup -Server $vmHost -Name $pg).VlanId
+          $QuarantinePortGroups = ($vmServer | Get-VirtualSwitch -Name $QuarantinevSwitch -Standard| Get-VirtualPortGroup).Name
+          if ($QuarantinePortGroups -notcontains $QuarantinePG) {
+            New-VirtualPortGroup -Server $vmHost -VirtualSwitch $QuarantinevSwitch -Name $QuarantinePG -VLanId $pgVlanId -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+          }
+          $vm | Get-NetworkAdapter | Where-Object NetworkName -eq $pg | Set-NetworkAdapter -Portgroup $QuarantinePG -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        }
+      }
+      else {
+        "Deleting $pg"
+      }
+    }
+  }
+}
+
+{%       endfor %}
+{%     endif %}
+
+{%     for vswitch in vsphere_vswitches %}
+$vmServer = Get-VMHost $vmHost
+$vmHostNetworkAdapters = $vmServer | Get-VMHostNetworkAdapter
+{%       if vswitch['vmkernel_ports'] is defined %}
+{%         for vmk in vswitch['vmkernel_ports'] %}
+if ($vmHostNetworkAdapters.Name -contains "{{ vmk['name'] }}") {
+  foreach ($adapter in $vmHostNetworkAdapters) {
+    if ($adapter.Name -eq "{{ vmk['name'] }}") {
+{%           if vmk['enable_mgmt'] %}
+      if ($adapter.IP -ne "{{ hostvars[host]['mgmt_ip'] }}") {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -IP {{ hostvars[host]['mgmt_ip'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      if ($adapter.SubnetMask -ne "{{ hostvars[host]['mgmt_subnetmask'] }}") {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -SubnetMask {{ hostvars[host]['mgmt_subnetmask'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+{%           endif %}
+{%           if vmk['enable_vmotion'] %}
+      if ($adapter.IP -ne "{{ hostvars[host]['vmotion_ip'] }}") {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -IP {{ hostvars[host]['vmotion_ip'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      if ($adapter.SubnetMask -ne "{{ hostvars[host]['vmotion_subnetmask'] }}") {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -SubnetMask {{ hostvars[host]['vmotion_subnetmask'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+{%           endif %}
+      if ($adapter.PortGroupName -ne "{{ vmk['portgroup_name'] }}") {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -PortGroup "{{ vmk['portgroup_name'] }}" -VirtualSwitch "{{ vswitch['name'] }}" -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      if ($adapter.FaultToleranceLoggingEnabled -ne ${{ vmk['enable_ft']|lower }}) {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -FaultToleranceLoggingEnabled ${{ vmk['enable_ft']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      if ($adapter.ManagementTrafficEnabled -ne ${{ vmk['enable_mgmt']|lower }}) {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -ManagementTrafficEnabled ${{ vmk['enable_mgmt']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      if ($adapter.VMotionEnabled -ne ${{ vmk['enable_vmotion']|lower }}) {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -VMotionEnabled ${{ vmk['enable_vmotion']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      if ($adapter.VsanTrafficEnabled -ne ${{ vmk['enable_vsan']|lower }}) {
+        $vmServer | Get-VMHostNetworkAdapter -name $adapter | Set-VMHostNetworkAdapter -VsanTrafficEnabled ${{ vmk['enable_vsan']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+    }
+  }
+}
+else {
+{%           if vmk['enable_mgmt'] %}
+  $vmServer | New-vmHostNetworkAdapter -PortGroup "{{ vmk['portgroup_name'] }}" -VirtualSwitch "{{ vswitch['name'] }}" -IP {{ hostvars[host]['mgmt_ip'] }} -SubnetMask {{ hostvars[host]['mgmt_subnetmask'] }} -ManagementTrafficEnabled -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+{%           endif %}
+{%           if vmk['enable_vmotion'] %}
+  $vmServer | New-vmHostNetworkAdapter -PortGroup "{{ vmk['portgroup_name'] }}" -VirtualSwitch "{{ vswitch['name'] }}" -IP {{ hostvars[host]['vmotion_ip'] }} -SubnetMask {{ hostvars[host]['vmotion_subnetmask'] }} -VMotionEnabled ${{ vmk['enable_vmotion']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+{%           endif %}
+}
+{%         endfor %}
+{%       endif %}
+{%     endfor %}
+Disconnect-VIServer * -Confirm:$false
+
+{%   endfor %}
+{% endif %}

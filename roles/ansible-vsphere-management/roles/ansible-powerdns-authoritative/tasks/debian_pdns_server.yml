@@ -1,0 +1,74 @@
+---
+- name: debian_pdns_server | installing powerdns pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'dnsutils'
+    - 'git'
+    - 'jq'
+    - 'python-mysqldb'
+    # - 'mysql-client' # Causing MariaDB to be uninstalled
+
+- name: debian_pdns_server | installing powerdns
+  apt:
+    deb: "{{ pdns_download_url }}/deb/pdns-static_{{ pdns_server_version }}_amd64.deb"
+    state: "present"
+  become: true
+  notify: restart pdns
+  when: >
+        ansible_architecture == "x86_64" and
+        pdns_server_version != "4.x"
+
+- name: debian_pdns_server | installing powerdns
+  apt:
+    deb: "{{ pdns_download_url }}/deb/pdns-static_{{ pdns_server_version }}_i386.deb"
+    state: "present"
+  become: true
+  notify: restart pdns
+  when: >
+        ansible_architecture == "i386" and
+        pdns_server_version != "4.x"
+
+- name: debian_pdns_server | Adding PowerDNS Repo Key
+  apt_key:
+    url: "{{ pdns_repo_gpgkey }}"
+    state: "present"
+  become: true
+  when: pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Pinning PowerDNS Repo
+  template:
+    src: "pdns_repo.j2"
+    dest: "/etc/apt/preferences.d/pdns"
+  become: true
+  when: pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Adding PowerDNS Repo
+  apt_repository:
+    repo: "deb {{ pdns_repo_baseurl }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-auth-40 main"
+    state: "present"
+  become: true
+  when: >
+        ansible_lsb['id'] != "Raspbian" and
+        pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Adding PowerDNS Repo
+  apt_repository:
+    repo: "deb {{ pdns_repo_baseurl }}/raspbian {{ ansible_distribution_release|lower }}-auth-40 main"
+    state: "present"
+  become: true
+  when: >
+        ansible_lsb['id'] == "Raspbian" and
+        pdns_server_version == "4.x"
+
+- name: debian_pdns_server | Installing PowerDNS Authoritative 4.x
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'pdns-server'
+    - 'pdns-backend-mysql'
+  when: pdns_server_version == "4.x"

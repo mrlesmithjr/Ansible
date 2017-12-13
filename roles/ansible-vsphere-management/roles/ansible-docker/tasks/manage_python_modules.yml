@@ -1,0 +1,68 @@
+---
+- name: manage_python_modules | installing python pre-req packages (Debian)
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - 'build-essential'
+    - 'libffi-dev'
+    - 'libssl-dev'
+    - 'python-dev'
+    - 'python-pip'
+    - 'python-setuptools'
+  when: ansible_os_family == "Debian"
+
+- name: manage_python_modules | installing python pre-req packages (RedHat)
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - 'gmp-devel'
+    - 'libffi-devel'
+    - 'openssl-devel'
+    - 'python-crypto'
+    - 'python-devel'
+    - 'python-pip'
+    - 'python-setuptools'
+    - 'redhat-rpm-config'
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+- name: manage_python_modules | Installing Ansible Pre-Reqs (Fedora)
+  dnf:
+    name: "python-dnf"
+    state: "present"
+  become: true
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+- name: manage_python_modules | installing python pre-req packages (Fedora)
+  dnf:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - 'gmp-devel'
+    - 'libffi-devel'
+    - 'openssl-devel'
+    - 'python-crypto'
+    - 'python-devel'
+    - 'python-pip'
+    - 'python-setuptools'
+    - 'redhat-rpm-config'
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+- name: manage_python_modules | installing python modules
+  pip:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - 'docker-compose'
+    - 'docker-py'

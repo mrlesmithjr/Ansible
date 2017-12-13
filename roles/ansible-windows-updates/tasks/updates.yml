@@ -1,0 +1,5 @@
+---
+- name: updates | Installing Windows Updates
+  win_updates:
+    category_names: "{{ windows_updates_categories }}"
+  register: "windows_updates"

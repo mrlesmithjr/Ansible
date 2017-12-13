@@ -1,0 +1,20 @@
+{% for vms in terraform_vms %}
+resource "vsphere_virtual_machine" "{{ vms['group'] }}" {
+  count = "${length(var.vms_{{ vms['group'] }})}"
+  name = "${var.vms_{{ vms['group'] }}[count.index]}"
+  datacenter = "${data.vsphere_datacenter.dc.name}"
+  disk {
+    datastore = "${var.vsphere_default_vm_datastore}"
+    template = "${var.linux_vm_template}"
+    type = "thin"
+  }
+  dns_servers = "${var.dns_servers}"
+  domain = "${var.pri_domain_name}"
+  folder = "${vsphere_folder.{{ vms['group'] }}.path}"
+  memory = {{ vms['memory_mb'] }}
+  network_interface {
+    label = "${var.vsphere_default_vm_network}"
+  }
+  vcpu = {{ vms['vcpu'] }}
+}
+{% endfor %}

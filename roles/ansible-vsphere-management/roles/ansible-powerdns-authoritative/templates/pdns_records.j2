@@ -1,0 +1,43 @@
+{
+  "rrsets": [
+    {
+{% if item.type == "SRV" %}
+      "name": "{{ item.name }}.{{ item.zone }}",
+{% endif %}
+{% if item.type != "SRV" %}
+{% if item.name == "default" %}
+      "name": "{{ item.zone }}",
+{% else %}
+      "name": "{{ item.name }}.{{ item.zone }}",
+{% endif %}
+{% endif %}
+      "type": "{{ item.type }}",
+      "changetype": "{{ item.changetype }}",
+      "records": [
+        {
+          "content": "{{ item.content }}",
+	  {% if item.content2 is defined %}
+	  "content2": "{{ item.content2 }}",
+	  {% endif %}
+          "disabled": {{ item.disabled|lower }},
+{% if item.type == "SRV" %}
+          "name": "{{ item.name }}.{{ item.zone }}",
+{% endif %}
+{% if item.type != "SRV" %}
+{% if item.name == "default" %}
+      "name": "{{ item.zone }}",
+{% else %}
+      "name": "{{ item.name }}.{{ item.zone }}",
+{% endif %}
+{% endif %}
+          "ttl": {{ item.ttl }},
+          "type": "{{ item.type }}",
+{% if item.type == "A" or item.type == "AAAA" %}
+          "set-ptr": true,
+{% endif %}
+          "priority": {{ item.priority }}
+        }
+      ]
+    }
+  ]
+}

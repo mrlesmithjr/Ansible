@@ -1,0 +1,24 @@
+---
+vsphere_bootstrap_vms:
+  - vm_name: bootstrap-vm-1.{{ vsphere_pri_domain_name }}
+    cpus: "{{ vsphere_bootstrap_vms_cpu }}"
+    deploy: "{{ vsphere_bootstrap_vms_deploy }}"
+    datastore: "{{ vsphere_vm_services_datastore }}"
+    gateway: "{{ vsphere_vm_services_subnet }}.1"
+    ip: "{{ vsphere_vm_services_subnet }}.101"
+    memory_mb: "{{ vsphere_bootstrap_vms_memory }}"
+    netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+    network_name: "{{ vsphere_vm_services_vswitch }}"
+    vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  - vm_name: bootstrap-vm-2.{{ vsphere_pri_domain_name }}
+    cpus: "{{ vsphere_bootstrap_vms_cpu }}"
+    deploy: "{{ vsphere_bootstrap_vms_deploy }}"
+    datastore: "{{ vsphere_vm_services_datastore }}"
+    gateway: "{{ vsphere_vm_services_subnet }}.1"
+    ip: "{{ vsphere_vm_services_subnet }}.102"
+    memory_mb: "{{ vsphere_bootstrap_vms_memory }}"
+    netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+    network_name: "{{ vsphere_vm_services_vswitch }}"
+    vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+
+vsphere_bootstrap_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_bootstrap_vms.inv"

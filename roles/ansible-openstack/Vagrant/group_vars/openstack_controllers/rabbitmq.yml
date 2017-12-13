@@ -1,0 +1,35 @@
+---
+# Defines if rabbitmq ha should be configured
+rabbitmq_config:
+  - queue_name: '^(?!amq\.).*'
+    durable: true
+    tags: 'ha-mode=all,ha-sync-mode=automatic'
+
+rabbitmq_config_ha: '{{ openstack_ha }}'
+
+rabbitmq_config_service: true
+
+# Defines if setting up a rabbitmq cluster
+rabbitmq_enable_clustering: '{{ openstack_ha }}'
+
+rabbitmq_listeners:
+  - '{{ openstack_management_ip }}'
+
+# Defines the inventory host that should be considered master
+rabbitmq_master: '{{ groups[openstack_controllers_group][0] }}'
+
+rabbitmq_users:
+  - name: 'rabbitmqadmin'
+    password: 'rabbitmqadmin'
+    vhost: '/'
+    configure_priv: '.*'
+    read_priv: '.*'
+    write_priv: '.*'
+    tags: 'administrator'
+  - name: '{{ openstack_rabbit_user }}'
+    password: '{{ openstack_rabbit_pass }}'
+    vhost: '/'
+    configure_priv: '.*'
+    read_priv: '.*'
+    write_priv: '.*'
+    tags: 'administrator'

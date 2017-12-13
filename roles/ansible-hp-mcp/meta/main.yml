@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install [HP Management Component Pack](https://downloads.linux.hpe.com/SDR/project/mcp/)
+
+  license: license (MIT)
+
+  min_ansible_version: 2.3
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+
+  galaxy_tags:
+    - system
+    - IPMI
+
+dependencies: []

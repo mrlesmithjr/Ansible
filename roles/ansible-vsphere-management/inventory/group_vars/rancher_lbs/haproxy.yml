@@ -1,0 +1,56 @@
+---
+# Defines is HAProxy should be configured
+haproxy_config: true
+
+haproxy_configs:
+  - name: rancher-8080
+    backend_checks: true
+    backend_name: rancher-hosts
+    backend_servers_bind_port: 8080
+    backend_servers: "{{ groups['rancher_hosts'] }}"
+    balance: roundrobin
+    default_server_options:
+      - name: maxconn
+        value: 256
+      - name: maxqueue
+        value: 128
+      - name: weight
+        value: 100
+    enabled: true
+    frontend_bind_address: "{{ haproxy_lb_vip }}"
+    frontend_bind_port: 8080
+    frontend_name: rancher-in
+    mode: tcp
+    # options:  #Defines options to add to backend group (not the same as default_server_options)
+      # - httplog
+      # - httpchk
+#      - httpchk HEAD / HTTP/1.1\r\nHost:localhost  #Works for default NGINX health checks
+  - name: rancher_db_cluster-3306
+    backend_checks: true
+    backend_name: rancher-db-cluster-hosts
+    backend_backups: true
+    backend_backups_primary: "{{ groups['rancher_db_cluster'][0] }}"
+    backend_servers_bind_port: 3306
+    backend_servers: "{{ groups['rancher_db_cluster'] }}"
+    balance: source
+    default_server_options:
+      - name: inter
+        value: 2000
+      - name: rise
+        value: 2
+      - name: fall
+        value: 5
+    enabled: true
+    frontend_bind_address: "{{ haproxy_lb_vip }}"
+    frontend_bind_port: 3306
+    frontend_name: rancher-db-cluster-in
+
+haproxy_lb_vip: "{{ rancher_lb_vip }}"
+
+haproxy_pri_domain_name: "{{ vsphere_pri_domain_name }}"
+
+# Defines if using a highly available setup. i.e. multiple haproxy load balancers
+haproxy_load_balancer_ha: true
+
+# Defines the primary host when in HA mode
+haproxy_load_balancer_ha_primary: "{{ groups['rancher_lbs'][0] }}"

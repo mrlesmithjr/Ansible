@@ -1,0 +1,303 @@
+---
+- name: bootstrap_vms | Creating bootstrap_vms_deploy Dynamic Group
+  add_host:
+    groups: vsphere_bootstrap_vms_deploy
+    hostname: "{{ item['vm_name'] }}"
+    cpus: "{{ item['cpus'] }}"
+    datastore: "{{ item['datastore'] }}"
+    ip: "{{ item['ip']|default(omit) }}"
+    gateway: "{{ item['gateway']|default(omit) }}"
+    memory_mb: "{{ item['memory_mb'] }}"
+    netmask: "{{ item['netmask']|default(omit) }}"
+    netmask_cidr: "{{ item['netmask_cidr']|default(omit) }}"
+    network_name: "{{ item['network_name'] }}"
+    vapp_source_path: "{{ item['vapp_source_path'] }}"
+  changed_when: false
+  tags:
+    - vsphere_generate_host_vars
+  with_items: "{{ vsphere_bootstrap_vms }}"
+  when: item['deploy']
+
+- name: bootstrap_vms | Ensuring host_vars Directory Exists For Each Host
+  file:
+    path: "{{ vsphere_inventory_directory }}/host_vars/{{ hostvars[item]['inventory_hostname'] }}"
+    state: directory
+  become: false
+  delegate_to: localhost
+  tags:
+    - vsphere_generate_host_vars
+  with_items: "{{ groups['vsphere_bootstrap_vms_deploy'] }}"
+  when: >
+        groups['vsphere_bootstrap_vms_deploy'] is defined and
+        vsphere_generate_host_vars
+
+- name: bootstrap_vms | Generating host_vars
+  template:
+    src: generated_host_vars.yml.j2
+    dest: "{{ vsphere_inventory_directory }}/host_vars/{{ hostvars[item]['inventory_hostname'] }}/generated_details.yml"
+  become: false
+  delegate_to: localhost
+  tags:
+    - vsphere_generate_host_vars
+  with_items: "{{ groups['vsphere_bootstrap_vms_deploy'] }}"
+  when: >
+        groups['vsphere_bootstrap_vms_deploy'] is defined and
+        vsphere_generate_host_vars
+
+- name: bootstrap_vms | Generating Secure Password
+  win_shell: $Password=ConvertTo-SecureString -String "{{ vsphere_bootstrap_user_info['password'] }}" -AsPlainText -Force | ConvertFrom-SecureString | Out-File {{ vsphere_bootstrap_vms_secure_password_file }}
+  no_log: true
+
+- name: bootstrap_vms | Generating bootstrap_vms.ps1 Powershell Script
+  win_template:
+    src: bootstrap_vms.ps1.j2
+    dest: c:\tmp\bootstrap_vms.ps1
+  register: _vsphere_bootstrap_vms_script
+
+- name: bootstrap_vms | Executing bootstrap_vms.ps1 Powershell Script
+  win_shell: c:\tmp\bootstrap_vms.ps1
+  failed_when: _bootstrap_vms_script_execution['stderr_lines'] != []
+  register: _bootstrap_vms_script_execution
+
+- debug: var=_bootstrap_vms_script_execution
+
+- name: bootstrap_vms | Capturing Guest Facts (Non-vCenter)
+  vmware_guest_facts:
+    hostname: "{{ hostvars[vsphere_bootstrap_host]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    datacenter: ha-datacenter
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item['vm_name'] }}"
+    folder: ha-datacenter/vm
+  delegate_to: localhost
+  failed_when: false
+  register: _vsphere_bootstrap_vms_non_vcenter
+  with_items: "{{ vsphere_bootstrap_vms }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: >
+        not _vsphere_vcenter_available
+
+- name: bootstrap_vms | Finding Bootstrap VMs (vCenter)
+  vmware_guest_find:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    datacenter: "{{ vsphere_vcenter_datacenter['name'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item['vm_name'] }}"
+  delegate_to: localhost
+  failed_when: false
+  register: _vsphere_bootstrap_vms_vcenter
+  with_items: "{{ vsphere_bootstrap_vms }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: _vsphere_vcenter_available
+
+- name: bootstrap_vms | Creating bootstrap_vms_not_deployed Dynamic Group
+  add_host:
+    groups: bootstrap_vms_not_deployed
+    hostname: "{{ item['item']['vm_name'] }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  with_items:
+    - "{{ _vsphere_bootstrap_vms_non_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vms_vcenter['results'] }}"
+  when: >
+        item['msg'] is defined and
+        ("Unable to find folders for VM" in item['msg'] or
+        "Unable to gather facts for non-existing VM" in item['msg'])
+
+- name: bootstrap_vms | Waiting For DHCP IP Address (Non-vCenter)
+  vmware_guest_facts:
+    hostname: "{{ hostvars[vsphere_bootstrap_host]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    datacenter: ha-datacenter
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item['item']['vm_name'] }}"
+    folder: ha-datacenter/vm
+  delegate_to: localhost
+  register: _vsphere_bootstrap_vm_facts_dhcp_non_vcenter
+  until: >
+         (_vsphere_bootstrap_vm_facts_dhcp_non_vcenter['instance']['ipv4'] != None)
+  retries: 30
+  delay: 2
+  failed_when: false
+  with_items: "{{ _vsphere_bootstrap_vms_non_vcenter['results'] }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: >
+        not _vsphere_vcenter_available and
+        item['item']['deploy'] and
+        item['item']['ip'] is not defined and
+        ((groups['bootstrap_vms_not_deployed'] is defined and
+        item['item']['vm_name'] not in groups['bootstrap_vms_not_deployed']) or
+        groups['bootstrap_vms_not_deployed'] is not defined)
+
+- name: bootstrap_vms | Waiting For DHCP IP Address (vCenter)
+  vmware_guest_facts:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    datacenter: "{{ vsphere_vcenter_datacenter['name'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item['item']['vm_name'] }}"
+    folder: "{{ vsphere_vcenter_datacenter['name'] }}{{ item['folders'][0] }}"
+  delegate_to: localhost
+  register: _vsphere_bootstrap_vm_facts_dhcp_vcenter
+  until: >
+         (_vsphere_bootstrap_vm_facts_dhcp_vcenter['instance']['ipv4'] != None)
+  retries: 30
+  delay: 2
+  failed_when: false
+  with_items: "{{ _vsphere_bootstrap_vms_vcenter['results'] }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: >
+        _vsphere_vcenter_available and
+        item['item']['deploy'] and
+        item['item']['ip'] is not defined and
+        ((groups['bootstrap_vms_not_deployed'] is defined and
+        item['item']['vm_name'] not in groups['bootstrap_vms_not_deployed']) or
+        groups['bootstrap_vms_not_deployed'] is not defined)
+
+- name: bootstrap_vms | Waiting For Static IP Address (Non-vCenter)
+  vmware_guest_facts:
+    hostname: "{{ hostvars[vsphere_bootstrap_host]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    datacenter: ha-datacenter
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item['item']['vm_name'] }}"
+    folder: ha-datacenter/vm
+  delegate_to: localhost
+  register: _vsphere_bootstrap_vm_facts_static_non_vcenter
+  until: >
+         (_vsphere_bootstrap_vm_facts_static_non_vcenter['instance']['ipv4'] == item['item']['ip'])
+  retries: 30
+  delay: 2
+  failed_when: false
+  with_items: "{{ _vsphere_bootstrap_vms_non_vcenter['results'] }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: >
+        not _vsphere_vcenter_available and
+        item['item']['deploy'] and
+        item['item']['ip'] is defined and
+        ((groups['bootstrap_vms_not_deployed'] is defined and
+        item['item']['vm_name'] not in groups['bootstrap_vms_not_deployed']) or
+        groups['bootstrap_vms_not_deployed'] is not defined)
+
+- name: bootstrap_vms | Waiting For Static IP Address (vCenter)
+  vmware_guest_facts:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    datacenter: "{{ vsphere_vcenter_datacenter['name'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ item['item']['vm_name'] }}"
+    folder: "{{ vsphere_vcenter_datacenter['name'] }}{{ item['folders'][0] }}"
+  delegate_to: localhost
+  register: _vsphere_bootstrap_vm_facts_static_vcenter
+  until: >
+         (_vsphere_bootstrap_vm_facts_static_vcenter['instance']['ipv4'] == item['item']['ip'])
+  retries: 30
+  delay: 2
+  failed_when: false
+  with_items: "{{ _vsphere_bootstrap_vms_vcenter['results'] }}"
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: >
+        _vsphere_vcenter_available and
+        item['item']['deploy'] and
+        item['item']['ip'] is defined and
+        ((groups['bootstrap_vms_not_deployed'] is defined and
+        item['item']['vm_name'] not in groups['bootstrap_vms_not_deployed']) or
+        groups['bootstrap_vms_not_deployed'] is not defined)
+
+- name: bootstrap_vms | Creating Dynamic Inventory For vsphere_bootstrap_vms
+  add_host:
+    hostname: "{{ item['instance']['hw_name'] }}"
+    ansible_host: "{{ item['instance']['ipv4'] }}"
+    groups: vsphere_bootstrap_vms
+    hw_product_uuid: "{{ item['instance']['hw_product_uuid'] }}"
+  changed_when: false
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  with_items:
+    - "{{ _vsphere_bootstrap_vm_facts_dhcp_non_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vm_facts_dhcp_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vm_facts_static_non_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vm_facts_static_vcenter['results'] }}"
+  when: >
+        item['instance'] is defined and
+        not item['failed']
+
+- name: bootstrap_vms | Creating Dynamic Inventory For vsphere_bootstrap_vms_failed
+  add_host:
+    hostname: "{{ item['instance']['hw_name'] }}"
+    ansible_host: "{{ item['instance']['ipv4']|default(omit) }}"
+    hw_product_uuid: "{{ item['instance']['hw_product_uuid'] }}"
+    groups: vsphere_bootstrap_vms_failed
+  changed_when: false
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  with_items:
+    - "{{ _vsphere_bootstrap_vm_facts_dhcp_non_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vm_facts_dhcp_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vm_facts_static_non_vcenter['results'] }}"
+    - "{{ _vsphere_bootstrap_vm_facts_static_vcenter['results'] }}"
+  when: >
+        item['instance'] is defined and
+        item['failed']
+
+- name: bootstrap_vms | Displaying IP Addresses For Each VM
+  debug: msg="{{ hostvars[item]['inventory_hostname'] }} has IP{{':'}} {{ hostvars[item]['ansible_host'] }}"
+  with_items: "{{ groups['vsphere_bootstrap_vms'] }}"
+  when: >
+        groups['vsphere_bootstrap_vms'] is defined and
+        (groups['vsphere_bootstrap_vms_deploy'] is defined and
+        hostvars[item]['inventory_hostname'] in groups['vsphere_bootstrap_vms_deploy'])
+
+- name: bootstrap_vms | Displaying Failed VMs
+  debug: msg="{{ hostvars[item]['inventory_hostname'] }} Failed and has IP{{':'}} {{ hostvars[item]['ansible_host'] }}"
+  with_items: "{{ groups['vsphere_bootstrap_vms_failed'] }}"
+  when: groups['vsphere_bootstrap_vms_failed'] is defined
+
+- name: bootstrap_vms | Waiting for SSH
+  wait_for:
+    host: "{{ hostvars[item]['ansible_host'] }}"
+    port: 22
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 600
+  vars:
+    ansible_connection: local
+  with_items: "{{ groups['vsphere_bootstrap_vms'] }}"
+  when: >
+        vsphere_bootstrap_vms_wait_for_ssh and
+        groups['vsphere_bootstrap_vms'] is defined and
+        (groups['vsphere_bootstrap_vms_deploy'] is defined and
+        hostvars[item]['inventory_hostname'] in groups['vsphere_bootstrap_vms_deploy'])
+
+- name: bootstrap_vms | Creating Inventory For vsphere_bootstrap_vms
+  template:
+    src: bootstrap_vms.inv.j2
+    dest: "{{ vsphere_bootstrap_vms_inventory_file }}"
+  become: false
+  delegate_to: localhost
+  tags:
+    - vsphere_bootstrap_vms_info
+    - vsphere_vms_info
+  when: vsphere_vms_generate_inventory

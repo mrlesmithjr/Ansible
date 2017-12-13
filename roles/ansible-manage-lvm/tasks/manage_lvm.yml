@@ -1,100 +1,153 @@
 ---
 - name: manage_lvm | creating new LVM volume group(s)
   lvg:
-    vg: "{{ item.vgname }}"
-    pvs: "{{ item.disks }}"
-    state: present
+    vg: "{{ item['vgname'] }}"
+    pvs: "{{ item['disks']|join(',') }}"
+    state: "present"
+  become: true
   with_items: "{{ lvm_groups }}"
-  when: item.create is defined and item.create
+  when: >
+        (item['create'] is defined and
+        item['create'])
 
 - name: manage_lvm | creating new LVM logical volume(s)
   lvol:
-    vg: "{{ item.0.vgname }}"
-    lv: "{{ item.1.lvname }}"
-    size: "{{ item.1.size }}"
+    vg: "{{ item[0]['vgname'] }}"
+    lv: "{{ item[1]['lvname'] }}"
+    size: "{{ item[1]['size'] }}"
     shrink: no
-    state: present
+    state: "present"
+  become: true
   register: lvm
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: ( item.0.create is defined and item.0.create ) and ( item.1 is defined and item.1 != 'None' ) and ( item.1.create is defined and item.1.create )
+  when: >
+        ((item[0]['create'] is defined
+        and item[0]['create']) and
+        (item[1] is defined and
+        item[1] != 'None') and
+        (item[1]['create'] is defined and
+        item[1]['create']))
 
 - name: manage_lvm | creating new filesystem on new LVM logical volume(s)
   filesystem:
-    fstype: "{{ item.1.filesystem }}"
-    dev: "/dev/{{ item.0.vgname }}/{{ item.1.lvname }}"
+    fstype: "{{ item[1]['filesystem'] }}"
+    dev: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
 #    resizefs: yes  #coming in 2.0 which will replace the resizing filesystem task below
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: ( item.0.create is defined and item.0.create ) and ( item.1 is defined and item.1 != 'None' ) and ( item.1.create is defined and item.1.create )
+  when: >
+        ((item[0]['create'] is defined and
+        item[0]['create']) and
+        (item[1] is defined and
+        item[1] != 'None') and
+        (item[1]['create'] is defined and
+        item[1]['create']))
 
 - name: manage_lvm | mounting new filesystem(s)
   mount:
-    name: "{{ item.1.mntp }}"
-    src: "/dev/{{ item.0.vgname }}/{{ item.1.lvname }}"
-    fstype: "{{ item.1.filesystem }}"
-    state: mounted
+    name: "{{ item[1]['mntp'] }}"
+    src: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
+    fstype: "{{ item[1]['filesystem'] }}"
+    state: "mounted"
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: ( item.0.create is defined and item.0.create ) and ( item.1 is defined and item.1 != 'None' ) and ( item.1.create is defined and item.1.create ) and ( item.1.mount is defined and item.1.mount )
+  when: >
+        ((item[0]['create'] is defined and
+        item[0]['create']) and
+        (item[1] is defined and
+        item[1] != 'None') and
+        (item[1]['create'] is defined and
+        item[1]['create']) and
+        (item[1]['mount'] is defined and
+        item[1]['mount']))
 
 - name: manage_lvm | resizing filesystem
-  command: resize2fs /dev/{{ item.0.vgname }}/{{ item.1.lvname }}
+  command: resize2fs /dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: lvm.changed and item.1.filesystem != "swap" and item.1.filesystem != "xfs" and item.1.filesystem != "btrfs"
+  when: >
+        lvm['changed'] and
+        item[1]['filesystem'] != "swap" and
+        item[1]['filesystem'] != "xfs" and
+        item[1]['filesystem'] != "btrfs"
 
 - name: manage_lvm | resizing xfs
-  command: xfs_growfs -d /dev/{{ item.0.vgname }}/{{ item.1.lvname }}
+  command: xfs_growfs -d /dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: lvm.changed and item.1.filesystem == "xfs"
+  when: >
+        lvm['changed'] and
+        item[1]['filesystem'] == "xfs"
 
 - name: manage_lvm | resizing swap
-  shell: "swapoff -a && mkswap /dev/{{ item.0.vgname }}/{{ item.1.lvname }} && swapon -va"
+  shell: "swapoff -a && mkswap /dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }} && swapon -va"
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: lvm.changed and item.1.filesystem == "swap"
+  when: >
+        lvm['changed'] and
+        item[1]['filesystem'] == "swap"
 
 - name: manage_lvm | resizing btrfs
-  shell: "btrfs filesystem resize max {{ item.1.mntp }}"
+  shell: "btrfs filesystem resize max {{ item[1]['mntp'] }}"
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: lvm.changed and item.1.filesystem == "btrfs"
+  when: >
+        lvm['changed'] and
+        item[1]['filesystem'] == "btrfs"
 
 - name: manage_lvm | unmounting filesystem(s)
   mount:
-    name: "{{ item.1.mntp }}"
-    src: "/dev/{{ item.0.vgname }}/{{ item.1.lvname }}"
-    fstype: "{{ item.1.filesystem }}"
-    state: absent
+    name: "{{ item[1]['mntp'] }}"
+    src: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
+    fstype: "{{ item[1]['filesystem'] }}"
+    state: "absent"
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: ( item.1 is defined and item.1 != 'None' ) and ( item.1.create is defined and not item.1.create )
+  when: >
+        (item[1] is defined and
+        item[1] != 'None') and
+        (item[1]['create'] is defined and
+        not item[1]['create'])
 
 - name: manage_lvm | Removing LVM logical volume(s)
   lvol:
-    vg: "{{ item.0.vgname }}"
-    lv: "{{ item.1.lvname }}"
-    state: absent
+    vg: "{{ item[0]['vgname'] }}"
+    lv: "{{ item[1]['lvname'] }}"
+    state: "absent"
     force: yes
+  become: true
   with_subelements:
     - "{{ lvm_groups }}"
     - lvnames
-  when: ( item.1 is defined and item.1 != 'None' ) and ( item.1.create is defined and not item.1.create )
+  when: >
+        (item[1] is defined and
+        item[1] != 'None') and
+        (item[1]['create'] is defined and
+        not item[1]['create'])
 
 - name: manage_lvm | Removing LVM volume group(s)
   lvg:
-    vg: "{{ item.vgname }}"
-    pvs: "{{ item.disks }}"
-    state: absent
+    vg: "{{ item['vgname'] }}"
+    pvs: "{{ item['disks']|join(',') }}"
+    state: "absent"
+  become: true
   with_items: "{{ lvm_groups }}"
-  when: item.create is defined and not item.create
+  when: >
+        item['create'] is defined and
+        not item['create']

@@ -5,8 +5,8 @@
     state: "present"
   become: true
   with_items:
-    - 'py-mysqldb'
-    - 'mysql-client'
+    - py-mysqldb
+    - mysql-client
 
 - name: alpine | Installing MySQL
   apk:

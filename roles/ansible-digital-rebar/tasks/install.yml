@@ -1,0 +1,41 @@
+---
+- name: install | Checking If Digital Rebar Is Already Installed
+  stat:
+    path: "{{ digital_rebar_binary }}"
+  register: _digital_rebar_install_check
+
+- name: install | Downloading Digital Rebar
+  get_url:
+    url: "{{ digital_rebar_dl }}"
+    dest: "/tmp/{{ digital_rebar_package }}"
+    checksum: "sha256:{{ digital_rebar_sha256 }}"
+  when: not _digital_rebar_install_check['stat']['exists']
+
+- name: install | Extracting Digital Rebar
+  unarchive:
+    src: "/tmp/{{ digital_rebar_package }}"
+    dest: /tmp
+    remote_src: true
+  register: _digital_rebar_extracted
+  when: not _digital_rebar_install_check['stat']['exists']
+
+- name: install | Copying Digital Rebar Packages
+  copy:
+    src: "/tmp/bin/linux/amd64/{{ item }}"
+    dest: "{{ digital_rebar_install_dir }}/{{ item }}"
+    mode: "u=rwx,g=rx,o=rx"
+    remote_src: true
+  become: true
+  with_items:
+    - drpcli
+    - dr-provision
+    - incrementer
+  when: >
+        not _digital_rebar_install_check['stat']['exists'] and
+        _digital_rebar_extracted['changed']
+
+- name: install | Creating /var/lib/dr-provision
+  file:
+    path: /var/lib/dr-provision
+    state: directory
+  become: true

@@ -3,6 +3,7 @@
   apt:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
     - python-dev
     - python-pip
@@ -11,6 +12,8 @@
   apt:
     name: "sqlite"
     state: present
+  become: true
   when: >
-        (django_db_type is defined and django_db_type == "sqlite") or
+        (django_db_type is defined and
+          django_db_type == "sqlite") or
         django_db_type is not defined

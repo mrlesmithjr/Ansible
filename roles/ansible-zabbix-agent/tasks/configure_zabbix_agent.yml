@@ -1,11 +1,4 @@
 ---
-- name: configure_zabbix_agent | installing agent package
-  apt:
-    name: "zabbix-agent"
-    state: "present"
-  become: true
-  when: ansible_os_family == "Debian"
-
 - name: configure_zabbix_agent | configuring agent
   template:
     src: "etc/zabbix/zabbix_agentd.conf.j2"

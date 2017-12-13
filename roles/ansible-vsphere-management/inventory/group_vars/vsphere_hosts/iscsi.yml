@@ -1,0 +1,7 @@
+---
+# Define this on a host_vars or group_vars level. Because we look for hostvars
+# variable the default variable defined here does not apply.
+vsphere_enable_software_iscsi: true
+
+vsphere_iscsi_targets:
+  - 10.0.101.50

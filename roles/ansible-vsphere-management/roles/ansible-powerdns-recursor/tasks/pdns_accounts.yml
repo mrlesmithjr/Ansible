@@ -1,0 +1,16 @@
+---
+- name: pdns_accounts | creating pdns group
+  group:
+    name: "pdns"
+    state: "present"
+  become: true
+
+- name: pdns_accounts | creating pdns user
+  user:
+    name: "pdns"
+    group: "pdns"
+    system: true
+    home: "/var/spool/powerdns"
+    shell: "/bin/false"
+    state: "present"
+  become: true

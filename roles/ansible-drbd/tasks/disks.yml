@@ -1,0 +1,8 @@
+---
+- name: disks | Partitioning Disks
+  parted:
+    device: "{{ item['disk'] }}"
+    number: "{{ item['partitions'] }}"
+    state: "{{ item['state'] }}"
+  become: true
+  with_items: "{{ drbd_disks }}"

@@ -1,0 +1,33 @@
+---
+- name: redhat | Enabling EPEL Repo
+  yum:
+    name: epel-release
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Enabling RPM Fusion Repos
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+    - https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Guacamole Pre-Reqs
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ guacamole_redhat_pre_reqs }}"
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Guacamole Pre-Reqs
+  dnf:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ guacamole_redhat_pre_reqs }}"
+  when: ansible_distribution == "Fedora"

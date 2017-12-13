@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+{% if saltstack_minion_configuration is defined and saltstack_minion_configuration != [] %}
+{{ saltstack_minion_configuration|to_nice_yaml }}
+{% endif %}

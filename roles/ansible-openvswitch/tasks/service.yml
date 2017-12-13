@@ -1,0 +1,7 @@
+---
+- name: service | Ensuring OVS Service Is Started And Enabled On Boot
+  service:
+    name: "openvswitch-switch"
+    state: "started"
+    enabled: true
+  become: true

@@ -1,0 +1,90 @@
+---
+# - hosts: vsphere_vcenter
+#   gather_facts: false
+#   tasks:
+#     - name: Changing Shell To Appliance Shell
+#       shell: chsh -s /bin/appliancesh root
+#
+#     - name: Changing Shell To BASH
+#       command: "{{ item }}"
+#       with_items:
+#         - shell.set --enabled true
+#         - shell
+#         - chsh -s /bin/bash root
+
+- hosts: vsphere_vcenter
+  gather_facts: false
+  tasks:
+    - name: Managing VCSA AD Domain Membership
+      when: vsphere_vcsa_manage_ad_domain
+      block:
+        - name: Checking Domain Status
+          shell: /opt/likewise/bin/domainjoin-cli query | grep Domain | awk '{ print $3 }'
+          register: _vcsa_domain_status
+          changed_when: false
+
+        - debug: var=_vcsa_domain_status
+
+        - name: Joining Domain
+          shell: /opt/likewise/bin/domainjoin-cli join {{ vsphere_ad_dns_domain_name }} {{ vsphere_samba_ad_user }} {{ vsphere_samba_ad_password }}
+          register: _vcsa_domain_join
+          when: _vcsa_domain_status['stdout_lines'] == []
+
+        - debug: var=_vcsa_domain_join
+
+        - name: Rebooting After Domain Join
+          shell: reboot
+          when: _vcsa_domain_join['changed']
+
+        - name: Rebooting After Domain Join
+          shell: sleep 2 && shutdown -r now "rebooting to complete domain join"
+          async: 1
+          poll: 0
+          ignore_errors: true
+          when: _vcsa_domain_join['changed']
+
+        - name: Waiting For vCenter To Come Back
+          wait_for:
+            host: "{{ ansible_host | default(inventory_hostname) }}"
+            port: 22
+            search_regex: OpenSSH
+            timeout: 600
+          vars:
+            ansible_connection: local
+          become: false
+          when: _vcsa_domain_join['changed']
+
+        - name: Checking If vCenter Is Available
+          win_shell: |
+            $vCenterHost = "{{ vsphere_vcsa_network_ip }}"
+            $vc = Connect-VIServer $vCenterHost
+            $vc.IsConnected
+            Disconnect-VIServer * -Confirm:$false
+          register: _vsphere_vcenter_check_2
+          delay: 30
+          retries: 20
+          until: ('True' in _vsphere_vcenter_check_2['stdout_lines'])
+          delegate_to: "{{ groups['powercli_host'][0] }}"
+
+        - name: Checking Domain Status
+          shell: /opt/likewise/bin/domainjoin-cli query | grep Domain | awk '{ print $3 }'
+          register: _vcsa_domain_status_post_domain_join
+          changed_when: false
+          when: _vcsa_domain_join['changed']
+
+        - debug: var=_vcsa_domain_status_post_domain_join
+          when: _vcsa_domain_join['changed']
+
+        # - name: Checking SSO Identity Sources
+        #   shell: /opt/vmware/bin/sso-config.sh -get_identity_sources | grep IdentitySourceName | awk -F':' '{ print $2 }'
+        #   register: _vcsa_sso_identity_sources
+        #   changed_when: false
+        #
+        # - debug: var=_vcsa_sso_identity_sources
+        #
+        # - name: Adding SSO Identity Source for
+        #   shell: /usr/lib/vmidentity/tools/scripts/sso-add-native-ad-idp.sh {{ vsphere_ad_dns_domain_name|lower }}
+        #   register: _vcsa_sso_identity_sources_updated
+        #   when: vsphere_ad_dns_domain_name|lower not in _vcsa_sso_identity_sources['stdout_lines']
+        #
+        # - debug: var=_vcsa_sso_identity_sources_updated

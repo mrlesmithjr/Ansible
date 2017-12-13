@@ -31,7 +31,7 @@ domain={{ dnsmasq_pri_domain_name }}
 {% endif %}
 {% if dnsmasq_custom_domains is defined %}
 {%   for item in dnsmasq_custom_domains %}
-domain={{ item.domain }},{{ item.network|join (',') }}
+domain={{ item['domain'] }},{{ item['network']|join (',') }}
 {%   endfor %}
 {% endif %}
 {% if dnsmasq_enable_forwarders %}
@@ -41,12 +41,12 @@ server={{ item }}
 {% endif %}
 {% if dnsmasq_static_addresses is defined %}
 {%   for item in dnsmasq_static_addresses %}
-address=/{{ item.name }}/{{ item.address }}
+address=/{{ item['name'] }}/{{ item['address'] }}
 {%   endfor %}
 {% endif %}
 {% if dnsmasq_conditional_forwarders is defined %}
 {%   for item in dnsmasq_conditional_forwarders %}
-server=/{{ item.domain }}/{{ item.address }}
+server=/{{ item['domain'] }}/{{ item['address'] }}
 {%   endfor %}
 {% endif %}
 {% if dnsmasq_enable_tftp %}
@@ -58,17 +58,17 @@ dhcp-client-update
 dhcp-boot={{ dnsmasq_dhcp_boot }}
 {%   if dnsmasq_dhcp_host_reservations is defined %}
 {%     for item in dnsmasq_dhcp_host_reservations %}
-dhcp-host={{ item.mac_address|join(',') }}{% if item.name is defined %},{{ item.name }}{% endif %}{% if item.address is defined %},{{ item.address }}{% endif %}{% if item.lease_time is defined %},{{ item.lease_time }}{% endif %}
+dhcp-host={{ item['mac_address']|join(',') }}{% if item['name'] is defined %},{{ item['name'] }}{% endif %}{% if item['address'] is defined %},{{ item['address'] }}{% endif %}{% if item['lease_time'] is defined %},{{ item['lease_time'] }}{% endif %}
 
 {%     endfor %}
 {%   endif %}
 {%   if dnsmasq_dhcp_options is defined %}
 {%     for item in dnsmasq_dhcp_options %}
-dhcp-option=option:{{ item.option }},{{ item.value|join(',') }}
+dhcp-option=option:{{ item['option'] }},{{ item['value']|join(',') }}
 {%     endfor %}
 {%   endif %}
 {%   for item in dnsmasq_dhcp_scopes %}
-dhcp-range={% if item.interface is defined %}{{ item.interface }},{% endif %}{{ item.start }},{{ item.end }},{{ item.netmask }}{% if item.lease_time is defined %},{{ item.lease_time }}{% endif %}
+dhcp-range={% if item['interface'] is defined %}{{ item['interface'] }},{% endif %}{{ item['start'] }},{{ item['end'] }},{{ item['netmask'] }}{% if item['lease_time'] is defined %},{{ item['lease_time'] }}{% endif %}
 
 {%   endfor %}
 {% endif %}

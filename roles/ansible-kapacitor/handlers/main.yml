@@ -1,0 +1,8 @@
+---
+# handlers file for ansible-kapacitor
+- name: restart kapacitor
+  service:
+    name: "kapacitor"
+    state: "restarted"
+    enabled: true
+  become: true

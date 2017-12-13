@@ -1,0 +1,2 @@
+---
+vsphere_network_dvs_state: present

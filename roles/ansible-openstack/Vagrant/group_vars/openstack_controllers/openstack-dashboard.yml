@@ -1,0 +1,2 @@
+---
+openstack_dashboard_openstack_host: '{{ openstack_vip }}'

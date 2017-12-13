@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-sshd
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config.yml
+  when: sshd_config

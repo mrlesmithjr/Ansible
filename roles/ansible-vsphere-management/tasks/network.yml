@@ -1,0 +1,79 @@
+---
+# We are using a template here instead of using the win_shell command in order
+# to get around the size limit of code which is able to be sent to a remote host.
+# Plus there is a lot of logic which will be put into networking.
+- name: network | Generating Network Powershell Script
+  win_template:
+    src: vsphere_network_management.ps1.j2
+    dest: c:\tmp\vsphere_network_management.ps1
+  when: vsphere_vswitches is defined
+
+- name: network | Executing Network Powershell Script
+  win_shell: c:\tmp\vsphere_network_management.ps1
+  failed_when: _vsphere_network_management_script_execution['stderr_lines'] != []
+  register: _vsphere_network_management_script_execution
+  when: vsphere_vswitches is defined
+
+- debug: var=_vsphere_network_management_script_execution
+
+- name: network | Managing Distributed vSwitches
+  vmware_dvswitch:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    datacenter_name: "{{ vsphere_vcenter_datacenter['name'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    switch_name: "{{ item['name'] }}"
+    mtu: "{{ item['mtu'] }}"
+    uplink_quantity: "{{ item['uplink_ports'] }}"
+    discovery_proto: "{{ item['discovery_protocol']['type']|lower }}"
+    discovery_operation: "{{ item['discovery_protocol']['operation']|lower }}"
+    state: "{{ item['state'] }}"
+  delegate_to: localhost
+  with_items: "{{ vsphere_dvswitches }}"
+  when: >
+        _vsphere_vcenter_available and
+        vsphere_dvswitches is defined and
+        vsphere_networking_use_dvs
+
+- name: network | Managing Distributed Port Groups
+  vmware_dvs_portgroup:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    portgroup_name: "{{ item[1]['name'] }}"
+    switch_name: "{{ item[0]['name'] }}"
+    vlan_id: "{{ item[1]['vlan_id'] }}"
+    num_ports: "{{ item[1]['num_ports'] }}"
+    portgroup_type: "{{ item[1]['type'] }}"
+    state: "{{ item[1]['state'] }}"
+  delegate_to: localhost
+  with_subelements:
+    - "{{ vsphere_dvswitches }}"
+    - port_groups
+  when: >
+        _vsphere_vcenter_available and
+        vsphere_dvswitches is defined and
+        vsphere_networking_use_dvs and
+        item[0]['state']|lower == "present"
+
+- name: network | Managing Distributed vSwitch Hosts
+  vmware_dvs_host:
+    hostname: "{{ vsphere_vcsa_network_fqdn }}"
+    username: "{{ vsphere_vcsa_sso_user_info['username'] }}"
+    password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+    validate_certs: "{{ vsphere_validate_certs }}"
+    esxi_hostname: "{{ item[1] }}"
+    switch_name: "{{ item[0]['name'] }}"
+    vmnics: "{{ item[0]['nics'] }}"
+    state: "{{ hostvars[item[1]]['vsphere_network_dvs_state'] }}"
+  delegate_to: localhost
+  with_subelements:
+    - "{{ vsphere_dvswitches }}"
+    - hosts
+  when: >
+        _vsphere_vcenter_available and
+        vsphere_dvswitches is defined and
+        vsphere_networking_use_dvs and
+        item[0]['state']|lower == "present"

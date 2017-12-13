@@ -1,0 +1,6 @@
+---
+- name: get-token | Requesting Auth Token
+  os_auth:
+    cloud: "default"
+  no_log: true
+  register: "_os_auth"

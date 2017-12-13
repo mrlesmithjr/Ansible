@@ -1,32 +1,5 @@
-interfaces:
-  device: {{ es_packetbeat_interface }}
-protocols:
-{% for item in es_packetbeat_protocols %}
-  {{ item.name }}:
-    ports: [{% for port in item.ports %}{{ port }}{% if not loop.last %}, {% endif %}{% endfor %}]
-{%   if item.name == "dns" %}
-    include_authorities: {{ item.include_authorities|lower }}
-    include_additionals: {{ item.include_additionals|lower }}
-    send_request: {{ item.send_request|lower }}
-    send_response: {{ item.send_response|lower }}
-{%   endif %}
-{% endfor %}
-output:
-{% for item in es_packetbeat_outputs %}
-  {{ item.name }}:
-    hosts: ["{{ item.host }}:{{ item.port }}"]
-    worker: {{ item.workers }}
-{%    if item.protocol is defined %}
-    protocol: "{{ item.protocol }}"
-{%    endif %}
-{%    if item.username is defined %}
-    username: "{{ item.username }}"
-{%    endif %}
-{%    if item.password is defined %}
-    password: "{{ item.password }}"
-{%    endif %}
-{% endfor %}
-shipper:
-logging:
-  files:
-    rotateeverybytes: 10485760 # = 10MB
+# {{ ansible_managed }}
+#
+{% if es_packetbeat_configuration is defined and es_packetbeat_configuration != [] %}
+{{ es_packetbeat_configuration|to_nice_yaml }}
+{% endif %}

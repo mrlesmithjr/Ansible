@@ -1,0 +1,123 @@
+@version: 3.5
+@include "scl.conf"
+@include "`scl-root`/system/tty10.conf"
+
+options {
+        chain_hostnames({{ syslog_ng_options['chain_hostnames'] }});
+        flush_lines({{ syslog_ng_options['flush_lines'] }});
+        use_dns({{ syslog_ng_options['use_dns'] }});
+        use_fqdn({{ syslog_ng_options['use_fqdn'] }});
+        owner("{{ syslog_ng_options['owner'] }}");
+        group("{{ syslog_ng_options['group'] }}");
+        perm({{ syslog_ng_options['perm'] }});
+        stats_freq({{ syslog_ng_options['stats_freq'] }});
+        bad_hostname("{{ syslog_ng_options['bad_hostname'] }}");
+};
+
+########################
+# Sources
+########################
+{% for item in syslog_ng_sources %}
+source {{ item['name'] }} {
+{%   for src in item['source'] %}
+        {{ src }};
+{%   endfor %}
+};
+{% endfor %}
+
+########################
+# Destinations
+########################
+{% for item in syslog_ng_destinations['files'] %}
+destination {{ item['name'] }} {
+        file("{{ item['path'] }}");
+};
+{% endfor %}
+
+# The root's console.
+#
+destination d_console { usertty("root"); };
+
+# Virtual console.
+#
+destination d_console_all { file(`tty10`); };
+
+# The named pipe /dev/xconsole is for the nsole' utility.  To use it,
+# you must invoke nsole' with the -file' option:
+#
+#    $ xconsole -file /dev/xconsole [...]
+#
+destination d_xconsole { pipe("/dev/xconsole"); };
+
+# Send the messages to an other host
+#
+#destination d_net { tcp("127.0.0.1" port(1000) log_fifo_size(1000)); };
+
+# Debian only
+destination d_ppp { file("/var/log/ppp.log"); };
+
+########################
+# Filters
+########################
+{% for item in syslog_ng_filters %}
+filter {{ item['name'] }} {
+{%   if item['level'] is defined %}
+{%     if item['not'] is not defined %}
+        level({{ item['level']|join(',') }});
+{%     elif item['not'] is defined %}
+        level({{ item['level']|join(',') }})
+        and not {{ item['not']['type'] }}({{ item['not']['items']|join(',') }});
+{%     endif %}
+{%   endif %}
+{%   if item['facility'] is defined %}
+{%     if item['not'] is not defined %}
+        facility({{ item['facility']|join(',') }});
+{%     elif item['not'] is defined %}
+        facility({{ item['facility']|join(',') }})
+        and not {{ item['not']['type'] }}({{ item['not']['items']|join(',') }});
+{%     endif %}
+{%   endif %}
+};
+{% endfor %}
+
+########################
+# Log paths
+########################
+log { source(s_src); filter(f_auth); destination(d_auth); };
+log { source(s_src); filter(f_cron); destination(d_cron); };
+log { source(s_src); filter(f_daemon); destination(d_daemon); };
+log { source(s_src); filter(f_kern); destination(d_kern); };
+log { source(s_src); filter(f_lpr); destination(d_lpr); };
+log { source(s_src); filter(f_syslog3); destination(d_syslog); };
+log { source(s_src); filter(f_user); destination(d_user); };
+log { source(s_src); filter(f_uucp); destination(d_uucp); };
+
+log { source(s_src); filter(f_mail); destination(d_mail); };
+#log { source(s_src); filter(f_mail); filter(f_info); destination(d_mailinfo); };
+#log { source(s_src); filter(f_mail); filter(f_warn); destination(d_mailwarn); };
+#log { source(s_src); filter(f_mail); filter(f_err); destination(d_mailerr); };
+
+log { source(s_src); filter(f_news); filter(f_crit); destination(d_newscrit); };
+log { source(s_src); filter(f_news); filter(f_err); destination(d_newserr); };
+log { source(s_src); filter(f_news); filter(f_notice); destination(d_newsnotice); };
+#log { source(s_src); filter(f_cnews); destination(d_console_all); };
+#log { source(s_src); filter(f_cother); destination(d_console_all); };
+
+#log { source(s_src); filter(f_ppp); destination(d_ppp); };
+
+log { source(s_src); filter(f_debug); destination(d_debug); };
+log { source(s_src); filter(f_error); destination(d_error); };
+log { source(s_src); filter(f_messages); destination(d_messages); };
+
+log { source(s_src); filter(f_console); destination(d_console_all);
+				    destination(d_xconsole); };
+log { source(s_src); filter(f_crit); destination(d_console); };
+
+# All messages send to a remote site
+#
+#log { source(s_src); destination(d_net); };
+
+###
+# Include all config files in /etc/syslog-ng/conf.d/
+###
+@include "/etc/syslog-ng/conf.d/*.conf"

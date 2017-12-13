@@ -1,0 +1,6 @@
+---
+- name: features | Enabling Containers Feature
+  win_feature:
+    name: "Containers"
+    state: "present"
+  register: "windows_container_feature"

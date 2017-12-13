@@ -1,0 +1,4 @@
+---
+etc_hosts_add_all_hosts: true
+etc_hosts_pri_dns_name: '{{ pri_domain_name }}'
+etc_hosts_static_ip: true

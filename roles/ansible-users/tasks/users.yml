@@ -1,39 +1,39 @@
 ---
-- name: users | managing user accounts
+- name: users | Managing Users
   user:
-    name: "{{ item['user'] }}"
-    password: "{{ item['pass'] }}"
-    shell: "{{ item['shell']|default (omit) }}"
-    comment: "{{ item['comment']|default (omit) }}"
-    generate_ssh_key: "{{ item['generate_keys']|default (omit) }}"
-    system: "{{ item['system_account']|default (omit) }}"
-    state: "{{ item['state'] }}"
+    name: "{{ item['key'] }}"
+    password: "{{ item['value']['password'] }}"
+    shell: "{{ item['value']['shell']|default (omit) }}"
+    comment: "{{ item['value']['comment']|default (omit) }}"
+    generate_ssh_key: "{{ item['value']['generate_keys']|default (omit) }}"
+    system: "{{ item['value']['system_account']|default (omit) }}"
+    state: "{{ item['value']['state'] }}"
   become: true
-  with_items: '{{ create_users }}'
+  with_dict: "{{ users }}"
 
-- name: users | adding users to sudoers
+- name: users | Adding Users To sudoers
   lineinfile:
-    dest: "/etc/sudoers"
-    regexp: "^{{ item['user'] }} ALL"
-    line: "{{ item['user'] }} ALL=(ALL) NOPASSWD:ALL"
-    validate: "visudo -cf %s"
-    state: "present"
+    dest: /etc/sudoers
+    regexp: "^{{ item['key'] }} ALL"
+    line: "{{ item['key'] }} ALL=(ALL) NOPASSWD:ALL"
+    validate: visudo -cf %s
+    state: present
   become: true
-  with_items: "{{ create_users }}"
+  with_dict: "{{ users }}"
   when: >
-        item['state'] == "present" and
-        item['sudo']
+        item['value']['state'] == "present" and
+        item['value']['sudo']
 
-- name: users | removing users from sudoers
+- name: users | Removing Users From sudoers
   lineinfile:
-    dest: "/etc/sudoers"
-    regexp: "^{{ item['user'] }} ALL"
-    line: "{{ item['user'] }} ALL=(ALL) NOPASSWD:ALL"
-    validate: "visudo -cf %s"
-    state: "absent"
+    dest: /etc/sudoers
+    regexp: "^{{ item['key'] }} ALL"
+    line: "{{ item['key'] }} ALL=(ALL) NOPASSWD:ALL"
+    validate: visudo -cf %s
+    state: absent
   become: true
-  with_items: '{{ create_users }}'
+  with_dict: "{{ users }}"
   when: >
-        (item['state'] == "present" and
-        not item['sudo']) or
-        item['state'] == "absent"
+        (item['value']['state'] == "present" and
+        not item['value']['sudo']) or
+        item['value']['state'] == "absent"

@@ -1,0 +1,11 @@
+---
+- name: invalid_certs | Capturing InvalidCertificateAction
+  win_shell: Get-PowerCLIConfiguration -Scope AllUsers | Select-Object -ExpandProperty InvalidCertificateAction
+  register: _invalid_cert_action
+  changed_when: false
+
+- name: Disabling Invalid Certs
+  win_shell: Set-PowerCLIConfiguration -Scope AllUsers -InvalidCertificateAction Ignore -confirm:$false
+  when: >
+        vsphere_management_invalid_certs_action|lower == "ignore" and
+        'Ignore' not in _invalid_cert_action['stdout']

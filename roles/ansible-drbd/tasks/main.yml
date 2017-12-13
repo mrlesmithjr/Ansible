@@ -1,0 +1,28 @@
+---
+# tasks file for ansible-drbd
+
+- include: debian.yml
+  tags:
+    - drbd
+  when: ansible_os_family == "Debian"
+
+- include: disks.yml
+  tags:
+    - drbd
+    - drbd-config
+    - drbd-disks
+
+- include: heartbeat.yml
+  tags:
+    - drbd
+    - drbd-heartbeat
+
+- include: config.yml
+  tags:
+    - drbd
+    - drbd-config
+
+- include: services.yml
+  tags:
+    - drbd
+    - drbd-services

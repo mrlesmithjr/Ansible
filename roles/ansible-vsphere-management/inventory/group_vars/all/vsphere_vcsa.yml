@@ -1,0 +1,23 @@
+---
+vsphere_vcsa_appliance_deployment_network: "{{ vsphere_vm_services_vswitch }}"
+vsphere_vcsa_appliance_deployment_option: tiny
+vsphere_vcsa_appliance_name: "{{ vsphere_vcsa_network_fqdn }}"
+vsphere_vcsa_appliance_thin_disk_mode: true
+vsphere_vcsa_deploy: false
+vsphere_vcsa_esx_datastore: "{{ vsphere_vm_services_datastore }}"
+vsphere_vcsa_esx_hostname: "{{ vsphere_bootstrap_host }}"
+vsphere_vcsa_esx_password: "{{ vsphere_user_info['password'] }}"
+vsphere_vcsa_esx_username: "{{ vsphere_user_info['username'] }}"
+vsphere_vcsa_manage_ad_domain: true
+vsphere_vcsa_network_fqdn: "{{ vsphere_vcsa_network_hostname }}.{{ vsphere_pri_domain_name }}"
+vsphere_vcsa_network_gateway: "{{ vsphere_vm_services_subnet }}.1"
+vsphere_vcsa_network_hostname: vcsa
+vsphere_vcsa_network_ip_family: ipv4
+vsphere_vcsa_network_ip: "{{ vsphere_vm_services_subnet }}.60"
+vsphere_vcsa_network_mode: static
+vsphere_vcsa_network_prefix: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+vsphere_vcsa_os_password: "{{ vsphere_vcsa_user_info['password'] }}"
+vsphere_vcsa_os_ssh_enabled: true
+vsphere_vcsa_sso_domain_name: vsphere.local
+vsphere_vcsa_sso_password: "{{ vsphere_vcsa_sso_user_info['password'] }}"
+vsphere_vcsa_sso_site_name: "{{ vsphere_site_name }}"

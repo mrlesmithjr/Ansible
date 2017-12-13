@@ -1,46 +1,6 @@
 ---
-- name: debian | installing monit
+- name: debian | Installing Monit
   apt:
     name: "monit"
-    state: present
-
-- name: debian | configuring monit
-  template:
-    src: "etc/monit/monitrc.j2"
-    dest: "/etc/monit/monitrc"
-    owner: root
-    group: root
-    mode: 0600
-  notify: restart monit
-  when: >
-        config_monit is defined and
-        config_monit
-
-- name: debian | configuring monitored services
-  template:
-    src: "etc/monit/conf.d/monitor.j2"
-    dest: "/etc/monit/conf.d/{{ item.name }}"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - reload monit
-  with_items: monit_monitor_services
-  when: >
-        (config_monit is defined and
-        config_monit) and
-        (item.monitored is defined and
-        item.monitored)
-
-- name: debian | removing unmonitored services
-  file:
-    path: "/etc/monit/conf.d/{{ item.name }}"
-    state: absent
-  notify:
-    - reload monit
-  with_items: monit_monitor_services
-  when: >
-        (config_monit is defined and
-        config_monit) and
-        (item.monitored is defined and
-        not item.monitored)
+    state: "present"
+  become: true

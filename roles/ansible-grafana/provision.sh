@@ -1,6 +1,7 @@
 #!/bin/bash
 sudo apt-get update
-sudo apt-get install -y git python-pip python-dev
+sudo apt-get install -y git python-pip python-dev libffi-dev libssl-dev
+sudo pip install --upgrade setuptools
 sudo pip install jinja2
 sudo pip install ansible
 sudo ansible-galaxy install -r /vagrant/requirements.yml -f

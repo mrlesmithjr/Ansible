@@ -1,0 +1,11 @@
+---
+# tasks file for ansible-rsyslog
+- include: debian.yml
+  tags:
+    - config_rsyslog
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  tags:
+    - config_rsyslog
+  when: ansible_os_family == "RedHat"

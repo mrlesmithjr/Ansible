@@ -1,0 +1,17 @@
+---
+pdns_allow_ddns_updates: true
+
+# Defines subnet to allow DDNS updates from if allowed
+pdns_allow_ddns_updates_from: 0.0.0.0/0
+
+pdns_create_pdns_records: false
+
+pdns_create_pdns_zones: false
+
+pdns_db_cluster: true
+
+pdns_enable_pdns_recursive_lookups: true
+
+pdns_enable_pdns_server_logging: true
+
+pdns_enable_pdns_web_server: true

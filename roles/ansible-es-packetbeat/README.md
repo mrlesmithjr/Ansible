@@ -1,100 +1,22 @@
-Role Name
-=========
+# ansible-es-packetbeat
 
-An [Ansible] role to install/configure [Packetbeat]
+An [Ansible](https://www.ansible.com) role to install/configure [Packetbeat](https://www.elastic.co/products/beats/packetbeat)
 
-Requirements
-------------
+## Requirements
 
 None
 
-Vagrant
--------
-Spin up and test  
-Spins up 3 nodes to test with following:  
-packetbeat  - client  
-es  - elasticsearch  
-logstash  - logstash server  
-```
-vagrant up
-```
+## Role Variables
 
-Role Variables
---------------
+[defaults/main.yml](defaults/main.yml)
 
-```
----
-# defaults file for ansible-es-packetbeat
-es_packetbeat_dashboard_dir: '/opt/beats-dashboards-{{ es_packetbeat_version }}'
-es_packetbeat_dashboard_dl: 'http://download.elastic.co/beats/dashboards/{{ es_packetbeat_dashboard_package }}'
-es_packetbeat_dashboard_package: 'beats-dashboards-{{ es_packetbeat_version }}.zip'
-es_packetbeat_debian_package: 'packetbeat_{{ es_packetbeat_version }}_amd64.deb'
-es_packetbeat_dl_url: 'https://download.elastic.co/beats/packetbeat'
-
-# Define the Elasticsearch host if using Elasticsearch as an output
-es_packetbeat_elasticsearch_host: 'es.{{ pri_domain_name }}'
-
-# Defines interface to sniff on... (any, eth0, eth1, etc.)
-es_packetbeat_interface: 'any'
-
-# Define the Logstash host if using Logstash as an output
-es_packetbeat_logstash_host: 'logstash.{{ pri_domain_name }}'
-
-es_packetbeat_outputs:
-  # - name: 'elasticsearch'
-  #   host: '{{ es_packetbeat_elasticsearch_host }}'
-  #   port: '9200'
-  #   workers: 1
-  #   # Optional protocol and basic auth credentials.
-  #   protocol: 'https'
-  #   username: 'elastic'
-  #   password: 'changeme'
-  - name: 'logstash'
-    host: '{{ es_packetbeat_logstash_host }}'
-    port: '5044'
-    workers: 1
-es_packetbeat_protocols:
-  - name: 'dns'
-    ports:
-      - '53'
-    # whether or not the dns.additionals field (additional resource records)
-    # is added to messages
-    include_additionals: true
-    # whether or not the dns.authorities field (authority resource records)
-    # is added to messages
-    include_authorities: true
-    send_request: false
-    send_response: false
-  - name: 'http'
-    ports:
-      - '80'
-      - '8080'
-  - name: 'memcache'
-    ports:
-      - '11211'
-  - name: 'mongodb'
-    ports:
-      - '27017'
-  - name: 'mysql'
-    ports:
-      - '3306'
-  - name: 'redis'
-    ports:
-      - '6379'
-es_packetbeat_redhat_package: 'packetbeat-{{ es_packetbeat_version }}-x86_64.rpm'
-es_packetbeat_version: '1.3.1'
-pri_domain_name: 'example.org'
-```
-
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 - hosts: packetbeat_clients
   become: true
   vars:
@@ -103,18 +25,14 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
-[Packetbeat]: <https://www.elastic.co/products/beats/packetbeat>
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   mrlesmithjr [at] gmail.com

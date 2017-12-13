@@ -1,0 +1,15 @@
+---
+- name: config | Configuring Wordpress
+  template:
+    src: wp-config.php.j2
+    dest: "{{ wordpress_apache2_web_root }}/wordpress/wp-config.php"
+  become: true
+
+- name: Configuring Wordpress Permissions
+  file:
+    path: "{{ wordpress_apache2_web_root }}"
+    state: directory
+    owner: "{{ wordpress_apache2_web_owner }}"
+    group: "{{ wordpress_apache2_web_group }}"
+    recurse: yes
+  become: true

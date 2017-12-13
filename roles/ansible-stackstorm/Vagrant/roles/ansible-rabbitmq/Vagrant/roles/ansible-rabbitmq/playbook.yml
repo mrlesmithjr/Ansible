@@ -2,7 +2,7 @@
 - hosts: all
   become: true
   vars:
-    - pri_domain_name: 'test.vagrant.local'
+    pri_domain_name: 'test.vagrant.local'
   roles:
   tasks:
     - name: updating /etc/hosts
@@ -11,15 +11,15 @@
         regexp: "^{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         line: "{{ hostvars[item].ansible_ssh_host }} {{ item }} {{ item }}.{{ pri_domain_name }}"
         state: present
-      with_items: groups['all']
-      
+      with_items: "{{ groups['all'] }}"
+
 - hosts: all
   become: true
   vars:
-    - rabbitmq_config_ha: true
-    - rabbitmq_enable_clustering: true
-    - pri_domain_name: 'test.vagrant.local'
-    - rabbitmq_master: 'node0'
+    pri_domain_name: 'test.vagrant.local'
+    rabbitmq_config_ha: true
+    rabbitmq_enable_clustering: true
+    rabbitmq_master: 'node0'
   roles:
     - role: ansible-rabbitmq
   tasks:

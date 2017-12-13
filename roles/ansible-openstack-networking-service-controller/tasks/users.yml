@@ -1,0 +1,32 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/neutron-controller-install.html
+
+# Create Neutron user
+- name: users | Creating Neutron User
+  os_user:
+    name: "{{ openstack_networking_service_controller_neutron_user_info['name'] }}"
+    password: "{{ openstack_networking_service_controller_neutron_user_info['password'] }}"
+    cloud: "default"
+    email: "{{ openstack_networking_service_controller_neutron_user_info['email']|default(omit) }}"
+    domain: "{{ openstack_networking_service_controller_neutron_user_info['domain_id'] }}"
+    default_project: "{{ openstack_networking_service_controller_neutron_user_info['default_project']|default(omit) }}"
+    state: "{{ openstack_networking_service_controller_neutron_user_info['state'] }}"
+  no_log: true
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master)
+
+# Create Neutron user role
+- name: users | Creating Neutron User Role
+  os_user_role:
+    cloud:  "default"
+    user: "{{ openstack_networking_service_controller_neutron_user_info['name'] }}"
+    role: "{{ openstack_networking_service_controller_neutron_user_info['role'] }}"
+    project: "{{ openstack_networking_service_controller_neutron_user_info['project'] }}"
+    state: "{{ openstack_networking_service_controller_neutron_user_info['state'] }}"
+  no_log: true
+  when: >
+        not openstack_networking_service_controller_ha or
+        (openstack_networking_service_controller_ha and
+          inventory_hostname == openstack_networking_service_controller_ha_master)

@@ -1,9 +1,0 @@
----
-# Needed for name resolution in the case of DNS issues
-- name: update_etc_hosts | Updating /etc/hosts For Name Resolution
-  lineinfile:
-    dest: "/etc/hosts"
-    regexp: "^{{ hostvars[item]['ansible_' + galera_cluster_bind_interface]['ipv4']['address'] }} {{ item }} {{ item }}.{{ mariadb_pri_domain_name }}"
-    line: "{{ hostvars[item]['ansible_' + galera_cluster_bind_interface]['ipv4']['address'] }} {{ item }} {{ item }}.{{ mariadb_pri_domain_name }}"
-    state: "present"
-  with_items: '{{ groups[galera_cluster_nodes_group] }}'

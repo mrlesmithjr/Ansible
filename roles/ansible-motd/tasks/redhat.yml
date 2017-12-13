@@ -1,0 +1,38 @@
+---
+- name: redhat | Installing Pre-Reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'bind-utils'
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Pre-Reqs
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'bind-utils'
+    - 'libselinux-python'
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Configuring Custom MOTD Scripts
+  template:
+    src: "etc/motd.sh.j2"
+    dest: "/etc/motd.sh"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  when: motd_enable_custom_scripts
+
+- name: redhat | Enabling Custom MOTD Script
+  lineinfile:
+    dest: "/etc/profile"
+    regexp: "^/etc/motd.sh"
+    line: "/etc/motd.sh"
+    state: "present"
+  become: true
+  when: motd_enable_custom_scripts

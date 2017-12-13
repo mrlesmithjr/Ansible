@@ -25,12 +25,34 @@
          zcat {{ zabbix_mysql_schema_archive }} | mysql -u{{ zabbix_db_info['user'] }}
          -p{{ zabbix_db_info['password'] }} {{ zabbix_db_info['name'] }}
   become: true
-  register: "_zabbix_db_imported"
-  when: not _zabbix_db_imported_check['stat']['exists']
+  register: "_zabbix_db_imported_1"
+  when: >
+        not _zabbix_db_imported_check['stat']['exists'] and
+        ((ansible_distribution != "Ubuntu") or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '<=', strict=true)))
+
+- name: manage_mysql_db | Importing DB Schema
+  shell: >
+         zcat {{ item }} | mysql -u{{ zabbix_db_info['user'] }}
+         -p{{ zabbix_db_info['password'] }} {{ zabbix_db_info['name'] }}
+  become: true
+  register: "_zabbix_db_imported_2"
+  with_items:
+    - '/usr/share/zabbix-server-mysql/schema.sql.gz'
+    - '/usr/share/zabbix-server-mysql/images.sql.gz'
+    - '/usr/share/zabbix-server-mysql/data.sql.gz'
+  when: >
+        not _zabbix_db_imported_check['stat']['exists'] and
+        ((ansible_distribution != "Ubuntu") or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version|version_compare('16.04', '>', strict=true)))
 
 - name: manage_mysql_db | marking db as imported
   file:
     path: "/var/log/.db_imported"
     state: "touch"
   become: true
-  when: _zabbix_db_imported['changed']
+  when: >
+        _zabbix_db_imported_1['changed'] or
+        _zabbix_db_imported_2['changed']

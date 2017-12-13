@@ -1,0 +1,43 @@
+---
+openstack_admin_pass: '2b980296c83c02b37ea6'
+
+openstack_glance_db_pass: '3076d59ef23fea79596d'
+
+openstack_glance_pass: 'c8335ec56c037d35e34c'
+
+openstack_keystone_db_pass: 'f476980f138c709ecf02'
+
+openstack_metadata_secret: '2df54418a63caecad3dd'
+
+openstack_nova_db_pass: '6dd18be1a81e2cc3b359'
+
+openstack_nova_pass: '3d7adbef04822fbf097b'
+
+openstack_neutron_db_pass: '31b4ad79599d841910ae'
+
+openstack_neutron_pass: '27c086efd5efe38f67bb'
+
+openstack_placement_pass: 'bed35b71da4d73567306'
+
+openstack_rabbit_pass: 'openstack'
+openstack_rabbit_user: 'openstack'
+
+
+
+# Password name	Description
+# Database password (no variable used)	Root password for the database
+# ADMIN_PASS	Password of user admin
+# CINDER_DBPASS	Database password for the Block Storage service
+# CINDER_PASS	Password of Block Storage service user cinder
+# DASH_DBPASS	Database password for the Dashboard
+# DEMO_PASS	Password of user demo
+# GLANCE_DBPASS	Database password for Image service
+# GLANCE_PASS	Password of Image service user glance
+# KEYSTONE_DBPASS	Database password of Identity service
+# METADATA_SECRET	Secret for the metadata proxy
+# NEUTRON_DBPASS	Database password for the Networking service
+# NEUTRON_PASS	Password of Networking service user neutron
+# NOVA_DBPASS	Database password for Compute service
+# NOVA_PASS	Password of Compute service user nova
+# PLACEMENT_PASS	Password of the Placement service user placement
+# RABBIT_PASS	Password of user guest of RabbitMQ

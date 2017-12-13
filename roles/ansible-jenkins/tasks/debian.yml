@@ -3,27 +3,32 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'python-software-properties'
-  when: ansible_distribution_version|int < 14
+  when: ansible_distribution_version|version_compare('12.04', '<=')
 
 - name: debian | Adding Jenkins Repo Key
   apt_key:
     url: "{{ jenkins_repo_key }}"
     state: "present"
+  become: true
 
 - name: debian | Adding Jenkins Repo
   apt_repository:
     repo: "{{ jenkins_apt_repo }}"
     state: "present"
+  become: true
 
 - name: debian | Installing Jenkins Pre-Reqs
   apt:
     name: "{{ item }}"
     state: "latest"
+  become: true
   with_items: '{{ jenkins_debian_pre_req_packages }}'
 
 - name: debian | Installing Jenkins
   apt:
     name: "jenkins"
     state: "present"
+  become: true

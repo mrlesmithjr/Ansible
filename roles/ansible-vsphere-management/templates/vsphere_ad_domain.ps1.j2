@@ -1,0 +1,45 @@
+{% for host in groups['vsphere_hosts'] %}
+$vmhost="{{ hostvars[host]['ansible_host'] }}"
+$AdDomain="{{ vsphere_ad_dns_domain_name|upper }}"
+$SecureAdUser="{{ vsphere_ad_user }}"
+$SecureAdPassword=Get-Content {{ vsphere_ad_domain_secure_password_file }} | ConvertTo-SecureString
+$SecureCreds=New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $SecureAdUser,$SecureAdPassword
+
+Connect-VIServer $vmhost
+
+$vmServer=Get-VMHost $vmhost
+$vmHostAuth=$vmServer | Get-VMHostAuthentication
+$vmHostDomain=$vmHostAuth.Domain
+$vmHostDomainMemberShipStatus=$vmHostAuth.DomainMembershipStatus
+{%   if vsphere_hosts_join_domain %}
+if ($vmHostDomain -ne $AdDomain -and $vmHostDomainMemberShipStatus -eq $null) {
+    $vmHostAuth | Set-VMHostAuthentication -Domain $AdDomain -JoinDomain -Credential $SecureCreds -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+$vmServer=Get-VMHost $vmhost
+$vmHostAuth=$vmServer | Get-VMHostAuthentication
+$vmHostDomain=$vmHostAuth.Domain
+$vmHostDomainMemberShipStatus=$vmHostAuth.DomainMembershipStatus
+if ($vmHostDomain -eq "{{ vsphere_ad_dns_domain_name|upper }}") {
+    if ($vmHostDomainMemberShipStatus -eq "OK") {
+{%     for role in vsphere_domain_access %}
+        $vmHostPermissions=$vmServer | Get-VIPermission
+        $vmHostRole=New-Object System.Collections.ArrayList
+        foreach ($role in $vmHostPermissions) {
+            if ($role.Role -eq "{{ role['role'] }}") {
+                $vmHostRole.Add($role.Principal)
+            }
+        }
+        if ($vmHostRole -notcontains "{{ role['name'] }}") {
+            $vmServer | New-VIPermission -Role {{ role['role'] }} -Principal "{{ role['name'] }}" -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        }
+{%     endfor %}
+    }
+}
+{%   elif not vsphere_hosts_join_domain %}
+if ($vmHostDomain -eq $AdDomain -and $vmHostDomainMemberShipStatus -eq "OK") {
+    $vmHostAuth | Set-VMHostAuthentication -LeaveDomain -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%   endif %}
+Disconnect-VIServer * -Confirm:$false
+
+{% endfor %}

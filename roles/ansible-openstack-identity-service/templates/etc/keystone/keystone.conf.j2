@@ -1,0 +1,106 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+{% if openstack_identity_service_ha %}
+bind_host = {{ openstack_identity_service_ha_admin_bind_host }}
+public_bind_host = {{ openstack_identity_service_ha_bind_host }}
+admin_bind_host = {{ openstack_identity_service_ha_public_bind_host }}
+{% endif %}
+{% set _rabbit_user = openstack_identity_service_rabbit_user %}
+{% set _rabbit_pass = openstack_identity_service_rabbit_pass %}
+transport_url = rabbit://{% for host in openstack_identity_service_rabbit_hosts %}{{ _rabbit_user }}:{{ _rabbit_pass }}@{{ host }}{% if not loop.last %},{% endif %}{% endfor %}
+
+
+[assignment]
+
+[auth]
+
+[cache]
+
+[catalog]
+{% if openstack_identity_service_ha %}
+driver = keystone.catalog.backends.sql.Catalog
+{% endif %}
+
+[cors]
+
+[cors.subdomain]
+
+[credential]
+
+[database]
+connection = mysql+pymysql://{{ openstack_identity_service_keystone_db_info['user'] }}:{{ openstack_identity_service_keystone_db_info['pass'] }}@{{ openstack_identity_service_keystone_db_info['host'] }}/{{ openstack_identity_service_keystone_db_info['db'] }}
+
+[domain_config]
+
+[endpoint_filter]
+
+[endpoint_policy]
+
+[eventlet_server]
+
+[extra_headers]
+
+[federation]
+
+[fernet_tokens]
+
+[healthcheck]
+
+[identity]
+{% if openstack_identity_service_ha %}
+driver = keystone.identity.backends.sql.Identity
+{% endif %}
+
+[identity_mapping]
+
+[kvs]
+
+[ldap]
+
+[matchmaker_redis]
+
+[memcache]
+
+[oauth1]
+
+[oslo_messaging_amqp]
+
+[oslo_messaging_kafka]
+
+[oslo_messaging_notifications]
+
+[oslo_messaging_rabbit]
+
+[oslo_messaging_zmq]
+
+[oslo_middleware]
+
+[oslo_policy]
+
+[paste_deploy]
+
+[policy]
+
+[profiler]
+
+[resource]
+
+[revoke]
+
+[role]
+
+[saml]
+
+[security_compliance]
+
+[shadow_users]
+
+[signing]
+
+[token]
+provider = {{ openstack_identity_service_token_provider }}
+
+[tokenless_auth]
+
+[trust]

@@ -1,0 +1,11 @@
+---
+- name: swap | Removing swapfile From /etc/fstab
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+  become: true
+
+- name: swap | Disabling Swap
+  command: swapoff -a
+  become: true

@@ -6,6 +6,7 @@
   changed_when: false
   failed_when: false
   with_items: '{{ mdadm_arrays }}'
+  check_mode: no
 
 # Creating raid arrays
 # We pass yes in order to accept any questions prompted for yes|no
@@ -27,6 +28,7 @@
 - name: arrays | Capturing Array Details
   command: "mdadm --detail --scan"
   register: "array_details"
+  changed_when: false
 
 # Creating raid arrays filesystem
 - name: arrays | Creating Array(s) Filesystem

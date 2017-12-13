@@ -1,0 +1,21 @@
+{% if groups['vsphere_samba_vms'] is defined %}
+[vsphere_samba_vms]
+{%   for host in groups['vsphere_samba_vms'] %}
+{%     if (groups['vsphere_destroy_vms'] is defined and host not in groups['vsphere_destroy_vms']) or groups['vsphere_destroy_vms'] is not defined %}
+{{ hostvars[host]['inventory_hostname'] }} ansible_host={{ hostvars[host]['ansible_host'] }} hw_product_uuid={{ hostvars[host]['hw_product_uuid'] }}
+{%     endif %}
+{%   endfor %}
+{% elif groups['vsphere_samba_vms'] is not defined %}
+[vsphere_samba_vms]
+{% endif %}
+
+{% if groups['vsphere_samba_vms_failed'] is defined %}
+[vsphere_samba_vms_failed]
+{%   for host in groups['vsphere_samba_vms_failed'] %}
+{%     if hostvars[host]['inventory_hostname'] not in groups['vsphere_samba_vms'] %}
+{{ hostvars[host]['inventory_hostname'] }}{% if hostvars[host]['ansible_host'] != '' %} ansible_host={{ hostvars[host]['ansible_host'] }} {% endif %} hw_product_uuid={{ hostvars[host]['hw_product_uuid'] }}
+{%     endif %}
+{%   endfor %}
+{% elif groups['vsphere_samba_vms_failed'] is not defined %}
+[vsphere_samba_vms_failed]
+{% endif %}

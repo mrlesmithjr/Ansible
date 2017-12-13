@@ -1,0 +1,43 @@
+$vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+Connect-VIServer $vCenterHost
+
+$vCenter = Get-VC $vCenterHost
+$DataCenter = Get-Datacenter -Name "{{ vsphere_vcenter_datacenter['name'] }}"
+$Cluster = $DataCenter | Get-Cluster -Name "{{ vsphere_vcenter_cluster['name'] }}"
+{% if vsphere_vcenter_resource_pools is defined %}
+{%   for parent in vsphere_vcenter_resource_pools %}
+$RootResourcePool = $Cluster | Get-ResourcePool -Name "Resources"
+$ResourcePools = $Cluster | Get-ResourcePool
+{%     if parent['state']|lower == "present" %}
+if ($ResourcePools.Name -notcontains "{{ parent['name'] }}") {
+  New-ResourcePool -Name "{{ parent['name'] }}" -Location $RootResourcePool -CPUSharesLevel {{ parent['cpu_shares_level'] }} -MemSharesLevel {{ parent['mem_shares_level'] }} -CpuExpandableReservation ${{ parent['cpu_expandable_reservation']|lower }} -MemExpandableReservation ${{ parent['mem_expandable_reservation']|lower }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+else {
+  $ResourcePool = Get-ResourcePool -Name "{{ parent['name'] }}" -Location $RootResourcePool
+  if ($ResourcePool.CpuSharesLevel -ne "{{ parent['cpu_shares_level'] }}") {
+    $Cluster | Get-ResourcePool -Name "{{ parent['name'] }}" |  Set-ResourcePool -CPUSharesLevel {{ parent['cpu_shares_level'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+  if ($ResourcePool.MemSharesLevel -ne "{{ parent['mem_shares_level'] }}") {
+    $Cluster | Get-ResourcePool -Name "{{ parent['name'] }}" | Set-ResourcePool -MemSharesLevel {{ parent['mem_shares_level'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+}
+{%       if parent['vms'] is defined %}
+{%         for vms in parent['vms'] %}
+$vms = @("{{ vms|join('", "')}}")
+foreach ($vm in $vms) {
+  $vm = $Cluster | Get-VM $vm
+  if ($vm.ResourcePool -ne "{{ parent['name'] }}") {
+    Move-VM -VM $vm.Name -Location ($Cluster | Get-ResourcePool "{{ parent['name'] }}") -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+}
+{%         endfor %}
+{%       endif %}
+{%     elif parent['state']|lower == "absent" %}
+if ($ResourcePools.Name -contains "{{ parent['name'] }}") {
+  $Cluster | Get-ResourcePool -Name "{{ parent['name'] }}" | Remove-ResourcePool -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+Disconnect-VIServer * -Confirm:$false

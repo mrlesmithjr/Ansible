@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-windows-docker
+
+- include: features.yml
+
+- include: reboot.yml
+
+- include: install.yml
+
+- include: service.yml
+
+- include: firewall.yml

@@ -1,0 +1,18 @@
+---
+- name: join_domain | Checking If Already Joined To Domain
+  stat:
+    path: /var/log/.samba_ad_joined
+  register: samba_ad_join_check
+
+- name: join_domain | Joining Domain
+  shell: samba-tool domain join {{ samba_ad_info['ad_dns_domain_name'] }} DC --username="{{ samba_ad_info['netbios_domain_name']|upper }}\administrator" --password="{{ samba_ad_info['adminpass'] }}"
+  become: true
+  register: _samba_domain_joined
+  when: not samba_ad_join_check['stat']['exists']
+
+- name: join_domain | Marking As Joined To Domain
+  file:
+    path: /var/log/.samba_ad_joined
+    state: touch
+  become: true
+  when: _samba_domain_joined['changed']

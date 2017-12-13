@@ -1,0 +1,26 @@
+---
+- name: redhat | Adding Kibana Repo Key
+  rpm_key:
+    key: "{{ kibana_repo_key }}"
+    state: present
+  become: true
+
+- name: redhat | Adding Kibana Repo
+  template:
+    src: kibana.repo.j2
+    dest: /etc/yum.repos.d/kibana.repo
+  become: true
+
+- name: redhat | Installing Kibana
+  dnf:
+    name: kibana
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing Kibana
+  yum:
+    name: kibana
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"

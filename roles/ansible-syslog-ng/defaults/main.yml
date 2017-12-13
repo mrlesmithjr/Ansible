@@ -1,0 +1,220 @@
+---
+# defaults file for ansible-syslog-ng
+syslog_ng_config: false
+
+syslog_ng_destinations:
+  files:
+    - name: 'd_auth'
+      path: '/var/log/auth.log'
+    - name: 'd_cron'
+      path: '/var/log/cron.log'
+    - name: 'd_daemon'
+      path: '/var/log/daemon.log'
+    - name: 'd_debug'
+      path: '/var/log/debug'
+    - name: 'd_error'
+      path: '/var/log/error'
+    - name: 'd_kern'
+      path: '/var/log/kern.log'
+    - name: 'd_lpr'
+      path: '/var/log/lpr.log'
+    - name: 'd_mail'
+      path: '/var/log/mail.log'
+    - name: 'd_mailerr'
+      path: '/var/log/mail.err'
+    - name: 'd_mailinfo'
+      path: '/var/log/mail.info'
+    - name: 'd_mailwarn'
+      path: '/var/log/mail.warn'
+    - name: 'd_messages'
+      path: '/var/log/messages'
+    - name: 'd_newscrit'
+      path: '/var/log/news/news.crit'
+    - name: 'd_newserr'
+      path: '/var/log/news/news.err'
+    - name: 'd_newsnotice'
+      path: '/var/log/news/news.notice'
+    - name: 'd_syslog'
+      path: '/var/log/syslog'
+    - name: 'd_user'
+      path: '/var/log/user.log'
+    - name: 'd_uucp'
+      path: '/var/log/uucp.log'
+
+# If you wish to get logs from remote machines
+syslog_ng_enable_remote_collector: false
+
+syslog_ng_filters:
+  - name: 'f_crit'
+    level:
+      - 'crit .. emerg'
+  - name: 'f_dbg'
+    level:
+      - 'debug'
+  - name: 'f_err'
+    level:
+      - 'err'
+  - name: 'f_info'
+    level:
+      - 'info'
+  - name: 'f_notice'
+    level:
+      - 'notice'
+  - name: 'f_warn'
+    level:
+      - 'warn'
+  - name: 'f_debug'
+    level:
+      - 'debug'
+    not:
+      type: 'facility'
+      items:
+        - 'auth'
+        - 'authpriv'
+        - 'news'
+        - 'mail'
+  # - name: 'f_error'
+  #   level:
+  #     - 'err .. emerg'
+  # - name: 'f_messages'
+  #   level:
+  #     - 'info'
+  #     - 'notice'
+  #     - 'warn'
+  #   not:
+  #     type: 'facility'
+  #     items:
+  #       - 'auth'
+  #       - 'authpriv'
+  #       - 'cron'
+  #       - 'daemon'
+  #       - 'mail'
+  #       - 'news'
+  # - name: 'f_auth'
+  #   facility:
+  #     - 'auth'
+  #     - 'authpriv'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_cron'
+  #   facility:
+  #     - 'cron'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_daemon'
+  #   facility:
+  #     - 'daemon'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_kern'
+  #   facility:
+  #     - 'kern'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_lpr'
+  #   facility:
+  #     - 'lpr'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_local'
+  #   facility:
+  #     - 'local0'
+  #     - 'local1'
+  #     - 'local3'
+  #     - 'local4'
+  #     - 'local5'
+  #     - 'local6'
+  #     - 'local7'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_mail'
+  #   facility:
+  #     - 'mail'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_news'
+  #   facility:
+  #     - 'news'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_user'
+  #   facility:
+  #     - 'user'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_uucp'
+  #   facility:
+  #     - 'uucp'
+  #   not:
+  #     type: 'filter'
+  #     items:
+  #       - 'f_debug'
+  # - name: 'f_cnews'
+  #   level:
+  #     - 'notice'
+  #     - 'err'
+  #     - 'crit'
+  #   facility:
+  #     - 'news'
+  # - name: 'f_cother'
+  #   level:
+  #     - 'debug'
+  #     - 'info'
+  #     - 'notice'
+  #     - 'warn'
+  #   facility:
+  #     - 'daemon'
+  #     - 'mail'
+
+# filter f_syslog3 { not facility(auth, authpriv, mail) and not filter(f_debug); };
+# filter f_cnews { level(notice, err, crit) and facility(news); };
+# filter f_cother { level(debug, info, notice, warn) or facility(daemon, mail); };
+#
+# filter f_ppp { facility(local2) and not filter(f_debug); };
+# filter f_console { level(warn .. emerg); };
+
+syslog_ng_listen:
+  address: 127.0.0.1
+  port: 514
+  protocol: 'udp'
+
+syslog_ng_options:
+  bad_hostname: '^gconfd$'
+  chain_hostnames: 'off'
+  flush_lines: 0
+  group: 'adm'
+  owner: 'root'
+  perm: '0640'
+  stats_freq: 0
+  use_dns: 'no'
+  use_fqdn: 'no'
+
+syslog_ng_sources:
+  - name: 's_src'
+    source:
+      - 'internal()'
+      - 'system()'
+  - name: 's_udp'
+    source:
+      - 'udp(port(514))'
+  - name: 's_tcp'
+    source:
+      - 'tcp(port(514))'

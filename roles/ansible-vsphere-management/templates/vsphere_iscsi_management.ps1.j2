@@ -1,0 +1,31 @@
+{% for host in groups['vsphere_hosts'] %}
+{%   if hostvars[host]['vsphere_enable_software_iscsi'] is defined %}
+$vmHost = "{{ hostvars[host]['ansible_host'] }}"
+Connect-VIServer -Server $vmHost
+$vmServer = Get-VMHost $vmHost
+$vmHostStorage = $vmServer | Get-VMHostStorage
+$SoftwareIScsiStatus = $vmHostStorage.SoftwareIScsiEnabled
+$vmHostIScsiEnabled = ${{ hostvars[host]['vsphere_enable_software_iscsi'] }}
+If ($SoftwareIScsiStatus -ne $vmHostIScsiEnabled) {
+  $vmHostStorage | Set-VMHostStorage -SoftwareIScsiEnabled $vmHostIScsiEnabled -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  Start-Sleep -Seconds 30
+}
+
+{%     if hostvars[host]['vsphere_enable_software_iscsi'] %}
+{%       if vsphere_iscsi_targets is defined %}
+{%         for tgt in vsphere_iscsi_targets %}
+$HBATarget = "{{ tgt }}"
+$SoftwareIScsiAdapter = $vmServer | Get-VMHostHba -Type iScsi | Where {$_.Model -eq "iSCSI Software Adapter"}
+$SoftwareIScsiDevice = $SoftwareIScsiAdapter.Device
+$SoftwareIScsiHBATargets = $SoftwareIScsiAdapter | Get-IScsiHbaTarget | Select-Object -ExpandProperty Address
+if ($SoftwareIScsiHBATargets -notcontains $HBATarget) {
+  $SoftwareIScsiAdapter | New-IScsiHbaTarget -Address $HBATarget | Out-File -Append {{ vsphere_management_log }}
+}
+$vmServer | Get-VMHostStorage -RescanAllHba -RescanVmfs
+{%         endfor %}
+{%       endif %}
+{%     endif %}
+
+Disconnect-VIServer * -Confirm:$false
+{%   endif %}
+{% endfor %}

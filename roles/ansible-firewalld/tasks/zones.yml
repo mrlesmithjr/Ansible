@@ -1,0 +1,11 @@
+---
+- name: zones | Managing Firewall Zones
+  firewalld:
+    immediate: "{{ item['immediate']|default(omit) }}"
+    interface: "{{ item['interface']|default(omit) }}"
+    permanent: "{{ item['permanent']|default(false) }}"
+    source: "{{ item['source']|default(omit) }}"
+    state: "{{ item['state']|default(omit) }}"
+    zone: "{{ item['zone'] }}"
+  become: true
+  with_items: '{{ firewalld_zones }}'

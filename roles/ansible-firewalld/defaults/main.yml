@@ -1,0 +1,47 @@
+---
+# defaults file for ansible-firewalld
+
+# Defines any custom zones to create/delete
+# zone - name of zone
+#
+# present - whether custom zone is created/deleted
+## present: true
+### creates zone if not already present
+## present: false
+### deletes zone if present
+firewalld_custom_zones: []
+  # - zone: 'docker'
+  #   state: 'enabled'
+  #   present: false
+  # - zone: 'privateDNS'
+  #   state: 'enabled'
+  #   present: true
+
+# Defines firewall rules
+firewalld_rules: []
+  # # - service: 'dhcp'
+  # #   permanent: true
+  # #   zone: 'public'
+  # - service: 'http'
+  #   state: 'enabled'
+  #   permanent: true
+  #   zone: 'public'
+  # - service: 'https'
+  #   state: 'enabled'
+  #   permanent: true
+  #   zone: 'public'
+  # - service: 'ssh'
+  #   state: 'enabled'
+  #   permanent: true
+  #   zone: 'public'
+
+# Defines firewall zones (default zones - not custom zones)
+firewalld_zones: []
+  # - zone: 'home'
+  #   permanent: true
+  #   state: 'enabled'
+  #   interface: 'enp0s3'
+  # - zone: 'public'
+  #   permanent: true
+  #   state: 'enabled'
+  #   interface: 'enp0s8'

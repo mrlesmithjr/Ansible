@@ -1,0 +1,12 @@
+---
+- name: services | Ensuring drbd Service Is Enabled On Boot
+  service:
+    name: drbd
+    enabled: true
+  become: true
+
+- name: services | Ensuring heartbeat Service Is Enabled On Boot
+  service:
+    name: heartbeat
+    enabled: true
+  become: true

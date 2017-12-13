@@ -1,19 +1,23 @@
 ---
 - name: centos | installing lvm2
   yum:
-    name: lvm2
-    state: present
+    name: "lvm2"
+    state: "present"
+  become: true
 
 - name: centos | installing sg3_utils
   yum:
-    name: sg3_utils
-    state: present
+    name: "sg3_utils"
+    state: "present"
+  become: true
 
 - name: centos | checking for scsi devices
-  shell: sg_scan
-  register: scsi_devices
+  shell: "sg_scan"
+  become: true
+  register: "scsi_devices"
   changed_when: False
 
 - name: centos | rescanning for new disks
-  command: /usr/bin/rescan-scsi-bus.sh
+  command: "/usr/bin/rescan-scsi-bus.sh"
+  become: true
   changed_when: False

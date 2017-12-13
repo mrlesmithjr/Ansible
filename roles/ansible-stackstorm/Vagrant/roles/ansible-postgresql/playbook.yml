@@ -1,8 +1,18 @@
 ---
-- name: provisions postgresql
-  hosts: all
-  sudo: true
+- hosts: postgres_cluster
   vars:
+    create_users: []
+      # - user: 'test'
+      #   comment: 'Test user'
+      #   generate_keys: true
+      #   pass: 'test'
+      #   preseed_user: false
+      #   state: 'present'
+      #   sudo: false
+      #   system_account: false
+    pri_domain_name: 'test.vagrant.local'
   roles:
+    - role: ansible-users
+      when: create_users is defined
     - role: ansible-postgresql
   tasks:

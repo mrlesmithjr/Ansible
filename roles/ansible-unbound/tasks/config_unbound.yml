@@ -3,8 +3,8 @@
   template:
     src: "etc/unbound/unbound.conf.d/local.conf.j2"
     dest: "{{ unbound_config_dir }}/local.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - restart unbound
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart unbound"

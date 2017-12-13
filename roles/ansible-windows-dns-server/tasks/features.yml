@@ -1,0 +1,6 @@
+---
+- name: features | Installing Windows DNS Server
+  win_feature:
+    name: DNS
+    state: "{{ windows_dns_server_state }}"
+  register: _windows_dns_server

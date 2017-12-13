@@ -7,10 +7,10 @@
     state: "present"
   become: true
   with_items:
-    - 'automysqlbackup'
-    - 'software-properties-common'
-    - 'python-mysqldb'
-    - 'rsync'
+    - automysqlbackup
+    - software-properties-common
+    - python-mysqldb
+    - rsync
 
 - name: debian | installing mysql
   apt:
@@ -83,31 +83,3 @@
   become: true
   when: >
         ansible_distribution_version <= '14.04'
-
-- name: debian | adding cacti db user for monitoring
-  mysql_user:
-    name: "{{ mysql_cacti_db_user }}"
-    password: "{{ mysql_cacti_db_password }}"
-    host: "{{ mysql_cacti_server }}"
-    priv: "*.*:SUPER,PROCESS"
-    state: "present"
-  become: true
-  tags:
-    - cacti_monitoring
-  when: >
-        mysql_enable_cacti_monitoring and
-        cacti_server is defined
-
-- name: debian | adding cacti db user for monitoring
-  mysql_user:
-    name: "{{ mysql_cacti_db_user }}"
-    password: "{{ mysql_cacti_db_password }}"
-    host: "{{ mysql_cacti_server_fqdn }}"
-    priv: "*.*:SUPER,PROCESS"
-    state: "present"
-  become: true
-  tags:
-    - cacti_monitoring
-  when: >
-        mysql_enable_cacti_monitoring and
-        mysql_cacti_server_fqdn is defined

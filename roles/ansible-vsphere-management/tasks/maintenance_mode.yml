@@ -1,0 +1,19 @@
+---
+- name: maintenance_mode |
+  win_shell: |
+    $vmHost="{{ hostvars[item]['ansible_host'] }}"
+    Connect-VIServer -Server $vmHost
+    $MaintenanceMode=$(Get-VMHost | Select-Object -ExpandProperty State)
+    {%   if vsphere_maintenance_mode %}
+    if ($MaintenanceMode -ne 'Maintenance') {
+      Set-VMHost -State 'Maintenance' -Confirm:$false
+    }
+    {%   elif not hostvars[item]['vsphere_maintenance_mode'] %}
+    if ($MaintenanceMode -ne 'Connected') {
+      Set-VMHost -State 'Connected' -Confirm:$false
+    }
+    {%   endif %}
+    Disconnect-VIServer * -Confirm:$false
+  with_items: "{{ groups['vsphere_hosts'] }}"
+  when: >
+        hostvars[item]['vsphere_maintenance_mode'] is defined

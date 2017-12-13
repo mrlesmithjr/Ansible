@@ -1,0 +1,63 @@
+---
+# tasks file for ansible-windows-powercli
+
+- name: Checking For Nuget Package
+  win_shell: Get-PackageProvider -Name Nuget
+  register: _nuget_package
+  failed_when: false
+  changed_when: false
+
+- name: Setting Fact For Package Management Check
+  set_fact:
+    _package_management_check: true
+  when: >
+        _nuget_package['stderr'] is defined and
+        "'Get-PackageProvider' is not recognized" not in _nuget_package['stderr']
+
+- name: Setting Fact For Package Management Check
+  set_fact:
+    _package_management_check: false
+  when: >
+        _nuget_package['stderr'] is defined and
+        "'Get-PackageProvider' is not recognized" in _nuget_package['stderr']
+
+- name: Copying PackageManagement Package
+  win_copy:
+    src: files/PackageManagement_x64.msi
+    dest: c:\tmp\PackageManagement_x64.msi
+  when: not _package_management_check
+
+- name: Installing PackageManagement Package
+  win_msi:
+    path: c:\tmp\PackageManagement_x64.msi
+    state: present
+    wait: true
+  register: _package_management_installed
+  when: not _package_management_check
+
+- name: Installing NuGet Package Provider
+  win_shell: Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+  when: _package_management_installed['changed']
+
+- name: Checking For PowerCLI Module
+  win_shell: Import-Module -Name VMware.PowerCLI
+  register: _powercli_module
+  failed_when: false
+  changed_when: false
+
+- name: Install PowerCLI Module
+  win_shell: Install-Module -Name VMware.PowerCLI –Force
+  when: _powercli_module['rc'] != 0
+
+- name: Disable Invalid Cert Warning For PowerCLI
+  win_shell: Set-PowerCLIConfiguration -InvalidCertificateAction ignore -confirm:$false
+  when: windows_powercli_disable_invalid_cert_warning
+
+- name: Manage PowerCLI Customer Experience Improvement Program
+  win_shell: "Set-PowerCLIConfiguration -ParticipateInCeip ${{ window_powercli_customer_experience_improvement_program|lower }} -confirm:$false"
+
+- name: Rebooting Server
+  win_reboot:
+    shutdown_timeout: 3600
+    reboot_timeout: 3600
+  when: ansible_reboot_pending

@@ -1,0 +1,2 @@
+[powercli_host]
+node0 ansible_ssh_host=192.168.250.10

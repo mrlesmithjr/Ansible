@@ -1,9 +1,8 @@
 ---
 # tasks file for ansible-users
+
 - include: users.yml
   tags:
     - setup_users
     - users
-  when: >
-        create_local_users and
-        create_users is defined
+  when: users_manage_accounts

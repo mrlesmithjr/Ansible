@@ -1,0 +1,11 @@
+---
+vsphere_template_vm: []
+  # cpus: 1
+  # deploy: true
+  # datastore: "{{ vsphere_vm_services_datastore }}"
+  # disk_gb: 72
+  # guest_id: ubuntu64Guest
+  # iso: /ISOs/ubuntu-16.04.3-server-amd64.iso
+  # memory_mb: 1024
+  # network_name: VSS-VLAN-101
+  # vm_name: ubuntu_16.04_template

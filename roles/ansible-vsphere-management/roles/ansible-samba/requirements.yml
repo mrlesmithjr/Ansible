@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-samba.git
+- src: https://github.com/mrlesmithjr/ansible-isc-dhcp.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git

@@ -6,6 +6,4 @@
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include: config_elasticsearch.yml
-
 - include: config_graylog_server.yml

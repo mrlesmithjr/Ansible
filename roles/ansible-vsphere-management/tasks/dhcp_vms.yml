@@ -1,0 +1,27 @@
+---
+- name: dhcp_vms | Creating vsphere_dhcp_servers Group
+  add_host:
+    groups: vsphere_dhcp_vms
+    name: "{{ hostvars[item]['inventory_hostname'] }}"
+  changed_when: false
+  delegate_to: localhost
+  become: false
+  tags:
+    - vsphere_dhcp_vms_info
+    - vsphere_vms_info
+  with_items: "{{ groups['vsphere_ddi_vms'] }}"
+  when: >
+        groups['vsphere_ddi_vms'] is defined and
+        ((hostvars[item]['inventory_hostname'] == groups['vsphere_ddi_vms'][0]) or
+        (hostvars[item]['inventory_hostname'] == groups['vsphere_ddi_vms'][1]))
+
+- name: dhcp_vms | Creating Inventory For vsphere_dhcp_servers
+  template:
+    src: dhcp_vms.inv.j2
+    dest: "{{ vsphere_dhcp_servers_inventory_file }}"
+  become: false
+  delegate_to: localhost
+  tags:
+    - vsphere_dhcp_vms_info
+    - vsphere_vms_info
+  when: vsphere_vms_generate_inventory

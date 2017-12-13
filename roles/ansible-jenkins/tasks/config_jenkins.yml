@@ -8,24 +8,27 @@
     dest: "{{ jenkins_config_file }}"
     regexp: "^{{ jenkins_java_options }}="
     line: "{{ jenkins_java_options }}=\"-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false\""
+  become: true
   register: "jenkins_setup_wizard_disabled"
-  when: jenkins_config_info.disable_setup_wizard
+  when: jenkins_config_info['disable_setup_wizard']
 
 - name: config_jenkins | Enabling Jenkins Setup Wizard
   lineinfile:
     dest: "{{ jenkins_config_file }}"
     regexp: "^{{ jenkins_java_options }}="
     line: "{{ jenkins_java_options }}=\"-Djava.awt.headless=true\""
+  become: true
   register: "jenkins_setup_wizard_enabled"
-  when: not jenkins_config_info.disable_setup_wizard
+  when: not jenkins_config_info['disable_setup_wizard']
 
 - name: config_jenkins | Restarting Jenkins (Setup Wizard Disabled)
   service:
     name: "jenkins"
     state: "restarted"
+  become: true
   when: >
-        jenkins_setup_wizard_disabled.changed or
-        jenkins_setup_wizard_enabled.changed
+        jenkins_setup_wizard_disabled['changed'] or
+        jenkins_setup_wizard_enabled['changed']
 
 - name: config_jenkins | Configuring Jenkins
   template:
@@ -33,26 +36,22 @@
     dest: "{{ jenkins_home_dir }}/{{ item }}"
     owner: "jenkins"
     group: "jenkins"
+  become: true
   notify:
     - 'restart jenkins'
-  with_items:
-    - 'config.xml'
-    - 'hudson.tasks.Mailer.xml'
-    - 'org.jenkinsci.plugins.ansible.AnsibleInstallation.xml'
+  with_items: '{{ jenkins_config_files }}'
 
 - name: config_jenkins | Checking If Secure Setup
   stat:
     path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
-  register: "jenkins_secure_setup"
-  when: >
-        jenkins_config_info.use_security is defined and
-        jenkins_config_info.use_security
+  register: "_jenkins_secure_setup_config"
 
 - name: config_jenkins | Marking As Secure Setup
   file:
     dest: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
     state: "touch"
+  become: true
   when: >
-        not jenkins_secure_setup.stat.exists and
-        (jenkins_config_info.use_security is defined and
-        jenkins_config_info.use_security)
+        not _jenkins_secure_setup_config['stat']['exists'] and
+        (jenkins_config_info['use_security'] is defined and
+        jenkins_config_info['use_security'])

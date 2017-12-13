@@ -1,0 +1,120 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Creating vsphere_samba_vms Dynamic Group
+      add_host:
+        groups: vsphere_samba_vms
+        hostname: "{{ item['vm_name'] }}"
+        cpus: "{{ item['cpus'] }}"
+        datastore: "{{ item['datastore'] }}"
+        ip: "{{ item['ip']|default(omit) }}"
+        gateway: "{{ item['gateway']|default(omit) }}"
+        memory_mb: "{{ item['memory_mb'] }}"
+        netmask: "{{ item['netmask']|default(omit) }}"
+        netmask_cidr: "{{ item['netmask_cidr']|default(omit) }}"
+        network_name: "{{ item['network_name'] }}"
+        vapp_source_path: "{{ item['vapp_source_path'] }}"
+      changed_when: false
+      tags:
+        - samba_phase_1
+        - samba_phase_2
+        # - vsphere_samba_vms_info
+      with_items: "{{ vsphere_samba_vms }}"
+      when: item['deploy']
+
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  tasks:
+    - name: Gathering Info
+      setup:
+      register: _vsphere_samba_vms_info
+      tags:
+        - samba_phase_1
+        - samba_phase_2
+        # - vsphere_samba_vms_info
+
+    - name: Updating Inventory For vsphere_samba_vms
+      template:
+        src: ../templates/samba_vms.inv.j2
+        dest: "{{ vsphere_samba_vms_inventory_file }}"
+      become: false
+      delegate_to: localhost
+      tags:
+        - samba_phase_1
+        - samba_phase_2
+        # - vsphere_samba_vms_info
+
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  roles:
+    - role: ansible-config-interfaces
+      tags:
+        - samba_phase_1
+    - role: ansible-change-hostname
+      tags:
+        - samba_phase_1
+    - role: ansible-etc-hosts
+      tags:
+        - samba_phase_1
+    - role: ansible-sshd
+      become: true
+      tags:
+        - samba_phase_1
+    - role: ansible-ntp
+      tags:
+        - samba_phase_1
+    - role: ansible-rsyslog
+      become: true
+      tags:
+        - samba_phase_1
+
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  serial: 1
+  roles:
+    - role: ansible-samba
+      become: true
+      tags:
+        - samba_phase_2
+
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  tasks:
+    - name: Setting Up SysVol Replication
+      block:
+
+        - name: Installing Packages Required To Setup SysVol Sync
+          apt:
+            name: "{{ item }}"
+            state: present
+          become: true
+          with_items:
+            - rsync
+            - unison
+
+        - name: Setup sudoers
+          lineinfile:
+            path: /etc/sudoers
+            regexp: "^{{ vsphere_bootstrap_user_info['username'] }} ALL=NOPASSWD: /usr/bin/rsync *"
+            line: "{{ vsphere_bootstrap_user_info['username'] }} ALL=NOPASSWD: /usr/bin/rsync *"
+            state: present
+            validate: /usr/sbin/visudo -cf %s
+          become: true
+
+        - name: Configuring SysVol Replication Script
+          template:
+            src: templates/samba_ad_sysvol_repl.sh.j2
+            dest: /root/samba_ad_sysvol_repl.sh
+            owner: root
+            group: root
+            mode: u=rwx,g=rwx,o=rw
+          become: true
+          when: inventory_hostname != samba_primary_domain_controller
+
+        - name: Configuring SysVol Replication Cron Job
+          template:
+            src: templates/samba_ad_sysvol_repl.j2
+            dest: /etc/cron.d/samba_ad_sysvol_repl
+          become: true
+          when: inventory_hostname != samba_primary_domain_controller
+
+      tags:
+        - samba_sysvol_replication

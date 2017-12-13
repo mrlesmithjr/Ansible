@@ -1,0 +1,119 @@
+---
+- name: pdns_zones | checking that pdns_zones_dir exists
+  stat:
+    path: "{{ pdns_zones_dir }}"
+  register: pdns_zones_dir_check
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: pdns_zones | creating pdns_zones_dir if it does not exist
+  file:
+    path: "{{ pdns_zones_dir }}"
+    state: directory
+  delegate_to: localhost
+  run_once: true
+  become: false
+  when: not pdns_zones_dir_check['stat']['exists']
+
+- name: pdns_zones | creating pdns zones folders
+  file:
+    path: "{{ pdns_zones_dir }}/{{ item }}"
+    state: directory
+  delegate_to: localhost
+  run_once: true
+  become: false
+  with_items:
+    - "{{ pdns_fwd_zones }}"
+    - "{{ pdns_rev_zones }}"
+  when: >
+        pdns_fwd_zones is defined or
+        pdns_rev_zones is defined
+
+- name: pdns_zones | creating pdns forward/reverse zones in zone folders
+  template:
+    src: pdns_zones.j2
+    dest: "{{ pdns_zones_dir }}/{{ item }}/{{ item }}_zone"
+  delegate_to: localhost
+  run_once: true
+  become: false
+  register: pdns_zones_created
+  with_items:
+    - "{{ pdns_fwd_zones }}"
+    - "{{ pdns_rev_zones }}"
+  when: >
+        pdns_fwd_zones is defined or
+        pdns_rev_zones is defined
+
+- name: pdns_zones | creating pdns zones script
+  template:
+    src: pdns_zones.sh.j2
+    dest: /tmp/pdns_zones.sh
+    owner: root
+    group: root
+    mode: 0770
+  when: >
+        pdns_zones_created['changed'] and
+        (pdns_fwd_zones is defined or
+        pdns_rev_zones is defined)
+
+- name: pdns_zones | creating pdns zones script
+  template:
+    src: pdns_zones.sh.j2
+    dest: /tmp/pdns_zones.sh
+    owner: root
+    group: root
+    mode: 0770
+  when: >
+        (force is defined and
+        force) and
+        (pdns_fwd_zones is defined or
+        pdns_rev_zones is defined)
+
+- name: pdns_zones | creating pdns zones
+  shell: /tmp/pdns_zones.sh
+  run_once: true
+  when: >
+        pdns_db_cluster and
+        pdns_zones_created['changed']
+
+- name: pdns_zones | creating pdns zones
+  shell: /tmp/pdns_zones.sh
+  when: >
+        not pdns_db_cluster and
+        pdns_zones_created['changed']
+
+- name: pdns_zones | creating pdns zones
+  shell: /tmp/pdns_zones.sh
+  run_once: true
+  when: >
+        pdns_db_cluster and
+        (force is defined and
+        force)
+
+- name: pdns_zones | creating pdns zones
+  shell: /tmp/pdns_zones.sh
+  when: >
+        not pdns_db_cluster and
+        (force is defined and
+        force)
+
+- name: pdns_zones | cleaning up pdns zones script
+  file:
+    path: /tmp/pdns_zones.sh
+    state: absent
+
+- name: pdns_zones | stopping service
+  run_once: true
+  service:
+    name: pdns
+    state: stopped
+
+- name: pdns_server | waiting to stop
+  pause:
+    seconds: 5
+
+- name: pdns_zones | starting service
+  service:
+    name: pdns
+    state: started

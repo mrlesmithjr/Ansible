@@ -1,0 +1,79 @@
+---
+- name: config | Configuring Salt Master
+  template:
+    src: etc/salt/master.j2
+    dest: "{{ saltstack_master_configuration['conf_file']|default('/etc/salt/master') }}"
+  become: true
+  notify: restart salt-master
+  when: inventory_hostname == saltstack_master
+
+- name: config | Configuring Salt Minion
+  template:
+    src: etc/salt/minion.j2
+    dest: "{{ saltstack_minion_configuration['conf_file']|default('/etc/salt/minion') }}"
+  become: true
+  notify: restart salt-minion
+  # when: inventory_hostname != saltstack_master
+
+# We have to do this as we cannot iterate over subelements using with_dict
+- name: config | Creating List Of File Roots
+  set_fact:
+    saltstack_file_roots: "{{ item['value'] }}"
+  with_dict: "{{ saltstack_master_configuration['file_roots'] }}"
+  when: >
+        inventory_hostname == saltstack_master and
+        (saltstack_master_configuration is defined and
+          saltstack_master_configuration['file_roots'] is defined)
+
+# We have to do this as we cannot iterate over subelements using with_dict
+- name: config | Creating List Of Pillar Roots
+  set_fact:
+    saltstack_pillar_roots: "{{ item['value'] }}"
+  with_dict: "{{ saltstack_master_configuration['pillar_roots'] }}"
+  when: >
+        inventory_hostname == saltstack_master and
+        (saltstack_master_configuration is defined and
+          saltstack_master_configuration['pillar_roots'] is defined)
+
+- name: config | Creating File Roots Folders
+  file:
+    path: "{{ item }}"
+    state: directory
+  become: true
+  with_items: "{{ saltstack_file_roots }}"
+  when: >
+        inventory_hostname == saltstack_master and
+        saltstack_file_roots is defined
+
+- name: config | Creating Pillar Roots Folders
+  file:
+    path: "{{ item }}"
+    state: directory
+  become: true
+  with_items: "{{ saltstack_pillar_roots }}"
+  when: >
+        inventory_hostname == saltstack_master and
+        saltstack_pillar_roots is defined
+
+- name: config | Creating Salt State Folders
+  file:
+    path: "{{ saltstack_master_file_root_base }}/{{ item }}"
+    state: directory
+  become: true
+  with_items: "{{ saltstack_states }}"
+  when: >
+        inventory_hostname == saltstack_master and
+        saltstack_states is defined
+
+- name: config | Creating State Files
+  template:
+    src: states/init.sls.j2
+    dest: "{{ saltstack_master_file_root_base }}/{{ item }}/init.sls"
+  become: true
+  with_items: "{{ saltstack_states }}"
+  when: >
+        inventory_hostname == saltstack_master and
+        saltstack_states is defined
+
+- name: config | Flushing Any Handlers Immediately
+  meta: flush_handlers

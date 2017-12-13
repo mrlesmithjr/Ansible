@@ -4,3 +4,6 @@
   when: ansible_os_family == "Debian"
 
 - include: config.yml
+
+- include: register.yml
+  when: landscape_client_app_server_config

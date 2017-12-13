@@ -1,0 +1,6 @@
+---
+# defaults file for ansible-windows-powercli
+
+window_powercli_customer_experience_improvement_program: false
+
+windows_powercli_disable_invalid_cert_warning: true

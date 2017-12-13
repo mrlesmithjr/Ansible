@@ -1,0 +1,56 @@
+---
+- name: set_facts | Setting Timestamp
+  set_fact:
+    vsphere_log_timestap: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: set_facts | Setting Log File
+  set_fact:
+    vsphere_management_log: c:\tmp\vsphere_management_{{ vsphere_log_timestap }}.log
+
+- name: set_facts | Creating Dynamic Group For vsphere_hosts
+  add_host:
+    groups: vsphere_hosts
+    hostname: "{{ item['hostname'] }}"
+    ansible_host: "{{ item['mgmt_ip'] }}"
+    mgmt_ip: "{{ item['mgmt_ip'] }}"
+    mgmt_subnetmask: "{{ item['mgmt_subnetmask'] }}"
+    mgmt_vlan_id: "{{ vsphere_host_mgmt_vlan_id }}"
+    vcenter_state: "{{ item['vcenter_state'] }}"
+    vmotion_ip: "{{ item['vmotion_ip'] }}"
+    vmotion_subnetmask: "{{ item['vmotion_subnetmask'] }}"
+    vmotion_vlan_id: "{{ vsphere_host_vmotion_vlan_id }}"
+  with_items: "{{ vsphere_hosts }}"
+
+- name: set_facts | Setting Bootstrap Host
+  set_fact:
+    vsphere_bootstrap_host: "{{ groups['vsphere_hosts'][0] }}"
+
+- name: set_facts | Creating Inventory For vsphere_hosts
+  template:
+    src: vsphere_hosts.inv.j2
+    dest: "{{ vsphere_hosts_inventory_file }}"
+  become: false
+  delegate_to: localhost
+
+- name: set_facts | Checking If vCenter Is Available
+  win_shell: |
+    $vCenterHost = "{{ vsphere_vcsa_network_ip }}"
+    $vc = Connect-VIServer $vCenterHost
+    $vc.IsConnected
+    Disconnect-VIServer * -Confirm:$false
+  register: _vsphere_vcenter_check
+  failed_when: false
+
+- debug: var=_vsphere_vcenter_check
+
+- name: set_facts | Setting vCenter Availability
+  set_fact:
+    _vsphere_vcenter_available: true
+  when: ('True' in _vsphere_vcenter_check['stdout_lines'])
+
+- name: set_facts | Setting vCenter Availability
+  set_fact:
+    _vsphere_vcenter_available: false
+  when: ('True' not in _vsphere_vcenter_check['stdout_lines'])
+
+- debug: var=_vsphere_vcenter_available

@@ -1,0 +1,12 @@
+---
+- name: datastores | Generating Datastore Management Powershell Script
+  win_template:
+    src: vsphere_datastore_management.ps1.j2
+    dest: c:\tmp\vsphere_datastore_management.ps1
+
+- name: datastores | Executing Datastore Management Powershell Script
+  win_shell: c:\tmp\vsphere_datastore_management.ps1
+  failed_when: _vsphere_datastore_management_script_execution['stderr_lines'] != []
+  register: _vsphere_datastore_management_script_execution
+
+- debug: var=_vsphere_datastore_management_script_execution

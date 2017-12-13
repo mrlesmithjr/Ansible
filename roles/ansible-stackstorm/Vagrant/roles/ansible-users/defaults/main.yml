@@ -1,0 +1,31 @@
+---
+# defaults file for ansible-users
+
+# Defines creating local user accounts on hosts
+create_local_users: true
+
+# Defines user accounts to setup on hosts
+create_users:
+    # Define username
+  - user: 'demo_user'
+    # Define a comment to associate with the account
+    comment: 'Demo user'
+    # Generate ssh keys
+    generate_keys: true
+    # Define a different home directory... ''=/home/username
+    # home: ''
+    # Define password for account
+    pass: 'demo_password'
+    # Define a different shell for the user
+    # shell: ''
+    # Defines if user should be setup as default user during preseed auto-install
+    # Only 1 user can be added
+    # used in tftpserver Ansible role (mrlesmithjr.tftpserver or ansible-tftpserver)
+    preseed_user: false
+    # Defines whether account exists or not
+    # ( absent|present )
+    state: 'absent'
+    # Define if user should have sudo access
+    sudo: false
+    # Define if account is a system account...( true|false )
+    system_account: false

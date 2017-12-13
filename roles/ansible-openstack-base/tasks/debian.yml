@@ -1,0 +1,49 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ openstack_base_pre_reqs }}'
+
+- name: debian | Adding OpenStack Repo
+  apt_repository:
+    repo: "{{ openstack_base_repo }}"
+    state: "present"
+  become: true
+  register: "_openstack_base_repo_added"
+
+- name: debian | Performing dist-upgrade
+  apt:
+    upgrade: "dist"
+  become: true
+  register: "_openstack_base_dist_upgrade"
+  when: _openstack_base_repo_added['changed']
+
+- name: debian | Rebooting After dist-upgrade
+  shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+  async: 1
+  poll: 0
+  ignore_errors: true
+  become: true
+  register: "_openstack_base_reboot"
+  when: _openstack_base_dist_upgrade['changed']
+
+- name: debian | Waiting For Host After Reboot
+  local_action: wait_for port=22 host="{{ ansible_ssh_host | default(inventory_hostname) }}" search_regex=OpenSSH delay=10
+  become: false
+  when: _openstack_base_reboot['changed']
+
+- name: debian | Installing OpenStack Client
+  apt:
+    name: "python-openstackclient"
+    state: "present"
+  become: true
+
+- name: debian | Installing Additional OpenStack Tools
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'shade'

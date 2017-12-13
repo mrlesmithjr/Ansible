@@ -1,0 +1,10 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    guacamole_tomcat: tomcat7
+  when: ansible_os_family == "Debian"
+
+- name: set_facts | Setting RedHat Facts
+  set_fact:
+    guacamole_tomcat: tomcat
+  when: ansible_os_family == "RedHat"

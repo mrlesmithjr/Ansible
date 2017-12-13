@@ -1,0 +1,90 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Setting pdns_api_url
+      set_fact:
+        pdns_api_url: "http://{{ hostvars[groups['vsphere_ddi_vms'][0]]['ansible_host'] }}:{{ pdns_webserver_port }}/api/v1"
+      when: >
+            not pdns_load_balanced or
+            groups['vsphere_lb_vms'] is not defined
+
+    - name: Setting pdns_api_url
+      set_fact:
+        pdns_api_url: "http://{{ pdns_api_vip }}:{{ pdns_webserver_port }}/api/v1"
+      when: >
+            pdns_load_balanced and
+            vsphere_lb_vms is defined
+
+    - name: Creating PDNS Nameserver Group
+      add_host:
+        groups: pdns_nameservers
+        name: "{{ hostvars[item]['inventory_hostname_short'] }}.{{ pri_domain_name }}."
+      changed_when: false
+      with_items: "{{ groups['vsphere_ddi_vms'] }}"
+
+    - name: Setting DNS Nameservers
+      set_fact:
+        _pdns_nameservers: "{{ groups['pdns_nameservers']|to_json }}"
+
+    - name: Add Zones
+      uri:
+        url: "{{ pdns_api_url }}/servers/localhost/zones"
+        method: POST
+        body:
+          name: "{{ item }}."
+          dnssec: false
+          kind: "Native"
+          masters: []
+          nameservers: "{{ _pdns_nameservers }}"
+          soa_edit_api: "INCEPTION-INCREMENT"
+        body_format: json
+        headers:
+          X-API-Key: "{{ pdns_webserver_password }}"
+        status_code: 201, 422
+      with_items: "{{ pdns_zones }}"
+      when: pdns_zones is defined
+
+    - name: Add Records For All Hosts
+      uri:
+        url: "{{ pdns_api_url }}/servers/localhost/zones/{{ pri_domain_name }}."
+        method: PATCH
+        body:
+          rrsets:
+            - name: "{{ hostvars[item]['inventory_hostname_short'] }}.{{ pri_domain_name }}."
+              type: "A"
+              changetype: "REPLACE"
+              ttl: 86400
+              priority: 0
+              records:
+                - content: "{{ hostvars[item]['ansible_host'] }}"
+                  disabled: false
+                  set-ptr: true
+        body_format: json
+        headers:
+          X-API-Key: "{{ pdns_webserver_password }}"
+        status_code: 201, 204
+      with_items: "{{ groups['all'] }}"
+      when: hostvars[item]['ansible_host'] is defined
+
+    - name: Add pdns_records
+      uri:
+        url: "{{ pdns_api_url }}/servers/localhost/zones/{{ item.domain }}."
+        method: PATCH
+        body:
+          rrsets:
+            - name: "{{ item['hostname'] }}.{{ item['domain'] }}."
+              type: "{{ item['type'] }}"
+              changetype: "REPLACE"
+              ttl: 86400
+              priority: 0
+              records:
+                - content: "{{ item['content'] }}"
+                  disabled: false
+                  set-ptr: true
+        body_format: json
+        headers:
+          X-API-Key: "{{ pdns_webserver_password }}"
+        status_code: 201, 204
+      with_items: "{{ pdns_records }}"
+      when: pdns_records is defined

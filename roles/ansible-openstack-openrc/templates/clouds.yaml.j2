@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+
+clouds:
+{% for item in openstack_openrc_clouds %}
+  {{ item['name'] }}:
+    auth:
+      auth_url: {{ item['auth_url'] }}
+      password: {{ item['password'] }}
+      project_domain_name: {{ item['project_domain_name'] }}
+      project_name: {{ item['project_name'] }}
+      tenant_name: {{ item['tenant_name'] }}
+      user_domain_name: {{ item['user_domain_name'] }}
+      username: {{ item['username'] }}
+    identity_api_version: {{ item['identity_api_version'] }}
+    interface: {{ item['interface'] }}
+    region_name: {{ item['region_name'] }}
+{% endfor %}

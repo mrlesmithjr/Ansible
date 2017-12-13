@@ -1,0 +1,9 @@
+halyard:
+  halconfig:
+    directory: {{ spinnaker_halyard_halconfig_dir }}
+
+spinnaker:
+  artifacts:
+    debianRepository: {{ spinnaker_halyard_repo }}
+    dockerRegistry: {{ spinnaker_halyard_docker_registry }}
+    googleImageProject: {{ spinnaker_halyard_gce_project }}

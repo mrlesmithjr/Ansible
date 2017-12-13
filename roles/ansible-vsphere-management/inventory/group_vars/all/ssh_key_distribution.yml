@@ -1,0 +1,5 @@
+---
+ssh_keys_distribution_vars_file_path: "{{ vsphere_inventory_directory }}"
+
+users_ssh_key_distribution:
+  - "{{ vsphere_bootstrap_user_info['username'] }}"

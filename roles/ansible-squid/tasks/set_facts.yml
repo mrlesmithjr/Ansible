@@ -7,13 +7,23 @@
   when: >
         ansible_distribution == "CentOS"
 
-- name: set_facts | Setting Debian Facts
+- name: set_facts | Setting Debian <= 8 Facts
   set_fact:
     squid_package: "squid3"
     squid_root_dir: "/etc/squid3"
     squid_service: "squid3"
   when: >
-        ansible_distribution == "Debian"
+        ansible_distribution == "Debian" and
+        ansible_distribution_version < '9'
+
+- name: set_facts | Setting Debian >= 9 Facts
+  set_fact:
+    squid_package: "squid"
+    squid_root_dir: "/etc/squid"
+    squid_service: "squid"
+  when: >
+        ansible_distribution == "Debian" and
+        ansible_distribution_version > '8'
 
 - name: set_facts | Setting Ubuntu < 16.04 Facts
   set_fact:

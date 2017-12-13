@@ -5,4 +5,7 @@ data_path = {{ landscape_client_data_path }}
 include_manager_plugins = ScriptExecution
 log_level = {{ landscape_client_log_level }}
 ping_url = {{ landscape_client_ping_url }}
+{% if landscape_client_app_server_config %}
+ssl_public_key = {{ landscape_client_app_server_cert }}
+{% endif %}
 url = {{ landscape_client_url }}

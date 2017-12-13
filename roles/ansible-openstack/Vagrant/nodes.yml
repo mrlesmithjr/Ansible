@@ -1,0 +1,86 @@
+---
+- name: 'controller01'
+  ansible_groups:
+    - 'openstack'
+    - 'openstack_controllers'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.11
+      auto_config: true
+      method: 'static'
+    - ip: 192.168.1.11
+      auto_config: false
+      method: 'static'
+      network_name: 'provider'
+  mem: 2560
+  provision: true
+  vcpu: 1
+- name: 'controller02'
+  ansible_groups:
+    - 'openstack'
+    - 'openstack_controllers'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.12
+      auto_config: true
+      method: 'static'
+    - ip: 192.168.1.12
+      auto_config: false
+      method: 'static'
+      network_name: 'provider'
+  mem: 2560
+  provision: true
+  vcpu: 1
+- name: 'controller03'
+  ansible_groups:
+    - 'openstack'
+    - 'openstack_controllers'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.13
+      auto_config: true
+      method: 'static'
+    - ip: 192.168.1.13
+      auto_config: false
+      method: 'static'
+      network_name: 'provider'
+  mem: 2560
+  provision: true
+  vcpu: 1
+# - name: 'compute01'
+#   ansible_groups:
+#     - 'openstack'
+#     - 'openstack_computes'
+#   box: 'mrlesmithjr/xenial64'
+#   desktop: false
+#   interfaces:
+#     - ip: 192.168.250.21
+#       auto_config: true
+#       method: 'static'
+#     - ip: 192.168.2.11
+#       auto_config: false
+#       method: 'static'
+#       network_name: 'provider'
+#   mem: 1024
+#   provision: true
+#   vcpu: 1
+# - name: 'compute02'
+#   ansible_groups:
+#     - 'openstack'
+#     - 'openstack_computes'
+#   box: 'mrlesmithjr/xenial64'
+#   desktop: false
+#   interfaces:
+#     - ip: 192.168.250.22
+#       auto_config: true
+#       method: 'static'
+#     - ip: 192.168.2.12
+#       auto_config: false
+#       method: 'static'
+#       network_name: 'provider'
+#   mem: 1024
+#   provision: true
+#   vcpu: 1

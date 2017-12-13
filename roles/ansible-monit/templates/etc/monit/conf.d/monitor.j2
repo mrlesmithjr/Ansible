@@ -1,49 +1,48 @@
-# {{ ansible_managed }}
-{% if item.alert is defined %}
-# Monitor {{ item.name }} and {{ item.alert | default('restart') }} if not running
+{% if item['alert'] is defined %}
+# Monitor {{ item['name'] }} and {{ item['alert'] | default('restart') }} if not running
 {% endif %}
 
-check process {{ item.name }}
-{% if item.pidfile is defined %}
-    with pidfile {{ item.pidfile }}
+check process {{ item['name'] }}
+{% if item['pidfile'] is defined %}
+    with pidfile {{ item['pidfile'] }}
 {% endif %}
-{% if item.groups is defined %}
-{%   for group in item.groups %}
+{% if item['groups'] is defined %}
+{%   for group in item['groups'] %}
     group {{ group }}
 {%   endfor %}
 {% endif %}
-{% if item.start_program is defined %}
-    start program = "{{ item.start_program }}"
+{% if item['start_program'] is defined %}
+    start program = "{{ item['start_program'] }}"
 {% endif %}
-{% if item.stop_program is defined %}
-    stop program = "{{ item.stop_program }}"
+{% if item['stop_program'] is defined %}
+    stop program = "{{ item['stop_program'] }}"
 {% endif %}
-{% if item.failed_host is defined and item.failed_host_port is defined %}
-{%   if item.failed_host_type is not defined and item.failed_host_protocol is not defined %}
-    if failed host {{ item.failed_host }} port {{ item.failed_host_port }} then {{ item.alert | default('restart') }}
-{%     if item.alert is not defined or item.alert == "restart" %}
+{% if item['failed_host'] is defined and item['failed_host_port'] is defined %}
+{%   if item['failed_host_type'] is not defined and item['failed_host_protocol'] is not defined %}
+    if failed host {{ item['failed_host'] }} port {{ item['failed_host_port'] }} then {{ item['alert'] | default('restart') }}
+{%     if item['alert'] is not defined or item['alert'] == "restart" %}
     if 5 restarts within 5 cycles then timeout
 {%     endif %}
 {%   endif %}
-{%   if item.failed_host_type is defined and item.failed_host_protocol is defined %}
-{%     for type in item.failed_host_type %}
-    if failed host {{ item.failed_host }} port {{ item.failed_host_port }} type {{ type }} protocol {{ item.failed_host_protocol }} then {{ item.alert | default('restart') }}
+{%   if item['failed_host_type'] is defined and item['failed_host_protocol'] is defined %}
+{%     for type in item['failed_host_type'] %}
+    if failed host {{ item['failed_host'] }} port {{ item['failed_host_port'] }} type {{ type }} protocol {{ item['failed_host_protocol'] }} then {{ item['alert'] | default('restart') }}
 {%     endfor %}
-{%     if item.alert is not defined or item.alert == "restart" %}
+{%     if item['alert'] is not defined or item['alert'] == "restart" %}
     if 5 restarts within 5 cycles then timeout
 {%     endif %}
 {%   endif %}
-{%   if item.failed_host_type is defined and item.failed_host_protocol is not defined %}
-{%     for type in item.failed_host_type %}
-    if failed host {{ item.failed_host }} port {{ item.failed_host_port }} type {{ type }} then {{ item.alert | default('restart') }}
+{%   if item['failed_host_type'] is defined and item['failed_host_protocol'] is not defined %}
+{%     for type in item['failed_host_type'] %}
+    if failed host {{ item['failed_host'] }} port {{ item['failed_host_port'] }} type {{ type }} then {{ item['alert'] | default('restart') }}
 {%     endfor %}
-{%     if item.alert is not defined or item.alert == "restart" %}
+{%     if item['alert'] is not defined or item['alert'] == "restart" %}
     if 5 restarts within 5 cycles then timeout
 {%     endif %}
 {%   endif %}
 {% endif %}
-{% if item.cpu_checks is defined %}
-{%   for check in item.cpu_checks %}
-    if {{ check.name }} is greater than {{ check.percentage }} for {{ check.cycles }} cycles then {{ check.action }}
+{% if item['cpu_checks'] is defined %}
+{%   for check in item['cpu_checks'] %}
+    if {{ check['name'] }} is greater than {{ check['percentage'] }} for {{ check['cycles'] }} cycles then {{ check['action'] }}
 {%   endfor %}
 {% endif %}

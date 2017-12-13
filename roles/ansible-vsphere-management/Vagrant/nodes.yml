@@ -1,0 +1,14 @@
+---
+- name: node0
+  ansible_groups:
+    - powercli_host
+  box: jacqinthebox/windowsserver2016
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.10
+      auto_config: true
+      method: static
+  mem: 2048
+  provision: true
+  vcpu: 1
+  windows: true

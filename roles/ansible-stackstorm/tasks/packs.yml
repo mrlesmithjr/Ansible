@@ -1,16 +1,16 @@
 ---
 - name: packs | Capturing Installed Packs
   shell: "st2 pack list -y | grep name: | awk '{ print $2 }'"
-  register: "st2_pack_list"
+  register: st2_pack_list
   changed_when: false
   become: true
   tags:
-    - "stackstorm-packs"
+    - stackstorm-packs
 
 - name: packs | Installing Packs
   command: "st2 run packs.install packs={{ item.name }}"
   tags:
-    - "stackstorm-packs"
+    - stackstorm-packs
   become: true
   with_items: '{{ stackstorm_packs }}'
   when: >
@@ -20,7 +20,7 @@
 - name: packs | Uninstalling Packs
   command: "st2 run packs.uninstall packs={{ item.name }}"
   tags:
-    - "stackstorm-packs"
+    - stackstorm-packs
   become: true
   with_items: '{{ stackstorm_packs }}'
   when: >
@@ -29,7 +29,7 @@
 
 # - name: packs | Saving Installed Packs
 #   template:
-#     src: "etc/st2/packs.yml.j2"
-#     dest: "/etc/st2/packs.yml"
+#     src: etc/st2/packs.yml.j2
+#     dest: /etc/st2/packs.yml
 #   tags:
-#     - "stackstorm-packs"
+#     - stackstorm-packs

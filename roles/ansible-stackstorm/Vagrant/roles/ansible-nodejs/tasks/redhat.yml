@@ -1,0 +1,28 @@
+---
+- name: redhat | Installing NodeJS (Fedora)
+  dnf:
+    name: "nodejs"
+    state: "present"
+  become: true
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Enabling EPEL Repo (!=Fedora)
+  yum:
+    name: "epel-release"
+    state: "present"
+  become: true
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+- name: redhat | Installing NodeJS (!=Fedora)
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'nodejs'
+    - 'npm'
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"

@@ -1,0 +1,138 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-controller-install.html
+
+- name: db | Ensuring MySQL Is Up And Running
+  wait_for:
+    port: 3306
+    host: "{{ openstack_compute_service_controller_management_ip }}"
+
+- name: db | Creating Compute Service DBs
+  mysql_db:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'nova_api'
+    - 'nova'
+    - 'nova_cell0'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)
+
+- name: db | Creating Compute Service DB User (nova_api)
+  mysql_user:
+    name: "nova"
+    host: "{{ item }}"
+    priv: "nova_api.*:ALL"
+    append_privs: true
+    password: "{{ openstack_compute_service_controller_nova_db_pass }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)
+
+- name: db | Creating Compute Service DB User (nova_api)
+  mysql_user:
+    name: "nova"
+    host: "{{ item }}"
+    priv: "nova_api.*:ALL"
+    append_privs: true
+    password: "{{ openstack_compute_service_controller_nova_db_pass }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        (openstack_compute_service_controller_ha and
+          inventory_hostname != openstack_compute_service_controller_ha_master)
+
+- name: db | Creating Compute Service DB User (nova)
+  mysql_user:
+    name: "nova"
+    host: "{{ item }}"
+    priv: "nova.*:ALL"
+    append_privs: true
+    password: "{{ openstack_compute_service_controller_nova_db_pass }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)
+
+- name: db | Creating Compute Service DB User (nova)
+  mysql_user:
+    name: "nova"
+    host: "{{ item }}"
+    priv: "nova.*:ALL"
+    append_privs: true
+    password: "{{ openstack_compute_service_controller_nova_db_pass }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        (openstack_compute_service_controller_ha and
+          inventory_hostname != openstack_compute_service_controller_ha_master)
+
+- name: db | Creating Compute Service DB User (nova_cell0)
+  mysql_user:
+    name: "nova"
+    host: "{{ item }}"
+    priv: "nova_cell0.*:ALL"
+    append_privs: true
+    password: "{{ openstack_compute_service_controller_nova_db_pass }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)
+
+- name: db | Creating Compute Service DB User (nova_cell0)
+  mysql_user:
+    name: "nova"
+    host: "{{ item }}"
+    priv: "nova_cell0.*:ALL"
+    append_privs: true
+    password: "{{ openstack_compute_service_controller_nova_db_pass }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        (openstack_compute_service_controller_ha and
+          inventory_hostname != openstack_compute_service_controller_ha_master)

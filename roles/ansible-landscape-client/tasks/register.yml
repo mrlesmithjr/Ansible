@@ -1,0 +1,25 @@
+---
+- name: register | Checking If Client Is Already Registered
+  stat:
+    path: "/etc/landscape/.client_registered"
+  become: true
+  register: "_landscape_client_registered_check"
+
+- name: register | Registering Client
+  command: >
+           landscape-config
+           --silent
+           --computer-title "{{ inventory_hostname }}"
+           --account-name standalone
+           --url {{ landscape_client_url }}
+           --ping-url {{ landscape_client_ping_url }}
+  become: true
+  register: "_landscape_client_registered"
+  when: not _landscape_client_registered_check['stat']['exists']
+
+- name: register | Marking Client As Registered
+  file:
+    path: "/etc/landscape/.client_registered"
+    state: "touch"
+  become: true
+  when: _landscape_client_registered['changed']

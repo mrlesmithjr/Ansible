@@ -1,5 +1,0 @@
----
-- name: centos | installing monit
-  yum:
-    name: "monit"
-    state: present

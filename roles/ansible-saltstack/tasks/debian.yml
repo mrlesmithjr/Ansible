@@ -1,0 +1,26 @@
+---
+- name: debian | Adding Repo Key
+  apt_key:
+    url: "{{ saltstack_debian_repo_info['key'] }}"
+    state: present
+  become: true
+
+- name: debian | Adding Repo
+  apt_repository:
+    repo: "{{ saltstack_debian_repo_info['repo'] }}"
+    state: present
+  become: true
+
+- name: debian | Installing Salt Master
+  apt:
+    name: salt-master
+    state: present
+  become: true
+  when: inventory_hostname == saltstack_master
+
+- name: debian | Installing Salt Minion
+  apt:
+    name: salt-minion
+    state: present
+  become: true
+  # when: inventory_hostname != saltstack_master

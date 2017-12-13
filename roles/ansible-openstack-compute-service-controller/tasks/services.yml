@@ -1,0 +1,34 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-controller-install.html
+
+- include: get-client-config.yml
+
+- include: get-token.yml
+
+- name: services | Creating Services
+  os_keystone_service:
+     cloud: "default"
+     name: "{{ item['name'] }}"
+     service_type: "{{ item['service_type'] }}"
+     state: "{{ item['state'] }}"
+     description: "{{ item['description']|default(omit) }}"
+  with_items: '{{ openstack_compute_service_controller_services }}'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)
+
+- name: services | Creating Endpoint Services
+  keystone_service:
+    name: "{{ item['name'] }}"
+    type: "{{ item['type'] }}"
+    description: "{{ item['description'] }}"
+    url: "{{ openstack_compute_service_controller_keystone_service_endpoint_url }}:{{ item['api_port'] }}{% if item['api_version'] is defined %}/{{ item['api_version'] }}{% endif %}"
+    region: "{{ openstack_compute_service_controller_keystone_service_endpoint_region }}"
+    token: "{{ _os_auth['ansible_facts']['auth_token'] }}"
+  no_log: true
+  with_items: '{{ openstack_compute_service_controller_endpoint_services }}'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)

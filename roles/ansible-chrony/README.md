@@ -1,38 +1,137 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-A brief description of the role goes here.
+- [ansible-chrony](#ansible-chrony)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Requirements
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+# ansible-chrony
 
-Role Variables
---------------
+An [Ansible](https://www.ansible.com) role to install/configure [chrony](https://chrony.tuxfamily.org/) NTP server/client
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Requirements
 
-Dependencies
-------------
+None
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Role Variables
 
-Example Playbook
-----------------
+```yaml
+---
+# defaults file for ansible-chrony
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+# Optionally specify a host, subnet, or network from which to allow NTP
+# connections to a machine acting as NTP server
+chrony_allow_hosts:
+  - '10/8'
+  - '192.168/16'
+  - '172.16/12'
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+# Path to the directory to save the measurement history across restarts of
+# chronyd (assuming no changes are made to the system clock behavior whilst
+# it is not running)
+chrony_dumpdir: '/var/lib/chrony'
 
-License
--------
+# A large value of 10 indicates that the clock is so many hops away from a
+# reference clock that its time is unreliable. If the computer ever has access
+# to another computer which is ultimately synchronized to a reference clock,
+# it will almost certainly be at a stratum less than 10. Therefore, the choice
+# of a high value like 10 for the local command prevents the machine’s own time
+# from ever being confused with real time, were it ever to leak out to clients
+# that have visibility of real servers.
+chrony_local_stratum: 10
 
-BSD
+# The log command indicates that certain information is to be logged. It
+# accepts the following options:
+# measurements
+# This option logs the raw NTP measurements and related information to a file
+# called measurements.log.
+#
+# statistics
+# This option logs information about the regression processing to a file called
+# statistics.log.
+#
+# tracking
+# This option logs changes to the estimate of the system’s gain or loss rate,
+# and any slews made, to a file called tracking.log.
+#
+# rtc
+# This option logs information about the system’s real-time clock.
+#
+# refclocks
+# This option logs the raw and filtered reference clock measurements to a file
+# called refclocks.log.
+#
+# tempcomp
+# This option logs the temperature measurements and system rate compensations
+# to a file called tempcomp.log.
+chrony_log:
+  - 'tracking'
+  - 'measurements'
+  - 'statistics'
 
-Author Information
-------------------
+# This directive allows the directory where log files are written to be specified
+chrony_logdir: '/var/log/chrony'
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+# The maxupdateskew parameter is the threshold for determining whether an
+# estimate is too unreliable to be used.
+# By default, the threshold is 1000 ppm
+# Typical values for skew-in-ppm might be 100 for a dial-up connection to
+# servers over a telephone line, and 5 or 10 for a computer on a LAN
+chrony_maxupdateskew: 100.0
+
+# Define upstream NTP servers
+chrony_ntp_servers:
+  - server: '0.debian.pool.ntp.org'
+    options:
+      - option: 'iburst'
+      - option: 'minpoll'
+        val: 8
+  - server: '1.debian.pool.ntp.org'
+    options:
+      - option: 'iburst'
+      - option: 'minpoll'
+        val: 8
+  - server: '2.debian.pool.ntp.org'
+    options:
+      - option: 'iburst'
+      - option: 'minpoll'
+        val: 8
+  - server: '3.debian.pool.ntp.org'
+    options:
+      - option: 'iburst'
+      - option: 'minpoll'
+        val: 8
+```
+
+## Dependencies
+
+None
+
+## Example Playbook
+
+```yaml
+- hosts: all
+  vars:
+  role:
+    - role: ansible-chrony
+  tasks:
+```
+
+## License
+
+MIT
+
+## Author Information
+
+Larry Smith Jr.
+
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://www.everythingshouldbevirtual.com)
+-   mrlesmithjr [at] gmail.com

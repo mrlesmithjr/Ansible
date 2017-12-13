@@ -1,0 +1,7 @@
+---
+- name: dbs | Managing Databases
+  mysql_db:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  become: true
+    

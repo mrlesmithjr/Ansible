@@ -1,0 +1,13 @@
+---
+- name: samba_users | adding samba users to samba groups
+  user:
+    name: "{{ item[0]['name'] }}"
+    groups: "{{ item[1] }}"
+    append: yes
+  with_subelements:
+    - '{{ samba_users }}'
+    - groups
+
+- name: samba_users | creating samba user passwords
+  shell: "(echo {{ item['smbpasswd'] }}; echo {{ item['smbpasswd'] }}) | smbpasswd -s -a {{ item['name'] }}"
+  with_items: '{{ samba_users }}'

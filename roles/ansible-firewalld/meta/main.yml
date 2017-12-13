@@ -1,0 +1,22 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: your descriptionAn [Ansible](https://www.ansible.com) role to manage [firewalld](http://www.firewalld.org/)
+
+  license: MIT
+
+  min_ansible_version: 2.1
+
+  platforms:
+    - name: EL
+      versions:
+      - 7
+    - name: Fedora
+      versions:
+        - 25
+        # - 26
+
+  galaxy_tags:
+    - firewall
+    - system
+
+dependencies: []

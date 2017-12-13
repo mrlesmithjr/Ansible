@@ -1,0 +1,12 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    opencart_web_group: www-data
+    opencart_web_owner: www-data
+  when: ansible_os_family == "Debian"
+
+- name: setting RedHat facts
+  set_fact:
+    opencart_web_group: apache
+    opencart_web_owner: apache
+  when: ansible_os_family == "RedHat"

@@ -10,7 +10,7 @@ k8s_advertise_bind_port: '6443'
 
 k8s_cluster_group: 'k8s'
 
-k8s_dashboard: 'https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml'
+k8s_dashboard: https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
 
 k8s_debian_packages:
   - 'kubelet'

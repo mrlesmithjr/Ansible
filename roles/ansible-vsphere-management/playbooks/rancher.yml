@@ -1,0 +1,283 @@
+---
+- hosts: rancher_db_cluster:rancher_lbs:rancher_hosts
+  roles:
+    - role: ansible-config-interfaces
+    - role: ansible-change-hostname
+    - role: ansible-etc-hosts
+    - role: ansible-sshd
+      become: true
+    - role: ansible-ntp
+    - role: ansible-rsyslog
+      become: true
+
+- hosts: rancher_db_cluster
+  roles:
+    - role: ansible-mariadb-galera-cluster
+
+- hosts: rancher_hosts
+  roles:
+    - role: ansible-docker
+
+- hosts: rancher_lbs
+  roles:
+    - role: ansible-keepalived
+    - role: ansible-haproxy
+
+- hosts: rancher_db_cluster
+  serial: 1
+  tasks:
+    - name: Installing python-mysqldb
+      apt:
+        name: python-mysqldb
+        state: present
+      become: true
+      when: ansible_os_family == "Debian"
+
+    - name: Creating MySQL DB
+      mysql_db:
+        name: cattle
+        state: present
+      become: true
+
+    - name: Creating MySQL User
+      mysql_user:
+        name: cattle
+        password: cattle
+        host: "{{ item }}"
+        priv: "cattle.*:ALL,GRANT"
+        append_privs: yes
+        state: present
+      become: true
+      with_items:
+        - 127.0.0.1
+        - "::1"
+        - localhost
+        - "%"
+        - "{{ groups['rancher_hosts'] }}"
+
+- hosts: rancher_hosts
+  serial: 1
+  tasks:
+    - name: Setting Rancher Server Host
+      set_fact:
+        rancher_server_host: "{{ groups['rancher_hosts'][0] }}"
+      when: not rancher_ha
+
+    - name: Setting Rancher Server Host
+      set_fact:
+        rancher_server_host: "{{ rancher_lb_host }}"
+      when: rancher_ha
+
+    - name: Setting Rancher Server Host API URL
+      set_fact:
+        rancher_server_host_api_url: "http://{{ rancher_server_host }}:{{ rancher_server_host_api_port }}/{{ rancher_api_version }}"
+
+    - name: Setting _rancher_cattle_agent_ip
+      set_fact:
+        _rancher_cattle_agent_ip: "{{ hostvars[inventory_hostname]['ansible_' + rancher_cattle_agent_interface]['ipv4']['address'] }}"
+
+    - name: Provisioning Rancher Server Container
+      docker_container:
+        image: rancher/server
+        log_driver: syslog
+        name: rancherserver
+        published_ports: "{{ rancher_server_host_api_port }}:{{ rancher_server_host_api_port }}"
+        restart_policy: unless-stopped
+        state: started
+      become: true
+      when: >
+            (inventory_hostname == rancher_server_host) and
+            not rancher_external_db and
+            not rancher_ha
+
+    - name: Provision Rancher Server Container
+      docker_container:
+        command: >
+                 --db-host {{ rancher_external_db_host }}
+        image: rancher/server
+        log_driver: syslog
+        name: rancherserver
+        published_ports: "{{ rancher_server_host_api_port }}:{{ rancher_server_host_api_port }}"
+        state: started
+      become: true
+      when: >
+            (inventory_hostname == rancher_server_host) and
+            rancher_external_db and
+            not rancher_ha
+
+    - name: Provision Rancher Server Container
+      docker_container:
+        command: >
+                 --db-host {{ rancher_external_db_host }}
+                 --advertise-address {{ _rancher_cattle_agent_ip }}
+        image: rancher/server
+        log_driver: syslog
+        name: rancherserver
+        published_ports:
+          - "{{ rancher_server_host_api_port }}:{{ rancher_server_host_api_port }}"
+          - 9345:9345
+        state: started
+      become: true
+      register: _rancher_server_container
+      when: >
+            rancher_external_db and
+            rancher_ha
+
+    - name: Installing python-httplib2
+      apt:
+          name: python-httplib2
+      become: true
+      when: ansible_os_family == "Debian"
+
+    - name: Installing EPEL Release
+      yum:
+        name: epel-release
+        state: present
+      become: true
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+    - name: Installing python-httplib2
+      yum:
+        name: python-httplib2
+        state: present
+      become: true
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+    - name: Installing python-httplib2
+      dnf:
+        name: python-httplib2
+        state: present
+      become: true
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution == "Fedora"
+
+- hosts: rancher_hosts
+  serial: 1
+  vars:
+  tasks:
+    - name: Waiting For Rancher API
+      uri:
+        url: "{{ rancher_server_host_api_url }}"
+        status_code: 200
+      register: _rancher_api_check
+      until: _rancher_api_check.status == 200
+      retries: 60
+      delay: 10
+
+    - name: Capturing Accounts
+      uri:
+        method: GET
+        status_code: 200
+        url: "{{ rancher_server_host_api_url }}/accounts"
+        return_content: true
+      register: _rancher_accounts
+
+    - name: Setting Default Rancher ID
+      set_fact:
+        _rancher_default_id: "{{ item['id'] }}"
+      with_items: "{{ _rancher_accounts['json']['data'] }}"
+      when: (item['name'] == 'Default')
+
+    - name: Capturing Projects For Default ID
+      uri:
+        method: GET
+        status_code: 200
+        url: "{{ rancher_server_host_api_url }}/projects/{{ _rancher_default_id }}"
+        return_content: true
+      register: _rancher_default_id_projects
+
+    - name: Checking For Existing Registration Tokens
+      uri:
+        method: GET
+        status_code: 200
+        url: "{{ rancher_server_host_api_url }}/projects/{{ _rancher_default_id }}/registrationtokens"
+        return_content: true
+      register: _rancher_default_id_registration_token_check
+
+    - name: Generating Registration Token
+      uri:
+        method: POST
+        status_code: 201
+        url: "{{ rancher_server_host_api_url }}/projects/{{ _rancher_default_id }}/registrationtokens"
+        return_content: true
+      register: _rancher_registration_token
+      when: _rancher_default_id_registration_token_check['json']['data'] == []
+
+    - name: Capturing Rancher Registration Token URL
+      uri:
+        method: GET
+        status_code: 200
+        url: "{{ rancher_server_host_api_url }}/projects/{{ _rancher_default_id }}/registrationtokens"
+        return_content: true
+      register: _rancher_registration_token_url
+
+    - name: Setting Registration Link
+      set_fact:
+        _rancher_registration_link: "{{ _rancher_registration_token_url['json']['data'][0]['registrationUrl'] }}"
+
+    - name: Setting Rancher Agent Image
+      set_fact:
+        _rancher_agent_image: "{{ _rancher_registration_token_url['json']['data'][0]['image'] }}"
+
+    - name: Checking For Existing docker-agent Container
+      shell: docker container ls | grep 'rancher-agent'
+      become: true
+      ignore_errors: true
+      changed_when: false
+      register: _rancher_agent_container
+
+    - name: Creating Rancher Agent Bootstrap Container
+      docker_container:
+        command: "{{ _rancher_registration_link }}"
+        env:
+          CATTLE_AGENT_IP: "{{ _rancher_cattle_agent_ip }}"
+        image: "{{ _rancher_agent_image }}"
+        log_driver: syslog
+        name: rancheragent
+        privileged: true
+        state: started
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /var/lib/rancher:/var/lib/rancher
+      become: true
+      when: (_rancher_agent_container['rc'] == 1)
+
+    - name: Removing Rancher Agent Bootstrap Container
+      docker_container:
+        name: rancheragent
+        state: absent
+      become: true
+      when: (_rancher_agent_container['rc'] == 0)
+
+    - name: Capturing API Keys For Default ID
+      uri:
+        method: GET
+        status_code: 200
+        url: "{{ rancher_server_host_api_url }}/projects/{{ _rancher_default_id }}/apikeys"
+        return_content: true
+      register: _rancher_default_id_apikeys
+
+    - name: Creating API Environment Key For Default ID
+      uri:
+        method: POST
+        body: {"accountId":"{{ _rancher_default_id }}", "publicValue":"publicKey", "secretValue":"secretKey"}
+        url: "{{ rancher_server_host_api_url }}/projects/{{ _rancher_default_id }}/apikeys"
+        return_content: true
+        body_format: json
+      failed_when: false
+      register: _rancher_default_id_apikey_created
+      when: _rancher_default_id_apikeys['json']['data'] == []
+
+    - name: Registering API Key
+      template:
+        src: templates/rancher_api_key.yml.j2
+        dest: ../inventory/group_vars/all/rancher_api_key.yml
+      delegate_to: localhost
+      when: >
+            _rancher_default_id_apikeys['json']['data'] == [] and
+            _rancher_default_id_apikey_created is defined

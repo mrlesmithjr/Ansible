@@ -1,0 +1,111 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    _rancher_services_found: []
+    _rancher_stacks_found: []
+  tasks:
+    - name: Downloading Rancher CLI
+      unarchive:
+        src: https://github.com/rancher/cli/releases/download/v0.6.4/rancher-darwin-amd64-v0.6.4.tar.gz
+        dest: $HOME
+        remote_src: true
+        creates: /usr/local/bin/rancher
+      register: _rancher_cli_downloaded
+      when: ansible_os_family == "Darwin"
+
+    - name: Moving Rancher CLI
+      command: mv $HOME/rancher-v0.6.4/rancher /usr/local/bin
+      when: _rancher_cli_downloaded['changed']
+
+    - name: Downloading Rancher Compose
+      unarchive:
+        src: https://github.com/rancher/rancher-compose/releases/download/v0.12.5/rancher-compose-darwin-amd64-v0.12.5.tar.gz
+        dest: $HOME
+        remote_src: true
+        creates: /usr/local/bin/rancher-compose
+      register: _rancher_compose_downloaded
+      when: ansible_os_family == "Darwin"
+
+    - name: Moving Rancher Compose
+      command: mv $HOME/rancher-compose-v0.12.5/rancher-compose /usr/local/bin
+      when: _rancher_compose_downloaded['changed']
+
+    - name: Setting pdns_api_url
+      set_fact:
+        pdns_api_url: "http://{{ hostvars[groups['vsphere_ddi_vms'][0]]['ansible_host'] }}:{{ pdns_webserver_port }}"
+      when: >
+            not pdns_load_balanced or
+            groups['vsphere_lb_vms'] is not defined
+
+    - name: Setting pdns_api_url
+      set_fact:
+        pdns_api_url: "http://{{ pdns_api_vip }}:{{ pdns_webserver_port }}"
+      when: >
+            pdns_load_balanced and
+            vsphere_lb_vms is defined
+
+    - name: Setting Rancher Server Host
+      set_fact:
+        rancher_server_host: "{{ groups['rancher_hosts'][0] }}"
+      when: not rancher_ha
+
+    - name: Setting Rancher Server Host
+      set_fact:
+        rancher_server_host: "{{ rancher_lb_host }}"
+      when: rancher_ha
+
+    - name: Setting Rancher Server URL
+      set_fact:
+        rancher_server_url: "http://{{ rancher_server_host }}:{{ rancher_server_host_api_port }}"
+
+    - name: Capturing Services
+      uri:
+        url: "{{ rancher_server_url }}/v1/services"
+        method: GET
+        return_data: true
+      register: _rancher_services
+
+    - name: Registering Services
+      set_fact:
+        _rancher_services_found: "{{ _rancher_services_found }} + [ '{{ item['name'] }}' ]"
+      with_items: "{{ _rancher_services['json']['data'] }}"
+
+    - name: Capturing Stacks
+      uri:
+        url: "{{ rancher_server_url }}/v2-beta/stacks"
+        method: GET
+        return_data: true
+      register: _rancher_stacks
+
+    - name: Registering Stacks
+      set_fact:
+        _rancher_stacks_found: "{{ _rancher_stacks_found }} + [ '{{ item['name'] }}']"
+      with_items: "{{ _rancher_stacks['json']['data'] }}"
+
+    - name: Creating PowerDNS External DNS docker-compose.yml
+      template:
+        src: templates/powerdns-external-dns_docker-compose.yml.j2
+        dest: ../rancher/powerdns-external-dns/docker-compose.yml
+
+    - name: Spinning Up PowerDNS External DNS Stack
+      command: rancher-compose --url {{ rancher_api_url }}/projects/{{ rancher_default_id }} --access-key {{ rancher_api_key }} --secret-key {{ rancher_api_secret }} up -d
+      args:
+        chdir: ../rancher/powerdns-external-dns
+      register: _rancher_pdns_external_dns_stack
+      when: ("powerdns-external-dns" not in _rancher_stacks_found)
+
+    - name: Spinning Up ELK Stack
+      command: rancher-compose --url {{ rancher_api_url }}/projects/{{ rancher_default_id }} --access-key {{ rancher_api_key }} --secret-key {{ rancher_api_secret }} up -d
+      args:
+        chdir: ../rancher/ELK
+      register: _rancher_elk_stack
+      when: ("ELK" not in _rancher_stacks_found)
+
+    - name: Spinning Up Prometheus Stack
+      command: rancher-compose --url {{ rancher_api_url }}/projects/{{ rancher_default_id }} --access-key {{ rancher_api_key }} --secret-key {{ rancher_api_secret }} up -d
+      args:
+        chdir: ../rancher/Prometheus
+      register: _rancher_prometheus_stack
+      when: ("Prometheus" not in _rancher_stacks_found)

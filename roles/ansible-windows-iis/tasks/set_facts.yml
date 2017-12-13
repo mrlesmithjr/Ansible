@@ -1,0 +1,16 @@
+---
+- name: set_facts | Setting Web Server Fact
+  set_fact:
+    windows_iis_web_server: true
+  with_items: "{{ windows_iis_role }}"
+  when: >
+        item['name'] == "Web-Server" and
+        item['state']|lower == "present"
+
+- name: set_facts | Setting Web Server Fact
+  set_fact:
+    windows_iis_web_server: false
+  with_items: "{{ windows_iis_role }}"
+  when: >
+        item['name'] == "Web-Server" and
+        item['state']|lower == "absent"

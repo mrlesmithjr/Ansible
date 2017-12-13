@@ -1,0 +1,65 @@
+---
+- hosts: openstack
+  vars:
+    etc_hosts_add_all_hosts: true
+    etc_hosts_pri_dns_name: '{{ pri_domain_name }}'
+    etc_hosts_static_ip: true
+    pri_domain_name: 'vagrant.local'
+  roles:
+    - role: ansible-etc-hosts
+    - role: ansible-config-interfaces
+    - role: ansible-chrony
+    - role: ansible-openstack-openrc
+    - role: ansible-openstack-base
+  tasks:
+
+- hosts: openstack_controllers
+  vars:
+    memcached_config: true
+    memcached_connections_in_limit: 1024
+    memcached_listen_address: '{{ openstack_management_ip }}'
+    mysql_allow_remote_connections: true
+    mysql_settings:
+      collation_server: 'utf8_general_ci'
+      character_set_client: 'utf8'
+      expire_logs_days: 10
+      innodb_buffer_pool_size: 128M
+      innodb_doublewrite: 'ON'
+      innodb_flush_log_at_timeout: 1
+      innodb_read_io_threads: 4
+      innodb_write_io_threads: 4
+      join_buffer_size: 1M
+      key_buffer_size: '{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M'
+      max_allowed_packet: 16M
+      max_binlog_size: 100M
+      max_connections: 4096
+      max_heap_table_size: 16M
+      query_cache_limit: 1M
+      query_cache_size: 16M
+      thread_cache_size: 8
+      thread_stack: 192K
+      tmp_table_size: 16M
+    openstack_compute_service_controller_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+    openstack_controllers_group: 'openstack_controllers'
+    openstack_image_service_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+    openstack_keystone_endpoint_url: 'http://{{ groups[openstack_controllers_group][0] }}'
+    openstack_management_ip: "{{ hostvars[inventory_hostname]['ansible_ssh_host'] }}"
+    rabbitmq_config_service: true
+    rabbitmq_listeners:
+      - '{{ openstack_management_ip }}'
+    rabbitmq_users:
+      - name: '{{ openstack_rabbit_user }}'
+        password: '{{ openstack_rabbit_password }}'
+        vhost: '/'
+        configure_priv: '.*'
+        read_priv: '.*'
+        write_priv: '.*'
+        tags: 'administrator'
+
+  roles:
+    - role: ansible-mysql
+    - role: ansible-rabbitmq
+    - role: ansible-memcached
+    - role: ansible-openstack-identity-service
+    - role: ansible-openstack-image-service
+    - role: ansible-openstack-compute-service-controller

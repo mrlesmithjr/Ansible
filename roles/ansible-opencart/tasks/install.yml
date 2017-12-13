@@ -1,0 +1,65 @@
+---
+- name: install | Ensuring {{ opencart_webroot }}/{{ opencart_version }} Exists
+  file:
+    path: "{{ opencart_default_webroot }}/{{ opencart_version }}"
+    owner: "{{ opencart_web_owner }}"
+    group: "{{ opencart_web_group }}"
+    state: directory
+  become: true
+
+- name: install | Download And Extract OpenCart {{ opencart_version }}
+  unarchive:
+    src: "{{ opencart_dl_url }}/{{ opencart_archive }}"
+    dest: "{{ opencart_default_webroot }}/{{ opencart_version }}"
+    remote_src: true
+    creates: "{{ opencart_default_webroot }}/{{ opencart_version }}/upload/index.php"
+  become: true
+
+- name: install | Copying OpenCart Files To {{ opencart_webroot }}
+  command: cp -a {{ opencart_default_webroot }}/{{ opencart_version }}/upload/. {{ opencart_webroot }}/
+  args:
+    creates: "{{ opencart_webroot }}/index.php"
+  become: true
+
+- name: install | Setting {{ opencart_webroot }} Permissions
+  file:
+    path: "{{ opencart_webroot }}"
+    owner: "{{ opencart_web_owner }}"
+    group: "{{ opencart_web_group }}"
+    recurse: true
+  become: true
+
+- name: install | Checking If OpenCart Has Been Successfully Setup
+  stat:
+    path: "{{ opencart_default_webroot }}/.opencart_setup"
+  register: _opencart_setup
+
+- name: install | Installing OpenCart Using PHP Installer
+  command: >
+           php {{ opencart_webroot }}/install/cli_install.php install
+           --db_hostname {{ opencart_db_host }}
+           --db_username {{ opencart_db_user }}
+           --db_password {{ opencart_db_password }}
+           --db_database {{ opencart_db }}
+           --db_driver mysqli
+           --username {{ opencart_admin_user }}
+           --password {{ opencart_admin_password }}
+           --email {{ opencart_admin_email }}
+           --http_server http://{{ opencart_listen_address }}/
+  become: true
+  register: _opencart_installed
+  when: not _opencart_setup['stat']['exists']
+
+- name: install | Removing OpenCart Install Directory
+  file:
+    dest: "{{ opencart_webroot }}/install"
+    state: absent
+  become: true
+  when: _opencart_installed['changed']
+
+- name: install | Marking OpenCart As Being Installed
+  file:
+    path: "{{ opencart_default_webroot }}/.opencart_setup"
+    state: touch
+  become: true
+  when: _opencart_installed['changed']

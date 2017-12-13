@@ -1,0 +1,64 @@
+---
+- name: Install Base Services
+  hosts: openstack
+  vars:
+  roles:
+    - role: ansible-motd
+    - role: ansible-etc-hosts
+    - role: ansible-config-interfaces
+    - role: ansible-timezone
+    - role: ansible-chrony
+    - role: ansible-openstack-openrc
+    - role: ansible-openstack-base
+  tasks:
+
+- name: Install Core Services
+  hosts: openstack_controllers
+  any_errors_fatal: true
+  vars:
+  roles:
+    - role: ansible-mysql
+      when: not openstack_ha
+    - role: ansible-mariadb-galera-cluster
+      when: openstack_ha
+    - role: ansible-rabbitmq
+      tags:
+        - 'openstack_rabbitmq'
+    - role: ansible-memcached
+      tags:
+        - 'openstack_memcached'
+
+- name: Install HA Services
+  hosts: openstack_controllers
+  any_errors_fatal: true
+  vars:
+  roles:
+    - role: ansible-haproxy
+      when: openstack_ha
+      tags:
+        - 'openstack_ha'
+        - 'openstack_ha_haproxy'
+    - role: ansible-pacemaker
+      when: openstack_ha
+      tags:
+        - 'openstack_ha'
+        - 'openstack_ha_pacemaker'
+
+- name: Install OpenStack Controller Services
+  hosts: openstack_controllers
+  any_errors_fatal: true
+  vars:
+  roles:
+    - role: ansible-openstack-identity-service
+    - role: ansible-openstack-image-service
+    - role: ansible-openstack-compute-service-controller
+    - role: ansible-openstack-networking-service-controller
+    - role: ansible-openstack-dashboard
+
+# - name: Install OpenStack Compute Services
+#   hosts: openstack_computes
+#   any_errors_fatal: true
+#   vars:
+#   roles:
+#     - role: ansible-openstack-compute-service-compute
+#     - role: ansible-openstack-networking-service-compute

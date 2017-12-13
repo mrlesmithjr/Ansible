@@ -1,11 +1,88 @@
 ---
-#### Below is for Ansible 2.0 when monit module is available
-#    - name: enabling monit monitoring of processes
-#      monit: name={{ item.name }} state=monitored
-#      with_items: monit_monitor_services
-#      when: item.monitored is defined and item.monitored
+- name: config_monit | Ensuring {{ monit_idfile|dirname }} Exists
+  file:
+    path: "{{ monit_idfile|dirname }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+  become: true
 
-#    - name: disable monit monitoring of processes
-#      monit: name={{ item.name }} state=unmonitored
-#      with_items: monit_monitor_services
-#      when: item.monitored is defined and not item.monitored
+- name: config_monit | Configuring Monit
+  template:
+    src: "etc/monit/monitrc.j2"
+    dest: "{{ monit_monitrc_file }}"
+    owner: "root"
+    group: "root"
+    mode: "o=rw,g=,o="
+  become: true
+  register: "_monit_configured"
+
+- name: config_monit | Restarting Monit If Configured
+  service:
+    name: "monit"
+    state: "restarted"
+  become: true
+  when: _monit_configured['changed']
+
+- name: config_monit | Configuring Monitored Services
+  template:
+    src: "etc/monit/conf.d/monitor.j2"
+    dest: "{{ monit_config_dir }}/{{ item['name'] }}"
+    owner: "root"
+    group: "root"
+    mode: "o=rw,g=r,o=r"
+  become: true
+  register: "_monit_service_created"
+  with_items: '{{ monit_monitor_services }}'
+  when: >
+        monit_monitor_services is defined and
+        (item['monitored'] is defined and
+        item['monitored'])
+
+- name: config_monit | Removing Unmonitored Services
+  file:
+    path: "{{ monit_config_dir }}/{{ item['name'] }}"
+    state: "absent"
+  become: true
+  register: "_monit_service_removed"
+  with_items: '{{ monit_monitor_services }}'
+  when: >
+        (config_monit is defined and
+        config_monit) and
+        monit_monitor_services is defined and
+        (item['monitored'] is defined and
+        not item['monitored'])
+
+- name: config_monit | Reloading Monit If Service Changed
+  service:
+    name: "monit"
+    state: "reloaded"
+  become: true
+  when: >
+        _monit_service_created['changed'] or
+        _monit_service_removed['changed']
+
+# I have not found a use case for the below at this time. The service definitions
+# still need to be added before leveraging the below. One potential use case
+# would be for possibly doing maintenance where the specific services would need
+# to be temporarily unmonitored.
+#
+# - name: config_monit | enabling monit monitoring of processes
+#   monit:
+#     name: "{{ item['name'] }}"
+#     state: "monitored"
+#   become: true
+#   with_items: '{{ monit_monitor_services }}'
+#   when: >
+#         item['monitored'] is defined and
+#         item['monitored']
+#
+# - name: config_monit | Disabling Monit Monitoring Of Processes
+#   monit:
+#     name: "{{ item['name'] }}"
+#     state: "unmonitored"
+#   become: true
+#   with_items: '{{ monit_monitor_services }}'
+#   when: >
+#         item['monitored'] is defined and
+#         not item['monitored']

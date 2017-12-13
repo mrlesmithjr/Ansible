@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-syslog-ng
+- name: "restart syslog-ng"
+  service:
+    name: "syslog-ng"
+    state: "restarted"
+  become: true

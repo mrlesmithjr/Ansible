@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install [VMware PowerCLI](https://blogs.vmware.com/PowerCLI/2017/05/powercli-6-5-1-install-walkthrough.html) on `Windows`.
+
+  license: license (MIT)
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Windows
+      versions:
+        - 2012R2
+
+  galaxy_tags:
+    - PowerCLI
+
+dependencies: []

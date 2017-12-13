@@ -1,7 +1,9 @@
 ---
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts.git
+- src: https://github.com/mrlesmithjr/ansible-manage-ssh-keys.git
 - src: https://github.com/mrlesmithjr/ansible-mongodb.git
 - src: https://github.com/mrlesmithjr/ansible-nginx.git
 - src: https://github.com/mrlesmithjr/ansible-nodejs.git
 - src: https://github.com/mrlesmithjr/ansible-postgresql.git
 - src: https://github.com/mrlesmithjr/ansible-rabbitmq.git
-- src: https://github.com/mrlesmithjr/ansible-stackstorm.git
+- src: https://github.com/mrlesmithjr/ansible-users.git

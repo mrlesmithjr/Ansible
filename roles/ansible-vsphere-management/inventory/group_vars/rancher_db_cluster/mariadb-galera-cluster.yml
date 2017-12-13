@@ -1,0 +1,10 @@
+---
+# galera_cluster_bind_address: 0.0.0.0
+galera_cluster_bind_interface: "{{ ansible_primary_interface }}"
+galera_cluster_name: rancher-db-cluster
+galera_cluster_nodes_group: rancher_db_cluster
+mariadb_pri_domain_name: "{{ vsphere_pri_domain_name }}"
+
+# MariaDB Repo Info
+mariadb_debian_repo: "deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/{{ mariadb_version }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} main"
+mariadb_debian_repo_pin: nyc2.mirrors.digitalocean.com

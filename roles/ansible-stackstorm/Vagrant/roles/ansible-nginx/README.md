@@ -1,27 +1,45 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-Installs and configures NGINX (http://nginx.org/)  
+- [ansible-nginx](#ansible-nginx)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Requirements
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-nginx
+
+An [Ansible](https://www.ansible) role to install/configure [NGINX](http://nginx.org)
+
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-````
+```yaml
 ---
 # defaults file for ansible-nginx
 config_nginx: false
 nginx_access_log: '/var/log/nginx/access.log'
 nginx_enable_ipv6: false
-nginx_enable_php5: true
+nginx_enable_php: true
 nginx_error_log: '/var/log/nginx/error.log'
 nginx_events_block:
 #  - 'multi_accept on'
   - 'worker_connections 768'
+
+# Define any custom headers which you would like to have configured
+nginx_headers: []
+  # - 'set_real_ip_from 192.168.250.0/24'
+  # - 'real_ip_header X-Real-IP'
+  # - 'real_ip_recursive on'
+
 nginx_http_block:
   basic_settings:
     - 'keepalive_timeout 65'
@@ -50,7 +68,11 @@ nginx_http_block:
     - 'include /etc/nginx/conf.d/*.conf'
     - 'include /etc/nginx/sites-enabled/*'
 nginx_listen_port: 80
-nginx_server_block:  #defines settings added to /etc/nginx/sites-enabled/default
+nginx_php_set_timezone: false
+nginx_php_timezone: 'America/New_York'
+
+# Defines settings added to /etc/nginx/sites-enabled/default
+nginx_server_block:
   - server_name: 'localhost'
     default_server: true
     enable_php: true
@@ -58,38 +80,39 @@ nginx_server_block:  #defines settings added to /etc/nginx/sites-enabled/default
       - 'index.php'
       - 'index.html'
       - 'index.htm'
-    listen: '{{ nginx_listen_port }}'
+    listen_address:
+      - '*'
+#      - '127.0.1.1'
+    listen_port: '{{ nginx_listen_port }}'
     location: '/'
     root: '{{ nginx_web_root }}'
     try_files: '$uri $uri/ =404'
 nginx_worker_processes: 4
-````
-Dependencies
-------------
+```
+
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-````
+```yaml
 - hosts: all
   become: true
   vars:
   roles:
     - role: ansible-nginx
   tasks:
-````
+```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
+
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   mrlesmithjr [at] gmail.com

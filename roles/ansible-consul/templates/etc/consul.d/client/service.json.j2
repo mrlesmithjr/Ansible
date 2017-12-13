@@ -2,7 +2,7 @@
 {% set services = {} %}
 {% set _services = [] %}
 {%   for item in consul_services %}
-{%   set _services = _services.append(item) %}
+{%   set _= _services.append(item) %}
 {%   endfor %}
 {% set __services = services.update({"services": _services}) %}
 {{ services|to_nice_json }}

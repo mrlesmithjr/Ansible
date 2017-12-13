@@ -1,0 +1,29 @@
+---
+- name: ad_domain | Ensuring AD Is Functional
+  shell: samba-tool domain info {{ hostvars[vsphere_ad_primary_domain_controller]['ansible_host'] }} | grep Domain | awk '{ print $3 }'
+  register: _vsphere_ad_domain_info
+  delegate_to: "{{ vsphere_ad_primary_domain_controller }}"
+  changed_when: false
+
+- name: ad_domain | Showing AD Domain Info
+  debug: var=_vsphere_ad_domain_info
+  when: >
+        _vsphere_ad_domain_info['rc'] == 0 and
+        _vsphere_ad_domain_info['stdout'] == vsphere_ad_dns_domain_name
+
+- name: ad_domain | Generating Secure Password
+  win_shell: $Password=ConvertTo-SecureString -String "{{ vsphere_ad_password }}" -AsPlainText -Force | ConvertFrom-SecureString | Out-File {{ vsphere_ad_domain_secure_password_file }}
+  no_log: true
+
+- name: ad_domain | Generating AD Domain Management PowerShell Script
+  win_template:
+    src: vsphere_ad_domain.ps1.j2
+    dest: c:\tmp\vsphere_ad_domain.ps1
+
+- name: ad_domain | Executing AD Domain Managment PowerShell Script
+  win_shell: c:\tmp\vsphere_ad_domain.ps1
+  register: _vsphere_ad_domain_management_script_execution
+  failed_when: _vsphere_ad_domain_management_script_execution['stderr_lines'] != []
+  when: >
+        _vsphere_ad_domain_info['rc'] == 0 and
+        _vsphere_ad_domain_info['stdout'] == vsphere_ad_dns_domain_name

@@ -1,0 +1,26 @@
+{% set _groups = [] %}
+{% for key, value in (_terraform_state['stdout']|from_json)['modules'][0]['resources'].items() %}
+{%   if 'vsphere_virtual_machine' in key %}
+{%     set _group = key.split('.') %}
+{%     set _groups = _groups.append(_group[1]) %}
+{%   endif %}
+{% endfor %}
+{% set groups = _groups|unique|list %}
+{% for group in groups %}
+[{{ group }}]
+{%   for key, value in (_terraform_state['stdout']|from_json)['modules'][0]['resources'].items() %}
+{%     if 'vsphere_virtual_machine' in key %}
+{%       set _group = key.split('.') %}
+{%       if _group[1] == group %}
+{{ value['primary']['attributes']['name'] }}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+
+{% endfor %}
+[terraform_vms]
+{% for key, value in (_terraform_state['stdout']|from_json)['modules'][0]['resources'].items() %}
+{%   if 'vsphere_virtual_machine' in key %}
+{{ value['primary']['attributes']['name'] }} ansible_host={{ value['primary']['attributes']['network_interface.0.ipv4_address'] }} mac_address={{ value['primary']['attributes']['network_interface.0.mac_address'] }} uuid={{ value['primary']['attributes']['uuid'] }}
+{%   endif %}
+{% endfor %}

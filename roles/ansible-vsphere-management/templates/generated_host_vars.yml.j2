@@ -1,0 +1,13 @@
+---
+cpus: {{ hostvars[item]['cpus'] }}
+datastore: {{ hostvars[item]['datastore'] }}
+ip: {{ hostvars[item]['ip']|default(omit) }}
+gateway: {{ hostvars[item]['gateway']|default(omit) }}
+{% if hostvars[item]['hw_product_uuid'] is defined %}
+hw_product_uuid: {{ hostvars[item]['hw_product_uuid'] }}
+{% endif %}
+memory_mb: {{ hostvars[item]['memory_mb'] }}
+netmask: {{ hostvars[item]['netmask']|default(omit) }}
+netmask_cidr: {{ hostvars[item]['netmask_cidr']|default(omit) }}
+network_name: {{ hostvars[item]['network_name'] }}
+vapp_source_path: {{ hostvars[item]['vapp_source_path'] }}

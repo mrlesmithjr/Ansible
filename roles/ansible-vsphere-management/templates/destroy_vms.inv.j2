@@ -1,0 +1,10 @@
+{% if groups['vsphere_destroy_vms'] is defined %}
+[vsphere_destroy_vms]
+{%   for host in groups['vsphere_destroy_vms'] %}
+{%     if (groups['vsphere_do_not_destroy_vms'] is defined and host not in groups['vsphere_do_not_destroy_vms']) or groups['vsphere_do_not_destroy_vms'] is not defined%}
+{{ hostvars[host]['inventory_hostname'] }} ansible_host={{ hostvars[host]['ansible_host'] }} hw_product_uuid={{ hostvars[host]['hw_product_uuid'] }}
+{%     endif %}
+{%   endfor %}
+{% elif groups['vsphere_destroy_vms'] is not defined %}
+[vsphere_destroy_vms]
+{% endif %}

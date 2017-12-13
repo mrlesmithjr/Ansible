@@ -1,0 +1,5 @@
+{% set config_json = {} %}
+{% for item in _vsphere_ddi_vm_configs['results'] %}
+{%   set _config = config_json.update({item['item']: item['stdout']|from_json}) %}
+{% endfor %}
+{{ config_json|to_nice_json }}

@@ -1,24 +1,29 @@
 ---
-- name: debian | installing pre-reqs
+- name: debian | Installing fluentd Pre-Reqs
   apt:
     name: "{{ item }}"
-    state: present
+    state: "present"
+  become: true
   with_items:
-    - ntp
+    - 'build-essential'
+    - 'ruby-dev'
 
-- name: debian | adding fluentd repo key
+- name: debian | Adding fluentd Repo Key
   apt_key:
-    url: "{{ fluentd_debian_repo_info.repo_key }}"
-    state: present
+    url: "{{ fluentd_debian_repo_info['repo_key'] }}"
+    state: "present"
+  become: true
 #    validate_certs: false
 
-- name: debian | adding fluentd repo
+- name: debian | Adding fluentd Repo
   apt_repository:
-    repo: "{{ fluentd_debian_repo_info.repo }}"
-    state: present
+    repo: "{{ fluentd_debian_repo_info['repo'] }}"
+    state: "present"
+  become: true
 
-- name: debian | installing fluentd toolbelt
+- name: debian | Installing fluentd Toolbelt
   apt:
     name: "td-agent"
-    state: present
+    state: "present"
     force: yes
+  become: true

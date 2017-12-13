@@ -1,0 +1,61 @@
+---
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  tasks:
+    - name: Generating User(s) SSH Key
+      user:
+        name: "{{ item }}"
+        generate_ssh_key: true
+      become: true
+      with_items: "{{ users_ssh_key_distribution }}"
+
+    - name: Scan And Register SSH Host Keys (hostname)
+      command: ssh-keyscan {{ item }}
+      register: host_keys_hostname
+      changed_when: false
+      with_items: "{{ play_hosts }}"
+      delegate_to: localhost
+      become: false
+
+    - name: Scan And Register SSH Host Keys (IP)
+      command: ssh-keyscan {{ hostvars[item]['ansible_host'] }}
+      register: host_keys_ip
+      changed_when: false
+      with_items: "{{ play_hosts }}"
+      delegate_to: localhost
+      become: false
+
+    - name: Write SSH Host Keys
+      template:
+        src: templates/ssh-hosts.j2
+        dest: /etc/ssh/ssh_known_hosts
+      become: true
+
+    - name: Capturing SSH Keys
+      command: cat /home/{{ item }}/.ssh/id_rsa.pub
+      register: _ssh_pub_key
+      become: true
+      changed_when: false
+      with_items: "{{ users_ssh_key_distribution }}"
+
+    - name: Generating SSH Keys
+      template:
+        src: templates/ssh_keys_distribution.yml.j2
+        dest: "{{ ssh_keys_distribution_vars_file_path }}/ssh_keys_distribution.yml"
+      become: false
+      run_once: true
+      delegate_to: localhost
+
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  vars_files:
+    - "{{ ssh_keys_distribution_vars_file_path }}/ssh_keys_distribution.yml"
+  tasks:
+    - name: Adding SSH Keys
+      authorized_key:
+        user: "{{ item[1]['user'] }}"
+        key: "{{ item[1]['key'] }}"
+        state: present
+      become: true
+      with_subelements:
+        - "{{ _ssh_keys_distribution }}"
+        - keys
+      when: inventory_hostname != item[0]['host']

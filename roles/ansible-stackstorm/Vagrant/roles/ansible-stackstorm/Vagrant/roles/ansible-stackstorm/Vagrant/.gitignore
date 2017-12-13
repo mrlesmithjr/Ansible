@@ -1,6 +1,0 @@
-#inventory
-#host-and-group-vars
-#ssh_pub_keys
-*.retry
-.DS_Store
-.galaxy_install_info

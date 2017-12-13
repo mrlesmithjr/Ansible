@@ -1,0 +1,101 @@
+{% if pdns_master %}
+allow-axfr-ips={{ pdns_slaves| join (',') }}
+{% endif %}
+{% if pdns_allow_ddns_updates %}
+allow-dnsupdate-from={{ pdns_allow_ddns_updates_from }}
+{% endif %}
+{% if pdns_also_notify.configure %}
+also-notify={{ pdns_also_notify.notify_ips|join (', ') }}
+{% endif %}
+{% if pdns_enable_pdns_api and pdns_server_version == "4.x" %}
+api=yes
+{% endif %}
+{% if pdns_enable_pdns_carbon_metrics %}
+carbon-interval={{ pdns_carbon_info.interval }}
+carbon-ourname={{ pdns_carbon_info.ourname }}
+carbon-server={{ pdns_carbon_info.server }}
+{% endif %}
+{% if pdns_default_soa_mail is defined %}
+default-soa-mail={{ pdns_default_soa_mail }}
+{% endif %}
+{% if pdns_default_soa_name is defined %}
+default-soa-name={{ pdns_default_soa_name }}
+{% endif %}
+{% if pdns_master or not pdns_slave %}
+disable-axfr=no
+{% elif pdns_slave %}
+disable-axfr=yes
+{% endif %}
+{% if pdns_api_key is defined %}
+{%   if pdns_server_version != "4.x" %}
+experimental-api-key={{ pdns_api_key }}
+{%   elif pdns_server_version == "4.x" %}
+api-key={{ pdns_api_key }}
+{%   endif %}
+{% endif %}
+{% if pdns_allow_ddns_updates %}
+{%   if pdns_server_version != "4.x" %}
+experimental-dnsupdate=yes
+{%   elif pdns_server_version == "4.x" %}
+dnsupdate=yes
+{%   endif %}
+{% endif %}
+{% if pdns_json_interface and pdns_server_version != "4.x" %}
+experimental-json-interface=yes
+{% endif %}
+gmysql-host={{ pdns_db_host }}
+gmysql-user={{ pdns_db_user }}
+gmysql-dbname={{ pdns_db_name }}
+gmysql-password={{ pdns_db_pass }}
+{% if ansible_os_family == "RedHat" %}
+gmysql-socket=/var/lib/mysql/mysql.sock
+{% endif %}
+{% if pdns_master or pdns_slave %}
+guardian=yes
+{% endif %}
+launch=gmysql
+{% if pdns_enable_pdns_anycast is defined and pdns_enable_pdns_anycast %}
+local-address=127.0.0.1,{{ ansible_default_ipv4.address }}
+{% endif %}
+{% if (pdns_enable_pdns_anycast is defined and not pdns_enable_pdns_anycast) or pdns_enable_pdns_anycast is not defined %}
+{%   if pdns_listen_all_interfaces %}
+local-address=0.0.0.0
+{%   elif not pdns_listen_all_interfaces %}
+local-address=127.0.0.1,{{ ansible_default_ipv4.address }}
+{%   endif %}
+{% endif %}
+local-port={{ pdns_auth_port }}
+{% if pdns_enable_pdns_server_logging %}
+log-dns-queries=yes
+{% endif %}
+{% if pdns_enable_pdns_server_logging %}
+loglevel=5
+{% endif %}
+{% if pdns_master %}
+master=yes
+{% elif not pdns_master %}
+master=no
+{% endif %}
+{% if pdns_enable_pdns_recursive_lookups %}
+recursor={{ pdns_recursor_host }}:{{ pdns_recursor_port }}
+{% endif %}
+{% if pdns_slave %}
+slave=yes
+{% elif not pdns_slave %}
+slave=no
+{% endif %}
+{% if pdns_enable_pdns_web_server %}
+webserver=yes
+{% endif %}
+{% if pdns_enable_pdns_web_server and pdns_webserver_address is defined %}
+webserver-address={{ pdns_webserver_address }}
+{% endif %}
+{% if pdns_enable_pdns_web_server and pdns_webserver_allow is defined %}
+webserver-allow-from={{ pdns_webserver_allow }}
+{% endif %}
+{% if pdns_enable_pdns_web_server and pdns_webserver_password is defined %}
+webserver-password={{ pdns_webserver_password }}
+{% endif %}
+{% if pdns_enable_pdns_web_server and pdns_webserver_port is defined %}
+webserver-port={{ pdns_webserver_port }}
+{% endif %}

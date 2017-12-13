@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-openstack-dashboard
+
+# https://docs.openstack.org/ocata/install-guide-ubuntu/horizon-install.html
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - 'openstack_dashboard'
+    - 'openstack_dashboard_debian'
+
+- include: config.yml
+  tags:
+    - 'openstack_dashboard'
+    - 'openstack_dashboard_config'
+    - 'openstack_dashboard_debian'

@@ -1,0 +1,35 @@
+---
+- hosts: fluentd
+  vars:
+    fluentd_inputs:
+      - type: 'tail'
+        format: 'apache2'
+        tag: 'apache.access'
+        path: '/var/log/apache2/access.log'
+      - type: 'tail'
+        format: '/^\[[^ ]* (?<time>[^\]]*)\] \[(?<level>[^\]]*)\] \[pid (?<pid>[^\]]*)\] \[client (?<client>[^\]]*)\] (?<message>.*)$/'
+        tag: 'apache.error'
+        path: '/var/log/apache2/error.log'
+      - type: 'syslog'
+        port: 5140
+        bind: 0.0.0.0
+        tag: 'syslog'
+        protocol_type: 'udp'
+      - type: 'tail'
+        path: '/var/log/syslog'
+        pos_file: '/var/log/syslog.pos'
+        tag: 'syslog'
+        format: 'syslog'
+    fluentd_ouputs:
+      - type: 'elasticsearch'
+        logstash_format: true
+        match: '**'
+        host: '192.168.250.10'
+        port: 9200
+        index_name: 'fluentd'
+        type_name: 'fluentd'
+    fluentd_plugins:
+      - 'fluent-plugin-elasticsearch'
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-fluentd

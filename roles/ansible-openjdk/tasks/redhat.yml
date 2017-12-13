@@ -1,0 +1,16 @@
+---
+- name: redhat | Installing Java
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ openjdk_redhat_packages }}"
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Java
+  dnf:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ openjdk_redhat_packages }}"
+  when: ansible_distribution == "Fedora"

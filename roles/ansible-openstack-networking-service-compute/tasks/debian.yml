@@ -1,0 +1,6 @@
+---
+- name: debian | Installing neutron-linuxbridge-agent
+  apt:
+    name: "neutron-linuxbridge-agent"
+    state: "present"
+  become: true

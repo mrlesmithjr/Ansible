@@ -1,0 +1,13 @@
+---
+- name: ports | Managing OVS Ports
+  openvswitch_port:
+    bridge: "{{ item[0]['bridge'] }}"
+    port: "{{ item[1]['port'] }}"
+    state: "{{ item[1]['state'] }}"
+    tag: "{{ item[1]['tag']|default(omit) }}"
+    timeout: "{{ item[0]['timeout']|default(omit) }}"
+  become: true
+  with_subelements:
+    - '{{ openvswitch_ports }}'
+    - ports
+  when: openvswitch_ports is defined

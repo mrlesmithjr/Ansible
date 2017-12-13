@@ -1,0 +1,17 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    monit_config_dir: '/etc/monit/conf.d'
+    monit_include_config_dirs:
+      - '/etc/monit/conf.d/*'
+      - '/etc/monit/conf-enabled/*'
+    monit_monitrc_file: '/etc/monit/monitrc'
+  when: ansible_os_family == "Debian"
+
+- name: set_facts | Setting RedHat Facts
+  set_fact:
+    monit_config_dir: '/etc/monit.d'
+    monit_include_config_dirs:
+      - '/etc/monit.d/*'
+    monit_monitrc_file: '/etc/monitrc'
+  when: ansible_os_family == "RedHat"

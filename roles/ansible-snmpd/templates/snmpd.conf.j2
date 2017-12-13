@@ -8,14 +8,14 @@ rocommunity {{ item.community }} {{ item.network }}
 {%   endfor %}
 {% endif %}
 rouser   authOnlyUser
-{% if snmp_sysLocation is defined %}
-sysLocation    {{ snmp_sysLocation }}
+{% if snmpd_sysLocation is defined %}
+sysLocation    {{ snmpd_sysLocation }}
 {% endif %}
-{% if snmp_sysContact is defined %}
-sysContact    {{ snmp_sysContact }}
+{% if snmpd_sysContact is defined %}
+sysContact    {{ snmpd_sysContact }}
 {% endif %}
-{% if snmp_sysName is defined %}
-sysName     {{ snmp_sysName }}
+{% if snmpd_sysName is defined %}
+sysName     {{ snmpd_sysName }}
 {% endif %}
 sysServices    72
 proc  mountd

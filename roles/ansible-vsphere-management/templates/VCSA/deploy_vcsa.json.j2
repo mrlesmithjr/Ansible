@@ -1,0 +1,39 @@
+{
+  "__version": "1.1",
+  "__comments": "Sample template to deploy a vCenter Server with an embedded Platform Services Controller to an ESXi host.",
+  "target.vcsa": {
+    "appliance": {
+      "deployment.network": "{{ vsphere_vcsa_appliance_deployment_network }}",
+      "deployment.option": "{{ vsphere_vcsa_appliance_deployment_option }}",
+      "name": "{{ vsphere_vcsa_appliance_name }}",
+      "thin.disk.mode": {{ vsphere_vcsa_appliance_thin_disk_mode|lower }}
+    },
+    "esx": {
+      "hostname": "{{ vsphere_vcsa_esx_hostname }}",
+      "username": "{{ vsphere_vcsa_esx_username }}",
+      "password": "{{ vsphere_vcsa_esx_password }}",
+      "datastore": "{{ vsphere_vcsa_esx_datastore }}"
+    },
+    "network": {
+      "hostname": "{{ vsphere_vcsa_network_fqdn }}",
+      "dns.servers": [
+        "{{ vsphere_dns_servers[0] }}",
+        "{{ vsphere_dns_servers[1] }}"
+      ],
+      "gateway": "{{ vsphere_vcsa_network_gateway }}",
+      "ip": "{{ vsphere_vcsa_network_ip }}",
+      "ip.family": "{{ vsphere_vcsa_network_ip_family }}",
+      "mode": "{{ vsphere_vcsa_network_mode }}",
+      "prefix": "{{ vsphere_vcsa_network_prefix }}"
+    },
+    "os": {
+      "password": "{{ vsphere_vcsa_os_password }}",
+      "ssh.enable": {{ vsphere_vcsa_os_ssh_enabled|lower }}
+    },
+    "sso": {
+      "password": "{{ vsphere_vcsa_sso_password }}",
+      "domain-name": "{{ vsphere_vcsa_sso_domain_name }}",
+      "site-name": "{{ vsphere_vcsa_sso_site_name }}"
+    }
+  }
+}

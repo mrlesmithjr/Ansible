@@ -1,0 +1,20 @@
+---
+- name: debian | Adding HP MCP repo keys
+  apt_key:
+    url: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: "{{ hp_mcp_debian_repo_info['keys'] }}"
+
+- name: debian | Adding HP MCP repo
+  apt_repository:
+    repo: "{{ hp_mcp_debian_repo_info['repo'] }}"
+    state: "present"
+  become: true
+
+- name: debian | Installing HP MCP Tools
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ hp_mcp_tools }}'

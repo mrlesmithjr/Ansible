@@ -1,0 +1,97 @@
+# {{ ansible_managed }}
+
+global
+{% if (haproxy_enable_remote_syslog is defined and not haproxy_enable_remote_syslog) or haproxy_enable_remote_syslog is not defined %}
+    log /dev/log local0
+    log /dev/log local1 notice
+{% endif %}
+{% if (haproxy_enable_remote_syslog is defined and haproxy_enable_remote_syslog) and haproxy_syslog_servers is defined %}
+    # Remote syslog servers
+{%   for item in haproxy_syslog_servers %}
+    log {{ item['name'] }}:{{ item['port'] }} local0
+{%   endfor %}
+    #log-send-hostname
+{% endif %}
+    daemon
+{% for item in haproxy_global %}
+    {{ item }}
+{% endfor %}
+    # Default SSL material locations
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+
+    # Default ciphers to use on SSL-enabled listening sockets.
+    # For more information, see ciphers(1SSL).
+    ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
+    ssl-default-bind-options no-sslv3
+
+defaults
+{% for item in haproxy_defaults %}
+    {{ item }}
+{% endfor %}
+
+{% if haproxy_enable_admin_page %}
+userlist STATSUSERS
+    group admin users admin
+    user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
+
+listen stats
+    bind *:{{ haproxy_admin_port }}
+    mode http
+    stats enable
+    stats refresh 60s
+    stats uri /
+    acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+    acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+    stats http-request auth realm stats unless AuthOkay_ReadOnly
+{% endif %}
+
+{% if haproxy_configs is defined and haproxy_configs != 'None' %}
+{%   for item in haproxy_configs %}
+{%     if item['enabled'] %}
+frontend {{ item['frontend_name'] }}-{{ item['frontend_bind_port'] }}
+{%       if item['mode'] is defined %}
+    mode {{ item['mode'] }}
+{%       endif %}
+    bind {{ item['frontend_bind_address'] }}:{{ item['frontend_bind_port'] }}{% if item['frontend_ssl']|default(false) %} ssl crt {{ haproxy_load_balancer_ssl['bundled_cert'] }}{% endif %}
+
+    default_backend {{ item['backend_name'] }}-{{ item['backend_servers_bind_port'] }}
+
+{%     endif %}
+{%   endfor %}
+{%   for item in haproxy_configs %}
+{%     if item['enabled'] %}
+backend {{ item['backend_name'] }}-{{ item['backend_servers_bind_port'] }}
+{%       if item['mode'] is defined %}
+    mode {{ item['mode'] }}
+{%       endif %}
+{%       if item['balance'] is defined %}
+    balance {{ item['balance'] }}
+{%       endif %}
+{%       if item['options'] is defined %}
+{%         for option in item['options'] %}
+    option {{ option }}
+{%         endfor %}
+{%       endif %}
+{%       if item['default_server_options'] is defined %}
+    default-server{% for bo in item['default_server_options'] %} {{ bo['name'] }} {{ bo['value'] }}{% endfor %}
+
+{%       endif %}
+{%       for server in item['backend_servers'] %}
+{%         if (item['backend_backups'] is defined and not item['backend_backups']) or item['backend_backups'] is not defined %}
+    server {{ server }} {{ server }}:{{ item['backend_servers_bind_port'] }}{% if item['backend_checks'] %} check{% endif %}
+
+{%         elif item['backend_backups'] %}
+{%           if item['backend_backups_primary'] == server %}
+    server {{ server }} {{ server }}:{{ item['backend_servers_bind_port'] }}{% if item['backend_checks'] %} check{% endif %}
+
+{%           elif item['backend_backups_primary'] != server %}
+    server {{ server }} {{ server }}:{{ item['backend_servers_bind_port'] }} backup{% if item['backend_checks'] %} check{% endif %}
+
+{%           endif %}
+{%         endif %}
+{%       endfor %}
+
+{%     endif %}
+{%   endfor %}
+{% endif %}

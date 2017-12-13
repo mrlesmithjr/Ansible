@@ -1,0 +1,99 @@
+---
+- name: vcsa | Checking For Existing VCSA
+  vmware_guest_facts:
+    hostname: "{{ hostvars[item]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    datacenter: ha-datacenter
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ vsphere_vcsa_appliance_name }}"
+    folder: /ha-datacenter/vm
+  delegate_to: localhost
+  register: _vsphere_vcsa_appliance_facts
+  failed_when: false
+  with_items: "{{ groups['vsphere_hosts'] }}"
+
+- name: vcsa | Setting VCSA Appliance Deployment Status
+  set_fact:
+    _vcsa_appliance_exists: true
+  with_items: "{{ _vsphere_vcsa_appliance_facts['results'] }}"
+  when: >
+        item['instance'] is defined and
+        item['instance']['hw_name'] is defined and
+        item['instance']['hw_name'] == vsphere_vcsa_appliance_name
+
+- name: vcsa | Setting VCSA Appliance Deployment Status
+  set_fact:
+    _vcsa_appliance_exists: false
+  when: >
+        _vcsa_appliance_exists is not defined
+
+- name: vcsa | Generating VCSA Appliance JSON Config
+  win_template:
+    src: VCSA/deploy_vcsa.json.j2
+    dest: c:\tmp\deploy_vcsa.json
+  when: not _vcsa_appliance_exists
+
+- name: vcsa | Verifying VCSA Applicance Deployment
+  win_shell: |
+             {{ vsphere_vcsa_iso_directory }}\vcsa-cli-installer\win32\vcsa-deploy.exe \
+             --verify-only --no-esx-ssl-verify --accept-eula \
+             c:\tmp\deploy_vcsa.json
+  register: _vsphere_vcsa_deployment_verification
+  when: not _vcsa_appliance_exists
+
+- name: vcsa | Deploying VCSA Appliance
+  win_shell: |
+             {{ vsphere_vcsa_iso_directory }}\vcsa-cli-installer\win32\vcsa-deploy.exe \
+             --no-esx-ssl-verify --accept-eula \
+             c:\tmp\deploy_vcsa.json
+  register: _vsphere_vcsa_deployment
+  until: >
+         'Finished successfully' in _vsphere_vcsa_deployment['stderr']
+  retries: 20
+  delay: 30
+  when: not _vcsa_appliance_exists
+
+- name: vcsa | VCSA Deployment Results
+  debug: var=_vsphere_vcsa_deployment
+  when: _vsphere_vcsa_deployment['changed']
+
+- name: vcsa | Capturing VCSA Info
+  vmware_guest_facts:
+    hostname: "{{ hostvars[item]['ansible_host'] }}"
+    username: "{{ vsphere_user_info['username'] }}"
+    password: "{{ vsphere_user_info['password'] }}"
+    datacenter: ha-datacenter
+    validate_certs: "{{ vsphere_validate_certs }}"
+    name: "{{ vsphere_vcsa_appliance_name }}"
+    folder: /ha-datacenter/vm
+  delegate_to: localhost
+  register: _vsphere_vcsa_appliance_info
+  failed_when: false
+  tags:
+    - vsphere_vms_info
+  with_items: "{{ groups['vsphere_hosts'] }}"
+
+- name: vcsa | Waiting for SSH
+  wait_for:
+    host: "{{ vsphere_vcsa_network_ip }}"
+    port: 22
+    search_regex: OpenSSH
+    delay: 10
+    timeout: 600
+  vars:
+    ansible_connection: local
+  when: vsphere_vcsa_os_ssh_enabled
+
+- name: vcsa | Creating Inventory For vsphere_vcenter
+  template:
+    src: vsphere_vcenter.inv.j2
+    dest: "{{ vsphere_vcenter_inventory_file }}"
+  become: false
+  delegate_to: localhost
+  tags:
+    - vsphere_vms_info
+  when: vsphere_vms_generate_inventory
+
+- name: vcsa | Results Of vCenter Check
+  debug: var=_vcsa_appliance_exists

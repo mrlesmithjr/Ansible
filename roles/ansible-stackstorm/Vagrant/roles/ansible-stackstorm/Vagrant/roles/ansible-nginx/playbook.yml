@@ -1,7 +1,0 @@
----
-- hosts: all
-  sudo: true
-  vars:
-  roles:
-    - role: ansible-nginx
-  tasks:

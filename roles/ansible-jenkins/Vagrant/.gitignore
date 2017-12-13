@@ -1,0 +1,7 @@
+*.retry
+.vagrant/
+ubuntu-yakkety-16.10-cloudimg-console.log
+ubuntu-xenial-16.04-cloudimg-console.log
+ubuntu-zesty-17.04-cloudimg-console.log
+jenkins@node0.pub
+host_vars/

@@ -1,0 +1,16 @@
+---
+- name: db | Creating {{ opencart_db }}
+  mysql_db:
+    name: "{{ opencart_db }}"
+    state: present
+  become: true
+  register: _opencart_db_created
+
+- name: db | Creating {{ opencart_db_user }} User
+  mysql_user:
+    name: "{{ opencart_db_user }}"
+    password: "{{ opencart_db_password }}"
+    priv: "{{ opencart_db }}.*:ALL,GRANT"
+    append_privs: true
+    state: present
+  become: true

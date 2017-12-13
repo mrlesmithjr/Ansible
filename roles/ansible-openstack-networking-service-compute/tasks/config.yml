@@ -1,0 +1,22 @@
+---
+- name: config | Configuring /etc/neutron/neutron.conf
+  template:
+    src: "etc/neutron/neutron.conf.j2"
+    dest: "/etc/neutron/neutron.conf"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o="
+  become: true
+  notify:
+    - "restart neutron-linuxbridge-agent"
+
+- name: config | Configuring /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+  template:
+    src: "etc/neutron/plugins/ml2/linuxbridge_agent.ini.j2"
+    dest: "/etc/neutron/plugins/ml2/linuxbridge_agent.ini"
+    owner: "root"
+    group: "neutron"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart neutron-linuxbridge-agent"

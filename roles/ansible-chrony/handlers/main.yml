@@ -4,3 +4,4 @@
   service:
     name: "chrony"
     state: "restarted"
+  become: true

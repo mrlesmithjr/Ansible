@@ -1,0 +1,34 @@
+---
+# HA info
+## Define as true if using HA
+openstack_compute_service_controller_ha: '{{ openstack_ha }}'
+## Define host which should be identified as HA master
+openstack_compute_service_controller_ha_master: '{{ groups[openstack_controllers_group][0] }}'
+
+openstack_compute_service_controller_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+
+# Management IP Info
+openstack_compute_service_controller_management_interface: '{{ openstack_management_interface }}'
+openstack_compute_service_controller_management_ip: '{{ openstack_management_ip }}'
+
+# Define memcached servers
+openstack_compute_service_controller_memcached_servers: '{{ groups[openstack_controllers_group] }}'
+
+# Define a suitable secret for the metadata proxy.
+openstack_compute_service_controller_neutron_metadata_secret: '{{ openstack_metadata_secret }}'
+
+## Define Neutron user password
+openstack_compute_service_controller_neutron_user_pass: '{{ openstack_neutron_pass }}'
+
+openstack_compute_service_controller_nova_db_host: '{{ openstack_vip }}'
+openstack_compute_service_controller_nova_db_pass: '{{ openstack_nova_db_pass }}'
+
+## Define Nova user password
+openstack_compute_service_controller_nova_user_pass: '{{ openstack_nova_pass }}'
+
+## Define placement user password
+openstack_compute_service_controller_placement_user_pass: '{{ openstack_placement_pass }}'
+
+# RabbitMQ Connection Info
+openstack_compute_service_controller_rabbit_hosts: '{{ groups[openstack_controllers_group] }}'
+openstack_compute_service_controller_rabbit_pass: '{{ openstack_rabbit_pass }}'

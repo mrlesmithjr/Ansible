@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+
+[agent]
+
+[linux_bridge]
+physical_interface_mappings = provider:{{ openstack_networking_service_compute_provider_interface }}
+
+[securitygroup]
+enable_security_group = true
+firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+
+[vxlan]
+enable_vxlan = false

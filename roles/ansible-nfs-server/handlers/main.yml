@@ -1,0 +1,15 @@
+---
+# handlers file for ansible-nfs-server
+- name: restart nfs-kernel-server
+  service:
+    name: "nfs-kernel-server"
+    state: "restarted"
+    enabled: true
+  become: true
+
+- name: restart nfs-server
+  service:
+    name: "nfs-server"
+    state: "restarted"
+    enabled: true
+  become: true

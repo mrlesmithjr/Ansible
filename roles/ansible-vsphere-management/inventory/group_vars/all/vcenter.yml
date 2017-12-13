@@ -1,0 +1,112 @@
+---
+vsphere_vcenter_cluster:
+  # FullyAutomated, Manual, and PartiallyAutomated
+  drs_automation_level: FullyAutomated
+  enable_drs: true
+  enable_ha: true
+  enable_vsan: false
+  evc_enabled: true
+  # intel-merom, intel-penryn, intel-nehalem, intel-westmere, intel-sandybridge, intel-ivybridge
+  # iamd-rev-e, amd-rev-f, amd-greyhound-no3dnow, amd-greyhound, amd-bulldozer, amd-piledriver
+  evc_mode: intel-penryn
+  ha_admission_control: true
+  ha_failover_level: "{{ groups['vsphere_hosts']|length -1 }}"
+  # PowerOff or DoNothing
+  ha_isolation_response: DoNothing
+  # Disabled, Low, Medium, and High
+  ha_restart_priority: Medium
+  name: "{{ vsphere_site_name }}-Cluster"
+  state: present
+
+# Defines if a VM template should be created from the OVF which was used during
+# initial provisioning of the environment. This is beneficial as it will no longer
+# be required to do an import of the OVF post vCenter deployment.
+vsphere_vcenter_create_template_from_ovf: true
+
+vsphere_vcenter_customization_specs:
+  - name: BasicLinuxSpec-DNS
+    description: Basic Linux spec with DNS servers
+    dns_server: "{{ vsphere_dns_servers }}"
+    dns_suffix: "{{ vsphere_pri_domain_name }}"
+    domain: "{{ vsphere_pri_domain_name }}"
+    os_type: Linux
+    state: present
+  - name: BasicLinuxSpec-No-DNS
+    description: Basic Linux spec without DNS servers
+    dns_suffix: "{{ vsphere_pri_domain_name }}"
+    domain: "{{ vsphere_pri_domain_name }}"
+    os_type: Linux
+    state: present
+
+vsphere_vcenter_datacenter:
+  name: "{{ vsphere_site_name }}"
+  state: present
+
+vsphere_vcenter_drs_rules:
+  - name: Separate Samba VMs
+    enabled: false
+    keep_together: false
+    state: present
+    vms:
+      - "{{ groups['vsphere_samba_vms'] }}"
+  - name: Separate DDI VMs
+    enabled: false
+    keep_together: false
+    state: present
+    vms:
+      - "{{ groups['vsphere_ddi_vms'] }}"
+  - name: Separate DNSDist VMs
+    enabled: true
+    keep_together: false
+    state: present
+    vms:
+      - "{{ groups['vsphere_dnsdist_vms'] }}"
+  - name: Separate LB VMs
+    enabled: true
+    keep_together: false
+    state: present
+    vms:
+      - "{{ groups['vsphere_lb_vms'] }}"
+
+vsphere_vcenter_folders:
+  - name: Core Services
+    type: vm
+    sub_folders:
+      - name: DDI
+        vms:
+          - "{{ groups['vsphere_ddi_vms'] }}"
+      - name: DNSDist
+        vms:
+          - "{{ groups['vsphere_dnsdist_vms'] }}"
+      - name: Load Balancers
+        vms:
+          - "{{ groups['vsphere_lb_vms'] }}"
+      - name: Samba DCs
+        vms:
+          - "{{ groups['vsphere_samba_vms'] }}"
+      - name: vCenter
+        vms:
+          - "{{ groups['vsphere_vcenter'] }}"
+
+vsphere_vcenter_resource_pools:
+  - name: Development
+    cpu_expandable_reservation: true
+    cpu_shares_level: low
+    mem_expandable_reservation: true
+    mem_shares_level: low
+    state: absent
+  - name: Production
+    cpu_expandable_reservation: true
+    cpu_shares_level: high
+    mem_expandable_reservation: true
+    mem_shares_level: high
+    state: absent
+    vms:
+      - "{{ groups['vsphere_samba_vms'] }}"
+      - "{{ groups['vsphere_ddi_vms'] }}"
+  - name: QA
+    cpu_expandable_reservation: true
+    cpu_shares_level: normal
+    mem_expandable_reservation: true
+    mem_shares_level: normal
+    state: absent

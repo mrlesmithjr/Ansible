@@ -29,12 +29,12 @@
 
 - name: debian | installing zfs
   apt:
-    name: "debian-zfs"
+    name: debian-zfs
     state: present
 
 - name: debian | enabling zfs module
   modprobe:
-    name: "zfs"
+    name: zfs
     state: present
 
 - name: debian | installing iscsitarget (if enabled)
@@ -61,8 +61,8 @@
 
 - name: debian | configuring iscsitarget service
   template:
-    src: "etc/default/iscsitarget.j2"
-    dest: "/etc/default/iscsitarget"
+    src: etc/default/iscsitarget.j2
+    dest: /etc/default/iscsitarget
     owner: root
     group: root
     mode: 0644
@@ -74,7 +74,7 @@
 
 - name: debian | installing NFS (if enabled)
   apt:
-    name: "nfs-kernel-server"
+    name: nfs-kernel-server
     state: present
   when: >
         zfs_enable_nfs is defined and
@@ -82,7 +82,7 @@
 
 - name: debian | un-installing NFS (if not enabled)
   apt:
-    name: "nfs-kernel-server"
+    name: nfs-kernel-server
     state: absent
   when: >
         zfs_enable_nfs is defined and
@@ -90,8 +90,8 @@
 
 - name: debian | configuring NFS Kernel Server
   template:
-    src: "etc/exports.j2"
-    dest: "/etc/exports"
+    src: etc/exports.j2
+    dest: /etc/exports
     owner: root
     group: root
     mode: 0644
@@ -104,8 +104,8 @@
 
 - name: debian | configuring ZFS
   template:
-    src: "etc/default/zfs.j2"
-    dest: "/etc/default/zfs"
+    src: etc/default/zfs.j2
+    dest: /etc/default/zfs
     owner: root
     group: root
     mode: 0644

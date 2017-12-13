@@ -1,0 +1,32 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/glance-install.html
+
+- name: services | Creating Glance Services
+  os_keystone_service:
+     cloud: "default"
+     name: "glance"
+     service_type: "image"
+     state: "present"
+     description: "OpenStack Image Service"
+  when: >
+        not openstack_image_service_ha or
+        (openstack_image_service_ha and
+          inventory_hostname == openstack_image_service_ha_master)
+
+- include: get-client-config.yml
+
+- include: get-token.yml
+
+- name: services | Creating Glance Endpoint Service
+  keystone_service:
+    name: "glance"
+    type: "image"
+    description: "Glance Identity Service"
+    url: "{{ openstack_image_service_keystone_service_endpoint_url }}:9292"
+    region: "{{ openstack_image_service_keystone_service_endpoint_region }}"
+    token: "{{ _os_auth['ansible_facts']['auth_token'] }}"
+  no_log: true
+  when: >
+        not openstack_image_service_ha or
+        (openstack_image_service_ha and
+          inventory_hostname == openstack_image_service_ha_master)

@@ -1,0 +1,29 @@
+# {{ ansible_managed }}
+
+{% if ansible_distribution == "Debian" %}
+{%   for item in apt_sources_archive_types %}
+{{ item }} {{ apt_sources_debian_repository_url }}/{{ ansible_distribution|lower }} {{ apt_sources_debian_distribution }} {{ apt_sources_debian_components|join (' ') }}
+{%     if apt_sources_enable_backports %}
+{{ item }} {{ apt_sources_debian_repository_url }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-backports main
+{%     endif %}
+{%     if apt_sources_enable_security %}
+{{ item }} {{ apt_sources_debian_repository_url }}/{{ ansible_distribution|lower }}-security {{ apt_sources_debian_distribution }}/updates main
+{%     endif %}
+{%     if apt_sources_enable_updates %}
+{{ item }} {{ apt_sources_debian_repository_url }}/{{ ansible_distribution|lower }} {{ apt_sources_debian_distribution }}-updates {{ apt_sources_debian_components|join (' ') }}
+{%     endif %}
+{%   endfor %}
+{% elif ansible_distribution == "Ubuntu" %}
+{%   for item in apt_sources_archive_types %}
+{{ item }} {{ apt_sources_ubuntu_repository_url }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} {{ apt_sources_ubuntu_components|join (' ') }}
+{%     if apt_sources_enable_proposed %}
+{{ item }} {{ apt_sources_ubuntu_repository_url }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-proposed {{ apt_sources_ubuntu_components|join (' ') }}
+{%     endif %}
+{%     if apt_sources_enable_security %}
+{{ item }} {{ apt_sources_ubuntu_repository_url }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-security {{ apt_sources_ubuntu_components|join (' ') }}
+{%     endif %}
+{%     if apt_sources_enable_updates %}
+{{ item }} {{ apt_sources_ubuntu_repository_url }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-updates {{ apt_sources_ubuntu_components|join (' ') }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

@@ -1,0 +1,48 @@
+---
+vsphere_vswitches:
+  - name: vSwitch0
+    load_balancing_policy: LoadBalanceSrcId
+    active_nics:
+      - vmnic0
+      - vmnic1
+    standby_nics: []
+    unused_nics: []
+    portgroups:
+      - name: Management Network
+        inherit_failover_order: true
+        vlan_id: 101
+      - name: vMotion Network
+        inherit_failover_order: true
+        vlan_id: 127
+      - name: VSS-VLAN-101
+        inherit_failover_order: true
+        vlan_id: 101
+      - name: VSS-VLAN-102
+        inherit_failover_order: true
+        vlan_id: 102
+      - name: VSS-VLAN-201
+        inherit_failover_order: true
+        vlan_id: 201
+    vmkernel_ports:
+        # name may not be able to be dictated
+      - name: vmk0
+        enable_ft: false
+        enable_mgmt: true
+        enable_vmotion: false
+        enable_vsan: false
+        portgroup_name: Management Network
+      - name: vmk1
+        enable_ft: false
+        enable_mgmt: false
+        enable_vmotion: true
+        enable_vsan: false
+        portgroup_name: vMotion Network
+  # - name: vSwitch1
+  #   active_nics: []
+  #     # - vmnic2
+  #     # - vmnic3
+  #     # - vmnic4
+  #     # - vmnic5
+  #   standby_nics: []
+  #   unused_nics: []
+  #   portgroups: []

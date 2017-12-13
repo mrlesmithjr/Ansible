@@ -1,0 +1,6 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-chrony
+- src: https://github.com/mrlesmithjr/ansible-config-interfaces
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://github.com/mrlesmithjr/ansible-openstack-base
+- src: https://github.com/mrlesmithjr/ansible-openstack-openrc

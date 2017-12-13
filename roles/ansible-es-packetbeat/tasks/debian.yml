@@ -1,18 +1,30 @@
 ---
-- name: debian | installing pre-reqs
+- name: debian | Installing Pre-Reqs
   apt:
     name: "{{ item }}"
-    state: "present"
+    state: present
+  become: true
   with_items:
-    - 'libpcap0.8'
-    - 'unzip'
+    - apt-transport-https
+    - libpcap0.8
 
-- name: debian | downloading packetbeat
-  get_url:
-    url: "{{ es_packetbeat_dl_url }}/{{ es_packetbeat_debian_package }}"
-    dest: "/opt/{{ es_packetbeat_debian_package }}"
+# Adding Elastic Repo Key
+- name: debian | Adding Elasticsearch Repo Key
+  apt_key:
+    url: "{{ es_packetbeat_repo_key }}"
+    state: present
+  become: true
 
-- name: debian | installing packetbeat
+# Adding Packetbeat Repo
+- name: debian | Adding Packetbeat Repo
+  apt_repository:
+    repo: "deb {{ es_packetbeat_repo_url }}/packages/{{ es_packetbeat['major_version'] }}/apt stable main"
+    state: present
+  become: true
+
+# Installing Packetbeat version defined by es_packetbeat['minor_version']
+- name: debian | Installing Packetbeat {{ es_packetbeat['minor_version'] }}
   apt:
-    deb: "/opt/{{ es_packetbeat_debian_package }}"
-    state: "present"
+    name: "packetbeat={{ es_packetbeat['minor_version'] }}"
+    state: present
+  become: true

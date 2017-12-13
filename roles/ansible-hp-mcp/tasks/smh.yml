@@ -1,0 +1,9 @@
+---
+# - name: smh | Granting users access to System Management Homepage
+#   user:
+#     name: "{{ item }}"
+#     groups: "hpsmh"
+#     append: true
+#   become: true
+#   with_items: '{{ hp_mcp_smh_users }}'
+#   when: hp_mcp_smh_users is defined

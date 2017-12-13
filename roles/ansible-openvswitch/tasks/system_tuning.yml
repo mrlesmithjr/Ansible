@@ -1,0 +1,9 @@
+---
+- name: system_tuning | Managing sysctl
+  sysctl:
+    name: "{{ item['name'] }}"
+    value: "{{ item['value'] }}"
+    state: "present"
+  become: true
+  with_items: '{{ openvswitch_system_tuning }}'
+  when: openvswitch_system_tuning is defined

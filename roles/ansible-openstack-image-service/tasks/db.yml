@@ -1,0 +1,56 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/glance-install.html
+
+- name: db | Ensuring MySQL Is Up And Running
+  wait_for:
+    port: 3306
+    host: "{{ openstack_image_service_management_ip }}"
+
+- name: db | Creating Glance DB
+  mysql_db:
+    name: "{{ openstack_image_service_glance_db_info['db'] }}"
+    state: "present"
+  become: true
+  when: >
+        not openstack_image_service_ha or
+        (openstack_image_service_ha and
+          inventory_hostname == openstack_image_service_ha_master)
+
+- name: db | Creating Glance DB User
+  mysql_user:
+    name: "{{ openstack_image_service_glance_db_info['user'] }}"
+    host: "{{ item }}"
+    priv: "{{ openstack_image_service_glance_db_info['db'] }}.*:ALL"
+    append_privs: true
+    password: "{{ openstack_image_service_glance_db_info['pass'] }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        not openstack_image_service_ha or
+        (openstack_image_service_ha and
+          inventory_hostname == openstack_image_service_ha_master)
+
+- name: db | Creating Glance DB User
+  mysql_user:
+    name: "{{ openstack_image_service_glance_db_info['user'] }}"
+    host: "{{ item }}"
+    priv: "{{ openstack_image_service_glance_db_info['db'] }}.*:ALL"
+    append_privs: true
+    password: "{{ openstack_image_service_glance_db_info['pass'] }}"
+  no_log: true
+  become: true
+  with_items:
+    - '{{ ansible_hostname }}'
+    - 127.0.0.1
+    - '::1'
+    - 'localhost'
+    - '%'
+  when: >
+        (openstack_image_service_ha and
+          inventory_hostname != openstack_image_service_ha_master)

@@ -1,0 +1,19 @@
+---
+- name: template_vm
+  win_shell: |
+    $vmHost="{{ hostvars[vsphere_bootstrap_host]['ansible_host'] }}"
+    $vmName="{{ vsphere_template_vm['vm_name'] }}"
+    $DataStore="{{ vsphere_template_vm['datastore'] }}"
+    $NetworkName="{{ vsphere_template_vm['network_name'] }}"
+    $CDIso="{{ vsphere_template_vm['iso'] }}"
+    Connect-VIServer -Server $vmHost
+    $vmServer=(Get-VMHost -Server $vmHost)
+    $vms=@(($vmServer | Get-VM | Select-Object -ExpandProperty Name))
+    If ($vms -notcontains $vmName) {
+      $CreateVM=($vmServer | New-VM -Name $vmName -NumCpu {{ vsphere_template_vm['cpus'] }} -MemoryMB {{ vsphere_template_vm['memory_mb'] }} -DiskGB {{ vsphere_template_vm['disk_gb'] }} -NetworkName $NetworkName -Datastore $DataStore -DiskStorageFormat Thin -GuestId "{{ vsphere_template_vm['guest_id'] }}" -CD -Confirm:$false -RunAsync)
+      Wait-Task -Task $CreateVM
+      $VM=($vmServer | Get-VM $vmName)
+      $MountCD=($VM | Get-CDDrive | Set-CDDrive -IsoPath "[$DataStore] $CDIso" -StartConnected:$true -Confirm:$false)
+      $StartVM=($VM | Start-VM -Confirm:$false)
+    }
+    Disconnect-VIServer * -Confirm:$false

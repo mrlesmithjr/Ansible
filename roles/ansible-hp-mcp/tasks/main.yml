@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-hp-mcp
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: ilo.yml
+  tags:
+    - 'hp_mcp_ilo'
+  when: hp_mcp_config_ilo
+
+- include: storage.yml
+  tags:
+    - 'hp_mcp_storage'
+
+- include: smh.yml
+  tags:
+    - 'hp_mcp_smh'

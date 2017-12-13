@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+
+[ml2]
+extension_drivers = port_security
+mechanism_drivers = linuxbridge
+tenant_network_types =
+type_drivers = flat,vlan
+
+[ml2_type_flat]
+flat_networks = provider
+
+[ml2_type_geneve]
+
+[ml2_type_gre]
+
+[ml2_type_vlan]
+
+[ml2_type_vxlan]
+
+[securitygroup]
+enable_ipset = true

@@ -1,0 +1,34 @@
+---
+- hosts: all
+  vars:
+    etc_hosts_add_all_hosts: true
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-etc-hosts
+  tasks:
+
+- hosts: wordpress_db
+  vars:
+    mysql_allow_remote_connections: true
+    mysql_pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-mysql
+
+- hosts: wordpress_app
+  vars:
+    apache2_config: true
+    apache2_config_php: true
+    apache2_config_virtual_hosts: true
+    apache2_install_php: true
+    apache2_virtual_hosts:
+      - documentroot: /var/www/html/wordpress
+        default_site: true
+        port: 80
+        serveradmin: '{{ apache2_server_admin }}'
+        servername: ''
+    wordpress_db_host: "{{ groups['wordpress_db'][0] }}"
+  roles:
+    - role: ansible-apache2
+    - role: ansible-php
+      become: true
+    - role: ansible-wordpress

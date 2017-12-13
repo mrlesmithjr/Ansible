@@ -3,6 +3,7 @@
   file:
     dest: "{{ apt_mirror_dir }}"
     state: directory
+  become: true
 
 - name: config_apt_mirror | ensuring permissions are set for apt_mirror_dir
   file:
@@ -12,14 +13,16 @@
     mode: 0755
     state: directory
     recurse: yes
+  become: true
   tags:
     - reset_apt_mirror_permissions
 
 - name: config_apt_mirror | configuring apt-mirror
   template:
-    src: "etc/apt/mirror.list.j2"
-    dest: "/etc/apt/mirror.list"
+    src: etc/apt/mirror.list.j2
+    dest: /etc/apt/mirror.list
     owner: root
     group: root
     mode: 0644
+  become: true
   notify: populate repos

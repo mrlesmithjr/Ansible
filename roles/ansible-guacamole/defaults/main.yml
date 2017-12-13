@@ -1,0 +1,74 @@
+---
+# defaults file for ansible-guacamole
+guacamole_auth_provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
+
+guacamole_debian_pre_reqs:
+  - build-essential
+  - default-jdk
+  - libavcodec-dev
+  - libavutil-dev
+  - libcairo2-dev
+  - libfreerdp-dev
+  - libjpeg-turbo8-dev
+  - libossp-uuid-dev
+  - libpango1.0-dev
+  - libpng12-dev
+  - libpulse-dev
+  - libssh2-1-dev
+  - libssl-dev
+  - libswscale-dev
+  - libtelnet-dev
+  - libvncserver-dev
+  - libvorbis-dev
+  - libwebp-dev
+  - maven
+  - tomcat7
+
+guacamole_client_package: "guacamole-client-{{ guacamole_version }}.tar.gz"
+
+guacamole_dl_url: https://sourceforge.net/projects/guacamole/files/current/source
+
+# RDP settings
+guacamole_rdp_color_depth: 24
+guacamole_rdp_disable_auth: false
+guacamole_rdp_height: 900
+guacamole_rdp_width: 1440
+guacamole_rdp_security: rdp
+
+guacamole_redhat_pre_reqs:
+  - cairo-devel
+  - ffmpeg-devel
+  - gcc
+  - freerdp-devel
+  - libjpeg-turbo-devel
+  - libpng-devel
+  - libssh2-devel
+  - libtelnet-devel
+  - libvncserver-devel
+  - libvorbis-devel
+  - libwebp-devel
+  - maven
+  - openssl-devel
+  - pango-devel
+  - pulseaudio-libs-devel
+  - tomcat
+  - uuid-devel
+
+guacamole_server_package: "guacamole-server-{{ guacamole_version }}.tar.gz"
+
+guacamole_server_port: 4822
+
+guacamole_users: []
+  # - name: user1
+  #   password: password
+  #   connections:
+  #     - host: 10.0.101.50
+  #       name: nas01
+  #       protocol: ssh
+  #       port: 22
+  #     - host: 192.168.250.11
+  #       name: windows2016
+  #       protocol: rdp
+  #       port: 3389
+
+guacamole_version: 0.9.13-incubating

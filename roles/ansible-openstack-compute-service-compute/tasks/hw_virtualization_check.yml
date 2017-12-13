@@ -1,0 +1,20 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-compute-install.html#
+
+- name: hw_virtualization_check | checking if hardware virtualization is supported
+  command: egrep -c '(vmx|svm)' /proc/cpuinfo
+  register: "_openstack_compute_service_compute_hw_check"
+  check_mode: no
+  changed_when: false
+  failed_when: false
+  become: true
+
+- name: hw_virtualization_check | Setting kvm_domain_type == qemu
+  set_fact:
+    openstack_compute_service_compute_kvm_domain_type: 'qemu'
+  when: _openstack_compute_service_compute_hw_check['stdout'] == '0'
+
+- name: hw_virtualization_check | Setting kvm_domain_type == kvm
+  set_fact:
+    openstack_compute_service_compute_kvm_domain_type: 'kvm'
+  when: _openstack_compute_service_compute_hw_check['stdout'] != '0'

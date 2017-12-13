@@ -1,0 +1,8 @@
+---
+configure_rsyslog: true
+rsyslog_allow_tcp: false
+rsyslog_allow_udp: false
+syslog_servers:
+  - name: "syslog.{{ vsphere_pri_domain_name }}"
+    proto: udp
+    port: 514

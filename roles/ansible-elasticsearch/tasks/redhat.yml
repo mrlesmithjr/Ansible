@@ -1,7 +1,45 @@
 ---
-- include: redhat_lvm.yml
-  tags:
-    - es_config_lvm
-  when: es_config_lvm is defined and es_config_lvm
+- name: redhat | Adding Elasticsearch Repo Key
+  rpm_key:
+    key: "{{ elasticsearch_repo_key }}"
+    state: present
+  become: true
 
-- include: redhat_elasticsearch.yml
+- name: redhat | Adding Elasticsearch Repo
+  yum_repository:
+    baseurl: "{{ elasticsearch_repo_url }}/packages/{{ elasticsearch['version_major_version'] }}/yum"
+    description: "Elasticsearch repository for {{ elasticsearch['version_major_version'] }} packages"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "{{ elasticsearch_repo_key }}"
+    name: "elasticsearch-{{ elasticsearch['version_major_version'] }}"
+    state: present
+  become: true
+
+- name: redhat | Installing Java
+  yum:
+    name: java-1.8.0-openjdk-headless
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Elasticsearch
+  yum:
+    name: "elasticsearch-{{ elasticsearch['version_minor_version'] }}"
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Java
+  dnf:
+    name: java
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing Elasticsearch
+  dnf:
+    name: "elasticsearch-{{ elasticsearch['version_minor_version'] }}"
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"

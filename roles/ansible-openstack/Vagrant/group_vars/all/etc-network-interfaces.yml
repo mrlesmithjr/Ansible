@@ -1,0 +1,23 @@
+---
+config_network_interfaces: true
+enable_configured_interfaces_after_defining: true
+network_interfaces:
+  - name: 'enp0s3'
+    configure: true
+    method: 'dhcp'
+    parameters:
+      - param: 'pre-up sleep'
+        val: '2'
+  - name: '{{ openstack_management_interface }}'
+    configure: true
+    method: 'static'
+    address: '{{ openstack_management_ip }}'
+    netmask: '255.255.255.0'
+  - name: '{{ openstack_provider_interface }}'
+    configure: true
+    method: 'manual'
+    parameters:
+      - param: 'up ip link set dev {{ openstack_provider_interface }}'
+        val: 'up'
+      - param: 'down ip link set dev {{ openstack_provider_interface }}'
+        val: 'down'

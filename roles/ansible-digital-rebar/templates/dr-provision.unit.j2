@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+description "DigitalRebar Provision Integrated DHCP and File Provisioner"
+author "support@rackn.com"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+exec {{ digital_rebar_binary }}

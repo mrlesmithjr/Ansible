@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+compute_driver=libvirt.LibvirtDriver
+
+[libvirt]
+virt_type = {{ openstack_compute_service_compute_kvm_domain_type }}

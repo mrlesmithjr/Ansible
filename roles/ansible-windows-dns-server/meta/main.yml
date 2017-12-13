@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install [Windows](https://www.microsoft.com/en-us/cloud-platform/windows-server) DNS server.
+
+  license: license (MIT)
+
+  min_ansible_version: 2.1
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+    - network
+
+dependencies: []

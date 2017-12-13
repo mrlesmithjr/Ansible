@@ -1,0 +1,67 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+auth_strategy = keystone
+bind_host = {{ openstack_networking_service_controller_management_ip }}
+core_plugin = ml2
+notify_nova_on_port_data_changes = true
+notify_nova_on_port_status_changes = true
+service_plugins =
+{% set _rabbit_user = openstack_networking_service_controller_rabbit_user %}
+{% set _rabbit_pass = openstack_networking_service_controller_rabbit_pass %}
+transport_url = rabbit://{% for host in openstack_networking_service_controller_rabbit_hosts %}{{ _rabbit_user }}:{{ _rabbit_pass }}@{{ host }}{% if not loop.last %},{% endif %}{% endfor %}
+
+
+[agent]
+root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
+
+[cors]
+
+[cors.subdomain]
+
+[database]
+connection = mysql+pymysql://{{ openstack_networking_service_controller_db_info['user'] }}:{{ openstack_networking_service_controller_db_info['pass'] }}@{{ openstack_networking_service_controller_db_info['host'] }}/{{ openstack_networking_service_controller_db_info['db'] }}
+
+[keystone_authtoken]
+auth_type = {{ openstack_networking_service_controller_keystone_authtoken['auth_type'] }}
+auth_uri = {{ openstack_networking_service_controller_keystone_authtoken['auth_uri'] }}
+auth_url = {{ openstack_networking_service_controller_keystone_authtoken['auth_url'] }}
+memcached_servers = {{ openstack_networking_service_controller_keystone_authtoken['memcached_servers']|join(',') }}
+password = {{ openstack_networking_service_controller_keystone_authtoken['password'] }}
+project_domain_name = {{ openstack_networking_service_controller_keystone_authtoken['project_domain_name'] }}
+project_name = {{ openstack_networking_service_controller_keystone_authtoken['project_name'] }}
+user_domain_name = {{ openstack_networking_service_controller_keystone_authtoken['user_domain_name'] }}
+username = {{ openstack_networking_service_controller_keystone_authtoken['username'] }}
+
+[matchmaker_redis]
+
+[nova]
+auth_type = {{ openstack_networking_service_controller_nova['auth_type'] }}
+auth_url = {{ openstack_networking_service_controller_nova['auth_url'] }}
+password = {{ openstack_networking_service_controller_nova['password'] }}
+project_domain_name = {{ openstack_networking_service_controller_nova['project_domain_name'] }}
+project_name = {{ openstack_networking_service_controller_nova['project_name'] }}
+user_domain_name = {{ openstack_networking_service_controller_nova['user_domain_name'] }}
+username = {{ openstack_networking_service_controller_nova['username'] }}
+
+[oslo_concurrency]
+
+[oslo_messaging_amqp]
+
+[oslo_messaging_kafka]
+
+[oslo_messaging_notifications]
+
+[oslo_messaging_rabbit]
+
+[oslo_messaging_zmq]
+
+[oslo_middleware]
+
+[oslo_policy]
+
+[qos]
+
+[quotas]
+
+[ssl]

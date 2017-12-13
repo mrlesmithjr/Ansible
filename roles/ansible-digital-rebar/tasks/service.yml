@@ -1,0 +1,36 @@
+---
+- name: service | Configuring SystemD Service
+  template:
+    src: dr-provision.service.j2
+    dest: /etc/systemd/system/dr-provision.service
+  become: true
+  register: _digital_rebar_systemd_configured
+  when: ansible_service_mgr == "systemd"
+
+- name: service | Configuring Upstart Service
+  template:
+    src: dr-provision.unit.j2
+    dest: /etc/init/dr-provision.conf
+  become: true
+  when: ansible_service_mgr == "upstart"
+
+- name: service | Configuring SysV Service
+  template:
+    src: dr-provision.sysv.j2
+    dest: /etc/init.d/dr-provision
+  become: true
+  when: ansible_service_mgr == "sysvinit"
+
+- name: service | Reloading SystemD
+  systemd:
+    daemon_reload: true
+    name: dr-provision
+  become: true
+  when: _digital_rebar_systemd_configured['changed']
+
+- name: service | Starting And Ensuring dr-provision Starts on Boot
+  service:
+    name: dr-provision
+    enabled: true
+    state: started
+  become: true

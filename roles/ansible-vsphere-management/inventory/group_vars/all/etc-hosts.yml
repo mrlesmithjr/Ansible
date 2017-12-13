@@ -1,0 +1,2 @@
+---
+etc_hosts_pri_dns_name: "{{ vsphere_pri_domain_name }}"

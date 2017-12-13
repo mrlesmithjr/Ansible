@@ -1,38 +1,153 @@
-Role Name
-=========
+# Role Name
 
-A brief description of the role goes here.
+An [Ansible] role to install/configure [fluentd]
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
-Role Variables
---------------
+## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+```yaml
+---
+# defaults file for ansible-fluentd
+fluentd_debian_repo_info:
+  repo: 'deb http://packages.treasuredata.com/2/{{ ansible_distribution|lower }}/{{ ansible_distribution_release|lower }}/ {{ ansible_distribution_release|lower }} contrib'
+  repo_key: 'http://packages.treasuredata.com/GPG-KEY-td-agent'
 
-Dependencies
-------------
+fluentd_inputs: []
+  # - type: 'tail'
+  #   format: 'apache2'
+  #   tag: 'apache.access'
+  #   path: '/var/log/apache2/access.log'
+  # - type: 'tail'
+  #   format: '/^\[[^ ]* (?<time>[^\]]*)\] \[(?<level>[^\]]*)\] \[pid (?<pid>[^\]]*)\] \[client (?<client>[^\]]*)\] (?<message>.*)$/'
+  #   tag: 'apache.error'
+  #   path: '/var/log/apache2/error.log'
+  # - type: 'syslog'
+  #   port: 5140
+  #   bind: 0.0.0.0
+  #   tag: 'syslog'
+  #   protocol_type: 'udp'
+  # - type: 'tail'
+  #   path: '/var/log/syslog'
+  #   pos_file: '/var/log/syslog.pos'
+  #   tag: 'syslog'
+  #   format: 'syslog'
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+fluentd_network_optimizations:
+  - name: 'net.ipv4.tcp_tw_recycle'
+    state: 'present'
+    value: 1
+  - name: 'net.ipv4.tcp_tw_reuse'
+    state: 'present'
+    value: 1
+  - name: 'net.ipv4.ip_local_port_range'
+    state: 'present'
+    value: '10240 65535'
 
-Example Playbook
-----------------
+fluentd_ouputs: []
+  # - type: 'elasticsearch'
+  #   logstash_format: true
+  #   match: '**'
+  #   host: '192.168.250.10'
+  #   port: 9200
+  #   index_name: 'fluentd'
+  #   type_name: 'fluentd'
+  # - type: 'rabbitmq'
+  #   match: '**'
+  #   host: 192.168.250.100
+  #   user: 'graylog'
+  #   pass: 'graylog'
+  #   vhost: '/'
+  #   format: 'json'
+  #   exchange: 'graylog'
+  #   exchange_type: 'direct'
+  #   exchange_durable: true
+  #   routing_key: 'graylog'
+  #   heartbeat: 10
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+fluentd_plugins: []
+  # - 'fluent-plugin-elasticsearch'
+  # - 'fluent-plugin-rabbitmq'
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+fluentd_ulimits:
+  - domain: 'root'
+    limit_type: 'soft'
+    limit_item: 'nofile'
+    value: 65536
+  - domain: 'root'
+    limit_type: 'hard'
+    limit_item: 'nofile'
+    value: 65536
+  - domain: '*'
+    limit_type: 'soft'
+    limit_item: 'nofile'
+    value: 65536
+  - domain: '*'
+    limit_type: 'hard'
+    limit_item: 'nofile'
+    value: 65536
+```
 
-License
--------
+## Dependencies
+
+None
+
+## Example Playbook
+
+```yaml
+---
+- hosts: fluentd
+  vars:
+    fluentd_inputs:
+      - type: 'tail'
+        format: 'apache2'
+        tag: 'apache.access'
+        path: '/var/log/apache2/access.log'
+      - type: 'tail'
+        format: '/^\[[^ ]* (?<time>[^\]]*)\] \[(?<level>[^\]]*)\] \[pid (?<pid>[^\]]*)\] \[client (?<client>[^\]]*)\] (?<message>.*)$/'
+        tag: 'apache.error'
+        path: '/var/log/apache2/error.log'
+      - type: 'syslog'
+        port: 5140
+        bind: 0.0.0.0
+        tag: 'syslog'
+        protocol_type: 'udp'
+      - type: 'tail'
+        path: '/var/log/syslog'
+        pos_file: '/var/log/syslog.pos'
+        tag: 'syslog'
+        format: 'syslog'
+    fluentd_ouputs:
+      - type: 'elasticsearch'
+        logstash_format: true
+        match: '**'
+        host: '192.168.250.10'
+        port: 9200
+        index_name: 'fluentd'
+        type_name: 'fluentd'
+    fluentd_plugins:
+      - 'fluent-plugin-elasticsearch'
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-fluentd
+```
+
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Larry Smith Jr.
+
+-   [@mrlesmithjr]
+-   <http://everythingshouldbevirtual.com>
+-   mrlesmithjr [at] gmail.com
+
+[@mrlesmithjr]: https://www.twitter.com/mrlesmithjr
+
+[ansible]: https://www.ansible.com
+
+[fluentd]: http://www.fluentd.org/

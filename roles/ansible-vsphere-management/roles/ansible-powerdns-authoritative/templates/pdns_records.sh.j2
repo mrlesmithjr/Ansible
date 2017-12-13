@@ -1,0 +1,14 @@
+#!/bin/bash
+{% if pdns_records is defined %}
+{%   for item in pdns_records %}
+curl -X PATCH --data '{"rrsets": [ {
+	"name": {% if item.name == "default" %}"{{ item.zone }}"{% else %}"{{ item.name }}.{{ item.zone }}"{% endif %}, "type": "{{ item.type }}", "changetype": "{{ item.changetype }}", "records": [
+  {"content": "{{ item.content }}", "disabled": {{ item.disabled|lower }}, "name": {% if item.name == "default" %}"{{ item.zone }}"{% else %}"{{ item.name }}.{{ item.zone }}"{% endif %}, "ttl": {{ item.ttl }}, "type": "{{ item.type }}" {% if item.noprt is not defined and item.type == "A" or item.type == "AAAA" %}, "set-ptr": true{% endif %}, "priority": "{{ item.priority }}"}
+	{% if item.content2 is defined %}
+	, {"content": "{{ item.content2 }}", "disabled": {{ item.disabled|lower }}, "name": {% if item.name == "default" %}"{{ item.zone }}"{% else %}"{{ item.name }}.{{ item.zone }}"{% endif %}, "ttl": {{ item.ttl }}, "type": "{{ item.type }}", "priority": "{{ item.priority }}"}
+	{% endif %}
+	]
+}
+]}' {{ pdns_curl_header }} {{ pdns_api_url }}/{{ item.zone }}
+{%    endfor %}
+{% endif %}

@@ -1,6 +1,13 @@
 ---
 # handlers file for ansible-monit
 - name: reload monit
-  service: name=monit state=reloaded
+  service:
+    name: "monit"
+    state: "reloaded"
+  become: true
+
 - name: restart monit
-  service: name=monit state=restarted
+  service:
+    name: "monit"
+    state: "restarted"
+  become: true

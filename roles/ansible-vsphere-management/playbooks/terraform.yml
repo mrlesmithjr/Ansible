@@ -1,0 +1,153 @@
+---
+- hosts: localhost
+  connection: local
+  become: false
+  gather_facts: false
+  vars:
+    terraform_apply: false
+    terraform_destroy: false
+    terraform_dir: ../terraform
+  tasks:
+    - name: Capturing Terraform Command
+      command: which terraform
+      register: _terraform_command
+      changed_when: false
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Setting Terraform Command Path
+      set_fact:
+        terraform_command: "{{ _terraform_command['stdout'] }}"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Generating Terraform Variables
+      template:
+        src: templates/terraform_variables.tf.j2
+        dest: "{{ terraform_dir }}/variables.tf"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Generating Secret Terraform Variables
+      template:
+        src: templates/terraform.tfvars.j2
+        dest: "{{ terraform_dir }}/terraform.tfvars"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Generating Terraform Inventory Resources
+      template:
+        src: templates/terraform_inventory_resources.tf.j2
+        dest: "{{ terraform_dir }}/inventory_resources.tf"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Generating Terraform VM Definitions
+      template:
+        src: templates/terraform_vm_resources.tf.j2
+        dest: "{{ terraform_dir }}/vm_resources.tf"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Generating Terraform PDNS Resources
+      template:
+        src: templates/terraform_pdns_resources.tf.j2
+        dest: "{{ terraform_dir }}/pdns_resources.tf"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_init
+        - terraform_inventory
+        - terraform_plan
+
+    - name: Capturing Terraform Init State
+      command: "{{ terraform_command }} init -get=true -input=false"
+      register: _terraform_init_state
+      changed_when: false
+      args:
+        chdir: "{{ terraform_dir }}"
+      tags:
+        - terraform_init
+
+    - name: Running Terraform Plan
+      command: "{{ terraform_command }} plan -out=tfplan -input=false -detailed-exitcode"
+      register: _terraform_plan
+      changed_when: false
+      args:
+        chdir: "{{ terraform_dir }}"
+      tags:
+        - terraform_apply
+        - terraform_plan
+      failed_when: _terraform_plan['rc'] > 2
+
+    - name: Displaying Terraform Plan
+      debug: var=_terraform_plan
+      tags:
+        - terraform_apply
+        - terraform_plan
+
+    - name: Applying Terraform Plan
+      command: "{{ terraform_command }} apply -input=false -auto-approve=true tfplan"
+      register: _terraform_apply
+      changed_when: false
+      args:
+        chdir: "{{ terraform_dir }}"
+      tags:
+        - terraform_apply
+      when: >
+            _terraform_plan['rc'] == 2 and
+            terraform_apply
+
+    - name: Destroying Terraform Plan
+      command: "{{ terraform_command }} destroy -force"
+      register: _terraform_destroy
+      changed_when: false
+      args:
+        chdir: "{{ terraform_dir }}"
+      tags:
+        - terraform_destroy
+      when: terraform_destroy
+
+    - name: Capturing Terraform State
+      command: "{{ terraform_command }} state pull"
+      register: _terraform_state
+      changed_when: false
+      args:
+        chdir: "{{ terraform_dir }}"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_inventory
+
+    - name: Generating Terraform Ansible Inventory
+      template:
+        src: terraform.inv.j2
+        dest: "{{ vsphere_inventory_directory }}/terraform.inv"
+      tags:
+        - terraform_apply
+        - terraform_destroy
+        - terraform_inventory

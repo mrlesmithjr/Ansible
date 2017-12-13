@@ -9,8 +9,8 @@
   no_log: true
   become: true
   with_items:
-    - question: 'mysql-server/root_password'
-      value: '{{ mysql_root_password }}'
-    - question: 'mysql-server/root_password_again'
-      value: '{{ mysql_root_password }}'
+    - question: "mysql-server/root_password"
+      value: "{{ mysql_root_password }}"
+    - question: "mysql-server/root_password_again"
+      value: "{{ mysql_root_password }}"
   when: ansible_os_family == "Debian"

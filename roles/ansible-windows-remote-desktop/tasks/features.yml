@@ -1,0 +1,14 @@
+---
+- name: features | Managing Remote Desktop Feature
+  win_feature:
+    name: Remote-Desktop-Services
+    state: present
+  register: _windows_remote_desktop_services_enabled
+  when: windows_remote_desktop_enabled
+
+- name: features | Managing Remote Desktop Feature
+  win_feature:
+    name: Remote-Desktop-Services
+    state: absent
+  register: _windows_remote_desktop_services_not_enabled
+  when: not windows_remote_desktop_enabled

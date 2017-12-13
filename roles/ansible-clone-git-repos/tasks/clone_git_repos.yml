@@ -9,7 +9,7 @@
     - name: cloning repos
       git:
 #        repo: "ssh://git@github.com/{{ item.full_name }}.git"
-        repo: "https://github.com/{{ item.full_name }}.git"
-        dest: "{{ github_repo_root }}/{{ item.user }}/{{ item.name }}"
+        repo: "https://github.com/{{ item['full_name'] }}.git"
+        dest: "{{ github_repo_root }}/{{ item['user'] }}/{{ item['name'] }}"
         accept_hostkey: yes
       with_items: '{{ github_repos }}'

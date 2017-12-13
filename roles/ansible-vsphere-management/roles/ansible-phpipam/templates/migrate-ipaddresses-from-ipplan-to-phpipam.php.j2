@@ -1,0 +1,66 @@
+<?php
+/*
+ * Quick and dirty script to import IPv4 addresses from an IPPlan export (converted to CSV)
+ * into {php}IPAM to suit a particular use case:
+ *
+ * - IPv4 only
+ * - no consideration of VLANs, VRFs
+ * - subnets already exist (we could import the IPPlan export directly into {php}IPAM
+ *
+ * Released in the hope it can be hacked to help someone else. It's very hacky as is!
+ *
+ * Barry O'Donovan <barry (at) islandbridgenetworks (dot) ie>
+ * MIT License
+ */
+$db = mysqli_connect('localhost','phpipam','phpipam','phpipam')
+    or die( "Could not connect to MySQL" );
+$fp = fopen('ipplan-exported-addresses.csv','r')
+        or die("Could not open CSV");
+while( ( $data = fgetcsv($fp,4096,',') ) !== false ) {
+    $ip   = $data[0] ?: null;
+    if( !$ip ) continue;
+    
+    $desc = trim( trim( ( $data[1] ?: "" ) ) . ' [' . trim( ( $data[2] ?: "" ) ) . ']' . ' (' . trim( ( $data[3] ?: "" ) ) . ')' );
+    if( $desc == '[] ()' ) continue;
+    $dns   = $data[4] ?: "";
+    
+    $note = "";
+    
+    foreach( [5,6,7,8] as $i) {
+        if( trim( $data[$i] ?: "" ) !== "" )
+            $note .= trim( $data[$i] ) . "\n";
+    }
+    // have data, find address / subnet and add
+    
+    // does address exist
+    $r = mysqli_query($db, "SELECT * FROM ipaddresses WHERE ip_addr = INET_ATON('{$ip}')");
+    if( mysqli_num_rows($r) ) {
+        // address exists, just update:
+        $a = mysqli_fetch_row( $r );
+        
+        mysqli_query( $db, sprintf( "UPDATE ipaddresses SET description = '%s', dns_name = '%s', note = '%s' WHERE id = %d",
+            mysqli_real_escape_string($db,$desc), mysqli_real_escape_string($db,$dns),mysqli_real_escape_string($db,$note),$a[0]
+        ));
+        echo "UPDATED $ip\n";
+        continue;
+    }
+    // address does not exist - first find subnet (smallest containing subnet)
+    $r = mysqli_query($db, "SELECT * FROM subnets WHERE subnet <= INET_ATON('{$ip}') AND (subnet+(POWER(2,32-mask))) > INET_ATON('{$ip}') ORDER BY mask DESC LIMIT 1");
+    if( mysqli_num_rows($r) ) {
+        $a = mysqli_fetch_row( $r );
+        if( !mysqli_query( $db, sprintf( "INSERT INTO ipaddresses
+                        ( subnetId, ip_addr, description, dns_name, note, editDate )
+                        VALUES ( %d, %d, '%s', '%s', '%s', NOW() )",
+                        $a[0], ip2long($ip), mysqli_real_escape_string($db,$desc), mysqli_real_escape_string($db,$dns),mysqli_real_escape_string($db,$note)
+                    ))
+            ) {
+                echo "ERROR $ip: " . mysqli_error($db) . "\n";
+            }
+        echo "INSERTED $ip\n";
+        continue;
+    }
+    
+    echo "ERROR $ip No Subnet\n";
+}
+fclose($fp);
+mysqli_close($db);

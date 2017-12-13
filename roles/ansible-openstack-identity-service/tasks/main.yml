@@ -1,0 +1,43 @@
+---
+# tasks file for ansible-openstack-identity-service
+# https://docs.openstack.org/ocata/install-guide-ubuntu/common/get-started-identity.html
+
+# We need to flush handlers here in order to restart any previously configured
+# services such as MySQL configrurations. rabbitmq, memcached
+#
+- meta: flush_handlers
+  tags:
+    - 'openstack_identity_service'
+    - 'openstack_identity_service_apache'
+    - 'openstack_identity_service_db'
+    - 'openstack_identity_service_keystone'
+    - 'openstack_identity_service_projects'
+
+- include: db.yml
+  tags:
+    - 'openstack_identity_service'
+    - 'openstack_identity_service_db'
+    - 'openstack_identity_service_keystone'
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - 'openstack_identity_service'
+    - 'openstack_identity_service_keystone'
+
+- include: keystone.yml
+  tags:
+    - 'openstack_identity_service'
+    - 'openstack_identity_service_keystone'
+
+- include: apache.yml
+  tags:
+    - 'openstack_identity_service'
+    - 'openstack_identity_service_apache'
+
+- meta: flush_handlers
+
+- include: projects.yml
+  tags:
+    - 'openstack_identity_service'
+    - 'openstack_identity_service_projects'

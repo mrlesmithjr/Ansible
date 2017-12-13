@@ -1,0 +1,7 @@
+---
+- name: config | Configuring Digital Rebar
+  template:
+    src: default.yaml.j2
+    dest: /usr/share/dr-provision/default.yaml
+  become: true
+  notify: restart dr-provision

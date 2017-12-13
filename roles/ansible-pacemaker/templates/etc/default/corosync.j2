@@ -1,2 +1,11 @@
-# start corosync at boot [yes|no]
-START={{ corosync_start_service|default ('no') }}
+# Corosync runtime directory
+#COROSYNC_RUN_DIR=/var/lib/corosync
+
+# Path to corosync.conf
+COROSYNC_MAIN_CONFIG_FILE={{ corosync_config_file }}
+
+# Path to authfile
+COROSYNC_TOTEM_AUTHKEY_FILE={{ corosync_authkey_file }}
+
+# Command line options
+#OPTIONS=""

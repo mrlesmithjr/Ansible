@@ -1,0 +1,16 @@
+---
+
+# Defines the default Keystone endpoint url
+# Do not append the port or api version
+openstack_networking_service_compute_keystone_service_endpoint_url: '{{ openstack_keystone_endpoint_url }}'
+
+# Define memcached servers
+openstack_networking_service_compute_memcached_servers: '{{ groups[openstack_controllers_group] }}'
+
+# Neutron info
+openstack_networking_service_compute_neutron_user_pass: '{{ openstack_neutron_pass }}'
+
+# RabbitMQ connection info
+openstack_networking_service_compute_rabbit_host: '{{ groups[openstack_controllers_group][0] }}'
+openstack_networking_service_compute_rabbit_pass: '{{ openstack_rabbit_pass }}'
+openstack_networking_service_compute_rabbit_user: '{{ openstack_rabbit_user }}'

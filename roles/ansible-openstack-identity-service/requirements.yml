@@ -1,0 +1,13 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-chrony
+- src: https://github.com/mrlesmithjr/ansible-config-interfaces
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://github.com/mrlesmithjr/ansible-haproxy
+- src: https://github.com/mrlesmithjr/ansible-mariadb-galera-cluster
+- src: https://github.com/mrlesmithjr/ansible-memcached
+- src: https://github.com/mrlesmithjr/ansible-mysql
+- src: https://github.com/mrlesmithjr/ansible-openstack-base
+- src: https://github.com/mrlesmithjr/ansible-openstack-openrc
+- src: https://github.com/mrlesmithjr/ansible-pacemaker
+- src: https://github.com/mrlesmithjr/ansible-rabbitmq
+- src: https://github.com/mrlesmithjr/ansible-timezone

@@ -1,0 +1,8 @@
+---
+# handlers file for ansible-keepalived
+- name: restart keepalived
+  service:
+    name: "keepalived"
+    state: "restarted"
+  become: true
+  when: not ansible_check_mode

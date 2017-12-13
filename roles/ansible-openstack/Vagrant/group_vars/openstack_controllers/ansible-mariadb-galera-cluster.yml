@@ -1,0 +1,19 @@
+---
+# Defines if root logins should be allowed from any host
+galera_allow_root_from_any: true
+
+# Define bind address for galera cluster
+galera_cluster_bind_address: '{{ openstack_management_ip }}'
+
+# Define interface in which to bind
+# ex. eth0|eth1|enp0s3|enp0s8
+galera_cluster_bind_interface: '{{ openstack_management_interface }}'
+
+# Define the name of the cluster
+galera_cluster_name: 'openstack'
+
+# Define Ansible group in which the nodes exist to be part of the cluster
+galera_cluster_nodes_group: '{{ openstack_controllers_group }}'
+
+# Define the primary domain name of your environment
+mariadb_pri_domain_name: '{{ pri_domain_name }}'

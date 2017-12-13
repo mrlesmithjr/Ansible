@@ -1,0 +1,14 @@
+---
+openstack_controllers_group: 'openstack_controllers'
+
+# High Availability
+openstack_ha: true
+
+openstack_keystone_endpoint_url: 'http://{{ openstack_vip }}'
+
+openstack_management_interface: 'enp0s8'
+openstack_management_ip: "{{ hostvars[inventory_hostname]['ansible_ssh_host'] }}"
+
+openstack_provider_interface: 'enp0s9'
+
+openstack_vip: 192.168.250.200

@@ -1,5 +1,0 @@
-[consul_clients]
-localhost
-
-[consul_servers]
-localhost

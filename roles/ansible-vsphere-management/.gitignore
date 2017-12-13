@@ -1,0 +1,46 @@
+.galaxy_install_info
+*.retry
+govc
+inventory/group_vars/all/accounts.yml
+inventory/host_vars/*/generated_details.yml
+logs/
+ssh_keys_distribution.yml
+terraform.inv
+vsphere_bootstrap_vms.inv
+vsphere_bootstrap_vms.json
+vsphere_ddi_vms.inv
+vsphere_ddi_vms.json
+vsphere_destroy_vms.inv
+vsphere_dhcp_vms.inv
+vsphere_dnsdist_vms.inv
+vsphere_dnsdist_vms.json
+vsphere_hosts.inv
+vsphere_lb_vms.inv
+vsphere_lb_vms.json
+vsphere_samba_vms.inv
+vsphere_samba_vms.json
+vsphere_vcenter.inv
+
+
+
+### Terraform ###
+# Compiled files
+*.tfstate
+*.tfstate.backup
+
+# Module directory
+.terraform/
+
+### Terraform Patch ###
+*.tfvars
+
+tfplan
+
+terraform/inventory_resources.tf
+terraform/pdns_resources.tf
+terraform/variables.tf
+terraform/vm_resources.tf
+
+
+inventory/group_vars/all/rancher_api_key.yml
+rancher/powerdns-external-dns/docker-compose.yml

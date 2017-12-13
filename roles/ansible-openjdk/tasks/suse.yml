@@ -1,0 +1,7 @@
+---
+- name: suse | Installing Java
+  zypper:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ openjdk_suse_packages }}"

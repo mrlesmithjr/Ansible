@@ -1,0 +1,62 @@
+---
+# Defines interface used for cluster
+corosync_bindnet_interface: '{{ openstack_management_interface }}'
+
+corosync_cluster_name: 'openstack'
+
+# Defines if unicast mode should be used rather than multicast
+corosync_unicast_mode: true
+
+pacemaker_cluster_constraints:
+  - constraint: 'colocation'
+    action: 'add'
+    source_resource_id: 'lb-haproxy-clone'
+    target_resource_id: 'vip'
+    # score: 'INFINITY'
+  - constraint: 'order'
+    order:
+      first_resource: 'vip'
+      first_resource_action: 'start'
+      second_resource: 'lb-haproxy-clone'
+      # second_resource_action: 'start'
+      op_options:
+        - 'kind=Optional'
+
+pacemaker_cluster_group: '{{ openstack_controllers_group }}'
+
+pacemaker_cluster_resources:
+  - resource_id: 'vip'
+    action: 'create'
+    provider: 'ocf:heartbeat:IPaddr2'
+    options:
+      - 'ip={{ openstack_vip }}'
+      - 'cidr_netmask=24'
+    op: 'monitor'
+    op_options:
+      - 'interval=30s'
+  - resource_id: 'lb-haproxy'
+    action: 'create'
+    provider: 'systemd:haproxy'
+    options:
+      - '--clone'
+      - '--force'
+  # - resource_id: 'openstack-keystone'
+  #   action: 'create'
+  #   provider: 'systemd:openstack-keystone'
+  #   options:
+  #     - '--clone'
+  #     - 'interleave=true'
+  #     - '--force'
+
+# Define specific cluster settings to configure
+pacemaker_cluster_settings:
+  # - property: 'start-failure-is-fatal'
+  #   value: 'false'
+  - property: 'pe-warn-series-max'
+    value: 1000
+  - property: 'pe-input-series-max'
+    value: 1000
+  - property: 'pe-error-series-max'
+    value: 1000
+  - property: 'cluster-recheck-interval'
+    value: 5min

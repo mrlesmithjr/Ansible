@@ -1,0 +1,14 @@
+---
+- name: pre-reqs | Installing Python Pre-Reqs
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'docker-py'
+
+- name: pre-reqs | Ensuring Docker Engine Is Running
+  service:
+    name: "docker"
+    state: "started"
+  become: true

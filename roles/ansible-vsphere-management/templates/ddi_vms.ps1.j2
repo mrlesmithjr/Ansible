@@ -1,0 +1,263 @@
+{% if groups['vsphere_ddi_vms_deploy'] is defined %}
+$vmHost="{{ hostvars[vsphere_bootstrap_host]['ansible_host'] }}"
+Connect-VIServer -Server $vmHost | Out-Null
+
+{%   for vm in groups['vsphere_ddi_vms_deploy'] %}
+$DataStore="{{ hostvars[vm]['datastore'] }}"
+$NetworkName="{{ hostvars[vm]['network_name'] }}"
+$vAppSourcePath="{{ hostvars[vm]['vapp_source_path'] }}"
+$vmName="{{ hostvars[vm]['inventory_hostname'] }}"
+$vmNameShort="{{ hostvars[vm]['inventory_hostname_short'] }}"
+$vmServer = Get-VMHost -Server $vmHost
+
+{%     if _vsphere_vcenter_available %}
+$vCenterServerHost = "{{ vsphere_vcsa_network_fqdn }}"
+Connect-VIServer $vCenterServerHost | Out-Null
+$vCenter = Get-VMHost -Server $vCenterServerHost
+$vms = $vCenter | Get-VM
+{%     elif not _vsphere_vcenter_available %}
+$vms = $vmServer | Get-VM
+{%     endif %}
+{%     if hostvars[vm]['hw_product_uuid'] is defined %}
+  $vmInventoryUuid="{{ hostvars[vm]['hw_product_uuid'] }}"
+if ($vms.Name -notcontains $vmName) {
+  foreach ($vm in $vms) {
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vm
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vm
+{%       endif %}
+    $vmView = $vm | Get-View
+    $vmUuid = $vmView.Config.Uuid
+    if ($vmInventoryUuid -eq $vmUuid) {
+      $vm | Set-VM -Name $vmName -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+  }
+}
+{%       if _vsphere_vcenter_available %}
+$vCenterServerHost = "{{ vsphere_vcsa_network_fqdn }}"
+Connect-VIServer $vCenterServerHost | Out-Null
+$vCenter = Get-VMHost -Server $vCenterServerHost
+$vms = $vCenter | Get-VM
+{%       elif not _vsphere_vcenter_available %}
+$vmServer = Get-VMHost -Server $vmHost
+$vms = $vmServer | Get-VM
+{%       endif %}
+{%     endif %}
+
+if ($vms.Name -contains $vmName) {
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+  $vmView = $vm | Get-View
+  $vmUuid = $vmView.Config.Uuid
+{%   if hostvars[vm]['hw_product_uuid'] is defined %}
+  $vmInventoryUuid="{{ hostvars[vm]['hw_product_uuid'] }}"
+  if ($vmInventoryUuid -eq $vmUuid) {
+    $vmUuidMatches=$true
+  }
+  else {
+    $vmUuidMatches=$false
+  }
+{%   elif hostvars[vm]['hw_product_uuid'] is not defined %}
+    $vmUuidMatches=$true
+{%   endif %}
+  if ($vmUuidMatches) {
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+    $vmPowerState = $vm.PowerState
+    $vmNetwork = $vm | Get-NetworkAdapter
+    if ($vmNetwork.NetworkName -ne $NetworkName) {
+      if ($vmPowerState -eq 'PoweredOn'){
+        "VM Is Not On Correct Network...Moving From $vmNetwork To $NetworkName" | Out-File -Append {{ vsphere_management_log }}
+        $vm | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $NetworkName -StartConnected:$true -Connected:$false -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        $vm | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $NetworkName -StartConnected:$true -Connected:$true -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+      else {
+        $vm | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $NetworkName -StartConnected:$true -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+      }
+    }
+    $vmCPU=$vm.NumCpu
+    if ($vmCPU -ne {{ hostvars[vm]['cpus'] }}) {
+      if ($vmPowerState -eq 'PoweredOn') {
+        $vm | Shutdown-VMGuest -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        do {
+{%       if _vsphere_vcenter_available %}
+          $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+          $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+          $vmPowerState = $vm.PowerState
+          sleep 3
+        } until ($vmPowerState -eq 'PoweredOff')
+      }
+      $vm | set-VM -NumCpu {{ hostvars[vm]['cpus'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+    $vmPowerState = $vm.PowerState
+    $vmMemory = $vm.MemoryMB
+    if ($vmMemory -ne {{ hostvars[vm]['memory_mb'] }}) {
+      if ($vmPowerState -eq 'PoweredOn') {
+        $vm | Shutdown-VMGuest -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+        do {
+{%       if _vsphere_vcenter_available %}
+          $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+          $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+          $vmPowerState = $vm.PowerState
+          sleep 3
+        } until ($vmPowerState -eq 'PoweredOff')
+      }
+      $vm | Set-VM -MemoryMB {{ hostvars[vm]['memory_mb'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+    $vmPowerState = $vm.PowerState
+    if ($vmPowerState -ne 'PoweredOn') {
+      $vm | Start-VM -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    }
+    do {
+      $vmView = $vm | Get-View
+      $vmToolsStatus=$vmView.Guest.ToolsStatus
+      sleep 3
+    }
+    until ($vmToolsStatus -eq 'toolsOk')
+  }
+}
+else {
+  $vmBootstrapHost = Get-VMHost -Server $vmHost
+  $vmBootstrapHost | Import-VApp -Datastore $DataStore -Source $vAppSourcePath -Name $vmName -DiskStorageFormat Thin -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+{%       if _vsphere_vcenter_available %}
+  $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+  $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+  $vmCPU = $vm.NumCpu
+  if ($vmCPU -ne {{ hostvars[vm]['cpus'] }}) {
+    $vm | set-VM -NumCpu {{ hostvars[vm]['cpus'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+  $vmMemory = $vm.MemoryMB
+  if ($vmMemory -ne {{ hostvars[vm]['memory_mb'] }}) {
+    $vm | Set-VM -MemoryMB {{ hostvars[vm]['memory_mb'] }} -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+  $vm | Get-NetworkAdapter| Set-NetworkAdapter -NetworkName $NetworkName -StartConnected:$true -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  $vm | Start-VM -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  do {
+    $vmView = $vm | Get-View
+    $vmToolsStatus=$vmView.Guest.ToolsStatus
+    sleep 3
+  }
+  until ($vmToolsStatus -eq 'toolsOk')
+}
+{%   endfor %}
+
+$vmServerAutoStartPolicy=$vmServer | Get-VMHostStartPolicy
+if ($vmServerAutoStartPolicy.Enabled -eq $false) {
+  $vmServerAutoStartPolicy | Set-VMHostStartPolicy -Enabled $true
+}
+
+{%   if groups['vsphere_dnsdist_vms'] is defined %}
+  $loopCount={{ groups['vsphere_dnsdist_vms'] | length }}
+{%   elif groups['vsphere_dnsdist_vms'] is not defined defined %}
+  $loopCount=0
+{%   endif %}
+
+{%   for vm in groups['vsphere_ddi_vms_deploy'] %}
+$SecureBootStrapUser = "{{ vsphere_bootstrap_user_info['username'] }}"
+$SecureBootStrapPassword = Get-Content {{ vsphere_bootstrap_vms_secure_password_file }} | ConvertTo-SecureString
+$SecureCreds = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $SecureBootStrapUser,$SecureBootStrapPassword
+$vmName = "{{ hostvars[vm]['inventory_hostname'] }}"
+$vmNameShort = "{{ hostvars[vm]['inventory_hostname_short'] }}"
+
+{%       if _vsphere_vcenter_available %}
+$vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+$vm = $vmServer | Get-VM $vmName
+{%       endif %}
+$vmAutoStart = $vm | Get-VMStartPolicy
+if ($vmAutoStart.StartAction -ne 'PowerOn') {
+  $vmAutoStart | Set-VMStartPolicy -StartAction PowerOn -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%       if not _vsphere_vcenter_available %}
+$vmStartOrder = {{ loop.index }} + $loopCount
+if ($vmAutoStart.StartOrder -ne $vmStartOrder) {
+  $vmAutoStart | Set-VMStartPolicy -StartOrder $vmStartOrder -WaitForHeartBeat $false -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%       endif %}
+if ($vmAutoStart.StopAction -ne 'GuestShutDown'){
+  $vmAutoStart | Set-VMStartPolicy -StopAction GuestShutDown -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+$vmView=$vm | Get-View
+$vmGuestFamily=$vm.Guest.GuestFamily
+if ($vmGuestFamily -eq $null) {
+  do {
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+    $vmGuestFamily=$vm.Guest.GuestFamily
+    sleep 3
+  }
+  until ($vmGuestFamily -ne $null)
+}
+$vmHostName=$vm.Guest.HostName
+if ($vmGuestFamily -eq 'linuxGuest') {
+  if ($vmHostName -ne $vmNameShort) {
+    $vm | Invoke-VMScript -GuestCredential $SecureCreds -ScriptType Bash "sudo hostnamectl set-hostname $vmNameShort" | Out-File -Append {{ vsphere_management_log }}
+    $vm | Restart-VMGuest -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+    do {
+{%       if _vsphere_vcenter_available %}
+      $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+      $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+      $vmView = $vm | Get-View
+      $vmToolsStatus = $vmView.Guest.ToolsStatus
+      sleep 3
+    }
+    until ($vmToolsStatus -eq 'toolsOk')
+  }
+{%     if hostvars[vm]['ip'] is defined and hostvars[vm]['ip'] != None %}
+{%       if _vsphere_vcenter_available %}
+  $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+  $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+  $vmIPs = $vm.Guest.IPAddress
+  $vmGateway = "{{ hostvars[vm]['gateway'] }}"
+  $vmIP = "{{ hostvars[vm]['ip'] }}"
+  $vmIPNetmaskCidr = "{{ hostvars[vm]['netmask_cidr'] }}"
+  $vmInt = "{{ ansible_primary_interface }}"
+  if ($vmIPs -notcontains $vmIP) {
+    $vm | Invoke-VMScript -GuestCredential $SecureCreds -ScriptType Bash "sudo ip addr flush dev $vmInt && sudo ip addr add $vmIP/$vmIPNetmaskCidr dev $vmInt && sudo ip route add default via $vmGateway dev $vmInt && sudo sh -c 'echo nameserver 8.8.8.8 > /etc/resolv.conf'" | Out-File -Append {{ vsphere_management_log }}
+  }
+  do {
+{%       if _vsphere_vcenter_available %}
+    $vm = $vCenter | Get-VM $vmName
+{%       elif not _vsphere_vcenter_available %}
+    $vm = $vmServer | Get-VM $vmName
+{%       endif %}
+    $vmIPs = $vm.Guest.IPAddress
+    sleep 3
+  }
+  until ($vmIPs -contains $vmIP)
+{%     endif %}
+}
+{%   endfor %}
+Disconnect-VIServer * -Confirm:$false
+
+{% endif %}

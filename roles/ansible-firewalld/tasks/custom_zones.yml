@@ -1,0 +1,35 @@
+---
+- name: zones | Gathering Firewall Zones
+  command: "firewall-cmd --get-zones"
+  become: true
+  changed_when: false
+  register: "_firewalld_get_zones"
+  check_mode: no
+
+- name: zones | Deleting Custom Firewall Zones
+  command: "firewall-cmd --permanent --delete-zone={{ item['zone'] }}"
+  become: true
+  register: "_firewalld_custom_zone_deleted"
+  with_items: '{{ firewalld_custom_zones }}'
+  when: >
+        item['zone'] in _firewalld_get_zones['stdout'] and
+        not item['present']
+
+- name: zones | Creating Custom Firewall Zones
+  command: "firewall-cmd --permanent --new-zone {{ item['zone'] }}"
+  become: true
+  register: "_firewalld_custom_zone_created"
+  with_items: '{{ firewalld_custom_zones }}'
+  when: >
+        item['zone'] not in _firewalld_get_zones['stdout'] and
+        item['present']
+
+# We need to reload the service when custom zones are create/deleted
+- name: zones | Reloading firewalld Service
+  service:
+    name: "firewalld"
+    state: "reloaded"
+  become: true
+  when: >
+        _firewalld_custom_zone_deleted['changed'] or
+        _firewalld_custom_zone_created['changed']

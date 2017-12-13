@@ -1,0 +1,13 @@
+version: '2'
+services:
+  powerdns:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 2000
+      port: 1000
+      unhealthy_threshold: 3
+      interval: 30000
+      strategy: recreate
+      request_line: GET / HTTP/1.0

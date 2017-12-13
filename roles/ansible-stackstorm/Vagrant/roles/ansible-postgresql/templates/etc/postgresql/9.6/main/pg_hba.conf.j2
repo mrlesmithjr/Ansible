@@ -1,0 +1,25 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Database administrative login by Unix domain socket
+local   all             postgres                                peer
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     peer
+
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+
+# Replication connections:
+{% if postgresql_enable_replication %}
+{%   if inventory_hostname == postgresql_replication['master'] %}
+{%     for host in groups[postgresql_replication_group] %}
+{%       set repl_ip = (hostvars[host]['ansible_' + postgresql_replication['interface']]['ipv4']['address']) %}
+{%       if host != postgresql_replication['master'] %}
+host    replication    {{ postgresql_replication['user'] }}    {{ repl_ip }}/32    trust
+{%       endif %}
+{%     endfor %}
+{%   endif %}
+{% endif %}

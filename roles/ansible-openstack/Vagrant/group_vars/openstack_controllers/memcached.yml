@@ -1,0 +1,4 @@
+---
+memcached_config: true
+memcached_connections_in_limit: 1024
+memcached_listen_address: '{{ openstack_management_ip }}'

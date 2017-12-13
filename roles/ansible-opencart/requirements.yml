@@ -1,0 +1,4 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-apache2
+- src: https://github.com/mrlesmithjr/ansible-mysql
+- src: https://github.com/mrlesmithjr/ansible-php

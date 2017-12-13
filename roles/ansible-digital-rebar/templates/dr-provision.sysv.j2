@@ -1,0 +1,16 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+# chkconfig: 2345 90 10
+# description: DigitalRebar Provision Provisioner and DHCP server
+PATH="$PATH:{{ digital_rebar_binary|dirname }}"
+touch /var/log/dr-provision.log
+case $1 in
+    start)
+        {{ digital_rebar_binary }} &>>/var/log/dr-provision.log </dev/zero &
+        disown;;
+    stop)
+        pkill dr-provision;;
+    status)
+        pgrep dr-provision;;
+esac

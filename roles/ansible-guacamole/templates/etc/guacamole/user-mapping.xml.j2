@@ -1,0 +1,25 @@
+<user-mapping>
+
+{% if guacamole_users is defined %}
+{%   for user in guacamole_users %}
+    <authorize username="{{ user['name'] }}" password="{{ user['password'] }}">
+{%     if user['connections'] is defined %}
+{%       for connection in user['connections'] %}
+        <connection name="{{ connection['name'] }}">
+            <protocol>{{ connection['protocol'] }}</protocol>
+            <param name="hostname">{{ connection['host'] }}</param>
+            <param name="port">{{ connection['port'] }}</param>
+{%         if connection['protocol'] == "rdp" %}
+            <param name="color-depth">{{ guacamole_rdp_color_depth }}</param>
+            <param name="height">{{ guacamole_rdp_height }}</param>
+            <param name="width">{{ guacamole_rdp_width }}</param>
+            <param name="security">{{ guacamole_rdp_security }}</param>
+            <param name="disable-auth">{{ guacamole_rdp_disable_auth|lower }}</param>
+{%         endif %}
+        </connection>
+{%       endfor %}
+{%     endif %}
+    </authorize>
+{%   endfor %}
+{% endif %}
+</user-mapping>

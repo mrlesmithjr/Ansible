@@ -1,0 +1,12 @@
+---
+# Defines if interfaces should be configured as defined
+config_network_interfaces: true
+
+# Defines non Open vSwitch network interfaces
+network_interfaces:
+  - name: "{{ ansible_primary_interface }}"
+    configure: true
+    method: static
+    address: "{{ hostvars[inventory_hostname]['ansible_host'] }}"
+    netmask: "{{ hostvars[inventory_hostname]['netmask'] }}"
+    gateway: "{{ hostvars[inventory_hostname]['gateway'] }}"

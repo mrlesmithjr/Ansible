@@ -3,6 +3,7 @@
   user:
     name: "jenkins"
     generate_ssh_key: yes
+  become: true
 
 - name: users | Adding Jenkins Account To Sudoers
   lineinfile:
@@ -11,6 +12,7 @@
     line: "jenkins ALL=(ALL) NOPASSWD:ALL"
     validate: "visudo -cf %s"
     state: "present"
+  become: true
   when: >
         enable_jenkins_sudo is defined and
         enable_jenkins_sudo

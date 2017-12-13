@@ -1,0 +1,320 @@
+---
+haproxy_config: true
+
+# Defines load balancer configurations to enable/disable
+#
+# backend_backups - Defines if all but one host should be a backup(standby) to the primary
+#
+# backend_backups_primary - Defines the host which should be considered the primary
+# when setting backend_backups: true
+#
+# Example of using backups(standby)
+# backend openstack_controllers-3306
+#     balance source
+#     default-server inter 2000 rise 2 fall 5
+#     server controller01 controller01:3306 check
+#     server controller02 controller02:3306 backup check
+#     server controller03 controller03:3306 backup check
+#
+# backend_checks - Defines if host checks should be enabled
+#
+haproxy_configs:
+  - name: 'dashboard_cluster-80'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 80
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 80
+    frontend_name: 'dashboard_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'galera_cluster-3306'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_backups: true
+    backend_backups_primary: '{{ groups[openstack_controllers_group][0] }}'
+    backend_servers_bind_port: 3306
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 3306
+    frontend_name: 'galera_cluster-in'
+  - name: 'glance_api_cluster-9292'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 9292
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 9292
+    frontend_name: 'glance_api_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'glance_registry_cluster-9191'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 9191
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 9191
+    frontend_name: 'glance_registry_cluster-in'
+    options:
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'keystone_admin_cluster-35357'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 35357
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 35357
+    frontend_name: 'keystone_admin_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'keystone_public_internal_cluster-5000'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 5000
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 5000
+    frontend_name: 'keystone_public_internal_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  # - name: 'nova_ec2_api_cluster-8773'
+  #   backend_checks: true
+  #   backend_name: '{{ openstack_controllers_group }}'
+  #   backend_servers_bind_port: 8773
+  #   backend_servers: '{{ groups[openstack_controllers_group] }}'
+  #   balance: 'source'
+  #   default_server_options:
+  #     - name: 'inter'
+  #       value: 2000
+  #     - name: 'rise'
+  #       value: 2
+  #     - name: 'fall'
+  #       value: 5
+  #   enabled: true
+  #   frontend_bind_address: '{{ openstack_vip }}'
+  #   frontend_bind_port: 8773
+  #   frontend_name: 'nova_ec2_api_cluster-in'
+  #   options:
+  #     - 'tcpka'
+  #     - 'tcplog'
+  - name: 'nova_compute_api_cluster-8774'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 8774
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 8774
+    frontend_name: 'nova_compute_api_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'nova_metadata_api_cluster-8775'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 8775
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 8775
+    frontend_name: 'nova_metadata_api_cluster-in'
+    options:
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'cinder_api_cluster-8776'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 8776
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 8776
+    frontend_name: 'cinder_api_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'ceilometer_api_cluster-8777'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 8777
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 8777
+    frontend_name: 'ceilometer_api_cluster-in'
+    options:
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'nova_vncproxy_cluster-6080'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 6080
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 6080
+    frontend_name: 'nova_vncproxy_cluster-in'
+    options:
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'neutron_api_cluster-9696'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 9696
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 9696
+    frontend_name: 'neutron_api_cluster-in'
+    options:
+      - 'httpchk'
+      - 'tcpka'
+      - 'tcplog'
+  - name: 'swift_proxy_cluster-8080'
+    backend_checks: true
+    backend_name: '{{ openstack_controllers_group }}'
+    backend_servers_bind_port: 8080
+    backend_servers: '{{ groups[openstack_controllers_group] }}'
+    balance: 'source'
+    default_server_options:
+      - name: 'inter'
+        value: 2000
+      - name: 'rise'
+        value: 2
+      - name: 'fall'
+        value: 5
+    enabled: true
+    frontend_bind_address: '{{ openstack_vip }}'
+    frontend_bind_port: 8080
+    frontend_name: 'swift_proxy_cluster-in'
+    options:
+      - 'tcpka'
+      - 'tcplog'
+
+# Defines default configurations for default block
+haproxy_defaults:
+  - 'log global'
+  - 'maxconn 40000'
+  - 'option redispatch'
+  - 'retries 3'
+  - 'timeout check 10s'
+  - 'timeout client 1m'
+  - 'timeout connect 10s'
+  - 'timeout http-request 10s'
+  - 'timeout queue 1m'
+  - 'timeout server 1m'

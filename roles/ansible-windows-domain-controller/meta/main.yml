@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to manage [Windows](https://www.microsoft.com/en-us/cloud-platform/windows-server) domain controllers.
+
+  license: license (MIT)
+
+  min_ansible_version: 2.3
+
+  platforms:
+    - name: Windows
+      versions:
+        - all
+
+  galaxy_tags:
+    - Active Directory
+
+dependencies: []

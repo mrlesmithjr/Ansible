@@ -1,21 +1,30 @@
 ---
 - name: rabbitmq_clustering | stopping rabbitmq app
   command: rabbitmqctl stop_app
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | resetting rabbitmq app
   command: rabbitmqctl reset
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | stopping rabbitmq-server
   service:
     name: rabbitmq-server
     state: stopped
+  become: true
 
-#- name: grabbing erlang cookie
-#  shell: cat /var/lib/rabbitmq/.erlang.cookie
-#  register: rabbitmq_erlang_cookie
-#  when: inventory_hostname == "{{ rabbitmq_master }}"
+- name: rabbitmq_clustering | Capturing Erlang Cookie On Master
+  command: "cat {{ rabbitmq_erlang_cookie_file }}"
+  become: true
+  register: "rabbitmq_erlang_cookie"
+  when: inventory_hostname == rabbitmq_master
+
+- name: rabbitmq_clustering | Setting Erlang Cookie Of Master on Non-Master
+  set_fact:
+    rabbitmq_erlang_cookie: "{{ hostvars[rabbitmq_master]['rabbitmq_erlang_cookie']['stdout'] }}"
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | copy erlang cookie
   template:
@@ -24,49 +33,62 @@
     owner: rabbitmq
     group: rabbitmq
     mode: 0400
-    backup: yes #backing up in case the need to recover
-#  when: inventory_hostname != "{{ rabbitmq_master }}"
+    # backing up in case the need to recover
+    backup: yes
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | restarting rabbitmq-server on master
   service:
     name: rabbitmq-server
     state: restarted
-  when: inventory_hostname == "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname == rabbitmq_master
 
 - name: rabbitmq_clustering | starting rabbitmq app on master
   command: rabbitmqctl start_app
   register: cluster_master
-  when: inventory_hostname == "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname == rabbitmq_master
 
 - name: rabbitmq_clustering | sending sigterm to any running rabbitmq processes
   shell: pkill -u rabbitmq || true
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | restarting rabbitmq-server
   service:
     name: rabbitmq-server
     state: restarted
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | stopping rabbitmq app
   command: rabbitmqctl stop_app
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | resetting rabbitmq app
   command: rabbitmqctl reset
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | joining rabbitmq cluster
   command: rabbitmqctl join_cluster "rabbit@{{ hostvars[rabbitmq_master]['ansible_hostname'] }}"
   register: cluster_joined
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | starting rabbitmq app
   command: rabbitmqctl start_app
-  when: inventory_hostname != "{{ rabbitmq_master }}"
+  become: true
+  when: inventory_hostname != rabbitmq_master
 
 - name: rabbitmq_clustering | marking as clustered
   file:
     path: /etc/rabbitmq/clustered
     state: touch
-  when: cluster_master.changed or cluster_joined.changed
+  become: true
+  when: >
+        cluster_master['changed'] or
+        cluster_joined['changed']

@@ -1,0 +1,7 @@
+---
+- name: debian | Installing Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ network_tools_debian }}'

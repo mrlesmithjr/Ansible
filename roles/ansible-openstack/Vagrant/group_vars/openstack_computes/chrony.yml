@@ -1,0 +1,5 @@
+---
+chrony_ntp_servers:
+  - server: "{{ groups[openstack_controllers_group] }}"
+    options:
+      - option: 'iburst'

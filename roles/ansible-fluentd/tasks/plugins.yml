@@ -1,0 +1,12 @@
+---
+- name: plugins | Capturing Installed Plugins
+  shell: "td-agent-gem list | awk '{print $1}'"
+  become: true
+  register: "_fluentd_plugins_installed"
+  changed_when: false
+
+- name: plugins | Installing Plugins
+  command: "td-agent-gem install --no-document {{ item }}"
+  become: true
+  with_items: '{{ fluentd_plugins }}'
+  when: item not in _fluentd_plugins_installed['stdout']

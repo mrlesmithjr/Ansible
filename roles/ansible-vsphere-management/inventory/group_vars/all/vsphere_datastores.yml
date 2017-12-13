@@ -1,0 +1,16 @@
+---
+# Defines if unclaimed LUNs are auto partitioned and added as a new datastore
+vsphere_auto_create_datastores: true
+
+# Defines whether an iSCSI datastore cluster should be created
+vsphere_iscsi_datastore_cluster:
+  automation_level: FullyAutomated
+  io_load_balance: false
+  name: "{{ vsphere_vcenter_datacenter['name'] }}-SDRS-iSCSI-Cluster"
+  state: present
+
+vsphere_nfs_datastores: []
+  # - name: Datastore_1
+  #   type: NFS
+  #   path: /TANK/NFS/vSphere/Datastore_1
+  #   host: 10.0.101.50

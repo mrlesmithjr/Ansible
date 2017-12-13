@@ -4,3 +4,4 @@
   service:
     name: packetbeat
     state: restarted
+  become: true

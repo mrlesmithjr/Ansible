@@ -5,7 +5,7 @@
     state: "present"
   become: true
   with_items:
-    - 'xinetd'
+    - xinetd
   when: >
         ansible_os_family == "Debian"
 
@@ -26,7 +26,7 @@
         ansible_os_family == "Debian"
 
 - name: mysql_check | finding mysql command path
-  command: 'which mysql'
+  command: which mysql
   register: "mysql_path"
 
 - name: mysql_check | configuring mysqlchk.sh

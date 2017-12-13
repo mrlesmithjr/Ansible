@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 # ACLS
 {% if squid_acl is defined and squid_acl != [] %}
 {%   for item in squid_acl %}

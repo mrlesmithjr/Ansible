@@ -1,0 +1,43 @@
+---
+- name: debian | Checking If UFW Is Installed
+  command: "dpkg -s ufw | grep Status"
+  become: true
+  changed_when: false
+  failed_when: false
+  register: "_firewalld_ufw_check"
+
+- name: debian | Disabling UFW If Installed
+  service:
+    name: "ufw"
+    state: "stopped"
+    enabled: false
+  become: true
+  when: >
+        'installed' in _firewalld_ufw_check['stdout']
+
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-pip'
+    - 'python-setuptools'
+
+- name: debian | Installing Firewalld
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'cockpit'
+    - 'firewall-config'
+    - 'firewalld'
+
+- name: debian | Installing Python Modules
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'firewall'

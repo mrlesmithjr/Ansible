@@ -1,0 +1,42 @@
+version: '2'
+services:
+  node-exporter:
+    start_on_create: true
+  prom-conf:
+    scale: 1
+    start_on_create: true
+  grafana:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 5000
+      port: 3000
+      unhealthy_threshold: 3
+      interval: 5000
+      strategy: recreate
+  cadvisor:
+    start_on_create: true
+  prometheus-rancher-exporter:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 5000
+      port: 9173
+      unhealthy_threshold: 3
+      interval: 5000
+      strategy: recreate
+  prometheus:
+    scale: 1
+    start_on_create: true
+    health_check:
+      healthy_threshold: 2
+      response_timeout: 5000
+      port: 9090
+      unhealthy_threshold: 3
+      interval: 5000
+      strategy: recreate
+  graf-db:
+    scale: 1
+    start_on_create: true

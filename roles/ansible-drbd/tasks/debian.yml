@@ -1,0 +1,6 @@
+---
+- name: debian | Installing DRBD
+  apt:
+    name: drbd8-utils
+    state: present
+  become: true

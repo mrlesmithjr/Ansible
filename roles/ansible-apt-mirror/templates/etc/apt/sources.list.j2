@@ -1,20 +1,22 @@
 {% if enable_apt_mirror is defined and enable_apt_mirror %}
 # Configured to point to upstream apt_mirror_server
-{%   for item in apt_mirror_client_repos %}
+{%   if apt_mirror_client_repos is defined and apt_mirror_client_repos != [] %}
+{%     for item in apt_mirror_client_repos %}
 {{ item }}
-{%   endfor %}
+{%     endfor %}
+{%   endif %}
 {% elif (enable_apt_mirror is defined and not enable_apt_mirror) or enable_apt_mirror is not defined %}
 # Configured as default -- Reset after local apt-mirror configured
 {%   if ansible_distribution == "Ubuntu" %}
-deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-updates main restricted universe multiverse
-#deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-proposed main restricted universe multiverse
-#deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-backports main restricted universe multiverse
-deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} main restricted universe multiverse
-deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security main restricted universe multiverse
-deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-updates main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-proposed main restricted universe multiverse
-#deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-backports main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }} main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-updates main restricted universe multiverse
+#deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-proposed main restricted universe multiverse
+#deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-backports main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }} main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-security main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-updates main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-proposed main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release|lower }}-backports main restricted universe multiverse
 {%   endif %}
 {% endif %}

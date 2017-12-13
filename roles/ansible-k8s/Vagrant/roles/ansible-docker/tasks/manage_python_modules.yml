@@ -65,4 +65,4 @@
   become: true
   with_items:
     - 'docker-compose'
-    - 'docker-py'
+    # - 'docker-py'

@@ -1,0 +1,43 @@
+$vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+Connect-VIServer $vCenterHost
+$vCenter = Get-VC $vCenterHost
+$DataCenter = Get-Datacenter -Name "{{ vsphere_vcenter_datacenter['name'] }}"
+$Cluster = $DataCenter | Get-Cluster -Name "{{ vsphere_vcenter_cluster['name'] }}"
+$ClusterDrsAutomationLevel = $Cluster.DrsAutomationLevel
+$ClusterHAAdmissionControl = $Cluster.HAAdmissionControlEnabled
+$ClusterHAFailOverLevel = $Cluster.HAFailoverLevel
+$ClusterHAIsolationResponse = $Cluster.HAIsolationResponse
+$ClusterHARestartPriority = $Cluster.HARestartPriority
+if ($ClusterHAAdmissionControl -ne ${{ vsphere_vcenter_cluster['ha_admission_control'] }}) {
+  $Cluster | Set-Cluster -HAAdmissionControlEnabled:${{ vsphere_vcenter_cluster['ha_admission_control'] }} -Confirm:$false
+}
+if ($ClusterHAFailOverLevel -ne {{ vsphere_vcenter_cluster['ha_failover_level'] }}) {
+  $Cluster | Set-Cluster -HAFailoverLevel {{ vsphere_vcenter_cluster['ha_failover_level'] }} -Confirm:$false
+}
+if ($ClusterHAIsolationResponse -ne "{{ vsphere_vcenter_cluster['ha_isolation_response'] }}") {
+  $Cluster | Set-Cluster -HAIsolationResponse "{{ vsphere_vcenter_cluster['ha_isolation_response'] }}" -Confirm:$false
+}
+if ($ClusterHARestartPriority -ne "{{ vsphere_vcenter_cluster['ha_restart_priority'] }}") {
+  $Cluster | Set-Cluster -HARestartPriority "{{ vsphere_vcenter_cluster['ha_restart_priority'] }}" -Confirm:$false
+}
+{% if vsphere_vcenter_drs_rules is defined %}
+{%   for rule in vsphere_vcenter_drs_rules %}
+$DRSRules = $Cluster | Get-DrsRule
+if ($DRSRules.Name -notcontains "{{ rule['name'] }}") {
+  $vms = @()
+{%     for vms in rule['vms'] %}
+  $vms += "{{ vms|join('", "')}}"
+{%     endfor %}
+  $Cluster | New-DrsRule -Name "{{ rule['name'] }}" -Enabled ${{ rule['enabled']|lower }} -KeepTogether ${{ rule['keep_together']|lower }} -VM $vms
+}
+else {
+  $vms = @()
+{%     for vms in rule['vms'] %}
+  $vms += "{{ vms|join('", "')}}"
+{%     endfor %}
+  $Cluster | Get-DrsRule -Name "{{ rule['name'] }}" | Select Cluster,Name,KeepTogether,Enabled, @{N="VMnames";E={ $_.Vmids|%{(get-view -id $_).name}}}
+  $Cluster | Get-DrsRule -Name "{{ rule['name'] }}" | Set-DrsRule -Enabled ${{ rule['enabled']|lower }} -VM $vms
+}
+{%   endfor %}
+{% endif %}
+Disconnect-VIServer * -Confirm:$false

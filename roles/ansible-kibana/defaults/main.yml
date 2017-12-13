@@ -1,0 +1,133 @@
+---
+# defaults file for ansible-kibana
+
+kibana:
+  # Defines if Kibana should be configured
+  config: false
+
+  config_dir: /etc/kibana
+
+  home_dir: /usr/share/kibana
+
+  # Define Kibana Major Release
+  major_version: 5.x
+
+  # Define Kibana Minor Release
+  minor_version: 5.6.4
+
+  plugin_bin: /usr/share/kibana/kibana-plugin
+
+  plugin_dir: /usr/share/kibana/plugins
+
+  # Plugins do not currently work
+  plugins: {}
+    # x-pack:
+    #   state: present
+
+kibana_configuration:
+  # # Time in milliseconds to wait for Elasticsearch to respond to pings. Defaults to the value of
+  # # the elasticsearch.requestTimeout setting.
+  # elasticsearch.pingTimeout: 1500
+
+  # # When this setting's value is true Kibana uses the hostname specified in the server.host
+  # # setting. When the value of this setting is false, Kibana uses the hostname of the host
+  # # that connects to this Kibana instance.
+  # elasticsearch.preserveHost: true
+
+  # # Time in milliseconds to wait for responses from the back end or Elasticsearch. This value
+  # # must be a positive integer.
+  # elasticsearch.requestTimeout: 30000
+
+  # # List of Kibana client-side headers to send to Elasticsearch. To send *no* client-side
+  # # headers, set this value to [] (an empty list).
+  # elasticsearch.requestHeadersWhitelist: [ authorization ]
+
+  # # Header names and values that are sent to Elasticsearch. Any custom headers cannot be overwritten
+  # # by client-side headers, regardless of the elasticsearch.requestHeadersWhitelist configuration.
+  # elasticsearch.customHeaders: {}
+
+  # # Time in milliseconds for Elasticsearch to wait for responses from shards. Set to 0 to disable.
+  # elasticsearch.shardTimeout: 0
+
+  # # Time in milliseconds to wait for Elasticsearch at Kibana startup before retrying.
+  # elasticsearch.startupTimeout: 5000
+
+  # # Optional settings that provide the paths to the PEM-format SSL certificate and key files.
+  # # These files validate that your Elasticsearch backend uses the same key files.
+  # elasticsearch.ssl.certificate: /path/to/your/client.crt
+  # elasticsearch.ssl.key: /path/to/your/client.key
+
+  # # Optional setting that enables you to specify a path to the PEM file for the certificate
+  # # authority for your Elasticsearch instance.
+  # elasticsearch.ssl.certificateAuthorities: [ "/path/to/your/CA.pem" ]
+
+  # # To disregard the validity of SSL certificates, change this setting's value to 'none'.
+  # elasticsearch.ssl.verificationMode: full
+
+  # # The URL of the Elasticsearch instance to use for all your queries.
+  # elasticsearch.url: http://localhost:9200
+
+  # # If your Elasticsearch is protected with basic authentication, these settings provide
+  # # the username and password that the Kibana server uses to perform maintenance on the Kibana
+  # # index at startup. Your Kibana users still need to authenticate with Elasticsearch, which
+  # # is proxied through the Kibana server.
+  # elasticsearch.username: user
+  # elasticsearch.password: pass
+
+  # # The default application to load.
+  # kibana.defaultAppId: discover
+
+  # # Kibana uses an index in Elasticsearch to store saved searches, visualizations and
+  # # dashboards. Kibana creates a new index if the index doesn't already exist.
+  # kibana.index: .kibana
+
+  # # Enables you specify a file where Kibana stores log output.
+  # logging.dest: stdout
+
+  # # Set the value of this setting to true to suppress all logging output.
+  # logging.silent: false
+
+  # # Set the value of this setting to true to suppress all logging output other than error messages.
+  # logging.quiet: false
+
+  # # Set the value of this setting to true to log all events, including system usage information
+  # # and all requests.
+  # logging.verbose: false
+
+  # # Set the interval in milliseconds to sample system and process performance
+  # # metrics. Minimum is 100ms. Defaults to 5000.
+  # ops.interval: 5000
+
+  # # Specifies the path where Kibana creates the process ID file.
+  # pid.file: /var/run/kibana.pid
+
+  # Specifies the address to which the Kibana server will bind. IP addresses and host names are both valid values.
+  # The default is 'localhost', which usually means remote machines will not be able to connect.
+  # To allow connections from remote users, set this parameter to a non-loopback address.
+  server.host: 0.0.0.0
+
+  # # The maximum payload size in bytes for incoming server requests.
+  # server.maxPayloadBytes: 1048576
+
+  # The Kibana server's name.  This is used for display purposes.
+  server.name: "{{ ansible_hostname }}"
+
+  # # Define Kibana listen port
+  # server.port: 5601
+
+  # # Enables SSL and paths to the PEM-format SSL certificate and SSL key files, respectively.
+  # # These settings enable SSL for outgoing requests from the Kibana server to the browser.
+  # server.ssl.enabled: false
+  # server.ssl.certificate: /path/to/your/server.crt
+  # server.ssl.key: /path/to/your/server.key
+
+  # # https://github.com/elastic/kibana/issues/9369
+  # xpack.security.enabled: false
+  # xpack.monitoring.enabled: true
+  # xpack.graph.enabled: true
+  # xpack.watcher.enabled: true
+  # xpack.reporting.enabled: true
+
+kibana_repo_key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+kibana_repo_url: https://artifacts.elastic.co

@@ -1,0 +1,16 @@
+---
+# defaults file for ansible-opencart
+opencart_admin_email: admin@vagrant.local
+opencart_admin_password: admin
+opencart_admin_user: admin
+opencart_archive: "{{ opencart_version }}-OpenCart.zip"
+opencart_db_host: localhost
+opencart_db: opencart
+opencart_db_user: opencart
+opencart_db_password: opencart
+opencart_default_webroot: /var/www/html
+opencart_dl_url: "https://github.com/opencart/opencart/releases/download/{{ opencart_version }}"
+opencart_listen_address: "{{ hostvars[inventory_hostname]['ansible_' + opencart_listen_interface]['ipv4']['address'] }}"
+opencart_listen_interface: enp0s8
+opencart_version: 3.0.2.0
+opencart_webroot: "{{ opencart_default_webroot }}/opencart"

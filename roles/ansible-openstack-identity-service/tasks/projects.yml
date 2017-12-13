@@ -1,0 +1,16 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/keystone-users.html
+
+# Create the default service project
+- name: projects | Creating Service Project
+  os_project:
+    cloud: 'default'
+    name: "service"
+    description: "Service Project"
+    domain_id: "default"
+    state: "present"
+    enabled: true
+  when: >
+        not openstack_identity_service_ha or
+        (openstack_identity_service_ha and
+          inventory_hostname == openstack_identity_service_ha_master)

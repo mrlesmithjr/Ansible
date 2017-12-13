@@ -1,0 +1,22 @@
+---
+- name: users | Configuring BASH auto-complete script
+  template:
+    src: "etc/bash_completion.d/hal.j2"
+    dest: "/etc/bash_completion.d/hal"
+    mode: "u=rx,g=rx,o=rx"
+  become: true
+
+- name: users | Configuring BASH auto-complete
+  lineinfile:
+    path: "/home/{{ spinnaker_halyard_user_info['name'] }}/.bashrc"
+    regexp: "^/etc/bash_completion.d/hal"
+    line: "/etc/bash_completion.d/hal"
+  become: true
+
+- name: users | Ensuring {{ spinnaker_halyard_halconfig_dir }} Exists
+  file:
+    path: "{{ spinnaker_halyard_halconfig_dir }}"
+    state: "directory"
+    owner: "{{ spinnaker_halyard_user_info['name'] }}"
+    group: "{{ spinnaker_halyard_user_info['group'] }}"
+  become: true

@@ -7,7 +7,7 @@
     priv: "*.*:REPLICATION SLAVE"
     state: "present"
   become: true
-  with_items: '{{ mysql_replication_nodes }}'
+  with_items: "{{ mysql_replication_nodes }}"
   when: >
         item.role == "master" and
         inventory_hostname == item.name
@@ -17,7 +17,7 @@
     name: "{{ item }}"
     state: "present"
   become: true
-  with_items: '{{ mysql_replication_dbs }}'
+  with_items: "{{ mysql_replication_dbs }}"
 
 - name: setup_replication | restarting mysql if reconfigured
   service:
@@ -67,7 +67,7 @@
     master_user: "{{ mysql_replication_account_info.user }}"
   ignore_errors: true  #setting this for now to get around the initial setup
   become: true
-  with_items: '{{ mysql_replication_nodes }}'
+  with_items: "{{ mysql_replication_nodes }}"
   when: >
         item.role == "slave" and
         inventory_hostname == item.name
@@ -76,7 +76,7 @@
   mysql_replication:
     mode: "startslave"
   become: true
-  with_items: '{{ mysql_replication_nodes }}'
+  with_items: "{{ mysql_replication_nodes }}"
   when: >
         item.role == "slave" and
         inventory_hostname == item.name

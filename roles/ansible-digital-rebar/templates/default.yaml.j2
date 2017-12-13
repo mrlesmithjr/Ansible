@@ -1,0 +1,7 @@
+meta:
+  Description: Initial Default Content
+  Name: DefaultStore
+  Version: user
+{% if digital_rebar_config is defined and digital_rebar_config != [] %}
+{{ digital_rebar_config|to_nice_yaml }}
+{% endif %}

@@ -1,0 +1,13 @@
+---
+# defaults file for ansible-openstack-base
+
+openstack_base_pre_reqs:
+  - 'python-dev'
+  - 'python-pip'
+  - 'python-setuptools'
+  - 'software-properties-common'
+  - 'ubuntu-cloud-keyring'
+
+openstack_base_release: 'ocata'
+
+openstack_base_repo: 'deb http://ubuntu-cloud.archive.canonical.com/{{ ansible_distribution| lower }} {{ ansible_distribution_release| lower }}-updates/{{ openstack_base_release }} main'

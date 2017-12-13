@@ -1,0 +1,33 @@
+$vCenterHost = "{{ vsphere_vcsa_network_fqdn }}"
+Connect-VIServer $vCenterHost
+$vCenter = Get-VC $vCenterHost
+$DataCenter = Get-Datacenter -Name "{{ vsphere_vcenter_datacenter['name'] }}"
+{% if vsphere_vcenter_folders is defined %}
+{%   for parent in vsphere_vcenter_folders %}
+$DataCenterFolders = $DataCenter | Get-Folder
+if ($DataCenterFolders.Name -notcontains "{{ parent['name'] }}") {
+  $DataCenter | Get-Folder -Name "{{ parent['type'] }}" | New-Folder -Name "{{ parent['name'] }}" -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%     if parent['sub_folders'] is defined %}
+{%       for sub in parent['sub_folders'] %}
+$DataCenterFolders = $DataCenter | Get-Folder
+if ($DataCenterFolders.Name -notcontains "{{ sub['name'] }}") {
+  $DataCenter | Get-Folder -Name "{{ parent['name'] }}" | New-Folder -Name "{{ sub['name'] }}" -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+}
+{%         if sub['vms'] is defined %}
+{%           for vms in sub['vms'] %}
+$vms = @("{{ vms|join('", "')}}")
+{%           endfor %}
+$FolderVMs = Get-VM -Location ($DataCenter | Get-Folder -Name "{{ sub['name'] }}")
+foreach ($vm in $vms) {
+  if ($FolderVMs.Name -notcontains $vm) {
+    Move-VM -VM $vm -Location ($DataCenter | Get-Folder -Name "{{ sub['name'] }}") -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
+  }
+}
+{%         endif %}
+{%       endfor %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+
+Disconnect-VIServer * -Confirm:$false

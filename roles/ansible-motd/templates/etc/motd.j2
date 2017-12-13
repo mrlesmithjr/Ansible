@@ -1,7 +1,9 @@
-****************Ansible Managed MOTD****************
 {% if motd_default_message is defined %}
 {{ motd_default_message }}
 {% endif %}
+
+{% if motd_static %}
+****************Ansible Managed MOTD****************
 
 System Information For Hostname: {{ inventory_hostname }}
 
@@ -53,3 +55,4 @@ Virtualization Type: {{ ansible_virtualization_type }}
 {% endif %}
 
 ************End Of Ansible Managed MOTD*************
+{% endif %}

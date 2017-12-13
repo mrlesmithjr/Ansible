@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+rsync -e "sudo -u {{ vsphere_bootstrap_user_info['username'] }} ssh" -a -XAavz --chmod=775 --delete-after --progress --stats --rsync-path="sudo rsync" {{ vsphere_bootstrap_user_info['username'] }}@{{ hostvars[samba_primary_domain_controller]['ansible_host'] }}:/var/lib/samba/sysvol/ /var/lib/samba/sysvol/
+
+# Check status of SysVol NT ACL
+samba-tool ntacl sysvolcheck
+
+# Set return code of status of SysVol NT ACL Check
+RC=$?
+
+# Reset SysVol NT ACL
+if [ $RC != 0 ]; then
+  samba-tool ntacl sysvolreset
+fi

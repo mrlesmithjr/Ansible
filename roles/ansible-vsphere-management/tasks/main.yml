@@ -1,0 +1,161 @@
+---
+# tasks file for ansible-vsphere-management
+
+- include: set_facts.yml
+  tags:
+    - vsphere_ad_domain
+    - vsphere_bootstrap_vms
+    - vsphere_bootstrap_vms_info
+    - vsphere_ddi_vms
+    - vsphere_ddi_vms_info
+    - vsphere_dhcp_vms
+    - vsphere_dns
+    - vsphere_dnsdist_vms
+    - vsphere_dnsdist_vms_info
+    - vsphere_lb
+    - vsphere_lb_vms
+    - vsphere_lb_vms_info
+    - vsphere_management
+    - vsphere_network
+    - vsphere_samba_vms
+    - vsphere_samba_vms_info
+    - vsphere_ssh
+    - vsphere_vcenter
+    - vsphere_vcenter_check
+    - vsphere_vcsa
+    - vsphere_vms
+    - vsphere_vms_info
+
+- include: invalid_certs.yml
+  tags:
+    - vsphere_management
+    - vsphere_ssh
+    - vsphere_vcenter
+
+- include: creds.yml
+  tags:
+    - vsphere_ad_domain
+    - vsphere_bootstrap_vms
+    - vsphere_ddi_vms
+    - vsphere_dhcp_vms
+    - vsphere_dns
+    - vsphere_dnsdist_vms
+    - vsphere_lb
+    - vsphere_lb_vms
+    - vsphere_management
+    - vsphere_network
+    - vsphere_samba_vms
+    - vsphere_ssh
+    - vsphere_vcenter
+    - vsphere_vms
+
+- include: network.yml
+  tags:
+    - vsphere_management
+    - vsphere_network
+
+- include: ssh.yml
+  tags:
+    - vsphere_management
+    - vsphere_ssh
+
+- include: ntp.yml
+  tags:
+    - vsphere_management
+
+- include: iscsi.yml
+  tags:
+    - vsphere_iscsi
+    - vsphere_management
+
+- include: datastores.yml
+  tags:
+    - vsphere_management
+
+- include: maintenance_mode.yml
+  tags:
+    - vsphere_maintenance_mode
+    - vsphere_management
+    - vsphere_updates
+
+- include: updates.yml
+  tags:
+    - vsphere_management
+    - vsphere_updates
+
+- include: template_vm.yml
+  when: >
+        vsphere_template_vm is defined and
+        (vsphere_template_vm['deploy'] is defined and
+        vsphere_template_vm['deploy'])
+  tags:
+    - vsphere_management
+
+- include: destroy_vms.yml
+  tags:
+    - vsphere_bootstrap_vms
+    - vsphere_ddi_vms
+    - vsphere_destroy_vms
+    - vsphere_dhcp_vms
+    - vsphere_dnsdist_vms
+    - vsphere_lb_vms
+    - vsphere_samba_vms
+    - vsphere_vms
+
+- include: bootstrap_vms.yml
+  tags:
+    - vsphere_bootstrap_vms
+    - vsphere_vms
+  when: vsphere_bootstrap_vms is defined
+
+- include: dnsdist_vms.yml
+  tags:
+    - vsphere_dnsdist_vms
+    - vsphere_vms
+  when: vsphere_dnsdist_vms is defined
+
+- include: ddi_vms.yml
+  tags:
+    - vsphere_ddi_vms
+    - vsphere_dhcp_vms
+    - vsphere_vms
+  when: vsphere_ddi_vms is defined
+
+- include: dhcp_vms.yml
+  tags:
+    - vsphere_ddi_vms
+    - vsphere_dhcp_vms
+    - vsphere_vms
+  when: vsphere_ddi_vms is defined
+
+- include: lb_vms.yml
+  tags:
+    - vsphere_lb
+    - vsphere_lb_vms
+    - vsphere_vms
+  when: vsphere_lb_vms is defined
+
+- include: samba_vms.yml
+  tags:
+    - vsphere_samba_vms
+    - vsphere_vms
+  when: >
+        vsphere_samba_vms is defined and
+        vsphere_samba_domain
+
+- include: dns.yml
+  tags:
+    - vsphere_dns
+
+- include: ad_domain.yml
+  tags:
+    - vsphere_ad_domain
+  when: vsphere_hosts_join_domain
+
+- include: vcsa.yml
+  tags:
+    - vsphere_vcsa
+
+- include: vcenter.yml
+  tags:
+    - vsphere_vcenter

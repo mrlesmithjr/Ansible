@@ -20,13 +20,13 @@
     - logstash
   when: ansible_os_family == "RedHat"
 
-- include: config_logstash.yml
-  when: config_logstash
-
 - include: plugins.yml
   tags:
     - logstash
     - logstash_plugins
+
+- include: config_logstash.yml
+  when: config_logstash
 
 - include: validate_permissions.yml
   tags:

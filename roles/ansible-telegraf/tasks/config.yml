@@ -1,0 +1,7 @@
+---
+- name: config | Configuring Telegraf
+  template:
+    src: "etc/telegraf/telegraf.conf.j2"
+    dest: "/etc/telegraf/telegraf.conf"
+  become: true
+  notify: "restart telegraf"

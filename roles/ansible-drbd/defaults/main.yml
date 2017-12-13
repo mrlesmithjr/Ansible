@@ -1,0 +1,20 @@
+---
+# defaults file for ansible-drbd
+
+drbd_disks:
+  - device: /dev/drbd0
+    disk: /dev/sdb
+    filesystem: ext4
+    partitions: 1
+    mountpoint: /opt/nfs
+    resource: r0
+    state: present
+    use_partition: /dev/sdb1
+
+drbd_group: test_nodes
+
+drbd_interface: enp0s8
+
+drbd_network_shared_secret: wXE8MqVa
+
+drbd_vip: 192.168.250.100

@@ -1,0 +1,37 @@
+---
+- hosts: powercli_host
+  vars:
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-windows-powercli
+    - role: ansible-windows-remote-desktop
+  tasks:
+    - name: Install NET-Framework-Core
+      win_feature:
+        name: NET-Framework-Core
+        state: present
+
+    - name: Install Windows GPMC
+      win_feature:
+        name: GPMC
+        state: present
+
+    - name: Install Windows RSAT Tools
+      win_feature:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - RSAT-AD-PowerShell
+        - RSAT-AD-AdminCenter
+        - RSAT-DNS-Server
+
+    - name: Rebooting Server
+      win_reboot:
+        shutdown_timeout: 3600
+        reboot_timeout: 3600
+      when: ansible_reboot_pending
+
+    - name: Install vmwarevsphereclient
+      win_chocolatey:
+        name: vmwarevsphereclient
+        state: present

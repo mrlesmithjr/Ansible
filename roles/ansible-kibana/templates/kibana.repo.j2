@@ -1,0 +1,8 @@
+[kibana-{{ kibana['major_version'] }}]
+autorefresh=1
+baseurl={{ kibana_repo_url }}/packages/{{ kibana['major_version'] }}/yum
+enabled=1
+gpgcheck=1
+gpgkey={{ kibana_repo_key }}
+name=Elastic repository for {{ kibana['major_version'] }} packages
+type=rpm-md

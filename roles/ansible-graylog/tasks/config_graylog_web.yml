@@ -1,9 +1,0 @@
----
-- name: config_graylog_web | configuring graylog-web
-  template:
-    src: etc/graylog/web/web.conf.j2
-    dest: /etc/graylog/web/web.conf
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart graylog-web

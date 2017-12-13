@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-wordpress
+
+- include: set_facts.yml
+
+- include: db.yml
+
+- include: install.yml
+
+- include: config.yml

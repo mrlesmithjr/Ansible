@@ -1,0 +1,19 @@
+---
+- name: debian | Adding Repo Key
+  apt_key:
+    url: "{{ spinnaker_halyard_repo_key }}"
+    state: "present"
+  become: true
+
+- name: debian | Adding Repo
+  apt_repository:
+    repo: "{{ spinnaker_halyard_debian_repo }}"
+    state: "present"
+  become: true
+
+- name: debian | Installing packages
+  apt:
+    name: "spinnaker-halyard"
+    state: "present"
+    force: true
+  become: true

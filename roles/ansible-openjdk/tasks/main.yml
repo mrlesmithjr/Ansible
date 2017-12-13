@@ -1,0 +1,10 @@
+---
+# tasks file for ansible-openjdk
+- include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include_tasks: suse.yml
+  when: ansible_os_family == "Suse"

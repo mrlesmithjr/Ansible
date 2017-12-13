@@ -1,0 +1,6 @@
+---
+- name: features | Installing RSAT AD Admin Center
+  win_feature:
+    name: RSAT-AD-AdminCenter
+    state: present
+  register: _windows_domain_rsat_ad_admincenter

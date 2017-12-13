@@ -1,4 +1,9 @@
 ---
 # defaults file for ansible-django
-django_db_type: sqlite  #defines DB type to use...sqlite or mysql
-django_version: latest  #defines django version to install. set to latest for the latest version or use version number...ex. (1.8.7, 1.8.8, 1.9, 1.9.1)
+
+# defines DB type to use...sqlite or mysql
+django_db_type: sqlite
+
+# Defines django version to install. set to latest for the latest version or
+# use version number...ex. (1.8.7, 1.8.8, 1.9, 1.9.1)
+django_version: latest

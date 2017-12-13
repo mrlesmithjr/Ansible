@@ -2,12 +2,12 @@
 github_repo_root: {{ github_repo_root }}
 repos_file: {{ repos_file }}
 github_repos:
-{% for user in github_repos.results %}
-{%   for item in user.json %}
-  - name: {{ item.name }}
-    full_name: {{ item.full_name }}
-    git_url: {{ item.git_url }}
-    ssh_url: {{ item.ssh_url }}
-    user: {{ item.owner.login }}
+{% for user in github_repos['results'] %}
+{%   for item in user['json'] %}
+  - name: {{ item['name'] }}
+    full_name: {{ item['full_name'] }}
+    git_url: {{ item['git_url'] }}
+    ssh_url: {{ item['ssh_url'] }}
+    user: {{ item['owner']['login'] }}
 {%   endfor %}
 {% endfor %}

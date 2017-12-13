@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DNSUP=`/usr/bin/dig @{{ ansible_default_ipv4.address }} localhost. A +short`
+if [ "$DNSUP" != "127.0.0.1" ];
+then
+echo "Stopping Anycast...."
+    /etc/init.d/quagga stop
+    /etc/init.d/pdns stop
+else
+    echo "Everything's good... Do nothing..."
+fi

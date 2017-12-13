@@ -3,6 +3,7 @@
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - 'apt-transport-https'
     - 'pwgen'
@@ -11,24 +12,26 @@
   apt:
     name: "default-jre-headless"
     state: "present"
+  become: true
   when: graylog_install_default_java_jre
 
 - name: debian | installing graylog repo
   apt:
     deb: "{{ graylog_debian_package_info.url }}/{{ graylog_debian_package_info.file }}"
     state: "present"
-    # dpkg_options: "force-all"
+  become: true
   register: "graylog_repo"
 
 - name: debian | updating apt-cache
   apt:
     update_cache: yes
+  become: true
   when: graylog_repo.changed
 
 - name: debian | installing graylog
   apt:
     name: "{{ item }}"
     state: "present"
+  become: true
   with_items:
     - graylog-server
-#    - graylog-web

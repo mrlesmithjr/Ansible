@@ -1,0 +1,47 @@
+---
+# defaults file for ansible-apt-sources
+# deb or deb-src, indicates the type of archive
+apt_sources_archive_types:
+  - 'deb'
+  - 'deb-src'
+
+# main consists of DFSG-compliant packages, which do not rely on software
+# outside this area to operate. These are the only packages considered part of
+# the Debian distribution.
+#
+# contrib packages contain DFSG-compliant software, but have dependencies not
+# in main (possibly packaged for Debian in non-free).
+#
+# non-free contains software that does not comply with the DFSG.
+#
+# Specific to Debian not Ubuntu
+apt_sources_debian_components:
+  - 'main'
+  - 'contrib'
+  - 'non-free'
+
+# The release class (oldstable, stable, testing, unstable) respectively.
+#
+# Specific to Debian not Ubuntu
+apt_sources_debian_distribution: 'stable'
+
+# Specific to Debian not Ubuntu
+apt_sources_debian_repository_url: 'http://deb.debian.org'
+
+apt_sources_enable_backports: true
+
+apt_sources_enable_proposed: false
+
+apt_sources_enable_security: true
+
+apt_sources_enable_updates: true
+
+# Specific to Ubuntu not Debian
+apt_sources_ubuntu_components:
+  - 'main'
+  - 'multiverse'
+  - 'restricted'
+  - 'universe'
+
+# Specific to Ubuntu not Debian
+apt_sources_ubuntu_repository_url: 'http://archive.ubuntu.com'

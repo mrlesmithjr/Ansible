@@ -3,19 +3,31 @@
   when: ansible_os_family == "Debian"
 
 - include: redhat.yml
-  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  when: >
+        ansible_distribution == "CentOS" or
+        ansible_distribution == "Red Hat Enterprise Linux" or
+        ansible_distribution == "OracleLinux"
 
 - include: fedora.yml
   when: ansible_distribution == "Fedora"
+
+- include: config.yml
+  when: rabbitmq_config_service
 
 - name: checking to see if already clustered
   stat: path=/etc/rabbitmq/clustered
   register: clustered
 
 - include: rabbitmq_clustering.yml
-  when: rabbitmq_enable_clustering and (clustered.stat.exists != True)
+  when: >
+        rabbitmq_enable_clustering and
+        not clustered['stat']['exists']
 
 - include: rabbitmq_ha_config.yml
-  when: rabbitmq_config_ha and rabbitmq_enable_clustering
+  when: >
+        rabbitmq_config_ha and
+        rabbitmq_enable_clustering and
+        rabbitmq_config is defined
 
 - include: rabbitmq_users.yml
+  when: rabbitmq_users is defined

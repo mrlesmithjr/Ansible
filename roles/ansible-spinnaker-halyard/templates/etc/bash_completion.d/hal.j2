@@ -1,0 +1,5854 @@
+# halyard-cli command completion
+
+_hal() {
+    local cur prev ptr
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ "${prev}" == -* ]]; then
+        local options sublen
+        if [ -z "${cur}" ]; then
+            # strip just the --flag from the query
+            sublen=$(($COMP_CWORD - 1))
+        else
+            # strip the --flag and value from the query
+            sublen=$(($COMP_CWORD - 2))
+        fi
+
+        options=$( ${COMP_WORDS[@]:0:$sublen} --options $prev --color false --quiet )
+
+        if [ "$?" = "0" ]; then
+            COMPREPLY=( $(compgen -W "${options}" -- ${cur}) )
+            return 0
+        fi
+    fi
+
+
+    ptr="${COMP_WORDS[0]}"
+
+    if [ "${ptr}" = "hal" ]; then
+
+        if [ "1" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --print-bash-completion --options --ready --log --output --color --version --debug --docs --quiet"
+            subcommands=" admin backup config deploy task version"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[1]}"
+
+    if [ "${ptr}" = "admin" ]; then
+
+        if [ "2" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" deprecate publish"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "deprecate" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" version"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "version" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --version --log --output --color --debug --quiet --illegal-reason"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "publish" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" bom latest latest-halyard latest-spinnaker profile version"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "bom" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --bom-path --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "latest" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "latest-halyard" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "latest-spinnaker" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "profile" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --bom-path --help --options --log --output --color --debug --profile-path --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "version" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --alias --options --log --output --version --changelog --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[1]}"
+
+    if [ "${ptr}" = "backup" ]; then
+
+        if [ "2" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" create restore"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "create" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "restore" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet --backup-path"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[1]}"
+
+    if [ "${ptr}" = "config" ]; then
+
+        if [ "2" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --set-current-deployment --no-validate --quiet"
+            subcommands=" ci deploy edit features generate metric-stores provider security storage version"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "ci" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" jenkins"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "jenkins" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable enable master"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "master" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --address --help --deployment --username --options --log --output --color --password --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --password --options --log --output --address --color --debug --no-validate --username --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "deploy" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --consul-enabled --log --output --debug --consul-address --vault-enabled --no-validate --quiet --account-name --help --deployment --options --color --type --vault-address"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --timezone --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "features" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --jobs --help --deployment --options --log --output --color --debug --no-validate --chaos --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "generate" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "metric-stores" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" datadog edit prometheus stackdriver"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "datadog" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --app-key --color --debug --no-validate --api-key --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --period --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "prometheus" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --push-gateway --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "stackdriver" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --credentials-path --project --help --deployment --options --log --output --color --debug --zone --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "provider" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" appengine aws azure dcos docker-registry google kubernetes openstack oraclebmcs"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "appengine" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --git-https-password --json-path --project --log --output --debug --local-repository-directory --no-validate --github-oauth-access-token --quiet --help --deployment --git-https-username --options --ssh-private-key-passphrase --ssh-trust-unknown-hosts --color --ssh-private-key-file-path --ssh-known-hosts-file-path"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --ssh-known-hosts-file-path --project --log --output --git-https-password --add-required-group-membership --debug --local-repository-directory --no-validate --git-https-username --ssh-trust-unknown-hosts --quiet --json-path --required-group-membership --help --deployment --options --ssh-private-key-passphrase --remove-required-group-membership --github-oauth-access-token --color --ssh-private-key-file-path"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "aws" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --edda --regions --log --output --debug --discovery --account-id --no-validate --quiet --help --deployment --options --color --default-key-pair --assume-role"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --edda --default-key-pair --remove-region --log --output --add-required-group-membership --debug --no-validate --add-region --quiet --discovery --account-id --required-group-membership --help --deployment --options --remove-required-group-membership --color --regions --assume-role"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --access-key-id --secret-access-key --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "azure" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account bakery disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --subscription-id --required-group-membership --packer-resource-group --log --output --tenant-id --debug --no-validate --quiet --client-id --app-key --help --deployment --options --color --default-key-vault --object-id --packer-storage-account --default-resource-group"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --packer-resource-group --object-id --default-resource-group --log --output --add-required-group-membership --debug --no-validate --tenant-id --subscription-id --client-id --quiet --required-group-membership --help --deployment --app-key --options --remove-required-group-membership --color --default-key-vault --packer-storage-account"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "bakery" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" base-image edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "base-image" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --log --output --image-version --debug --no-validate --offer --quiet --template-file --short-description --help --deployment --publisher --options --sku --package-type --color --detailed-description"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --log --output --debug --short-description --detailed-description --no-validate --quiet --template-file --offer --help --deployment --options --image-version --color --publisher --sku --id --package-type"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "dcos" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account cluster disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --uid --log --output --debug --cluster --no-validate --quiet --docker-registries --help --deployment --options --password --service-key --color"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --log --output --add-docker-registry --add-required-group-membership --debug --no-validate --update-user-credential --quiet --required-group-membership --help --deployment --options --update-service-credential --remove-docker-registry --remove-required-group-membership --color --docker-registries --remove-credential"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "cluster" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --skip-tls-verify --log --output --lb-account-secret --debug --lb-image --no-validate --quiet --dcos-url --help --deployment --options --ca-cert-data --color"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --ca-cert-data --log --output --debug --skip-tls-verify --dcos-url --no-validate --remove-ca-cert-data --quiet --help --deployment --options --color --remove-lb --lb-account-secret --lb-image"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "docker-registry" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --email --log --output --address --debug --repositories --no-validate --quiet --password --help --deployment --username --options --color --password-file"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --address --log --output --password --repositories --add-required-group-membership --debug --add-repository --no-validate --quiet --required-group-membership --help --deployment --options --email --remove-required-group-membership --color --username --password-file --remove-repository"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "google" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account bakery disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --alpha-listed --project --log --output --json-path --debug --no-validate --quiet --image-projects --help --deployment --options --user-data --color"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --json-path --log --output --add-required-group-membership --debug --set-alpha-listed --no-validate --add-image-project --image-projects --user-data --quiet --project --required-group-membership --help --deployment --options --remove-required-group-membership --color --remove-image-project"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "bakery" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" base-image edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "base-image" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --is-image-family --log --output --debug --no-validate --quiet --template-file --short-description --help --deployment --source-image --options --package-type --color --source-image-family --detailed-description"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --source-image --log --output --debug --short-description --is-image-family --detailed-description --no-validate --quiet --source-image-family --template-file --help --deployment --options --color --id --package-type"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[6]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "7" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --zone --options --network --log --output --color --use-internal-ip --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "kubernetes" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --kubeconfig-file --namespaces --log --output --omit-namespaces --debug --no-validate --quiet --docker-registries --help --deployment --options --color --context"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --add-namespace --remove-namespace --add-required-group-membership --no-validate --quiet --help --deployment --kubeconfig-file --options --remove-required-group-membership --color --omit-namespaces --context --namespaces --clear-context --add-docker-registry --log --output --debug --add-omit-namespace --remove-omit-namespace --required-group-membership --all-namespaces --docker-registries --remove-docker-registry"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "openstack" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --domain-name --lbaas-poll-timout --log --output --regions --debug --no-validate --project-name --quiet --auth-url --help --deployment --lbaas-poll-interval --insecure --options --username --color --user-data-file --password"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --remove-region --user-data-file --domain-name --add-required-group-membership --lbaas-poll-timout --no-validate --project-name --quiet --password --help --deployment --options --add-region --remove-required-group-membership --color --remove-user-data-file --insecure --log --output --debug --required-group-membership --username --regions --lbaas-poll-interval --auth-url"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "oraclebmcs" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" account disable enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "account" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" add delete edit get list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "add" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --required-group-membership --region --ssh-private-key-file-path --log --output --debug --no-validate --fingerprint --quiet --help --deployment --options --compartment-id --color --tenancyId --user-id"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "delete" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --user-id --ssh-private-key-file-path --log --output --add-required-group-membership --debug --no-validate --quiet --required-group-membership --help --deployment --options --remove-required-group-membership --compartment-id --color --region --fingerprint --tenancyId"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "get" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "security" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" api authn authz ui"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "api" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit ssl"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --override-base-url --options --log --output --color --cors-access-pattern --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "ssl" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --keystore --keystore-type --truststore-type --log --output --key-alias --client-auth --debug --keystore-password --no-validate --quiet --truststore --help --deployment --options --color --truststore-password"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "authn" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" oauth2 saml"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "oauth2" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --pre-established-redirect-uri --log --output --client-id --debug --no-validate --quiet --user-info-requirements --provider --help --deployment --options --color --client-secret"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "saml" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --keystore-password --keystore --log --output --debug --keystore-alias --no-validate --quiet --service-address-url --help --deployment --options --metadata --color --issuer-id"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "authz" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable github google"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --type --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "github" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --accessToken --no-validate --organization --baseUrl --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "google" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --credential-path --no-validate --domain --admin-username --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "ui" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit ssl"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --override-base-url --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "ssl" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" disable edit enable"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "disable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --ssl-certificate-passphrase --help --deployment --ssl-certificate-key-file --options --ssl-certificate-file --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[5]}"
+
+    if [ "${ptr}" = "enable" ]; then
+
+        if [ "6" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "storage" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" azs edit gcs oraclebmcs s3"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "azs" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --storage-account-key --log --output --color --debug --no-validate --storage-container-name --quiet --storage-account-name"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --type --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "gcs" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --log --output --project --debug --no-validate --quiet --help --deployment --root-folder --options --json-path --color --bucket --bucket-location"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "oraclebmcs" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --bucket-name --log --output --compartment-id --debug --no-validate --ssh-private-key-file-path --tenancy-id --quiet --namespace --help --deployment --options --fingerprint --user-id --region --color"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "s3" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[4]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "5" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --region --log --output --debug --no-validate --bucket --quiet --help --deployment --root-folder --assume-role --options --endpoint --color --secret-access-key --access-key-id"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "version" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=" edit"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[3]}"
+
+    if [ "${ptr}" = "edit" ]; then
+
+        if [ "4" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --version --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[1]}"
+
+    if [ "${ptr}" = "deploy" ]; then
+
+        if [ "2" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" apply clean collect-logs connect details diff rollback"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "apply" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --service-names --auto-run --log --output --color --debug --omit-config --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "clean" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "collect-logs" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --service-names --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "connect" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --auto-run --log --output --color --debug --no-validate --service-names --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "details" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --service-name --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "diff" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "rollback" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --service-names --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[1]}"
+
+    if [ "${ptr}" = "task" ]; then
+
+        if [ "2" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" interrupt list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "interrupt" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[1]}"
+
+    if [ "${ptr}" = "version" ]; then
+
+        if [ "2" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=" bom latest list"
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "bom" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --artifact-name --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "latest" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --options --log --output --color --debug --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+    ptr="${COMP_WORDS[2]}"
+
+    if [ "${ptr}" = "list" ]; then
+
+        if [ "3" -eq "$COMP_CWORD" ]; then
+
+            local flags subcommands
+
+            flags=" --help --deployment --options --log --output --color --debug --no-validate --quiet"
+            subcommands=""
+
+            if [[ "${cur}" == -* ]]; then
+                COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+                return 0
+            fi
+
+            COMPREPLY=( $(compgen -W "${subcommands}" -- ${cur}) )
+            return 0
+
+        else
+
+        :
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+
+        fi
+
+    fi
+
+
+}
+
+complete -F _hal hal

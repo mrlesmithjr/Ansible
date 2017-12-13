@@ -1,0 +1,9 @@
+---
+# Defines if specific forward zones should be defined
+pdns_recursor_enable_fwd_zones: false
+
+# Define forward lookup zone(s) along with DNS servers to use
+# pdns_recursor_fwd_zones:
+#   - name: "{{ vsphere_ad_dns_domain_name }}"
+#     servers:
+#       - 10.0.102.30

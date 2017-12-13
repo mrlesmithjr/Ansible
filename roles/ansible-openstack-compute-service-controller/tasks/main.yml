@@ -1,0 +1,38 @@
+---
+# tasks file for ansible-openstack-compute-service-controller
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-controller-install.html
+
+# We need to flush handlers here in order to restart any previously configured
+# services such as MySQL configrurations. rabbitmq, memcached
+#
+- meta: flush_handlers
+  tags:
+    - 'openstack_compute_service_controller'
+    - 'openstack_compute_service_controller_db'
+
+- include: db.yml
+  tags:
+    - 'openstack_compute_service_controller'
+    - 'openstack_compute_service_controller_db'
+
+- include: users.yml
+  tags:
+    - 'openstack_compute_service_controller'
+    - 'openstack_compute_service_controller_users'
+
+- include: services.yml
+  tags:
+    - 'openstack_compute_service_controller'
+    - 'openstack_compute_service_controller_services'
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+  tags:
+    - 'openstack_compute_service_controller'
+    - 'openstack_compute_service_controller_debian'
+
+- include: config.yml
+  tags:
+    - 'openstack_compute_service_controller'
+    - 'openstack_compute_service_controller_config'
+    - 'openstack_compute_service_controller_debian'

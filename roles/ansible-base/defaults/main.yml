@@ -1,6 +1,14 @@
 ---
 # defaults file for ansible-base
 
+base_arch_packages:
+  - 'base-devel'
+  - 'curl'
+  - 'git'
+  - 'git-core'
+  - 'ntp'
+  - 'sg3_utils'
+
 base_debian_packages:
   - 'build-essential'
   - 'software-properties-common'

@@ -1,0 +1,5 @@
+---
+# Capture auth info from clouds.yaml
+- name: get-client-config | Capturing Client Config From clouds.yaml or openrc
+  os_client_config:
+  no_log: true

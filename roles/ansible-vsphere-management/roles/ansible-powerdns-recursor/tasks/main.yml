@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-powerdns-recursor
+
+- include: pdns_accounts.yml
+
+- include: pdns_recursor.yml

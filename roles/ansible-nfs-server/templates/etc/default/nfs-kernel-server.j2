@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+
+RPCNFSDCOUNT={{ nfs_server_rpcnfsdcount }}
+
+# Runtime priority of server (see nice(1))
+RPCNFSDPRIORITY=0
+
+RPCMOUNTDOPTS="{% if nfs_server_rpcmountdopts is defined %}{{ nfs_server_rpcmountdopts|join(' ') }}{% endif %}"
+
+# Do you want to start the svcgssd daemon? It is only required for Kerberos
+# exports. Valid alternatives are "yes" and "no"; the default is "no".
+NEED_SVCGSSD=""
+
+# Options for rpc.svcgssd.
+RPCSVCGSSDOPTS=""
+
+RPCNFSDOPTS="{% if nfs_server_rpcnfsdopts is defined %}{{ nfs_server_rpcnfsdopts|join(' ') }}{% endif %}"

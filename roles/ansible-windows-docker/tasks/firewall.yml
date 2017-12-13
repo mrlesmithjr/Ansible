@@ -1,0 +1,9 @@
+---
+- name: firewall | Configuring Windows Firewall
+  win_firewall_rule:
+    name: "docker engine"
+    direction: "in"
+    action: "allow"
+    protocol: "TCP"
+    localport: 2375
+    state: "present"

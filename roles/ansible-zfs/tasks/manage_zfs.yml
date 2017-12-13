@@ -2,21 +2,21 @@
 - name: manage_zfs | checking existing zpool(s)
   shell: "zpool list | awk 'FNR >1' | awk '{print $1}'"
   changed_when: false
-  register: "zpools"
+  register: zpools
   check_mode: no
   when: zfs_pools is defined
 
 - name: manage_zfs | Gather ZPool Status
-  shell: "zpool status"
+  shell: zpool status
   changed_when: false
-  register: "zpool_devices"
+  register: zpool_devices
   check_mode: no
   when: zfs_pools is defined
 
 - name: manage_zfs | creating basic zpool(s)
-  command: "zpool create {{ item.name }} {{ item.devices|join (' ') }}"
-  register: "zpool_created"
-  with_items: '{{ zfs_pools }}'
+  command: "zpool create {{ item.options | join (' ') if item.options is defined else '' }} {{ item.name }} {{ item.devices|join (' ') }}"
+  register: zpool_created
+  with_items: "{{ zfs_pools }}"
   when: >
         zfs_pools is defined and
         zfs_create_pools and
@@ -27,8 +27,8 @@
         item.action|lower == "create"
 
 - name: manage_zfs | adding basic zpool(s)
-  command: "zpool add {{ item.name }} {{ item.devices|join (' ') }}"
-  with_items: '{{ zfs_pools }}'
+  command: "zpool add {{ item.options | join (' ') if item.options is defined else '' }} {{ item.name }} {{ item.devices|join (' ') }}"
+  with_items: "{{ zfs_pools }}"
   when: >
         zfs_pools is defined and
         zfs_create_pools and
@@ -39,9 +39,9 @@
         (zpool_created.changed or item.name in zpools.stdout)
 
 - name: manage_zfs | creating mirror/zraid zpool(s)
-  command: "zpool create {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
-  with_items: '{{ zfs_pools }}'
-  register: "zpool_created"
+  command: "zpool create {{ item.options | join (' ') if item.options is defined else '' }} {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
+  with_items: "{{ zfs_pools }}"
+  register: zpool_created
   when: >
         zfs_pools is defined and
         zfs_create_pools and
@@ -52,8 +52,8 @@
         item.action|lower == "create"
 
 - name: manage_zfs | adding mirror/zraid zpool(s)
-  command: "zpool add {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
-  with_items: '{{ zfs_pools }}'
+  command: "zpool add {{ item.options | join (' ') if item.options is defined else '' }} {{ item.name }} {{ item.type }} {{ item.devices|join (' ') }}"
+  with_items: "{{ zfs_pools }}"
   when: >
         zfs_pools is defined and
         zfs_create_pools and
@@ -75,7 +75,7 @@
     sharenfs: "{{ item.sharenfs|default(omit) }}"
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
-  with_items: '{{ zfs_pools }}'
+  with_items: "{{ zfs_pools }}"
   when: zfs_create_pools
 
 - name: manage_zfs | managing filesystems
@@ -92,7 +92,7 @@
     sharenfs: "{{ item.sharenfs|default(omit) }}"
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
-  with_items: '{{ zfs_filesystems }}'
+  with_items: "{{ zfs_filesystems }}"
   when: zfs_create_filesystems
 
 - name: manage_zfs | managing volumes
@@ -110,7 +110,7 @@
     volsize: "{{ item.volsize|default(omit) }}"
   notify:
     - restart iscsitarget
-  with_items: '{{ zfs_volumes }}'
+  with_items: "{{ zfs_volumes }}"
   when: zfs_create_volumes
 
 - name: manage_zfs | Setting ZFS Filesystem Permissions
@@ -119,13 +119,13 @@
     mode: "{{ item.mode|default(omit) }}"
     owner: "{{ item.owner|default(omit) }}"
     group: "{{ item.group|default(omit) }}"
-  with_items: '{{ zfs_filesystems }}'
+  with_items: "{{ zfs_filesystems }}"
   when: zfs_manage_filesystem_permissions
 
 - name: manage_zfs | configuring iscsi devices
   template:
-    src: "etc/iet/ietd.conf.j2"
-    dest: "/etc/iet/ietd.conf"
+    src: etc/iet/ietd.conf.j2
+    dest: /etc/iet/ietd.conf
     owner: root
     group: root
     mode: 0600
@@ -137,8 +137,8 @@
 
 - name: manage_zfs | configuring iscsi device access
   template:
-    src: "etc/iet/initiators.allow.j2"
-    dest: "/etc/iet/initiators.allow"
+    src: etc/iet/initiators.allow.j2
+    dest: /etc/iet/initiators.allow
     owner: root
     group: root
     mode: 0644
@@ -150,8 +150,8 @@
 
 - name: manage_zfs | configuring iscsi targets access
   template:
-    src: "etc/iet/targets.allow.j2"
-    dest: "/etc/iet/targets.allow"
+    src: etc/iet/targets.allow.j2
+    dest: /etc/iet/targets.allow
     owner: root
     group: root
     mode: 0644

@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-ntp
+# Defines if host is ntp_master
+# set ntp_master to true on specific group_vars/group
+ntp_master: true

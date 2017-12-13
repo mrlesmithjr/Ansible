@@ -1,0 +1,176 @@
+---
+# defaults file for ansible-saltstack
+saltstack_bind_interface: enp0s8
+
+saltstack_debian_repo_info:
+  key: "https://repo.saltstack.com/apt/{{ ansible_distribution|lower }}/{{ ansible_distribution_version }}/amd64/latest/SALTSTACK-GPG-KEY.pub"
+  repo: "deb http://repo.saltstack.com/apt/{{ ansible_distribution|lower }}/{{ ansible_distribution_version }}/amd64/latest {{ ansible_distribution_release|lower }} main"
+
+# Defines the Ansible group which contains the Salt nodes
+saltstack_group: salt
+
+saltstack_master: "{{ groups[saltstack_group][0] }}"
+
+saltstack_master_configuration:
+  # # Enable auto_accept. This setting will automatically accept all incoming
+  # # public keys from minions.
+  auto_accept: false
+  # # The location used to store cache information, particularly the job
+  # # information for executed salt commands.
+  # # This directory may contain sensitive data and should be protected accordingly.
+  # cachedir: /var/cache/salt/master
+  # # The path to the master's configuration file.
+  # conf_file: /etc/salt/master
+  # default_include: master.d/*.conf
+  # enable_gpu_grains: False
+  # # To specify the order in which environments are merged, set the ordering
+  # # in the env_order option. Given a conflict, the last matching value will
+  # # win.
+  # env_order:
+  #   - base
+  #   - dev
+  #   - prod
+  # extension_modules: /var/cache/salt/master/extmods
+  # file_recv: True
+  # # The file server works on environments passed to the master, each environment
+  # # can have multiple root directories, the subdirectories in the multiple file
+  # # roots cannot match, otherwise the downloaded files will not be able to be
+  # # reliably ensured. A base environment is required to house the top file.
+  file_roots:
+    base:
+      - "{{ saltstack_master_file_root_base }}"
+  #   dev:
+  #     - /srv/salt/dev/services
+  #     - /srv/salt/dev/states
+  #   prod:
+  #     - /srv/salt/prod/services
+  #     - /srv/salt/prod/states
+  # # The number of seconds to wait when the client is requesting information
+  # # about running jobs.
+  # gather_job_timeout: 10
+  # # The local interface to bind to, must be an IP address.
+  # interface: 0.0.0.0
+  # # Whether the master should listen for IPv6 connections. If this is set to True,
+  # # the interface option must be adjusted too (for example: interface: '::')
+  # ipv6: False
+  # # Set the number of hours to keep old job information. Note that setting
+  # # this option to 0 disables the cache cleaner.
+  # keep_jobs: 24
+  # # The size of key that should be generated when creating new keys.
+  # keysize: 2048
+  # # The loop_interval option controls the seconds for the master's maintenance
+  # # process check cycle. This process updates file server backends, cleans the
+  # # job cache and executes the scheduler.
+  # loop_interval: 60
+  # # module_dirs: []
+  # output_file: None
+  # # Set the default outputter used by the salt command.
+  # output: nested
+  # # A list of additional directories to search for salt outputters in.
+  # outputter_dirs: []
+  # # Specify the location of the master pidfile.
+  # pidfile: /var/run/salt-master.pid
+  pillar_roots:
+    base:
+      - /srv/pillar
+  # # The directory to store the pki authentication keys.
+  # pki_dir: /etc/salt/pki/master
+  # # The network port to set up the publication interface.
+  # publish_port: 4505
+  # # The port used by the return server, this is the server used by Salt to
+  # # receive execution returns and command executions.
+  # ret_port: 4506
+  # # The system root directory to operate from, change this to make Salt run
+  # # from an alternative root.
+  # root_dir: /
+  # # Tell the client to show minions that have timed out.
+  # show_timeout: True
+  # # Set the location to use for creating Unix sockets for master process communication.
+  # sock_dir: /var/run/salt/master
+  # ssh_identities_only: False
+  # ssh_log_file: /var/log/salt/ssh
+  # # ssh_passwd: ''
+  # ssh_port: 22
+  # ssh_scan_ports: 22
+  # ssh_scan_timeout: 0.01
+  # ssh_sudo: False
+  # ssh_timeout: 60
+  # ssh_use_home_key: False
+  # # ssh_user: root
+  # tcp_keepalive_cnt: -1
+  # tcp_keepalive_idle: 300
+  # tcp_keepalive_intvl: -1
+  # tcp_keepalive: True
+  # # The TCP port on which events for the master should be published if ipc_mode is TCP
+  # tcp_master_pub_port: 4512
+  # # The TCP port on which events for the master should be pulled if ipc_mode is TCP.
+  # tcp_master_pull_port: 4513
+  # # The TCP port on which events for the master should be pulled fom and then
+  # # republished onto the event bus on the master.
+  # tcp_master_publish_pull: 4514
+  # # The TCP port for mworkers to connect to on the master.
+  # tcp_master_workers: 4515
+  # # Set the default timeout for the salt command and api.
+  # timeout: 5
+  # # Time (in seconds) for a newly generated token to live.
+  # token_expire: 43200
+  # # The user to run the Salt processes
+  # user: root
+  # # Verify and set permissions on configuration directories at startup.
+  # verify_env: True
+  # # The number of threads to start for receiving commands and replies from minions.
+  # # If minions are stalling on replies because you have many minions, raise the
+  # # worker_threads value.
+  # worker_threads: 5
+
+saltstack_master_ip: "{% if inventory_hostname == saltstack_master %}127.0.0.1{% else %}{{ hostvars[saltstack_master]['ansible_' + saltstack_bind_interface]['ipv4']['address'] }}{% endif %}"
+
+saltstack_master_file_root_base: /srv/salt
+
+saltstack_minion_configuration:
+  # cachedir: /var/cache/salt/minion
+  # conf_file: /etc/salt/minion
+  # default_include: minion.d/*.conf
+  # # disable_modules:
+  # #   - cmdmod
+  # #   - test
+  # ipv6: False
+  # master_alive_interval: 30
+  # master_port: 4506
+  # master_shuffle: False
+  master: "{{ saltstack_master_ip }}"
+  # pidfile: /var/run/salt-minion.pid
+  # pki_dir: /etc/salt/pki/minion
+  # # proxy_host:
+  # # proxy_password:
+  # # proxy_port:
+  # # proxy_username:
+  # publish_port: 4505
+  # random_master: False
+  # retry_dns: 30
+  # root_dir: /
+  # sudo_user: root
+  # tcp_keepalive_cnt: -1
+  # tcp_keepalive_idle: 300
+  # tcp_keepalive_intvl: -1
+  # tcp_keepalive: True
+  # user: root
+  # verify_env: True
+
+saltstack_states: []
+  # nginx:
+  #   pkg:
+  #     - installed
+  #   service.running:
+  #     - watch:
+  #         - pkg: nginx
+  #         - file: /etc/nginx/nginx.conf
+  #         - file: /etc/nginx/sites-available/default
+  # haproxy:
+  #   pkg:
+  #     - installed
+  #   service.running:
+  #     - watch:
+  #       - pkg: haproxy
+  #       - file: /etc/haproxy/haproxy.cfg
+  #       - file: /etc/default/haproxy

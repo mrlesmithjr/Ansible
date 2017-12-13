@@ -1,0 +1,81 @@
+---
+- name: config | Setting Facts
+  set_fact:
+    corosync_bindnet_addr: "{{ hostvars[inventory_hostname]['ansible_' + corosync_bindnet_interface]['ipv4']['address'] }}"
+
+- name: config | Setting hacluster password
+  user:
+    name: "hacluster"
+    password: "{{ pacemaker_hacluster_password }}"
+  become: true
+
+- name: config | Capturing Corosync Auth Key
+  slurp:
+    src: "{{ corosync_authkey_file }}"
+  become: true
+  register: "_corosync_authkey_"
+  no_log: true
+  changed_when: false
+  when: (inventory_hostname == pacemaker_primary_server)
+
+- name: config | Setting Fact For Corosync Auth Key On Non Masters
+  set_fact:
+    _corosync_authkey_: "{{ hostvars[pacemaker_primary_server]['_corosync_authkey_'] }}"
+  no_log: true
+  when: (inventory_hostname != pacemaker_primary_server)
+
+- name: config | Configuring Corosync Auth Key On Non Masters
+  template:
+    src: "etc/corosync/authkey.j2"
+    dest: "{{ corosync_authkey_file }}"
+    owner: "root"
+    group: "root"
+    mode: "u=r,g=,o="
+  become: true
+  no_log: true
+  when: (inventory_hostname != pacemaker_primary_server)
+
+- name: config | configuring corosync
+  template:
+    src: "etc/corosync/corosync.conf.j2"
+    dest: "{{ corosync_config_file }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - restart corosync
+    - restart pacemaker
+  register: "_corosync_reconfigured"
+
+- name: config | configuring corosync service to start
+  template:
+    src: "etc/default/corosync.j2"
+    dest: "/etc/default/corosync"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - restart corosync
+    - restart pacemaker
+
+# Flush handlers
+- meta: flush_handlers
+  become: true
+
+- name: config | Ensuring Service Are Enabled
+  service:
+    name: "{{ item }}"
+    enabled: true
+  become: true
+  with_items:
+    - 'corosync'
+    - 'pacemaker'
+    - 'pcsd'
+
+- name: config | Ensuring PCSD Service Is Started
+  service:
+    name: 'pcsd'
+    state: "started"
+  become: true

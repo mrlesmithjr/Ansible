@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to configure [OpenStack](https://www.openstack.org/) `openrc` and `clouds.yaml` files to use for management.
+
+  license: MIT
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+
+  galaxy_tags:
+    - openstack
+
+dependencies: []

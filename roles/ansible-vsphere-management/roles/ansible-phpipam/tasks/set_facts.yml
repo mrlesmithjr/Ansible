@@ -1,0 +1,33 @@
+---
+- name: setting fact Debian apache2
+  set_fact:
+    web_group: "www-data"
+    web_owner: "www-data"
+  when: ansible_os_family == "Debian"
+
+- name: setting fact RedHat apache
+  set_fact:
+    web_group: "apache"
+    web_owner: "apache"
+  when: ansible_os_family == "RedHat"
+
+- name: setting PHP version
+  set_fact:
+    phpenmod_command: 'php5enmod'
+    php_path: 'etc/php5'  #no leading / for template path
+    php_sqlite_package: 'php5-sqlite'
+    php_ver: 5
+  when: >
+        ansible_distribution == "Debian" or
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version <= '14.04')
+
+- name: setting PHP version
+  set_fact:
+    phpenmod_command: 'phpenmod'
+    php_path: 'etc/php/7.0'  #no leading / for template path
+    php_sqlite_package: 'php7.0-sqlite3'
+    php_ver: 7.0
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04')

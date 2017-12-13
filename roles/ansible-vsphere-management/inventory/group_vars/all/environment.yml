@@ -1,0 +1,98 @@
+---
+pri_domain_name: "{{ vsphere_pri_domain_name }}"
+
+#vSphere AD Info
+# Define Ansible group which contains your Samba domain controllers
+# Do not change this until further refactoring occurs...this comment will be removed at that time
+samba_domain_controllers_group: "{{ vsphere_samba_vms_group }}"
+vsphere_ad_netbios_name: LAB-AD
+
+#vSphere bootstrap VM info
+vsphere_bootstrap_vms_cpu: 1
+vsphere_bootstrap_vms_deploy: false
+vsphere_bootstrap_vms_memory: 512
+# Define Ansible group which contains your DDI VMs
+# Do not change this until further refactoring occurs...this comment will be removed at that time
+vsphere_bootstrap_vms_group: vsphere_bootstrap_vms
+
+#vSphere DDI VM info
+vsphere_ddi_vms_cpu: 1
+vsphere_ddi_vms_deploy: true
+vsphere_ddi_vms_memory: 2048
+# Define Ansible group which contains your DDI VMs
+# Do not change this until further refactoring occurs...this comment will be removed at that time
+vsphere_ddi_vms_group: vsphere_ddi_vms
+
+# Defines if VMs defined as not defined to deploy to be destroyed
+# reference vsphere_vm_services_groups as well
+# Good for keeping environment in a defined state
+# references tasks/destroy_vms.yml
+vsphere_destroy_vms: true
+
+#vSphere DHCP VM info
+# Define Ansible group which contains your DHCP VMs
+# Do not change this until further refactoring occurs...this comment will be removed at that time
+vsphere_dhcp_vms_group: vsphere_dhcp_vms
+
+#vSphere DNSDist VM info
+vsphere_dnsdist_vms_cpu: 1
+vsphere_dnsdist_vms_deploy: true
+vsphere_dnsdist_vms_memory: 1024
+
+# Defines whether host_vars should be generated
+vsphere_generate_host_vars: true
+
+#vSphere Host Info
+vsphere_host_mgmt_subnet: 10.0.101
+vsphere_host_mgmt_subnetmask: 255.255.255.0
+vsphere_host_mgmt_vlan_id: 101
+vsphere_host_vmotion_subnet: 10.0.127
+vsphere_host_vmotion_subnetmask: 255.255.255.0
+vsphere_host_vmotion_vlan_id: 127
+
+# Defines inventory directory
+vsphere_inventory_directory: ../inventory
+
+#vSphere LB VM info
+vsphere_lb_vms_cpu: 1
+vsphere_lb_vms_deploy: true
+# Define Ansible group which contains your LB VMs
+# Do not change this until further refactoring occurs...this comment will be removed at that time
+vsphere_lb_vms_group: vsphere_lb_vms
+vsphere_lb_vms_memory: 1024
+
+# Defines the OVF template to deploy VMs from
+vsphere_linux_vapp_ovf: C:\vagrant\vApps\ubuntu_16.04_template.ovf
+vsphere_linux_vapp_template_name: ubuntu-16.04-template
+
+vsphere_networking_use_dvs: true
+vsphere_networking_use_vss: true
+
+vsphere_pri_domain_name: lab.etsbv.internal
+
+#vSphere Samba VM info
+vsphere_samba_vms_cpu: 1
+vsphere_samba_vms_deploy: true
+# Define Ansible group which contains your LB VMs
+# Do not change this until further refactoring occurs...this comment will be removed at that time
+vsphere_samba_vms_group: vsphere_samba_vms
+vsphere_samba_vms_memory: 512
+
+# Define Site Name
+vsphere_site_name: LAB
+
+vsphere_validate_certs: false
+
+# Defines the directory where the VCSA ISO has been extracted to
+vsphere_vcsa_iso_directory: C:\vagrant\vApps\VCSA_ISO
+
+#vSphere VM Services info
+# Defines the vSphere datastore to store vm core services on
+vsphere_vm_services_datastore: vSphere_iSCSI_Datastore_1
+# vSphere core services for vms
+vsphere_vm_services_subnet: 10.0.102
+vsphere_vm_services_subnet_mask: 255.255.255.0
+vsphere_vm_services_subnet_mask_cidr: 24
+vsphere_vm_services_vswitch: VSS-VLAN-102
+
+vsphere_vswitches_remove_unmanaged_vswitches: true

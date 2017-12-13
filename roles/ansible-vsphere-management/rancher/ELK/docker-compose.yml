@@ -1,0 +1,91 @@
+version: '2'
+services:
+  logstash-processor:
+    image: mrlesmithjr/logstash-processor
+    environment:
+      ES_SERVER: http://escluster:9200
+      REDIS_SERVER: redis
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  logstash:
+    image: rancher/lb-service-haproxy:v0.7.9
+    ports:
+    - 10514:10514/tcp
+    - 5044:5044/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  kibana-web:
+    image: kibana:4.6.4
+    environment:
+      ELASTICSEARCH_URL: http://escluster:9200
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  elasticsearch:
+    image: rancher/lb-service-haproxy:v0.7.9
+    ports:
+    - 9200:9200/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  redis-broker:
+    image: redis
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  kibana:
+    image: rancher/lb-service-haproxy:v0.7.9
+    ports:
+    - 5601:5601/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  syslog-collector:
+    image: mrlesmithjr/syslog-collector
+    environment:
+      ENABLE_UDP: 'true'
+      REDIRECT_SYSLOG: 'true'
+      REDIRECT_SYSLOG_HOST: logstash
+      REDIRECT_SYSLOG_HOST_PORT: '10514'
+      REDIRECT_SYSLOG_PROTOCOL: tcp
+      UDP_PORT: '514'
+    stdin_open: true
+    tty: true
+    ports:
+    - 514:514/udp
+    labels:
+      io.rancher.container.pull_image: always
+  escluster:
+    image: elasticsearch:2.4.4
+    stdin_open: true
+    tty: true
+    command:
+    - elasticsearch
+    - -Des.discovery.zen.ping.multicast.enabled=false
+    - -Des.discovery.zen.ping.unicast.hosts=escluster
+    - -Des.gateway.expected_nodes=3
+    - -Des.discovery.zen.minimum_master_nodes=2
+    - -Des.gateway.recover_after_nodes=2
+    - -Des.network.bind=_eth0:ipv4_
+    labels:
+      io.rancher.container.pull_image: always
+  redis:
+    image: rancher/lb-service-haproxy:v0.7.9
+    ports:
+    - 6379:6379/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin
+      io.rancher.container.create_agent: 'true'
+  logstash-pre-processor:
+    image: mrlesmithjr/logstash-pre-processor
+    environment:
+      REDIS_SERVER: redis
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always

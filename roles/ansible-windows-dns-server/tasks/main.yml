@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-windows-dns-server
+
+- include: features.yml
+
+- include: reboot.yml

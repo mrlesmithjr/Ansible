@@ -2,4 +2,5 @@
 - name: debian | installing unbound
   apt:
     name: "unbound"
-    state: present
+    state: "present"
+  become: true

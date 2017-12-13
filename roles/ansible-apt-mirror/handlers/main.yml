@@ -1,5 +1,8 @@
 ---
 # handlers file for ansible-apt-mirror
 - name: populate repos
-  command: "apt-mirror"
-  when: apt_mirror_populate_repos is defined and apt_mirror_populate_repos
+  command: apt-mirror
+  become: true
+  when: >
+        apt_mirror_populate_repos is defined and
+        apt_mirror_populate_repos

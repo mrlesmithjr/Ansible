@@ -1,17 +1,28 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-An [Ansible] role to install and configure [NGINX]
+- [ansible-nginx](#ansible-nginx)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Requirements
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-nginx
+
+An [Ansible](https://www.ansible) role to install/configure [NGINX](http://nginx.org)
+
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-```
+```yaml
 ---
 # defaults file for ansible-nginx
 config_nginx: false
@@ -22,6 +33,13 @@ nginx_error_log: '/var/log/nginx/error.log'
 nginx_events_block:
 #  - 'multi_accept on'
   - 'worker_connections 768'
+
+# Define any custom headers which you would like to have configured
+nginx_headers: []
+  # - 'set_real_ip_from 192.168.250.0/24'
+  # - 'real_ip_header X-Real-IP'
+  # - 'real_ip_recursive on'
+
 nginx_http_block:
   basic_settings:
     - 'keepalive_timeout 65'
@@ -72,15 +90,13 @@ nginx_server_block:
 nginx_worker_processes: 4
 ```
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 - hosts: all
   become: true
   vars:
@@ -89,18 +105,14 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
-[NGINX]: <http://nginx.org/>
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   mrlesmithjr [at] gmail.com

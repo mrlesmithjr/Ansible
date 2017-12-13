@@ -1,0 +1,6 @@
+---
+rancher_api_version: v1
+rancher_ha: true
+rancher_lb_host: "{{ rancher_lb_vip }}"
+rancher_lb_vip: "{{ vsphere_lb_vips[1] }}"
+rancher_server_host_api_port: 8080

@@ -1,0 +1,15 @@
+{% if groups['vsphere_hosts'] is defined %}
+[vsphere_hosts]
+{%   for host in groups['vsphere_hosts'] %}
+{{ hostvars[host]['inventory_hostname'] }} ansible_host={{ hostvars[host]['ansible_host'] }} mgmt_ip={{ hostvars[host]['mgmt_ip'] }} mgmt_subnetmask={{ hostvars[host]['mgmt_subnetmask'] }} vmotion_ip={{ hostvars[host]['vmotion_ip'] }} vmotion_subnetmask={{ hostvars[host]['vmotion_subnetmask'] }} vcenter_state={{ hostvars[host]['vcenter_state'] }}
+{%   endfor %}
+
+[vsphere_bootstrap_host]
+{%   if vsphere_bootstrap_host is defined %}
+{{ vsphere_bootstrap_host }}
+{%   endif %}
+{% elif groups['vsphere_hosts'] is not defined %}
+[vsphere_hosts]
+
+[vsphere_bootstrap_host]
+{% endif %}

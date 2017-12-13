@@ -1,0 +1,41 @@
+# {{ ansible_managed }}
+
+[DEFAULT]
+bind_host = {{ openstack_image_service_management_ip }}
+{% set _rabbit_user = openstack_image_service_rabbit_user %}
+{% set _rabbit_pass = openstack_image_service_rabbit_pass %}
+transport_url = rabbit://{% for host in openstack_image_service_rabbit_hosts %}{{ _rabbit_user }}:{{ _rabbit_pass }}@{{ host }}{% if not loop.last %},{% endif %}{% endfor %}
+
+
+[database]
+connection = mysql+pymysql://glance:{{ openstack_image_service_glance_db_info['pass'] }}@{{ openstack_image_service_glance_db_info['host']}}/{{ openstack_image_service_glance_db_info['db'] }}
+
+[keystone_authtoken]
+auth_type = {{ openstack_image_service_keystone_authtoken['auth_type'] }}
+auth_uri = {{ openstack_image_service_keystone_authtoken['auth_uri'] }}
+auth_url = {{ openstack_image_service_keystone_authtoken['auth_url'] }}
+memcached_servers = {{ openstack_image_service_keystone_authtoken['memcached_servers']|join(',') }}
+password = {{ openstack_image_service_keystone_authtoken['password'] }}
+project_domain_name = {{ openstack_image_service_keystone_authtoken['project_domain_name'] }}
+project_name = {{ openstack_image_service_keystone_authtoken['project_name'] }}
+user_domain_name = {{ openstack_image_service_keystone_authtoken['user_domain_name'] }}
+username = {{ openstack_image_service_keystone_authtoken['username'] }}
+
+[matchmaker_redis]
+
+[oslo_messaging_amqp]
+
+[oslo_messaging_kafka]
+
+[oslo_messaging_notifications]
+
+[oslo_messaging_rabbit]
+
+[oslo_messaging_zmq]
+
+[oslo_policy]
+
+[paste_deploy]
+flavor = keystone
+
+[profiler]

@@ -1,0 +1,57 @@
+AcceptEnv {{ sshd_accept_env }}
+{% if sshd_allow_groups != [] %}
+AllowGroups {{ sshd_allow_groups|join (' ') }}
+{% endif %}
+AllowTcpForwarding {{ sshd_allow_tcp_forwarding }}
+{% if sshd_allow_users != [] %}
+AllowUsers {{ sshd_allow_users|join (' ') }}
+{% endif %}
+AuthorizedKeysFile {{ sshd_authorized_keys_file }}
+{% if sshd_banner != [] %}
+Banner {{ sshd_banner }}
+{% endif %}
+ChallengeResponseAuthentication {{ sshd_challenge_response_authentication }}
+Compression {{ sshd_compression }}
+{% if sshd_deny_groups != [] %}
+DenyGroups {{ sshd_deny_groups|join (' ') }}
+{% endif %}
+{% if sshd_deny_users != [] %}
+DenyUsers {{ sshd_deny_users|join (' ') }}
+{% endif %}
+GSSAPIAuthentication {{ sshd_gssapi_authentication }}
+GSSAPICleanupCredentials {{ sshd_gssapi_cleanup_credentials }}
+HostbasedAuthentication {{ sshd_host_based_authentication }}
+{% for item in sshd_host_keys %}
+HostKey {{ item }}
+{% endfor %}
+IgnoreRhosts {{ sshd_ignore_rhosts }}
+IgnoreUserKnownHosts {{ sshd_ignore_user_known_hosts }}
+KeyRegenerationInterval {{ sshd_key_regeneration_interval }}
+{% for item in sshd_ports %}
+Port {{ item }}
+{% endfor %}
+{% for item in sshd_listen_addresses %}
+ListenAddress {{ item }}
+{% endfor %}
+LoginGraceTime {{ sshd_login_grace_time }}
+LogLevel {{ sshd_log_level }}
+MaxStartups {{ sshd_max_startups }}
+PasswordAuthentication {{ sshd_password_authentication }}
+PermitEmptyPasswords {{ sshd_permit_empty_passwords }}
+PermitRootLogin {{ sshd_permit_root_login }}
+PrintLastLog {{ sshd_print_lastlog }}
+PrintMotd {{ sshd_print_motd }}
+Protocol {{ sshd_protocol }}
+PubkeyAuthentication {{ sshd_pubkey_authentication }}
+RhostsRSAAuthentication {{ sshd_rhosts_rsa_authentication }}
+RSAAuthentication {{ sshd_rsa_authentication }}
+ServerKeyBits {{ sshd_server_key_bits }}
+StrictModes {{ sshd_strict_modes }}
+Subsystem {{ sshd_subsystem }}
+SyslogFacility {{ sshd_syslog_facility }}
+TCPKeepAlive {{ sshd_tcp_keep_alive }}
+UseDNS {{ sshd_use_dns }}
+UsePAM {{ sshd_use_pam }}
+UsePrivilegeSeparation {{ sshd_use_privilege_separation }}
+X11DisplayOffset {{ sshd_x11_display_offset }}
+X11Forwarding {{ sshd_x11_forwarding }}

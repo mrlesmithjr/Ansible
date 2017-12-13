@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-saltstack
+- include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include_tasks: config.yml

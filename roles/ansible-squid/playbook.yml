@@ -40,7 +40,7 @@
         vip_int: '{{ ansible_enp0s8.device }}'
         vip_addresses:
           - '{{ haproxy_lb_vip }}'
-    pri_domain_name: 'test.vagrant.local'
+    squid_pri_domain_name: 'test.vagrant.local'
     squid_enable_haproxy: true
     squid_enable_keepalived: true
   roles:

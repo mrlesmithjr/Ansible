@@ -1,0 +1,17 @@
+version: '2'
+services:
+  powerdns:
+    image: rancher/external-dns:v0.7.1
+    environment:
+      POWERDNS_API_KEY: {{ pdns_webserver_password }}
+      POWERDNS_URL: {{ pdns_api_url }}
+      ROOT_DOMAIN: {{ vsphere_pri_domain_name }}
+      TTL: '299'
+    expose:
+    - '1000'
+    command:
+    - -provider=powerdns
+    labels:
+      io.rancher.container.agent.role: external-dns
+      io.rancher.container.create_agent: 'true'
+      io.rancher.container.pull_image: always

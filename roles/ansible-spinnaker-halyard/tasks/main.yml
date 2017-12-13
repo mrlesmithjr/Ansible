@@ -1,0 +1,8 @@
+---
+# tasks file for ansible-spinnaker-halyard
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: users.yml
+
+- include: config.yml

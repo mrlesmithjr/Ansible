@@ -1,5 +1,21 @@
 ---
 # defaults file for ansible-landscape-client
+
+# Landscape App Info
+## Define below if using https://github.com/mrlesmithjr/ansible-landscape-app to
+## deploy Landscape App
+### define landscape primary app server
+landscape_client_app_server: "{{ groups['landscape_app'][0] }}"
+### defines server cert on client which will be created
+landscape_client_app_server_cert: '/etc/landscape/server.pem'
+### defines if client should be configured as being managed by an internal
+### Landscape App Server
+landscape_client_app_server_config: false
+### defines the ssl cert on the primary app server which should be captured
+### and copied to the client
+landscape_client_app_ssl_cert_file: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+
+
 landscape_client_data_path: '/var/lib/landscape/client'
 landscape_client_log_level: 'info'
 landscape_client_ping_url: 'http://landscape.canonical.com/ping'

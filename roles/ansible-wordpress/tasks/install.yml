@@ -1,0 +1,12 @@
+---
+- name: install | Downloading and Extracting Wordpress {{ wordpress_version }}
+  unarchive:
+    src: "{{ wordpress_dl }}"
+    dest: "{{ wordpress_apache2_web_root }}/"
+    remote_src: true
+    creates: "{{ wordpress_apache2_web_root }}/wordpress/index.php"
+  become: true
+
+- name: install | Generating Wordpress Salt
+  command: curl https://api.wordpress.org/secret-key/1.1/salt/
+  register: wordpress_salt

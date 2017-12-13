@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-windows-domain-controller
+
+windows_domain_controller_info:
+  dns_domain_name: vagrant.local
+  domain_admin_password: vagrant
+  domain_admin_user: administrator@vagrant.local
+  safe_mode_password: Vagrant@123!
+  state: domain_controller

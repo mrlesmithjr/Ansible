@@ -1,6 +1,8 @@
 [logstash-{{ logstash_major_ver }}]
-name=logstash repository for {{ logstash_major_ver }}.x packages
-baseurl={{ logstash_repo_url }}/{{ logstash_major_ver }}/centos
+name=Elastic repository for {{ logstash_major_ver }} packages
+baseurl={{ logstash_redhat_repo_url }}
 gpgcheck=1
 gpgkey={{ logstash_repo_key }}
 enabled=1
+autorefresh=1
+type=rpm-md

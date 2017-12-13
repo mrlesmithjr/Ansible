@@ -1,0 +1,10 @@
+---
+- name: config | Configuring Syslog-NG
+  template:
+    src: "etc/syslog-ng/syslog-ng.conf.j2"
+    dest: "/etc/syslog-ng/syslog-ng.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify: "restart syslog-ng"

@@ -1,0 +1,41 @@
+---
+- name: config | Ensuring Guacamole Folders Exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ guacamole_tomcat }}"
+    group: "{{ guacamole_tomcat }}"
+  become: true
+  with_items:
+    - /etc/guacamole
+    - /etc/guacamole/lib
+    - /etc/guacamole/extensions
+    - "/usr/share/{{ guacamole_tomcat }}/.guacamole/"
+
+- name: config | Configuring guacamole.properties
+  template:
+    src: etc/guacamole/guacamole.properties.j2
+    dest: /etc/guacamole/guacamole.properties
+    owner: "{{ guacamole_tomcat }}"
+    group: "{{ guacamole_tomcat }}"
+  become: true
+  notify: "restart {{ guacamole_tomcat }}"
+
+- name: config | Configuring user-mapping.xml
+  template:
+    src: etc/guacamole/user-mapping.xml.j2
+    dest: /etc/guacamole/user-mapping.xml
+    owner: "{{ guacamole_tomcat }}"
+    group: "{{ guacamole_tomcat }}"
+  become: true
+  notify: "restart {{ guacamole_tomcat }}"
+
+- name: config | Creating Tomcat symlink For guacamole.properties
+  file:
+    src: /etc/guacamole/guacamole.properties
+    dest: "/usr/share/{{ guacamole_tomcat }}/.guacamole/guacamole.properties"
+    state: link
+    owner: "{{ guacamole_tomcat }}"
+    group: "{{ guacamole_tomcat }}"
+  become: true
+  notify: "restart {{ guacamole_tomcat }}"

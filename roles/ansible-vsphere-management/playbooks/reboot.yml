@@ -1,0 +1,100 @@
+---
+- hosts: vsphere_dnsdist_vms:vsphere_ddi_vms:vsphere_lb_vms:vsphere_samba_vms:!vsphere_destroy_vms
+  serial: 1
+  tasks:
+    - name: Checking If Post Deployment Reboot Completed
+      stat:
+        path: /post_deployment_reboot_completed
+      register: _post_deployment_reboot_completed
+      tags:
+        - post_deployment_reboot
+
+    - name: Rebooting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _rebooting_host
+      tags:
+        - post_deployment_reboot
+      when: not _post_deployment_reboot_completed['stat']['exists']
+
+    - name: Waiting For Host To Come Back
+      wait_for:
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+        port: 22
+        search_regex: OpenSSH
+        delay: 10
+      vars:
+        ansible_connection: local
+      become: false
+      tags:
+        - post_deployment_reboot
+      when: _rebooting_host['changed']
+
+    - name: Pausing For 30 Seconds
+      pause:
+        seconds: 30
+      tags:
+        - post_deployment_reboot
+      when: _rebooting_host['changed']
+
+    - name: Marking Post Deployment Reboot As Completed
+      file:
+        path: /post_deployment_reboot_completed
+        state: touch
+      become: true
+      tags:
+        - post_deployment_reboot
+      when: not _post_deployment_reboot_completed['stat']['exists']
+
+- hosts: vsphere_samba_vms:!vsphere_destroy_vms
+  serial: 1
+  tasks:
+    - name: Checking If Post Samba Deployment Reboot Completed
+      stat:
+        path: /post_samba_deployment_reboot_completed
+      register: _post_samba_deployment_reboot_completed
+      tags:
+        - post_samba_deployment_reboot
+
+    - name: Rebooting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _rebooting_host
+      tags:
+        - post_samba_deployment_reboot
+      when: not _post_samba_deployment_reboot_completed['stat']['exists']
+
+    - name: Waiting For Host To Come Back
+      wait_for:
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+        port: 22
+        search_regex: OpenSSH
+        delay: 10
+      vars:
+        ansible_connection: local
+      become: false
+      tags:
+        - post_samba_deployment_reboot
+      when: _rebooting_host['changed']
+
+    - name: Pausing For 30 Seconds
+      pause:
+        seconds: 30
+      tags:
+        - post_samba_deployment_reboot
+      when: _rebooting_host['changed']
+
+    - name: Marking Post Deployment Reboot As Completed
+      file:
+        path: /post_samba_deployment_reboot_completed
+        state: touch
+      become: true
+      tags:
+        - post_samba_deployment_reboot
+      when: not _post_samba_deployment_reboot_completed['stat']['exists']

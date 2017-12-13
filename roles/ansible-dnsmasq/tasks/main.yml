@@ -1,5 +1,8 @@
 ---
 # tasks file for ansible-dnsmasq
+- include: alpine.yml
+  when: ansible_os_family == "Alpine"
+
 - include: debian.yml
   when: ansible_os_family == "Debian"
 

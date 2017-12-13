@@ -1,0 +1,45 @@
+---
+- name: redhat_pdns_recursor | downloading powerdns recursor
+  get_url:
+    url: "{{ pdns_recursor_download_url }}/rpm/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
+    dest: "/opt/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
+  become: true
+  when: pdns_recursor_version != "4.x"
+
+- name: redhat_pdns_recursor | installing powerdns recursor
+  yum:
+    name: "/opt/pdns-recursor-{{ pdns_recursor_version }}.x86_64.rpm"
+  become: true
+  notify: restart pdns recursor
+  when: pdns_recursor_version != "4.x"
+
+- name: redhat_pdns_recursor | Installing PowerDNS 4.x Pre-Reqs
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'epel-release'
+    - 'yum-plugin-priorities'
+  when: pdns_recursor_version == "4.x"
+
+- name: redhat_pdns_recursor | Adding PowerDNS Repo
+  yum_repository:
+    name: "powerdns-rec-40"
+    baseurl: "http://repo.powerdns.com/centos/$basearch/$releasever/rec-40"
+    description: "PDNS-Recursor"
+    gpgcheck: yes
+    gpgkey: "https://repo.powerdns.com/FD380FBB-pub.asc"
+    enabled: yes
+    includepkgs: "pdns*"
+    priority: 90
+    state: "present"
+  become: true
+  when: pdns_recursor_version == "4.x"
+
+- name: redhat_pdns_recursor | Installing PowerDNS 4.x
+  yum:
+    name: "pdns-recursor"
+    state: "present"
+  become: true
+  when: pdns_recursor_version == "4.x"

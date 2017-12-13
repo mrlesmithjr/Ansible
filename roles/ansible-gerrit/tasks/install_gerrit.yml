@@ -122,6 +122,24 @@
     src: "{{ gerrit_site_dir }}/bin/gerrit.sh"
     dest: /etc/init.d/gerrit
     state: link
+  when: ansible_service_mgr != 'systemd'
+
+- name: install_gerrit | Configuring Gerrit SystemD Service
+  template:
+    src: "etc/systemd/system/gerrit.service.j2"
+    dest: "/etc/systemd/system/gerrit.service"
+    owner: "root"
+    group: "root"
+  become: true
+  register: "_gerrit_systemd_service"
+  when: ansible_service_mgr == 'systemd'
+
+- name: install_gerrit | Reloading SystemD
+  systemd:
+    daemon_reload: true
+    name: "{{ gerrit_service_name }}"
+  become: true
+  when: _gerrit_systemd_service['changed']
 
 - name: install_gerrit | ensuring gerrit service is started and starts on boot
   service:

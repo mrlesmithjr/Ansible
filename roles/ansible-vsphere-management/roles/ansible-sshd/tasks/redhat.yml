@@ -1,0 +1,14 @@
+---
+# This obviously is already installed if using Ansible
+# However, could be useful as an ansible-pull task
+- name: redhat | Installing SSHD
+  dnf:
+    name: "openssh-server"
+    state: "present"
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing SSHD
+  yum:
+    name: "openssh-server"
+    state: "present"
+  when: ansible_distribution != "Fedora"

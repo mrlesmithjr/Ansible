@@ -1,0 +1,35 @@
+---
+# tasks file for ansible-openstack-openrc
+- name: Generating openrc Config
+  template:
+    src: "openrc.j2"
+    dest: "{{ ansible_env['HOME'] }}/{{ item['username'] }}-openrc"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "u=rw,g=,o="
+  become: true
+  with_items: '{{ openstack_openrc_clouds }}'
+  tags:
+    - 'openstack_openrc'
+
+- name: Creating Client Configuration Directory
+  file:
+    dest: "{{ ansible_env['HOME'] }}/.config/openstack"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "u=rwx,g=,o="
+    state: "directory"
+  become: true
+  tags:
+    - 'openstack_openrc'
+
+- name: Generating clouds.yaml Config
+  template:
+    src: "clouds.yaml.j2"
+    dest: "{{ ansible_env['HOME'] }}/.config/openstack/clouds.yaml"
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "u=rw,g=,o="
+  become: true
+  tags:
+    - 'openstack_openrc'

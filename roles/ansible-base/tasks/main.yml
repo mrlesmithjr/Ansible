@@ -1,5 +1,10 @@
 ---
 # tasks file for ansible-base
+- include: archlinux.yml
+  when: ansible_os_family == "Archlinux"
+  tags:
+    - base
+
 - include: debian.yml
   tags:
     - base

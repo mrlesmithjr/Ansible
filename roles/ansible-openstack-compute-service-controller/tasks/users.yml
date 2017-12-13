@@ -1,0 +1,38 @@
+---
+# https://docs.openstack.org/ocata/install-guide-ubuntu/nova-controller-install.html
+
+# Create default users
+- name: users | Creating Users
+  os_user:
+    name: "{{ item['name'] }}"
+    password: "{{ item['password'] }}"
+    cloud: "default"
+    email: "{{ item['email']|default(omit) }}"
+    domain: "{{ item['domain_id'] }}"
+    default_project: "{{ item['default_project']|default(omit) }}"
+    state: "{{ item['state'] }}"
+  no_log: true
+  with_items:
+    - '{{ openstack_compute_service_controller_nova_user_info }}'
+    - '{{ openstack_compute_service_controller_placement_user_info }}'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)
+
+# Create default user roles
+- name: users | Creating User Roles
+  os_user_role:
+    cloud:  "default"
+    user: "{{ item['name'] }}"
+    role: "{{ item['role'] }}"
+    project: "{{ item['project'] }}"
+    state: "{{ item['state'] }}"
+  no_log: true
+  with_items:
+    - '{{ openstack_compute_service_controller_nova_user_info }}'
+    - '{{ openstack_compute_service_controller_placement_user_info }}'
+  when: >
+        not openstack_compute_service_controller_ha or
+        (openstack_compute_service_controller_ha and
+          inventory_hostname == openstack_compute_service_controller_ha_master)

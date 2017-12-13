@@ -2,16 +2,20 @@
 # handlers file for ansible-logstash
 - name: init logstash
   command: update-rc.d logstash defaults 96 04
+  become: true
 
 - name: remove logstash-web
   command: update-rc.d -f logstash-web remove
+  become: true
 
 - name: restart logstash
   service:
     name: logstash
     state: restarted
+  become: true
 
 - name: stop logstash-web
   service:
     name: logstash-web
     state: stopped
+  become: true

@@ -1,0 +1,36 @@
+---
+# handlers file for ansible-openstack-compute-service-controller
+- name: restart nova-api
+  service:
+    name: "nova-api"
+    state: "restarted"
+    enabled: true
+  become: true
+
+- name: restart nova-conductor
+  service:
+    name: "nova-conductor"
+    state: "restarted"
+    enabled: true
+  become: true
+
+- name: restart nova-consoleauth
+  service:
+    name: "nova-consoleauth"
+    state: "restarted"
+    enabled: true
+  become: true
+
+- name: restart nova-novncproxy
+  service:
+    name: "nova-novncproxy"
+    state: "restarted"
+    enabled: true
+  become: true
+
+- name: restart nova-scheduler
+  service:
+    name: "nova-scheduler"
+    state: "restarted"
+    enabled: true
+  become: true

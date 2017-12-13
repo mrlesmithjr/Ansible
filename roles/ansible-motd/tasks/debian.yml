@@ -1,0 +1,80 @@
+---
+- name: debian | Ensuring {{ motd_default_dir }} Exists
+  file:
+    path: "{{ motd_default_dir }}"
+    state: "directory"
+  become: true
+  when: >
+        ansible_distribution == "Debian" and
+        ansible_distribution_version|version_compare('9.0', '<')
+
+- name: debian | Removing /etc/motd
+  file:
+    path: "/etc/motd"
+    state: "absent"
+  become: true
+  when: >
+        ansible_distribution == "Debian" and
+        ansible_distribution_version|version_compare('9.0', '<')
+
+- name: debian | Creating symlink for /etc/motd
+  file:
+    src: "/var/run/motd"
+    dest: "/etc/motd"
+    state: "link"
+    force: true
+  become: true
+  when: >
+        ansible_distribution == "Debian" and
+        ansible_distribution_version|version_compare('9.0', '<')
+
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'dnsutils'
+
+- name: debian | Checking If Distro Defaults Exist
+  stat:
+    path: "{{ motd_default_dir }}/{{ item }}"
+  register: "_motd_ubuntu_defaults"
+  with_items: '{{ motd_ubuntu_defaults }}'
+  when: >
+        ansible_distribution == "Ubuntu"
+
+- name: debian | Disabling Distro Defaults
+  file:
+    path: "{{ motd_default_dir }}/{{ item['item'] }}"
+    state: "file"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  with_items: "{{ _motd_ubuntu_defaults['results'] }}"
+  when: >
+        (motd_disable_defaults and
+        ansible_distribution == "Ubuntu") and
+        item['stat']['exists']
+
+- name: debian | Enabling Distro Defaults
+  file:
+    path: "{{ motd_default_dir }}/{{ item['item'] }}"
+    state: "file"
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  with_items: "{{ _motd_ubuntu_defaults['results'] }}"
+  when: >
+        (not motd_disable_defaults and
+        ansible_distribution == "Ubuntu") and
+        item['stat']['exists']
+
+- name: debian | Configuring Custom MOTD Scripts
+  template:
+    src: "etc/update-motd.d/{{ item }}.j2"
+    dest: "{{ motd_default_dir }}/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  with_items: '{{ motd_custom_scripts }}'
+  when: motd_enable_custom_scripts

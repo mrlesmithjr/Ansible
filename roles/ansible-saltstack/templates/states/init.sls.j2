@@ -1,0 +1,2 @@
+{{ item }}:
+  {{ saltstack_states[item]|to_nice_yaml|indent(width=2) }}

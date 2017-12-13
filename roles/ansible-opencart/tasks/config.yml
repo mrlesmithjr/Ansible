@@ -1,0 +1,16 @@
+---
+- name: config | Configuring OpenCart
+  template:
+    src: config.php.j2
+    dest: "{{ opencart_webroot }}/config.php"
+    owner: "{{ opencart_web_owner }}"
+    group: "{{ opencart_web_group }}"
+  become: true
+
+- name: config | Configuring OpenCart Admin
+  template:
+    src: admin/config.php.j2
+    dest: "{{ opencart_webroot }}/admin/config.php"
+    owner: "{{ opencart_web_owner }}"
+    group: "{{ opencart_web_group }}"
+  become: true

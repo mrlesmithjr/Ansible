@@ -1,0 +1,87 @@
+# {{ ansible_managed }}
+
+pid {{ ngninx_load_balancer_pid }};
+user {{ nginx_load_balancer_user }};
+worker_processes {{ nginx_load_balancer_worker_processes }};
+{% if nginx_load_balancer_includes is defined %}
+{%   for item in nginx_load_balancer_includes %}
+include {{ item }};
+{%   endfor %}
+{% endif %}
+{% if nginx_load_balancer_events is defined %}
+events {
+{%   for item in nginx_load_balancer_events %}
+  {{ item }};
+{%   endfor %}
+}
+{% endif %}
+{% if nginx_load_balancer_configs is defined %}
+http {
+{%   for item1 in nginx_load_balancer_configs %}
+{%     if item1['protocol']|lower == 'http' %}
+  upstream {{ item1['name'] }} {
+{%       if item1['method'] != 'round_robin' %}
+    {{ item1['method'] }};
+{%       endif %}
+{%       for item2 in item1['upstream'] %}
+{%         set blp = item2['backend_listen_port'] %}
+{%           if item2['server'] is defined %}
+    server {{ item2['server'] }}:{{ blp }}{% if item2['options'] is defined %} {{ item2['options']|join(' ') }}{% endif %};
+{%           elif item2['servers'] is defined %}
+{%             for item3 in item2['servers'] %}
+    server {{ item3 }}:{{ blp }}{% if item2['options'] is defined %} {{ item2['options']|join(' ') }}{% endif %};
+{%             endfor %}
+{%           endif %}
+{%       endfor %}
+  }
+  server {
+    listen {{ item1['frontend_listen_port'] }}{% if item1['ssl']|default(false) %} ssl{% endif %};
+    server_name {{ item1['server_name']|join(' ') }};
+    location {{ item1['location'] }} {
+{%       if nginx_load_balancer_headers is defined %}
+{%         for item2 in nginx_load_balancer_headers %}
+      proxy_set_header {{ item2 }};
+{%         endfor %}
+{%       endif %}
+      proxy_pass {{ item1['protocol'] }}://{{ item1['name'] }};
+    }
+{%       if item1['ssl']|default(false) %}
+    ssl on;
+{%         if not nginx_load_balancer_ha %}
+    ssl_certificate {{ nginx_load_balancer_ssl['public_key_file'] }};
+    ssl_certificate_key {{ nginx_load_balancer_ssl['private_key_file'] }};
+{%         elif nginx_load_balancer_ha %}
+    ssl_certificate {{ nginx_load_balancer_ha_key_file_prefix }}-cert.pem;
+    ssl_certificate_key {{ nginx_load_balancer_ha_key_file_prefix }}-key.pem;
+{%         endif %}
+{%       endif %}
+  }
+{%     endif %}
+{%   endfor %}
+}
+stream {
+{%   for item1 in nginx_load_balancer_configs %}
+{%     if item1['protocol']|lower == 'tcp' or item1['protocol']|lower == 'udp' %}
+  upstream {{ item1['name'] }} {
+{%       if item1['method'] != 'round_robin' %}
+    {{ item1['method'] }};
+{%       endif %}
+{%       for item2 in item1['upstream'] %}
+{%         set blp = item2['backend_listen_port'] %}
+{%           if item2['server'] is defined %}
+    server {{ item2['server'] }}:{{ blp }}{% if item2['options'] is defined %} {{ item2['options']|join(' ') }}{% endif %};
+{%           elif item2['servers'] is defined %}
+{%             for item3 in item2['servers'] %}
+    server {{ item3 }}:{{ blp }}{% if item2['options'] is defined %} {{ item2['options']|join(' ') }}{% endif %};
+{%             endfor %}
+{%           endif %}
+{%       endfor %}
+  }
+  server {
+    listen {{ item1['frontend_listen_port'] }} {{ item1['protocol'] }};
+    proxy_pass {{ item1['name'] }};
+  }
+{%     endif %}
+{%   endfor %}
+}
+{% endif %}

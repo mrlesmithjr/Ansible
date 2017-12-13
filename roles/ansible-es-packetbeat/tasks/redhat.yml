@@ -1,19 +1,40 @@
 ---
-- name: redhat | installing pre-reqs
+- name: redhat | Installing Pre-Reqs
   yum:
     name: "{{ item }}"
-    state: "present"
+    state: present
+  become: true
   with_items:
-    - 'libpcap'
-    - 'unzip'
+    - libpcap
   when: ansible_distribution != "Fedora"
 
-- name: redhat | downloading packetbeat
-  get_url:
-    url: "{{ es_packetbeat_dl_url }}/{{ es_packetbeat_redhat_package }}"
-    dest: "/opt/{{ es_packetbeat_redhat_package }}"
+- name: redhat | Adding Packetbeat Repo Key
+  rpm_key:
+    key: "{{ es_packetbeat_repo_key }}"
+    state: present
+  become: true
 
-- name: redhat | installing packetbeat
+- name: redhat | Adding Packetbeat Repo
+  yum_repository:
+    baseurl: "{{ es_packetbeat_repo_url }}/packages/{{ es_packetbeat['major_version'] }}/yum"
+    description: "Packetbeat repository for {{ es_packetbeat['major_version'] }} packages"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "{{ es_packetbeat_repo_key }}"
+    name: "packetbeat-{{ es_packetbeat['major_version'] }}"
+    state: present
+  become: true
+
+- name: redhat | Installing Packetbeat
   yum:
-    name: "/opt/{{ es_packetbeat_redhat_package }}"
-    state: "present"
+    name: "packetbeat-{{ es_packetbeat['minor_version'] }}"
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Packetbeat
+  dnf:
+    name: "packetbeat-{{ es_packetbeat['minor_version'] }}"
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"

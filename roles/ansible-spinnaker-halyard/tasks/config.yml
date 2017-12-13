@@ -1,0 +1,19 @@
+---
+- name: config | Ensuring Config Folders Exist
+  file:
+    path: "/opt/spinnaker/config"
+    state: "directory"
+    mode: "u=rx,g=rx,o=rx"
+  become: true
+
+- name: config | Configuring Halyard Defaults
+  template:
+    src: "halyard.yml.j2"
+    dest: "/opt/spinnaker/config/halyard.yml"
+  become: true
+
+- name: config | Configuring /opt/spinnaker/config/halyard-user
+  template:
+    src: "halyard-user.j2"
+    dest: "/opt/spinnaker/config/halyard-user"
+  become: true

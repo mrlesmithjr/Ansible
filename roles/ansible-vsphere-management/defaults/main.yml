@@ -1,0 +1,571 @@
+---
+# defaults file for ansible-vsphere-management
+
+_vsphere_ad_netbios_name: "{{ pri_domain_name.split('.') }}"
+
+vsphere_ad_dns_domain_name: "{{ vsphere_ad_netbios_name|lower }}.{{ vsphere_pri_domain_name }}"
+
+vsphere_ad_domain_secure_password_file: c:\tmp\ad_domain_pwd.txt
+
+vsphere_ad_netbios_name: "{{ _vsphere_ad_netbios_name[0] }}"
+
+vsphere_ad_password: "{{ vsphere_samba_ad_password }}"
+
+vsphere_ad_user: "{{ vsphere_samba_ad_user }}"
+
+# Defines initial bootstrap vms to deploy from OVA/OVF. Currently this OVF
+# needs to reside on the Windows host which powercli is being ran against.
+#
+# If a static IP address is desired define the following
+# (Enter shorthand cidr for netmask_cidr, i.e. 24 for 255.255.255.0):
+##
+## ip: x.x.x.x
+## netmask_cidr: x
+## gateway: x.x.x.x
+##
+# Defines core services bootstrap vms
+# reference vsphere_vm_services_groups as well
+vsphere_bootstrap_vms: []
+  # - vm_name: bootstrap-vm-1.{{ vsphere_pri_domain_name }}
+  #   cpus: "{{ vsphere_bootstrap_vms_cpu }}"
+  #   deploy: "{{ vsphere_bootstrap_vms_deploy }}"
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_vm_services_subnet }}.101"
+  #   memory_mb: "{{ vsphere_bootstrap_vms_memory }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: bootstrap-vm-2.{{ vsphere_pri_domain_name }}
+  #   cpus: "{{ vsphere_bootstrap_vms_cpu }}"
+  #   deploy: "{{ vsphere_bootstrap_vms_deploy }}"
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   memory_mb: "{{ vsphere_bootstrap_vms_memory }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+
+vsphere_bootstrap_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_bootstrap_vms.inv"
+
+vsphere_bootstrap_vms_json_output_file: "{{ vsphere_inventory_directory }}/vsphere_bootstrap_vms.json"
+
+# This file will contain the encrypted password to use with the boostrap_vms.ps1 script
+vsphere_bootstrap_vms_secure_password_file: c:\tmp\pwd.txt
+
+vsphere_bootstrap_vms_wait_for_ssh: "{{ vsphere_vms_wait_for_ssh }}"
+
+# These define the IP addresses for the DDI VMs
+vsphere_ddi_vm_ips: []
+  # - "{{ vsphere_vm_services_subnet }}.10"
+  # - "{{ vsphere_vm_services_subnet }}.11"
+  # - "{{ vsphere_vm_services_subnet }}.12"
+
+# Defines core services ddi vms
+# reference vsphere_vm_services_groups as well
+vsphere_ddi_vms: []
+  # - vm_name: "ddi-00.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_ddi_vm_ips[0] }}"
+  #   memory_mb: 2048
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: "ddi-01.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_ddi_vm_ips[1] }}"
+  #   memory_mb: 2048
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: "ddi-02.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_ddi_vm_ips[2] }}"
+  #   memory_mb: 2048
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+
+# Define Ansible group which contains your DDI VMs
+vsphere_ddi_vms_group: vsphere_ddi_vms
+
+vsphere_ddi_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_ddi_vms.inv"
+
+vsphere_ddi_vms_json_output_file: "{{ vsphere_inventory_directory }}/vsphere_ddi_vms.json"
+
+vsphere_ddi_vms_wait_for_ssh: "{{ vsphere_vms_wait_for_ssh }}"
+
+# Defines if VMs defined as not defined to deploy to be destroyed
+# reference vsphere_vm_services_groups as well
+# Good for keeping environment in a defined state
+# references tasks/destroy_vms.yml
+vsphere_destroy_vms: false
+
+vsphere_destroy_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_destroy_vms.inv"
+
+vsphere_dhcp_servers_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_dhcp_vms.inv"
+
+# Define Ansible group which contains your DHCP VMs
+vsphere_dhcp_vms_group: vsphere_dhcp_vms
+
+# These should be defined as the DNSDist VM IPs
+vsphere_dns_servers: []
+  # - "{{ vsphere_dnsdist_vm_ips[0] }}"
+  # - "{{ vsphere_dnsdist_vm_ips[1] }}"
+
+# These define the IP addresses for the DNSDist VMs
+vsphere_dnsdist_vm_ips: []
+  # - "{{ vsphere_vm_services_subnet }}.40"
+  # - "{{ vsphere_vm_services_subnet }}.41"
+
+# Defines core services dnsdist vms
+# reference vsphere_vm_services_groups as well
+vsphere_dnsdist_vms: []
+  # - vm_name: "dnsdist-00.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_dnsdist_vm_ips[0] }}"
+  #   memory_mb: 1024
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: "dnsdist-01.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_dnsdist_vm_ips[1] }}"
+  #   memory_mb: 1024
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+
+vsphere_dnsdist_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_dnsdist_vms.inv"
+
+vsphere_dnsdist_vms_json_output_file: "{{ vsphere_inventory_directory }}/vsphere_dnsdist_vms.json"
+
+vsphere_dnsdist_vms_wait_for_ssh: "{{ vsphere_vms_wait_for_ssh }}"
+
+# Define this on a host_vars or group_vars level. Because we look for hostvars
+# variable the default variable defined here does not apply.
+vsphere_enable_software_iscsi: false
+
+# Defines whether host_vars should be generated
+vsphere_generate_host_vars: false
+
+#vSphere Host Info
+# Reference inventory/group_vars/all/vsphere_hosts.yml
+vsphere_host_mgmt_subnet: []
+vsphere_host_mgmt_subnetmask: []
+vsphere_host_mgmt_vlan_id: []
+vsphere_host_vmotion_subnet: []
+vsphere_host_vmotion_subnetmask: []
+vsphere_host_vmotion_vlan_id: []
+
+# Define vSphere hosts and relevant info
+# This information is used to generate a dynamic group vsphere_hosts as well as
+# generate an inventory file for the hosts.
+vsphere_hosts: []
+  # - hostname: "esxi-01.{{ vsphere_pri_domain_name }}"
+  #   mgmt_ip: "{{ vsphere_host_mgmt_subnet }}.61"
+  #   mgmt_subnetmask: "{{ vsphere_host_mgmt_subnetmask }}"
+  #   vmotion_ip: "{{ vsphere_host_vmotion_subnet }}.61"
+  #   vmotion_subnetmask: "{{ vsphere_host_vmotion_subnetmask }}"
+  # - hostname: "esxi-02.{{ vsphere_pri_domain_name }}"
+  #   mgmt_ip: "{{ vsphere_host_mgmt_subnet }}.62"
+  #   mgmt_subnetmask: "{{ vsphere_host_mgmt_subnetmask }}"
+  #   vmotion_ip: "{{ vsphere_host_vmotion_subnet }}.62"
+  #   vmotion_subnetmask: "{{ vsphere_host_vmotion_subnetmask }}"
+
+# Defines if vSphere hosts should have SSH enabled or not
+vsphere_hosts_enable_ssh: false
+
+vsphere_hosts_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_hosts.inv"
+
+# Defines if vSphere hosts should be updated
+vsphere_hosts_update: false
+
+# Defines if hosts should be joined to domain
+vsphere_hosts_join_domain: false
+
+# Defines inventory directory
+vsphere_inventory_directory: ../inventory
+
+# Define any iSCSI Targets for Software iSCSI adapter
+vsphere_iscsi_targets: []
+  # - 10.0.101.50
+
+vsphere_lb_vips: []
+  # - 10.0.101.100
+
+# Defines core services load balancer vms
+# reference vsphere_vm_services_groups as well
+vsphere_lb_vms: []
+  # - vm_name: "lb-00.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_vm_services_subnet }}.20"
+  #   memory_mb: 1024
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: "lb-01.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_vm_services_subnet }}.21"
+  #   memory_mb: 1024
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+
+# Define Ansible group which contains your LB VMs
+vsphere_lb_vms_group: vsphere_lb_vms
+
+vsphere_lb_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_lb_vms.inv"
+
+vsphere_lb_vms_json_output_file: "{{ vsphere_inventory_directory }}/vsphere_lb_vms.json"
+
+vsphere_lb_vms_wait_for_ssh: "{{ vsphere_vms_wait_for_ssh }}"
+
+# Defines the OVF template to deploy VMs from
+vsphere_linux_vapp_ovf: C:\vagrant\vApps\ubuntu_16.04_template.ovf
+vsphere_linux_vapp_template_name: ubuntu-16.04-template
+
+vsphere_maintenance_mode: false
+
+vsphere_management_invalid_certs_action: Ignore
+
+vsphere_nfs_datastores: []
+  # - name: Datastore_1
+  #   type: NFS
+  #   path: /TANK/NFS/vSphere/Datastore_1
+  #   host: 10.0.101.50
+
+vsphere_ntp_servers: []
+  # - "{{ vsphere_ddi_vm_ips[0] }}"
+  # - "{{ vsphere_ddi_vm_ips[1] }}"
+  # - "{{ vsphere_ddi_vm_ips[2] }}"
+
+vsphere_pri_domain_name: example.org
+
+vsphere_reboot_after_updates: false
+
+vsphere_samba_domain: false
+
+# Defines core services samba vms
+# reference vsphere_vm_services_groups as well
+vsphere_samba_vms: []
+  # - vm_name: "samba-dc-00.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_samba_vm_ips[0] }}"
+  #   memory_mb: 512
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: "samba-dc-01.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_samba_vm_ips[1] }}"
+  #   memory_mb: 512
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+  # - vm_name: "samba-dc-02.{{ vsphere_pri_domain_name }}"
+  #   cpus: 1
+  #   deploy: true
+  #   datastore: "{{ vsphere_vm_services_datastore }}"
+  #   gateway: "{{ vsphere_vm_services_subnet }}.1"
+  #   ip: "{{ vsphere_samba_vm_ips[2] }}"
+  #   memory_mb: 512
+  #   netmask: "{{ vsphere_vm_services_subnet_mask }}"
+  #   netmask_cidr: "{{ vsphere_vm_services_subnet_mask_cidr }}"
+  #   network_name: "{{ vsphere_vm_services_vswitch }}"
+  #   vapp_source_path: "{{ vsphere_linux_vapp_ovf }}"
+
+vsphere_samba_vms_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_samba_vms.inv"
+
+vsphere_samba_vms_json_output_file: "{{ vsphere_inventory_directory }}/vsphere_samba_vms.json"
+
+vsphere_samba_vms_wait_for_ssh: "{{ vsphere_vms_wait_for_ssh }}"
+
+# Define site name of location of deployment
+vsphere_site_name: []
+
+vsphere_template_vm: []
+  # cpus: 1
+  # deploy: true
+  # datastore: "{{ vsphere_vm_services_datastore }}"
+  # disk_gb: 72
+  # guest_id: ubuntu64Guest
+  # iso: /ISOs/ubuntu-16.04.3-server-amd64.iso
+  # memory_mb: 1024
+  # network_name: VSS-VLAN-101
+  # vm_name: ubuntu_16.04_template
+
+vsphere_updates: []
+  # - build: 4192238
+  #   path: /vmfs/volumes/Datastore_1/ESXi600-201608001
+  #   version: 6.0.0
+  # - build: 5050593
+  #   path: /vmfs/volumes/Datastore_1/update-from-esxi6.0-6.0_update03
+  #   version: 6.0.0
+  # # - build: 5050593
+  # #   path: /vmfs/volumes/Datastore_1/VMware-ESXi-6.0.0-Update3-5224934-HPE-600.10.1.0.73-Jul2017-depot
+  # #   version: 6.0.0
+  # - build: 5572656
+  #   path: /vmfs/volumes/Datastore_1/ESXi600-201706001
+  #   version: 6.0.0
+
+# Defines if SSL certs should be validated for various tasks.
+vsphere_validate_certs: false
+
+# Defines vCenter Cluster settings
+vsphere_vcenter_cluster: []
+  # # FullyAutomated, Manual, and PartiallyAutomated
+  # drs_automation_level: FullyAutomated
+  # enable_drs: true
+  # enable_ha: true
+  # enable_vsan: false
+  # evc_enabled: true
+  # # intel-merom, intel-penryn, intel-nehalem, intel-westmere, intel-sandybridge, intel-ivybridge
+  # # iamd-rev-e, amd-rev-f, amd-greyhound-no3dnow, amd-greyhound, amd-bulldozer, amd-piledriver
+  # evc_mode: intel-penryn
+  # ha_admission_control: true
+  # ha_failover_level: "{{ groups['vsphere_hosts']|length -1 }}"
+  # # PowerOff or DoNothing
+  # ha_isolation_response: DoNothing
+  # # Disabled, Low, Medium, and High
+  # ha_restart_priority: Medium
+  # name: "{{ vsphere_site_name }}-Cluster"
+  # state: present
+
+# Defines if a VM template should be created from the OVF which was used during
+# initial provisioning of the environment. This is beneficial as it will no longer
+# be required to do an import of the OVF post vCenter deployment.
+vsphere_vcenter_create_template_from_ovf: false
+
+# Define any OS customization specs
+vsphere_vcenter_customization_specs: []
+  # - name: BasicLinuxSpec-DNS
+  #   description: Basic Linux spec with DNS servers
+  #   dns_server: "{{ vsphere_dns_servers }}"
+  #   dns_suffix: "{{ vsphere_pri_domain_name }}"
+  #   domain: "{{ vsphere_pri_domain_name }}"
+  #   os_type: Linux
+  #   state: present
+  # - name: BasicLinuxSpec-No-DNS
+  #   description: Basic Linux spec without DNS servers
+  #   dns_suffix: "{{ vsphere_pri_domain_name }}"
+  #   domain: "{{ vsphere_pri_domain_name }}"
+  #   os_type: Linux
+  #   state: present
+
+# Defines vCenter DataCenter
+vsphere_vcenter_datacenter: []
+  # name: "{{ vsphere_site_name }}"
+  # state: present
+
+# Defines vCenter DRS Affinity Rules
+vsphere_vcenter_drs_rules: []
+  # - name: Separate Samba VMs
+  #   enabled: false
+  #   keep_together: false
+  #   state: present
+  #   vms:
+  #     - "{{ groups['vsphere_samba_vms'] }}"
+  # - name: Separate DDI VMs
+  #   enabled: false
+  #   keep_together: false
+  #   state: present
+  #   vms:
+  #     - "{{ groups['vsphere_ddi_vms'] }}"
+  # - name: Separate DNSDist VMs
+  #   enabled: true
+  #   keep_together: false
+  #   state: present
+  #   vms:
+  #     - "{{ groups['vsphere_dnsdist_vms'] }}"
+  # - name: Separate LB VMs
+  #   enabled: true
+  #   keep_together: false
+  #   state: present
+  #   vms:
+  #     - "{{ groups['vsphere_lb_vms'] }}"
+
+# Defines vCenter Folders
+vsphere_vcenter_folders: []
+  # - name: Core Services
+  #   type: vm
+  #   sub_folders:
+  #     - name: DDI
+  #       vms:
+  #         - "{{ groups['vsphere_ddi_vms'] }}"
+  #     - name: DNSDist
+  #       vms:
+  #         - "{{ groups['vsphere_dnsdist_vms'] }}"
+  #     - name: Load Balancers
+  #       vms:
+  #         - "{{ groups['vsphere_lb_vms'] }}"
+  #     - name: Samba DCs
+  #       vms:
+  #         - "{{ groups['vsphere_samba_vms'] }}"
+  #     - name: vCenter
+  #       vms:
+  #         - "{{ groups['vsphere_vcenter'] }}"
+
+vsphere_vcenter_inventory_file: "{{ vsphere_inventory_directory }}/vsphere_vcenter.inv"
+
+# Define Parent Resource Pools
+vsphere_vcenter_resource_pools: []
+  # - name: Development
+  #   cpu_expandable_reservation: true
+  #   cpu_shares_level: low
+  #   mem_expandable_reservation: true
+  #   mem_shares_level: low
+  #   state: absent
+  # - name: Production
+  #   cpu_expandable_reservation: true
+  #   cpu_shares_level: high
+  #   mem_expandable_reservation: true
+  #   mem_shares_level: high
+  #   state: absent
+  #   vms:
+  #     - "{{ groups['vsphere_samba_vms'] }}"
+  #     - "{{ groups['vsphere_ddi_vms'] }}"
+  # - name: QA
+  #   cpu_expandable_reservation: true
+  #   cpu_shares_level: normal
+  #   mem_expandable_reservation: true
+  #   mem_shares_level: normal
+  #   state: absent
+
+# Define VCSA appliance info below for vsphere_vcsa definitions
+# Reference inventory/group_vars/all/vsphere_vcsa.yml
+vsphere_vcsa_appliance_deployment_network: []
+vsphere_vcsa_appliance_deployment_option: small
+vsphere_vcsa_appliance_name: []
+vsphere_vcsa_appliance_thin_disk_mode: true
+vsphere_vcsa_deploy: false
+vsphere_vcsa_esx_datastore: []
+vsphere_vcsa_esx_hostname: []
+vsphere_vcsa_esx_password: []
+vsphere_vcsa_esx_username: []
+vsphere_vcsa_network_gateway: []
+vsphere_vcsa_network_hostname: []
+vsphere_vcsa_network_ip: []
+vsphere_vcsa_network_ip_family: ipv4
+vsphere_vcsa_network_mode: static
+vsphere_vcsa_network_prefix: []
+vsphere_vcsa_os_password: []
+vsphere_vcsa_os_ssh_enabled: false
+vsphere_vcsa_sso_domain_name: vsphere.local
+vsphere_vcsa_sso_password: []
+vsphere_vcsa_sso_site_name: "{{ vsphere_site_name }}"
+
+# Defines core VM service groups
+# Also used for determining which VMs should exist or not
+# Not 100% complete yet
+vsphere_vm_services_groups:
+  - "{{ vsphere_bootstrap_vms }}"
+  - "{{ vsphere_samba_vms }}"
+  - "{{ vsphere_ddi_vms }}"
+  - "{{ vsphere_dnsdist_vms }}"
+  - "{{ vsphere_lb_vms }}"
+
+# Defines whether or not VM inventory files should be generated
+vsphere_vms_generate_inventory: true
+
+# Defines whether to or not wait for SSH connections on VMs
+vsphere_vms_wait_for_ssh: true
+
+vsphere_vswitches: []
+  # - name: vSwitch0
+  #   load_balancing_policy: LoadBalanceSrcId
+  #   active_nics:
+  #     - vmnic0
+  #     - vmnic1
+  #   standby_nics: []
+  #   unused_nics: []
+  #   portgroups:
+  #     - name: Management Network
+  #       inherit_failover_order: true
+  #       vlan_id: 101
+  #     - name: VSS-VLAN-101
+  #       inherit_failover_order: true
+  #       vlan_id: 101
+  #     - name: VSS-VLAN-102
+  #       inherit_failover_order: true
+  #       vlan_id: 102
+  #     - name: VSS-VLAN-201
+  #       inherit_failover_order: true
+  #       vlan_id: 201
+  #   # vmkernel_ports:
+  #   #   - name: vmk0
+  #   #     enable_ft: false
+  #   #     enable_mgmt: true
+  #   #     enable_vmotion: false
+  #   #     enable_vsan: false
+  #   #     ip_address: '{{ ansible_host }}'
+  #   #     portgroup_name: Management Network
+  #   #     subnet_mask: 255.255.255.0
+  #   #     vlan_id: 101
+  #   #     vswitch_name: vSwitch0
+  # - name: vSwitch1
+  #   active_nics:
+  #     - vmnic2
+  #     - vmnic3
+  #     - vmnic4
+  #     - vmnic5
+  #   standby_nics: []
+  #   unused_nics: []
+  #   portgroups: []
+  #     # - name: VSS-VLAN-101
+  #     #   inherit_failover_order: true
+  #     #   vlan_id: 101
+  #     # - name: VSS-VLAN-102
+  #     #   inherit_failover_order: true
+  #     #   vlan_id: 102
+  #     # - name: VSS-VLAN-201
+  #     #   inherit_failover_order: true
+  #     #   vlan_id: 201
+
+vsphere_vswitches_management_network: Management Network
+
+# Add documentation on usage
+vsphere_vswitches_quarantine_unmanaged_portgroups: false
+
+# Add documentation on usage
+vsphere_vswitches_quarantine_vswitch: Quarantine
+
+# Add documentation on usage
+vsphere_vswitches_remove_unmanaged_portgroups: false
+
+# Add documentation on usage
+vsphere_vswitches_remove_unmanaged_vswitches: false

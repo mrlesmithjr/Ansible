@@ -1,0 +1,81 @@
+version: '2'
+services:
+  node-exporter:
+    image: prom/node-exporter:latest
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.scheduler.global: 'true'
+  prom-conf:
+    image: infinityworks/prom-conf:19
+    network_mode: none
+    volumes:
+    - /etc/prom-conf/
+    tty: true
+    links:
+    - prometheus-rancher-exporter:prometheus-rancher-exporter
+    - node-exporter:node-exporter
+    - cadvisor:cadvisor
+  grafana:
+    image: grafana/grafana:4.2.0
+    tty: true
+    links:
+    - prometheus:prometheus
+    - prometheus-rancher-exporter:prometheus-rancher-exporter
+    volumes_from:
+    - graf-db
+    ports:
+    - 3000:3000/tcp
+    labels:
+      io.rancher.sidekicks: graf-db
+  cadvisor:
+    image: google/cadvisor:latest
+    stdin_open: true
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    tty: true
+    labels:
+      io.rancher.scheduler.global: 'true'
+  prometheus-rancher-exporter:
+    image: infinityworks/prometheus-rancher-exporter:v0.22.52
+    tty: true
+    labels:
+      io.rancher.container.agent.role: environment
+      io.rancher.container.create_agent: 'true'
+  prometheus:
+    image: prom/prometheus:v1.6.0
+    volumes:
+    - prometheus-data:/prometheus
+    tty: true
+    extra_hosts:
+    - rancher-server:0.0.0.0
+    links:
+    - prometheus-rancher-exporter:prometheus-rancher-exporter
+    - node-exporter:node-exporter
+    - cadvisor:cadvisor
+    volumes_from:
+    - prom-conf
+    ports:
+    - 9090:9090/tcp
+    command:
+    - -alertmanager.url=http://alertmanager:9093
+    - -config.file=/etc/prom-conf/prometheus.yml
+    - -storage.local.path=/prometheus
+    - -web.console.libraries=/etc/prometheus/console_libraries
+    - -web.console.templates=/etc/prometheus/consoles
+    labels:
+      io.rancher.sidekicks: prom-conf
+  graf-db:
+    image: infinityworks/graf-db:11
+    network_mode: none
+    volumes:
+    - /var/lib/grafana/
+    tty: true
+    links:
+    - prometheus:prometheus
+    - prometheus-rancher-exporter:prometheus-rancher-exporter
+    command:
+    - cat
