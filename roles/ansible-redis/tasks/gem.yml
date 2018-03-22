@@ -2,7 +2,7 @@
 - name: gem | Installing Ruby Gems
   gem:
     name: "{{ item }}"
-    state: "present"
+    state: present
   become: true
   with_items:
-    - 'redis'
+    - redis

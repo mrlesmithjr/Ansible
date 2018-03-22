@@ -1,0 +1,6 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-chronograf.git
+- src: https://github.com/mrlesmithjr/ansible-docker.git
+- src: https://github.com/mrlesmithjr/ansible-grafana.git
+- src: https://github.com/mrlesmithjr/ansible-influxdb.git
+- src: https://github.com/mrlesmithjr/ansible-telegraf.git

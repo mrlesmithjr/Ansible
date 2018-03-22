@@ -1,0 +1,30 @@
+---
+- name: app_services | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-dev'
+    - 'python-pip'
+  when: ansible_os_family == "Debian"
+
+- name: app_services | installing python modules
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-consul'
+
+- name: app_services | configuring consul app services
+  template:
+    src: "etc/consul.d/client/service.json.j2"
+    dest: "{{ consul_config_dir }}/client/services.json"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "reload consul"
+  when: not ansible_check_mode

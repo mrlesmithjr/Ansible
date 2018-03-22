@@ -1,0 +1,4 @@
+---
+glusterfs_client_group: "{{ k8s_cluster_group }}"
+
+glusterfs_server_group: "{{ k8s_cluster_group }}"

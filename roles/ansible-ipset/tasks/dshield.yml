@@ -1,0 +1,16 @@
+---
+- name: dshield | Downloading DShield.org Block List
+  get_url:
+    url: http://feeds.dshield.org/block.txt
+    dest: "{{ ipset_dshield_block_file }}"
+  delegate_to: localhost
+
+- name: dshield | Generating DShield.org YAML Block List
+  template:
+    src: block.yml.j2
+    dest: "{{ ipset_dshield_block_file_yaml }}"
+  delegate_to: localhost
+
+- name: dshield | Importing dshield_block_list Variables
+  include_vars:
+    file: "{{ ipset_dshield_block_file_yaml }}"

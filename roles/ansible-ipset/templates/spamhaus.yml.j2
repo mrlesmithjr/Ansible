@@ -1,0 +1,23 @@
+---
+spamhaus_drop_block_list:
+{% for item in ipset_spamhaus_drop_block_list.split('\n') %}
+{%   if '#' not in item %}
+{%     if '0.0.0.0' not in item %}
+{%       set _ip = item.split(';')[0].strip() %}
+{%       if _ip|ipaddr %}
+  - {{ _ip }}
+{%       endif %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+spamhaus_edrop_block_list:
+{% for item in ipset_spamhaus_edrop_block_list.split('\n') %}
+{%   if '#' not in item %}
+{%     if '0.0.0.0' not in item %}
+{%       set _ip = item.split(';')[0].strip() %}
+{%       if _ip|ipaddr %}
+  - {{ _ip }}
+{%       endif %}
+{%     endif %}
+{%   endif %}
+{% endfor %}

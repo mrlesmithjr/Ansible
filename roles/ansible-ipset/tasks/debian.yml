@@ -1,0 +1,22 @@
+---
+- name: debian | Installing ipset
+  apt:
+    name: ipset
+    state: present
+  become: true
+
+- name: debian | Installing iptables
+  apt:
+    name: iptables
+    state: present
+  become: true
+
+- name: debian | Creating Firewall Load On Reboot Script
+  template:
+    src: etc/network/if-pre-up.d/firewall.j2
+    dest: /etc/network/if-pre-up.d/firewall
+    owner: root
+    group: root
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+  when: ansible_service_mgr == "upstart"

@@ -1,0 +1,35 @@
+---
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to define a base configuration state.
+
+  license: MIT
+  min_ansible_version: 1.2
+
+  platforms:
+  - name: EL
+    versions:
+      - 6
+      - 7
+  - name: Fedora
+    versions:
+      - 22
+      - 23
+      - 24
+      - 25
+  - name: Ubuntu
+    versions:
+      - precise
+      - trusty
+      - utopic
+      - vivid
+      - xenial
+  - name: Debian
+    versions:
+      - jessie
+      - wheezy
+
+  categories:
+    - networking
+    - system
+dependencies: []

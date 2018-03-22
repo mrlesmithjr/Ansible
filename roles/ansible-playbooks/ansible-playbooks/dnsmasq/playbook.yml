@@ -1,0 +1,7 @@
+---
+- hosts: dnsmasq-nodes
+  become: true
+  vars:
+  roles:
+    - role: ansible-dnsmasq
+  tasks:

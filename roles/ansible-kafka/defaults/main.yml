@@ -1,0 +1,36 @@
+---
+# defaults file for ansible-kafka
+
+# Defines if Kafka is being setup as a cluster
+kafka_cluster: false
+
+# Defines Kafka cluster group if setting up Kafka cluster
+kafka_cluster_group: []
+
+kafka_data_dir: /var/lib/kafka/data
+
+kafka_download: "{{ kafka_uri }}/{{ kafka_version }}/kafka_{{ kafka_scala_version }}-{{ kafka_version }}.tgz"
+
+# Switch to enable topic deletion or not, default value is false
+kafka_enable_topic_deletion: false
+
+kafka_install_dir: /opt/kafka
+
+# The minimum age of a log file to be eligible for deletion due to age
+kafka_log_retention_hours: 168
+
+kafka_scala_version: 2.11
+
+kafka_uri: http://www-us.apache.org/dist/kafka
+
+kafka_version: 0.11.0.2
+
+# Defines if Zookeeper cluster is used for Kafka
+kafka_zookeeper_cluster: false
+
+# Defines the bind interface of Zookeeper cluster nodes in order to capture the
+# ip address of each node defined in kafka_zookeeper_cluster_group
+kafka_zookeeper_cluster_bind_interface: enp0s8
+
+# Defines Ansible Zookeeper cluster group if using a Zookeeper cluster
+kafka_zookeeper_cluster_group: []

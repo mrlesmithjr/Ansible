@@ -1,8 +1,4 @@
-{% if redis_daemonize %}
-daemonize yes
-{% elif not redis_daemonize %}
-daemonize no
-{% endif %}
+daemonize {{ "yes" if redis_daemonize else "no" }}
 pidfile {{ redis_pid_file }}
 port {{ redis_port }}
 tcp-backlog {{ redis_tcp_backlog }}
@@ -11,9 +7,7 @@ timeout 0
 tcp-keepalive 0
 loglevel notice
 logfile {{ redis_log_file }}
-{% if redis_syslog_logging %}
-syslog-enabled yes
-{% endif %}
+syslog-enabled {{ "yes" if redis_syslog_logging else "no" }}
 databases {{ redis_databases }}
 
 ################################ SNAPSHOTTING  ################################
@@ -68,15 +62,11 @@ aof-load-truncated yes
 lua-time-limit 5000
 
 ################################ REDIS CLUSTER  ###############################
-{% if redis_cluster %}
-cluster-enabled yes
+cluster-enabled {{ "yes" if redis_cluster else "no" }}
 # cluster-node-timeout 15000
 # cluster-slave-validity-factor 10
 # cluster-migration-barrier 1
 # cluster-require-full-coverage yes
-{% elif not redis_cluster %}
-cluster-enabled no
-{% endif %}
 
 ################################## SLOW LOG ###################################
 

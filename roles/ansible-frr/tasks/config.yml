@@ -1,0 +1,56 @@
+---
+- name: config | Configuring daemons
+  template:
+    src: etc/frr/daemons.j2
+    dest: /etc/frr/daemons
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  become: true
+  notify:
+    - restart frr
+
+- name: config | Configuring debian.conf
+  template:
+    src: etc/frr/debian.conf.j2
+    dest: /etc/frr/debian.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  become: true
+  notify:
+    - restart frr
+  when: ansible_os_family == "Debian"
+
+- name: config | Configuring zebra.conf
+  template:
+    src: etc/frr/zebra.conf.j2
+    dest: /etc/frr/zebra.conf
+    owner: frr
+    group: frr
+    mode: u=rw,g=r,o=
+  become: true
+  register: _frr_zebra_configured
+  notify:
+    - restart frr
+
+# We need to flush here in case interfaces are configured in zebra.conf
+- name: config | Flusing Handlers
+  meta: flush_handlers
+  when: _frr_zebra_configured['changed']
+
+# We need to rediscover facts if interfaces are initially configured in zebra.conf
+- name: config | Rediscovering Facts
+  setup:
+  when: _frr_zebra_configured['changed']
+
+- name: config | Configuring FRR
+  template:
+    src: etc/frr/frr.conf.j2
+    dest: /etc/frr/frr.conf
+    owner: frr
+    group: frr
+    mode: u=rw,g=r,o=
+  become: true
+  notify:
+    - restart frr

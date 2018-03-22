@@ -1,0 +1,16 @@
+---
+- name: redhat | installing base packages
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ base_redhat_packages }}'
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing base packages
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ base_redhat_packages }}'
+  when: ansible_distribution == "Fedora"

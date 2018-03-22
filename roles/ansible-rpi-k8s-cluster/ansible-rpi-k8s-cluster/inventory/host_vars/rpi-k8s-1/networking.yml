@@ -1,0 +1,5 @@
+---
+rpi_k8_static_ip: "{{ rpi_k8_static_ip_addr }}/{{ rpi_k8_static_ip_cidr }}"
+rpi_k8_static_ip_addr: "{{ dhcp_scope_subnet }}.1"
+rpi_k8_static_ip_cidr: 24
+rpi_k8_static_ip_int: "{{ rpi_wired_int }}"

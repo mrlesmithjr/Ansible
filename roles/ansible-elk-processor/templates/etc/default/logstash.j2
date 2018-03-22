@@ -12,9 +12,6 @@
 
 # Arguments to pass to logstash agent
 #LS_OPTS=""
-{% if logstash_workers is defined %}
-LS_OPTS="-w {{ logstash_workers }}"
-{% endif %}
 
 # Arguments to pass to java
 #LS_HEAP_SIZE="500m"

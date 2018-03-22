@@ -9,9 +9,9 @@ kapacitor_config_override:
   enabled: true
 
 # Directory for storing a small amount of metadata about the server.
-kapacitor_data_dir: '/var/lib/kapacitor'
+kapacitor_data_dir: /var/lib/kapacitor
 
-kapacitor_debian_file: 'kapacitor_{{ kapacitor_version }}_amd64.deb'
+kapacitor_debian_file: "kapacitor_{{ kapacitor_version }}_amd64.deb"
 
 kapacitor_deadman:
   # Configure a deadman's switch
@@ -28,19 +28,19 @@ kapacitor_deadman:
 # Default retention-policy, if a write is made to Kapacitor and
 # it does not have a retention policy associated with it,
 # then the retention policy will be set to this value
-kapacitor_default_retention_policy: ''
+kapacitor_default_retention_policy: ""
 
-kapacitor_dl_uri: 'https://dl.influxdata.com/kapacitor/releases'
+kapacitor_dl_uri: https://dl.influxdata.com/kapacitor/releases
 
 # Must be resolvable by any configured InfluxDB hosts.
-kapacitor_hostname: '{{ ansible_hostname }}'
+kapacitor_hostname: "{{ ansible_hostname }}"
 
 # HTTP API Server for Kapacitor
 # This server is always on, it serves both as a write endpoint and as the API
 # endpoint for all other Kapacitor calls.
 kapacitor_http:
-  bind_address: ':9092'
-  https_certificate: '/etc/ssl/kapacitor.pem'
+  bind_address: :9092
+  https_certificate: /etc/ssl/kapacitor.pem
   https_enabled: false
   log_enabled: true
   ppof_enabled: false
@@ -50,13 +50,13 @@ kapacitor_http:
 # Exactly one must be marked as the default.
 # Each one will be given a name and can be referenced in batch queries and InfluxDBOut nodes.
 kapacitor_influxdb:
-  - name: 'localhost'
+  - name: localhost
     enabled: true
     default: true
     urls:
-      - 'http://localhost:8086'
-    username: ''
-    password: ''
+      - http://localhost:8086
+    username: ""
+    password: ""
     timeout: 0
     # Do not verify the TLS/SSL certificate.
     # This is insecure.
@@ -67,7 +67,7 @@ kapacitor_influxdb:
     disable_subscriptions: false
     # Which protocol to use for subscriptions
     # one of 'udp', 'http', or 'https'.
-    subscription_protocol: 'http'
+    subscription_protocol: http
     # Subscriptions resync time interval
     # Useful if you want to subscribe to new created databases
     # without restart Kapacitord
@@ -76,7 +76,7 @@ kapacitor_influxdb:
     # Useful if the InfluxDB cluster is in a separate network and
     # needs special config to connect back to this Kapacitor instance.
     # Defaults to `hostname` if empty.
-    kapacitor_hostname: ''
+    kapacitor_hostname: ""
     # Override the global http port option for this InfluxDB cluster.
     # Useful if the InfluxDB cluster is in a separate network and
     # needs special config to connect back to this Kapacitor instance.
@@ -87,7 +87,7 @@ kapacitor_influxdb:
     # and `udp-bind = "hostname_or_ip"`,
     # then the UDP port will be bound to `hostname_or_ip:1234`
     # The default empty value will bind to all addresses.
-    udp_bind: ''
+    udp_bind: ""
     # Subscriptions use the UDP network protocl.
     # The following options of for the created UDP listeners for each subscription.
     # Number of packets to buffer when reading packets off the socket.
@@ -99,22 +99,22 @@ kapacitor_influxdb:
 kapacitor_logging:
   # Destination for logs
   # Can be a path to a file or 'STDOUT', 'STDERR'.
-  file: '/var/log/kapacitor/kapacitor.log'
+  file: /var/log/kapacitor/kapacitor.log
   # Logging level can be one of:
   # DEBUG, INFO, WARN, ERROR, or OFF
-  level: 'INFO'
+  level: INFO
 
-kapacitor_redhat_file: 'kapacitor-{{ kapacitor_version }}.x86_64.rpm'
+kapacitor_redhat_file: "kapacitor-{{ kapacitor_version }}.x86_64.rpm"
 
 kapacitor_replay:
   # Where to store replay files, aka recordings.
-  dir: '/var/lib/kapacitor/replay'
+  dir: /var/lib/kapacitor/replay
 
 # Send usage statistics
 # every 12 hours to Enterprise.
 kapacitor_reporting:
   enabled: true
-  url: 'https://usage.influxdata.com'
+  url: https://usage.influxdata.com
 
 # Do not apply configuration overrides during startup.
 # Useful if the configuration overrides cause Kapacitor to fail startup.
@@ -126,15 +126,15 @@ kapacitor_smtp:
   # Will use TLS and authentication if possible
   # Only necessary for sending emails from alerts.
   enabled: false
-  host: 'localhost'
+  host: localhost
   port: 25
-  username: ''
-  password: ''
+  username: ""
+  password: ""
   # From address for outgoing mail
-  from: ''
+  from: ""
   # List of default To addresses.
   to:
-    - 'oncall@example.com'
+    - oncall@example.com
   # Skip TLS certificate verify when connecting to SMTP server
   no_verify: false
   # Close idle connections after timeout
@@ -158,20 +158,20 @@ kapacitor_stats:
   #
   enabled: true
   stats_interval: 10s
-  database: '_kapacitor'
-  retention_policy: 'autogen'
+  database: _kapacitor
+  retention_policy: autogen
 
 kapacitor_storage:
   # Where to store the Kapacitor boltdb database
-  boltdb: '/var/lib/kapacitor/kapacitor.db'
+  boltdb: /var/lib/kapacitor/kapacitor.db
 
 kapacitor_task:
   # Where to store the tasks database
   # DEPRECATED: This option is not needed for new installations.
   # It is only used to determine the location of the task.db file
   # for migrating to the new `storage` service.
-  dir: '/var/lib/kapacitor/tasks'
+  dir: /var/lib/kapacitor/tasks
   # How often to snapshot running task state.
   snapshot_interval: 60s
 
-kapacitor_version: 1.3.1
+kapacitor_version: 1.4.0

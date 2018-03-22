@@ -2,7 +2,7 @@ galaxy_info:
   author: Larry Smith Jr.
   description: An [Ansible](https://www.ansible.com) role to install/configure [influxdata Kapacitor](https://www.influxdata.com/time-series-platform/kapacitor/)
 
-  license: license (MIT)
+  license: MIT
 
   min_ansible_version: 1.2
 

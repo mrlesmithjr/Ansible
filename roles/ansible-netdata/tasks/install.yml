@@ -10,6 +10,6 @@
   command: "{{ netdata_installer }} --dont-wait"
   args:
     chdir: "{{ netdata_source_dir }}"
-    creates: "/usr/sbin/netdata"
+    creates: /usr/sbin/netdata
   become: true
-  notify: "restart netdata"
+  notify: restart netdata

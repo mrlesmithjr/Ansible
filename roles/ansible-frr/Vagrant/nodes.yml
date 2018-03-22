@@ -1,0 +1,220 @@
+---
+- name: spine1
+  ansible_groups:
+    - spines
+    - routers
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.11
+      auto_config: true
+      method: static
+    - ip: 192.168.1.0
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-1
+    - ip: 192.168.1.2
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-2
+    - ip: 192.168.1.4
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-3
+    - ip: 192.168.1.6
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-4
+  mem: 512
+  provision: true
+  vcpu: 1
+  windows: false
+- name: spine2
+  ansible_groups:
+    - spines
+    - routers
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.12
+      auto_config: true
+      method: static
+    - ip: 192.168.2.0
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-3
+    - ip: 192.168.2.2
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-4
+    - ip: 192.168.2.4
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-1
+    - ip: 192.168.2.6
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-2
+  mem: 512
+  provision: true
+  vcpu: 1
+  windows: false
+- name: leaf1
+  ansible_groups:
+    - leafs
+    - routers
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.21
+      auto_config: true
+      method: static
+    - ip: 192.168.1.1
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-1
+    - ip: 192.168.10.1
+      auto_config: false
+      method: static
+      network_name: leaf-1-compute
+    - ip: 192.168.2.5
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-1
+  mem: 512
+  provision: true
+  vcpu: 1
+  windows: false
+- name: leaf2
+  ansible_groups:
+    - leafs
+    - routers
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.22
+      auto_config: true
+      method: static
+    - ip: 192.168.1.3
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-2
+    - ip: 192.168.10.2
+      auto_config: false
+      method: static
+      network_name: leaf-2-compute
+    - ip: 192.168.2.7
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-2
+  mem: 512
+  provision: true
+  vcpu: 1
+  windows: false
+- name: leaf3
+  ansible_groups:
+    - leafs
+    - routers
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.23
+      auto_config: true
+      method: static
+    - ip: 192.168.2.1
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-3
+    - ip: 192.168.20.0
+      auto_config: false
+      method: static
+      network_name: leaf-3-compute
+    - ip: 192.168.1.5
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-3
+  mem: 512
+  provision: true
+  vcpu: 1
+  windows: false
+- name: leaf4
+  ansible_groups:
+    - leafs
+    - routers
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.24
+      auto_config: true
+      method: static
+    - ip: 192.168.2.3
+      auto_config: false
+      method: static
+      network_name: spine-2-leaf-4
+    - ip: 192.168.20.2
+      auto_config: false
+      method: static
+      network_name: leaf-4-compute
+    - ip: 192.168.1.7
+      auto_config: false
+      method: static
+      network_name: spine-1-leaf-4
+  mem: 512
+  provision: true
+  vcpu: 1
+  windows: false
+- name: compute1
+  ansible_groups:
+    - compute
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.31
+      auto_config: true
+      method: static
+    - ip: 192.168.10.1
+      auto_config: false
+      method: static
+      network_name: leaf-1-compute
+    - ip: 192.168.10.3
+      auto_config: false
+      method: static
+      network_name: leaf-2-compute
+  mem: 1024
+  provision: true
+  vcpu: 1
+  windows: false
+- name: compute2
+  ansible_groups:
+    - compute
+  box: mrlesmithjr/xenial64
+  desktop: false
+  interfaces:
+    - ip: 192.168.250.32
+      auto_config: true
+      method: static
+    - ip: 192.168.20.1
+      auto_config: false
+      method: static
+      network_name: leaf-3-compute
+    - ip: 192.168.20.3
+      auto_config: false
+      method: static
+      network_name: leaf-4-compute
+  mem: 1024
+  provision: true
+  vcpu: 1
+  windows: false
+# - name: monitoring
+#   ansible_groups:
+#     - monitoring
+#   box: mrlesmithjr/xenial64
+#   desktop: false
+#   interfaces:
+#     - ip: 192.168.250.101
+#       auto_config: true
+#       method: static
+#   mem: 1024
+#   provision: true
+#   vcpu: 1
+#   windows: false

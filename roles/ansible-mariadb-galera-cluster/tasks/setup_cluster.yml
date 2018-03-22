@@ -80,14 +80,16 @@
         not galera_cluster_configured.stat.exists and
         inventory_hostname == galera_mysql_master_node and
         ((ansible_distribution == "Ubuntu" and
-        ansible_distribution_version >= '16.04') or
-        ansible_distribution == "Debian")
+        ansible_distribution_version >= '16.04')
+        or ansible_distribution == "Debian"
+        or ansible_os_family == "RedHat")
 
 - name: setup_cluster | joining galera cluster
   service:
     name: "mysql"
     state: "restarted"
   become: true
+  serial: 1
   when: >
         not galera_cluster_configured.stat.exists and
         inventory_hostname != galera_mysql_master_node

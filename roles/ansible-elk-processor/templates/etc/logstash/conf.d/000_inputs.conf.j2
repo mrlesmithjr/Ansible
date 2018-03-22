@@ -1,4 +1,5 @@
-{% if logstash_file_inputs is defined %}
+{{ ansible_managed|comment }}
+{% if logstash_file_inputs != [] %}
 {%   for item in logstash_file_inputs %}
 input {
   file {
@@ -29,9 +30,18 @@ input {
 {%     if item.type == "rabbitmq" %}
 input {
   rabbitmq {
+{%       if item['auto_delete'] is defined %}
+    auto_delete => {{ item['auto_delete']|lower }}
+{%       endif %}
     host => "{{ item.host }}"
 {%       if item.exchange is defined %}
     exchange => "{{ item.exchange }}"
+{%       endif %}
+{%       if item['user'] is defined %}
+    user => "{{ item['user'] }}"
+{%       endif %}
+{%       if item['password'] is defined %}
+    password => "{{ item['password'] }}"
 {%       endif %}
   }
 }

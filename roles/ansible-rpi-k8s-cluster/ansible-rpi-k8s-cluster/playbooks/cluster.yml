@@ -1,0 +1,80 @@
+---
+- hosts: rpi_k8s
+  gather_facts: false
+  any_errors_fatal: true
+  tasks:
+    - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+      wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+
+- hosts: rpi_k8s
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Removing docker.io
+      apt:
+        name: docker.io
+        state: absent
+        purge: true
+      become: true
+
+    - name: Adding Docker Repo Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        id: 0EBFCD88
+        state: present
+      become: true
+
+    - name: Adding Docker Repo
+      apt_repository:
+        repo: deb [arch=armhf] https://download.docker.com/linux/raspbian stretch stable
+        state: present
+      become: true
+
+    - name: Installing Docker
+      apt:
+        name: "docker-ce={{ docker_version }}~ce-0~raspbian"
+        state: present
+      become: true
+
+    - name: Ensuring docker Service Is Started and Enabled On Boot
+      service:
+        name: docker
+        state: started
+        enabled: true
+      become: true
+
+    - name: Adding Kubernetes Repo Key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+      become: true
+
+    - name: Adding Kubernetes Repo
+      apt_repository:
+        repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+      become: true
+  roles:
+    - role: ansible-k8s
+
+- hosts: rpi_k8s_slaves
+  tasks:
+    - name: Setting IP Route To Reach Cluster-IP On Master
+      template:
+        src: templates/40-route.j2
+        dest: /lib/dhcpcd/dhcpcd-hooks/40-route
+      become: true
+
+- hosts: rpi_k8s
+  tasks:
+    - name: Installing Weave Script
+      get_url:
+        url: https://git.io/weave
+        dest: /usr/local/bin/weave
+        mode: a+x
+      become: true
+      tags:
+        - weave

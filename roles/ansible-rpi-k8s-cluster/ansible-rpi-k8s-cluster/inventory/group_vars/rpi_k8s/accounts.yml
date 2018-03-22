@@ -1,0 +1,6 @@
+---
+# Defines the ansible user to use when connecting to devices
+ansible_user: "{{ rpi_username }}"
+
+# Defines the ansible password to use when connecting to devices
+ansible_password: "{{ rpi_password }}"

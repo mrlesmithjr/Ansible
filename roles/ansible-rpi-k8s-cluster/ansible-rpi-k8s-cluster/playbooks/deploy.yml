@@ -1,0 +1,13 @@
+---
+- name: Bootstrapping Nodes
+  import_playbook: bootstrap.yml
+
+- name: Setting Up GlusterFS
+  import_playbook: glusterfs.yml
+  when: rpi_k8s_use_glusterfs
+
+- name: Provisioning K8's Cluster
+  import_playbook: cluster.yml
+
+- name: Managing K8's Deployments
+  import_playbook: deployments.yml

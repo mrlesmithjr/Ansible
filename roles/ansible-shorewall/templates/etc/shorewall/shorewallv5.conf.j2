@@ -131,7 +131,7 @@ ACCOUNTING_TABLE=filter
 
 ADD_IP_ALIASES=No
 
-ADD_SNAT_ALIASES=No
+ADD_SNAT_ALIASES={{ shorewall_config_options.add_snat_aliases|default('No') }}
 
 ADMINISABSENTMINDED=Yes
 

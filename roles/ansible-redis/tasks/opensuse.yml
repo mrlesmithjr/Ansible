@@ -2,17 +2,17 @@
 - name: opensuse | installing dependencies
   zypper:
     name: "{{ item }}"
-    state: "present"
+    state: present
   become: true
   with_items:
-    - 'python-devel'
-    - 'python-pip'
+    - python-devel
+    - python-pip
 
 - name: opensuse | installing redis
   zypper:
-    name: "redis"
-    state: "present"
+    name: redis
+    state: present
   become: true
   notify:
-    - 'start redis'
+    - start redis
   when: not redis_install_from_source

@@ -1,0 +1,7 @@
+{{ ansible_managed|comment }}
+
+{% if avahi_hosts is defined and avahi_hosts != [] %}
+{%   for host in avahi_hosts %}
+{{ host['ip'] }} {{ host['host'] }}
+{%   endfor %}
+{% endif %}

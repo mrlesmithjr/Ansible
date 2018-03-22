@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 {% if logstash_drop_grokparsefailures is defined and logstash_drop_grokparsefailures %}
 # Drop all _grokparsefailure messages
 filter {

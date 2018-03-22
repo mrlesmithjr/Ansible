@@ -62,13 +62,21 @@
   become: true
   when: >
         ansible_distribution == "Ubuntu" and
-        (ansible_distribution_version >= '14.04')
+        (ansible_distribution_version >= '14.04') and
+        docker_linux_image_extra is defined and
+        docker_linux_image_extra
+
+- name: debian | checking for existing docker
+  shell: dpkg-query -W 'docker-ce'
+  ignore_errors: true
+  register: has_docker
 
 - name: debian | installing docker
   apt:
     name: "docker-ce={{ docker_version_debian }}"
     state: "present"
   become: true
+  when: has_docker|failed
 
 - name: debian | setting grub memory limit (if set)
   lineinfile:
@@ -93,3 +101,6 @@
   become: true
   with_items:
     - bridge-utils
+  when: >
+    docker_install_bridge_utils is defined and
+    docker_install_bridge_utils

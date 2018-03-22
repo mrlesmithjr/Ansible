@@ -1,0 +1,92 @@
+---
+- name: vsphere_support | Installing Pre-Reqs
+  apt:
+    name: "default-jdk-headless"
+    state: "present"
+  become: true
+  when: ansible_distribution == "Ubuntu"
+
+- name: vsphere_support | Installing Pre-Reqs
+  apt:
+    name: "default-jdk"
+    state: "present"
+  become: true
+  when: ansible_distribution == "Debian"
+
+- name: vsphere_support | installing python pip module pysphere
+  pip:
+    name: "pysphere"
+    state: "present"
+  become: true
+
+- name: vsphere_support | create /opt/statsfeeder if not present
+  file:
+    path: "/opt/statsfeeder"
+    state: "directory"
+  become: true
+
+- name: vsphere_support | downloading statsfeeder
+  get_url:
+    url: "http://download3.vmware.com/software/vmw-tools/statsfeeder/StatsFeeder-4.1.697.zip"
+    dest: "/opt/statsfeeder/statsfeeder.zip"
+    mode: 0644
+  become: true
+
+- name: vsphere_support | extracting statsfeeder
+  command: "unzip /opt/statsfeeder/statsfeeder.zip -d /opt/statsfeeder"
+  args:
+    creates: "/opt/statsfeeder/StatsFeeder.sh"
+  become: true
+
+- name: vsphere_support | pulling graphitereceiver from github
+  git:
+    repo: "https://github.com/SYNAXON/GraphiteReceiver"
+    dest: "~/GraphiteReceiver"
+  become: false
+
+- name: vsphere_support | creating build folders
+  file:
+    path: "{{ item }}"
+    state: directory
+  become: false
+  with_items:
+    - '~/.m2/repository/com/vmware/tools/statsfeeder-common/4.1'
+    - '~/.m2/repository/com/vmware/tools/statsfeeder-core/4.1'
+    - '~/.m2/repository/com/vmware/tools/vsphere-sdk/4.1'
+
+- name: vsphere_support | copying build files
+  shell: "cp {{ item['src'] }} {{ item['dest'] }}"
+  become: false
+  with_items:
+    - src: '/opt/statsfeeder/lib/statsfeeder-common-4.1.jar'
+      dest: '~/.m2/repository/com/vmware/tools/statsfeeder-common/4.1'
+    - src: '/opt/statsfeeder/lib/statsfeeder-core-4.1.jar'
+      dest: '~/.m2/repository/com/vmware/tools/statsfeeder-core/4.1'
+    - src: '/opt/statsfeeder/lib/vsphere-sdk-4.1.jar'
+      dest: '~/.m2/repository/com/vmware/tools/vsphere-sdk/4.1'
+
+- name: vsphere_support | building GraphiteReceiver maven package
+  shell: "mvn package"
+  args:
+    chdir: "~/GraphiteReceiver"
+    creates: "~/GraphiteReceiver/target/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar"
+  become: false
+
+- name: vsphere_support | copying files to tmp
+  shell: "cp {{ item }} /tmp"
+  become: false
+  with_items:
+    - '~/GraphiteReceiver/target/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar'
+
+- name: vsphere_support | moving files to statsfeeder
+  shell: "mv {{ item['src'] }} {{ item['dest'] }}"
+  with_items:
+    - src: '/tmp/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar'
+      dest: '/opt/statsfeeder/lib'
+  become: true
+
+- name: vsphere_support | creating sampleConfig.xml
+  template:
+    src: "opt/statsfeeder/sampleConfig.xml.j2"
+    dest: "/opt/statsfeeder/sampleConfig.xml"
+  become: true

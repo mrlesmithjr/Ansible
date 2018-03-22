@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 output {
   if "metric" in [tags] {
     stdout {
@@ -15,7 +16,7 @@ output {
       host => "{{ item.host }}"
 {%   endif %}
 {%   if item.hosts is defined %}
-      hosts => ["{{ item.hosts }}"]
+      hosts => ["{{ item.hosts|join('", "') }}"]
 {%   endif %}
 {%   if item.output == "elasticsearch" %}
 {%     if item.flush_size is defined %}
@@ -40,7 +41,7 @@ output {
 }
 {% endfor %}
 {% if enable_logstash_slack_output is defined and enable_logstash_slack_output %}
-{%   if logstash_slack_output_tags is defined and logstash_slack_output_tags != None %}
+{%   if logstash_slack_output_tags != [] %}
 # Slack outputs based on tags.
 {%     for item in logstash_slack_output_tags %}
 output {

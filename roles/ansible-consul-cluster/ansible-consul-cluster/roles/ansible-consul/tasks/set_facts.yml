@@ -1,0 +1,10 @@
+---
+- name: set_facts | Setting Facts
+  set_fact:
+    consul_bind_address: "{{ consul_bind_address }}"
+
+- name: set_facts | Show Consul Bind Interface
+  debug: var=consul_bind_interface
+
+- name: set_facts | Show Consul Bind Address
+  debug: var=consul_bind_address

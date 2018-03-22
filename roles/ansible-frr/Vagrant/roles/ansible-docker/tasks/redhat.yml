@@ -1,0 +1,56 @@
+---
+- name: redhat | Installing Pre-Reqs (Fedora)
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'device-mapper-persistent-data'
+    - 'libselinux-python'
+    - 'lvm2'
+    - 'yum-utils'
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing Pre-Reqs (!=Fedora)
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'device-mapper-persistent-data'
+    - 'libselinux-python'
+    - 'lvm2'
+    - 'yum-utils'
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Uninstalling Old Docker Package (if exists)
+  yum:
+    name: "{{ item }}"
+    state: "absent"
+  become: true
+  with_items:
+    - 'container-selinux'
+    - 'docker-common'
+    - 'docker-engine'
+    - 'docker-selinux'
+    - 'docker'
+
+- name: redhat | adding Docker repo
+  template:
+    src: "etc/yum.repos.d/docker.repo.j2"
+    dest: "/etc/yum.repos.d/docker.repo"
+  become: true
+
+- name: redhat | installing Docker
+  yum:
+    name: "docker-ce-{{ docker_version_redhat }}"
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing Docker
+  dnf:
+    name: "docker-ce-{{ docker_version_redhat }}"
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"

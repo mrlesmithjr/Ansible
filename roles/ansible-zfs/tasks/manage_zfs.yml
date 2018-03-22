@@ -92,6 +92,8 @@
     sharenfs: "{{ item.sharenfs|default(omit) }}"
     state: "{{ item.state }}"
     sync: "{{ item.sync|default(omit) }}"
+    snapdev: "{{ item.snapdev|default('hidden')}}"
+    snapdir: "{{ item.snapdir|default('hidden')}}"
   with_items: "{{ zfs_filesystems }}"
   when: zfs_create_filesystems
 

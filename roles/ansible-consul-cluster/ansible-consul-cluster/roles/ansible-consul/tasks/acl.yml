@@ -1,0 +1,36 @@
+---
+- name: acl | install required Python modules via package manager
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-requests
+    - python-pip
+  when: consul_acl_install_requirements
+
+- name: acl | install required Python modules via PIP
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-consul
+    - pyhcl
+  when: consul_acl_install_requirements
+
+- name: acl | deploy Consul ACL's
+  consul_acl:
+    host: "{{ item.0.host | default(ansible_hostname) }}"
+    port: "{{ item.0.port | default(omit) }}"
+    scheme: "{{ item.0.scheme | default(omit) }}"
+    state: "{{ item.0.state | default(omit) }}"
+    mgmt_token: "{{ item.0.mgmt_token }}"
+    name: "{{ item.0.name }}"
+    token: "{{ item.0.token | default(omit) }}"
+    token_type: "{{ item.0.token_type | default(omit) }}"
+    validate_certs: "{{ item.0.validate_certs | default(omit) }}"
+    rules: "{{ item.1 }}"
+  with_subelements:
+    - "{{ consul_acl }}"
+    - rules
+  no_log: true
+  run_once: true

@@ -1,9 +1,7 @@
 ---
-- name: Installs zookeeper
-  hosts: all
-  become: true
+- hosts: zookeeper_cluster
   vars:
+    pri_domain_name: test.vagrant.local
   roles:
-    - role: ansible-oracle-java8
+    - role: ansible-openjdk
     - role: ansible-zookeeper
-  tasks:

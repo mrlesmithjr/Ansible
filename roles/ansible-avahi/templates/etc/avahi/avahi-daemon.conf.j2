@@ -1,0 +1,43 @@
+{{ ansible_managed|comment }}
+
+[server]
+host-name={{ ansible_hostname }}
+domain-name={{ avahi_domain_name }}
+browse-domains={{ avahi_browse_domains|join(', ') }}
+use-ipv4={{ "yes" if avahi_use_ipv4 else "no" }}
+use-ipv6={{ "yes" if avahi_use_ipv6 else "no" }}
+{% if avahi_allow_interfaces is defined and avahi_allow_interfaces != [] %}
+allow-interfaces={{ avahi_allow_interfaces|join(', ') }}
+{% endif %}
+ratelimit-interval-usec={{ avahi_ratelimit_interval_usec }}
+ratelimit-burst={{ avahi_ratelimit_burst}}
+
+[wide-area]
+enable-wide-area={{ "yes" if avahi_enable_wide_area else "no" }}
+
+[publish]
+add-service-cookie={{ "yes" if avahi_add_service_cookie else "no" }}
+disable-publishing={{ "yes" if avahi_disable_publishing else "no" }}
+disable-user-service-publishing={{ "yes" if avahi_disable_user_service_publishing else "no" }}
+publish-a-on-ipv6={{ "yes" if avahi_publish_a_on_ipv6 else "no" }}
+publish-aaaa-on-ipv4={{ "yes" if avahi_publish_aaaa_on_ipv4 else "no" }}
+publish-addresses={{ "yes" if avahi_publish_addresses else "no" }}
+{% if avahi_publish_dns_servers != [] %}
+publish-dns-servers={{ avahi_publish_dns_servers|join(', ') }}
+{% endif %}
+publish-domain={{ "yes" if avahi_publish_domain else "no" }}
+publish-hinfo={{ "yes" if avahi_publish_hinfo else "no" }}
+publish-resolv-conf-dns-servers={{ "yes" if avahi_publish_resolv_conf_dns_servers else "no" }}
+publish-workstation={{ "yes" if avahi_publish_workstation else "no" }}
+
+[reflector]
+enable-reflector={{ "yes" if avahi_enable_reflector else "no" }}
+reflect-ipv={{ "yes" if avahi_reflect_ipv else "no" }}
+
+[rlimits]
+rlimit-core={{ avahi_rlimit_core }}
+rlimit-data={{ avahi_rlimit_data }}
+rlimit-fsize={{ avahi_rlimit_fsize }}
+rlimit-nofile={{ avahi_rlimit_nofile }}
+rlimit-stack={{ avahi_rlimit_stack }}
+rlimit-nproc={{ avahi_rlimit_nproc }}

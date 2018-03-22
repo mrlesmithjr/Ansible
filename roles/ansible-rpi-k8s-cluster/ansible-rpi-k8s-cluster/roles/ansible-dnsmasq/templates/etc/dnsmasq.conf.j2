@@ -1,0 +1,74 @@
+port={{ dnsmasq_listen_port }}
+{% if not dnsmasq_read_etc_hosts %}
+no-hosts
+{% endif %}
+{% if not dnsmasq_read_etc_resolv_conf %}
+no-resolv
+{% endif %}
+{% if not dnsmasq_poll_etc_resolv_conf %}
+no-poll
+{% endif %}
+{% if dnsmasq_bind_interfaces is defined %}
+{%   for item in dnsmasq_bind_interfaces %}
+interface={{ item }}
+{%   endfor %}
+{% endif %}
+{% if dnsmasq_bind_listen_only_interfaces %}
+bind-interfaces
+{% elif not dnsmasq_bind_listen_only_interfaces %}
+{% endif %}
+{% if dnsmasq_do_not_listen_on_interfaces is defined %}
+{%   for item in dnsmasq_do_not_listen_on_interfaces %}
+except-interface={{ item }}
+{%   endfor %}
+{% endif %}
+{% if dnsmasq_forward_nonrouted_addresses %}
+bogus-priv
+{% elif not dnsmasq_forward_nonrouted_addresses %}
+{% endif %}
+{% if dnsmasq_pri_domain_name is defined %}
+domain={{ dnsmasq_pri_domain_name }}
+{% endif %}
+{% if dnsmasq_custom_domains is defined %}
+{%   for item in dnsmasq_custom_domains %}
+domain={{ item['domain'] }},{{ item['network']|join (',') }}
+{%   endfor %}
+{% endif %}
+{% if dnsmasq_enable_forwarders %}
+{%   for item in dnsmasq_nameservers %}
+server={{ item }}
+{%   endfor %}
+{% endif %}
+{% if dnsmasq_static_addresses is defined %}
+{%   for item in dnsmasq_static_addresses %}
+address=/{{ item['name'] }}/{{ item['address'] }}
+{%   endfor %}
+{% endif %}
+{% if dnsmasq_conditional_forwarders is defined %}
+{%   for item in dnsmasq_conditional_forwarders %}
+server=/{{ item['domain'] }}/{{ item['address'] }}
+{%   endfor %}
+{% endif %}
+{% if dnsmasq_enable_tftp %}
+enable-tftp
+tftp-root={{ dnsmasq_tftpboot_dir }}
+{% endif %}
+{% if dnsmasq_enable_dhcp %}
+dhcp-client-update
+dhcp-boot={{ dnsmasq_dhcp_boot }}
+{%   if dnsmasq_dhcp_host_reservations is defined %}
+{%     for item in dnsmasq_dhcp_host_reservations %}
+dhcp-host={{ item['mac_address']|join(',') }}{% if item['name'] is defined %},{{ item['name'] }}{% endif %}{% if item['address'] is defined %},{{ item['address'] }}{% endif %}{% if item['lease_time'] is defined %},{{ item['lease_time'] }}{% endif %}
+
+{%     endfor %}
+{%   endif %}
+{%   if dnsmasq_dhcp_options is defined %}
+{%     for item in dnsmasq_dhcp_options %}
+dhcp-option=option:{{ item['option'] }},{{ item['value']|join(',') }}
+{%     endfor %}
+{%   endif %}
+{%   for item in dnsmasq_dhcp_scopes %}
+dhcp-range={% if item['interface'] is defined %}{{ item['interface'] }},{% endif %}{{ item['start'] }},{{ item['end'] }},{{ item['netmask'] }}{% if item['lease_time'] is defined %},{{ item['lease_time'] }}{% endif %}
+
+{%   endfor %}
+{% endif %}

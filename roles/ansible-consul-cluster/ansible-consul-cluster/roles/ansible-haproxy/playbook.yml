@@ -1,0 +1,84 @@
+---
+- hosts: all
+  vars:
+    etc_hosts_add_all_hosts: true
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-etc-hosts
+
+- hosts: load_balancers
+  vars:
+    haproxy_config: true
+    haproxy_configs:
+      - name: 'nginx-80'
+        backend_backups: false
+        backend_backups_primary: 'node1'
+        backend_checks: true
+        backend_name: 'web_servers'
+        backend_servers_bind_port: '80'
+        backend_servers: "{{ groups['web_servers'] }}"
+        balance: 'roundrobin'
+        default_server_options:
+          - name: 'maxconn'
+            value: '256'
+          - name: 'maxqueue'
+            value: '128'
+          - name: 'weight'
+            value: '100'
+        enabled: true
+        frontend_bind_address: 192.168.250.200
+        frontend_bind_port: '443'
+        frontend_name: 'web_servers-in'
+        frontend_ssl: true
+        frontend_ssl_cert: "{{ haproxy_load_balancer_ssl['bundled_cert'] }}"
+        mode: 'http'
+        options:
+          - 'httplog'
+          # - 'tcplog'
+          # - 'httpchk'
+    haproxy_load_balancer_ha: true
+    haproxy_load_balancer_ha_key_file_prefix: '/etc/ssl/{{ haproxy_load_balancer_ha_primary }}'
+    haproxy_load_balancer_ha_primary: "{{ groups['load_balancers'][0] }}"
+    haproxy_load_balancer_ssl:
+      bundled_cert: '/etc/ssl/{{ inventory_hostname }}-bundle.pem'
+      csr_key_file: '/etc/ssl/{{ inventory_hostname }}-csr.pem'
+      enabled: true
+      generate_keys: true
+      private_key_file: '/etc/ssl/private/{{ inventory_hostname }}-key.pem'
+      private_key_size: 4096
+      private_key_type: 'RSA'
+      protocols:
+        - 'TLSv1'
+        - 'TLSv1.1'
+        - 'TLSv1.2'
+      public_key_file: '/etc/ssl/public/{{ inventory_hostname }}-cert.pem'
+      public_key_valid_days: 1825
+      regenerate_keys: false
+    keepalived_config: true
+    keepalived_router_info:
+      - name: vrrp_1
+        check_script:
+          - name: chk_haproxy
+            script: 'killall -0 haproxy'
+            interval: 2
+            weight: 2
+        # Define inventory_hostname of node to be considered Master
+        master_node: "{{ groups['load_balancers'][0] }}"
+        router_id: 50
+        router_pri_backup: 100
+        router_pri_master: 150
+        vip_int: 'enp0s8'
+        vip_addresses:
+          - 192.168.250.200
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-keepalived
+    - role: ansible-haproxy
+  tasks:
+
+- hosts: web_servers
+  vars:
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-nginx
+  tasks:

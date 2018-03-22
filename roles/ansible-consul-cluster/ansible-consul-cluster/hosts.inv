@@ -1,0 +1,18 @@
+#
+# Ansible managed
+#
+
+[ansible_provisioned]
+consul-1
+consul-2
+consul-3
+
+[consul_cluster]
+consul-1
+consul-2
+consul-3
+
+[vms]
+consul-1 ansible_host=10.0.102.200 mac_address=00-50-56-a1-37-06 uuid=422153b1-da61-25a2-96f5-a38cb34b9419
+consul-2 ansible_host=10.0.102.139 mac_address=00-50-56-a1-2a-fa uuid=42211708-1e95-e6f1-0c27-5eff176f05ed
+consul-3 ansible_host=10.0.102.186 mac_address=00-50-56-a1-24-9b uuid=4221259e-37e8-05dd-c01c-e7ea6c3607e6

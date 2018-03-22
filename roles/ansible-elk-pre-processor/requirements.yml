@@ -1,5 +1,6 @@
 ---
 - src: https://github.com/mrlesmithjr/ansible-dnsmasq.git
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts.git
 - src: https://github.com/mrlesmithjr/ansible-logstash.git
 - src: https://github.com/mrlesmithjr/ansible-ntp.git
 - src: https://github.com/mrlesmithjr/ansible-rsyslog.git

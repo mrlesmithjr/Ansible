@@ -1,0 +1,17 @@
+{{ ansible_managed|comment }}
+
+[Unit]
+Description=IPv4 firewall with iptables
+After=ipset.service
+Wants=ipset.service
+ConditionFileNotEmpty={{ ipset_iptables_config_file }}
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={{ _iptables_restore_bin_path['stdout'] }} {{ ipset_iptables_config_file }}
+ExecReload={{ _iptables_restore_bin_path['stdout'] }} {{ ipset_iptables_config_file }}
+ExecStop={{ _iptables_save_bin_path['stdout'] }} > {{ ipset_iptables_config_file }}
+
+[Install]
+WantedBy=multi-user.target

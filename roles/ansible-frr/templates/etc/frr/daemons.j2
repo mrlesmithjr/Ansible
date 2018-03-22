@@ -1,0 +1,6 @@
+{{ ansible_managed|comment }}
+
+{% for key, value in frr_daemons.iteritems() %}
+{{ key }}={% if value %}yes{% else %}no{% endif %}
+
+{% endfor %}

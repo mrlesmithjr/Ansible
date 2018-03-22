@@ -1,0 +1,28 @@
+---
+- name: services | Creating ipset systemd Service
+  template:
+    src: etc/systemd/system/ipset.service.j2
+    dest: "{{ _ipset_ipset_systemd_file }}"
+  become: true
+  notify:
+    - reload ipset
+
+- name: services | Creating iptables systemd Service
+  template:
+    src: etc/systemd/system/iptables.service.j2
+    dest: "{{ _ipset_iptables_systemd_file }}"
+  become: true
+  notify:
+    - reload iptables
+
+- name: services | Ensuring iptables Service Loads On Reboot
+  service:
+    name: iptables
+    enabled: true
+  become: true
+
+- name: services | Ensuring ipset Service Loads On Reboot
+  service:
+    name: ipset
+    enabled: true
+  become: true

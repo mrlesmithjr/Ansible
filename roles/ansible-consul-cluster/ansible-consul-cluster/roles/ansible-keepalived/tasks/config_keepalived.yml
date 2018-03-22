@@ -1,0 +1,11 @@
+---
+- name: config_keepalived | configuring keepalived
+  template:
+    src: "etc/keepalived/keepalived.conf.j2"
+    dest: "/etc/keepalived/keepalived.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - restart keepalived

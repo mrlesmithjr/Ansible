@@ -1,0 +1,17 @@
+{{ ansible_managed|comment }}
+
+hostname {{ ansible_hostname }}
+password {{ frr_password }}
+log {{ frr_logging }}
+!
+{% if frr_interfaces is defined and frr_interfaces != [] %}
+{%   for key, value in frr_interfaces.iteritems() %}
+interface {{ key }}
+{%     if value['description'] is defined %}
+  description {{ value['description'] }}
+{%     endif %}
+{%     if value['ip'] is defined %}
+  ip address {{ value['ip'] }}
+{%     endif %}
+{%   endfor %}
+{% endif %}

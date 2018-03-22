@@ -1,0 +1,32 @@
+---
+# tasks file for ansible-etc-hosts
+- name: pre-reqs (RedHat)
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - libselinux-python
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+- name: pre-reqs (RedHat)
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - libselinux-python
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+- name: main | updating /etc/hosts (localhost)
+  template:
+    src: "etc/hosts.j2"
+    dest: "/etc/hosts"
+    owner: root
+    group: root
+    mode: 0644
+  become: true

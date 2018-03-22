@@ -2,21 +2,6 @@
 # tasks file for ansible-elk-pre-processor
 - include: set_facts.yml
 
-- include: config_hosts_file.yml
-  when: >
-        config_hosts_file is defined and
-        config_hosts_file
-
-- include: debian_rsyslog.yml
-  tags:
-    - config_rsyslog
-  when: ansible_os_family == "Debian"
-
-- include: centos_rsyslog.yml
-  tags:
-    - config_rsyslog
-  when: ansible_os_family == "RedHat"
-
 - include: config_logstash.yml
   tags:
     - config_logstash

@@ -1,0 +1,70 @@
+---
+- name: install | Creating Kafka User
+  user:
+    createhome: false
+    group: nogroup
+    name: kafka
+    shell: /bin/false
+    system: true
+  become: true
+
+- name: install | Creating Kafka Installation Directory {{ kafka_install_dir }}
+  file:
+    group: nogroup
+    owner: kafka
+    path: "{{ kafka_install_dir }}"
+    state: directory
+  become: true
+
+- name: install | Downloading Kafka
+  unarchive:
+    dest: "{{ kafka_install_dir }}"
+    creates: "{{ kafka_install_dir }}/bin"
+    extra_opts: [--strip-components=1]
+    remote_src: true
+    src: "{{ kafka_download }}"
+  become: true
+
+- name: install | Creating Kafka Data Directory {{ kafka_data_dir }}
+  file:
+    group: nogroup
+    owner: kafka
+    path: "{{ kafka_data_dir }}"
+    state: directory
+  become: true
+
+- name: install | Configuring Kafka
+  template:
+    dest: "{{ kafka_install_dir }}/config/server.properties"
+    group: nogroup
+    owner: kafka
+    src: server.properties.j2
+  become: true
+
+- name: install | Configuring Directory Permissions
+  file:
+    group: nogroup
+    owner: kafka
+    path: "{{ item }}"
+    recurse: true
+    state: directory
+  become: true
+  with_items:
+    - "{{ kafka_install_dir }}"
+    - "{{ kafka_data_dir }}"
+
+- name: install | Configuring Kafka Service
+  template:
+    src: kafka.service.j2
+    dest: /etc/systemd/system/kafka.service
+  become: true
+  register: _kafka_systemd_service
+  notify: restart kafka
+  when: ansible_service_mgr == "systemd"
+
+- name: install | Reloading Systemd
+  systemd:
+    name: kafka
+    daemon_reload: true
+  become: true
+  when: _kafka_systemd_service['changed']

@@ -1,0 +1,15 @@
+---
+# tasks file for ansible-frr
+- include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include_tasks: system_tuning.yml
+
+- include_tasks: config.yml
+
+- include_tasks: monitor.yml
+  tags:
+    - frr-monitoring

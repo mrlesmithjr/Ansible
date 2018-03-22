@@ -1,0 +1,66 @@
+---
+- name: install | check if consul binary is installed
+  stat:
+    path: "{{ consul_bin_path }}/consul"
+  register: consul_binary_exists
+  ignore_errors: true
+  become: true
+
+- name: install | try to determine current consul version
+  shell: "{{ consul_bin_path }}/consul version | head -1 | cut -d 'v' -f2"
+  register: consul_version_installed
+  changed_when: false
+  when: consul_upgrade and
+        consul_binary_exists.stat.exists
+
+- name: install | backup current binary as fallback
+  shell: "mv {{ consul_bin_path }}/consul {{ consul_bin_path }}/consul_backup"
+  register: consul_binary_backup
+  become: true
+  when: consul_upgrade and
+        consul_binary_exists.stat.exists and
+        consul_version_installed.stdout < consul_version and
+        not ansible_check_mode
+
+- name: install | download and extract consul
+  unarchive:
+    src: "{{ consul_dl_url }}/{{ consul_dl_file }}"
+    dest: "{{ consul_bin_path }}"
+    remote_src: True
+    creates: "{{ consul_bin_path }}/consul"
+    owner: "{{ consul_bin_owner }}"
+    group: "{{ consul_bin_group }}"
+    mode: "{{ consul_bin_mode }}"
+  become: true
+  ignore_errors: true
+  register: consul_download_extract
+  notify:
+    - restart consul
+  when: not ansible_check_mode
+
+- name: install | restoring former binary as upgrade failed
+  shell: "mv {{ consul_bin_path }}/consul_backup {{ consul_bin_path }}/consul"
+  become: true
+  register: consul_binary_restore
+  notify:
+    - restart consul
+  when: consul_download_extract|failed and
+        consul_binary_backup|success and
+        not ansible_check_mode
+
+- name: install | remove not required binary backup
+  file:
+    path: "{{ consul_bin_path }}/consul_backup"
+    state: absent
+  when: consul_download_extract|success
+
+- name: install | ensure binary ownership and mode
+  file:
+    path: "{{ consul_bin_path }}/consul"
+    owner: "{{ consul_bin_owner }}"
+    group: "{{ consul_bin_group }}"
+    mode: "{{ consul_bin_mode }}"
+  become: true
+  notify:
+    - restart consul
+  when: not ansible_check_mode

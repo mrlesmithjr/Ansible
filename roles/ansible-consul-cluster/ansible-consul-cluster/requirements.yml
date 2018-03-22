@@ -1,0 +1,7 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-consul
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://github.com/mrlesmithjr/ansible-haproxy
+- src: https://github.com/mrlesmithjr/ansible-keepalived
+- src: https://github.com/mrlesmithjr/ansible-ntp
+- src: https://github.com/mrlesmithjr/ansible-timezone

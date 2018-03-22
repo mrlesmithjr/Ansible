@@ -18,7 +18,7 @@
 # Mandatory settings
 wsrep_on=ON
 wsrep_provider=/usr/lib64/galera/libgalera_smm.so
-wsrep_cluster_address="gcomm://{% for host in groups[galera_cluster_nodes_group] %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %}"
+wsrep_cluster_address="gcomm://{{ groups[galera_cluster_nodes_group] | map('extract', hostvars, 'ansible_' ~ galera_cluster_bind_interface) | map(attribute='ipv4.address') | list | join(',') }}"
 wsrep_cluster_name="{{ galera_cluster_name }}"
 binlog_format=row
 default_storage_engine=InnoDB

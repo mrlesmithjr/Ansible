@@ -1,0 +1,17 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-pip'
+    - 'ruby'
+    - 'rubygems-integration'
+
+- name: debian | Installing Redis
+  apt:
+    name: "redis-server"
+    state: "present"
+  become: true
+  when: not redis_install_from_source

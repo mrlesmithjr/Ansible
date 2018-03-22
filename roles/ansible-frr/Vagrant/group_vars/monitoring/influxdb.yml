@@ -1,0 +1,14 @@
+---
+influxdb_admin:
+  # Determines whether the admin service is enabled.
+  enabled: true
+  # The default bind address used by the admin service.
+  bind_address: ""
+  # The default bind port used by the admin service.
+  bind_port: 8083
+  # The SSL certificate used when HTTPS is enabled.
+  https_certificate: /etc/ssl/influxdb.pem
+  # Whether the admin service should use HTTPS.
+  https_enabled: false
+
+influxdb_config: true

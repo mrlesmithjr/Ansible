@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+
+<service-group>
+  <name replace-wildcards="yes">%h</name>
+  <service>
+    <type>{{ item['value']['type'] }}</type>
+{%     if item['value']['subtype'] is defined %}
+    <subtype>{{ item['value']['subtype'] }}</subtype>
+{%     endif %}
+    <port>{{ item['value']['port'] }}</port>
+  </service>
+</service-group>

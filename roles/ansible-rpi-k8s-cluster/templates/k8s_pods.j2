@@ -1,0 +1,18 @@
+{% if _k8s_pods_all_namespaces is defined and k8s_reports['all_pod_namespaces'] %}
+{%   set containers = {} %}
+{%   set _containers = [] %}
+{%   for item in (_k8s_pods_all_namespaces['stdout']|from_json)['items'] %}
+{%     set _container = {} %}
+{%     set _node = item['spec']['nodeName'] %}
+{%     set _hostip = item['status']['hostIP'] %}
+{%     set _podip = item['status']['podIP'] %}
+{%     set _phase = item['status']['phase'] %}
+{%     set _container_name = item['spec']['containers'][0]['name'] %}
+{%     set _container_image = item['spec']['containers'][0]['image'] %}
+{%     set _container_resources = item['spec']['containers'][0]['resources'] %}
+{%     set _cont = _container.update({"phase": _phase, "podIP": _podip, "hostIP": _hostip, "name": _container_name, "image": _container_image, "resources": _container_resources, "nodeName": _node}) %}
+{%     set _cont = _containers.append(_container) %}
+{%   endfor %}
+{%   set _cont = containers.update({"containers": _containers}) %}
+{{ containers|to_nice_json }}
+{% endif %}

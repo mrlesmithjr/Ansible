@@ -1,0 +1,85 @@
+---
+# Defines DHCP handed out DNS servers
+dhcp_dns_servers:
+  - "{{ hostvars[groups['rpi_k8s_master'][0]]['rpi_k8_static_ip_addr'] }}"
+  # - 8.8.8.8
+  # - 8.8.4.4
+
+# Defines DHCP scope end address
+dhcp_scope_end_range: "{{ dhcp_scope_subnet }}.131"
+
+# Defines DHCP scope gateway address
+dhcp_scope_gateway: "{{ hostvars[groups['rpi_k8s_master'][0]]['rpi_k8_static_ip_addr'] }}"
+
+# Defines DHCP scope subnet mask
+dhcp_scope_netmask: 255.255.255.0
+
+# Defines DHCP scope start address
+dhcp_scope_start_range: "{{ dhcp_scope_subnet }}.128"
+
+# Defines dhcp scope subnet for isolated network
+dhcp_scope_subnet: 192.168.100
+
+# Defines jumphost IP address to use as bastion host to reach isolated hosts
+jumphost_ip: 172.16.24.186
+
+# Defines IPTABLES rules to define on jumphost
+jumphost_iptables_rules:
+  - chain: POSTROUTING
+    jump: MASQUERADE
+    out_interface: "{{ rpi_wireless_int}}"
+    source: "{{ dhcp_scope_subnet }}.0/24"
+    state: present
+    table: nat
+  - chain: FORWARD
+    ctstate: RELATED,ESTABLISHED
+    in_interface: "{{ rpi_wireless_int}}"
+    jump: ACCEPT
+    out_interface: "{{ rpi_wired_int }}"
+    state: present
+    table: filter
+  - chain: FORWARD
+    in_interface: "{{ rpi_wired_int }}"
+    jump: ACCEPT
+    out_interface: "{{ rpi_wireless_int }}"
+    state: present
+    table: filter
+
+# Defines the K8's GlusterFS cluster name to define for deployments
+k8s_glusterfs_cluster_name: glusterfs-cluster
+
+# Define the namespaces for GlusterFS to be defined within
+k8s_glusterfs_namespaces:
+  - default
+  - kube-system
+
+# Defines primary dns domain name for isolated network
+pri_domain_name: etsbv.internal
+
+# Defines if GlusterFS should be used for persistent storage capabilities
+rpi_k8s_use_glusterfs: true
+
+# Defines the number of nodes in cluster
+# Extremely important to define correctly, otherwise provisioning will fail.
+rpi_nodes: 5
+
+# Defines the default rpi password for the rpi_username...default is raspberry
+rpi_password: raspberry
+
+# Defines the root volume device of the RPI's. This is used to update cmdline.txt
+rpi_root_device: /dev/mmcblk0p2
+
+# Defines if DNSMasq should be used for DHCP within cluster
+rpi_k8s_use_dnsmasq: true
+
+# Defines if ISC-DHCP should be used for DHCP within cluster
+rpi_k8s_use_isc_dhcp: false
+
+# Defines the default rpi username...default is pi
+rpi_username: pi
+
+# Defines rpi wired interface name
+rpi_wired_int: eth0
+
+# Defines rpi wireless interface name
+rpi_wireless_int: wlan0

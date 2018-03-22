@@ -1,0 +1,3 @@
+---
+docker_swarm_interface: "{{ rpi_wired_int }}"
+docker_version: 17.09.0

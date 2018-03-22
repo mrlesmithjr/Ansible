@@ -2,5 +2,5 @@
 - name: debian | Installing Kapacitor
   apt:
     deb: "{{ kapacitor_dl_uri }}/{{ kapacitor_debian_file }}"
-    state: "present"
+    state: present
   become: true

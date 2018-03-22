@@ -1,0 +1,12 @@
+---
+- name: arch | Installing ipset
+  pacman:
+    name: ipset
+    state: present
+  become: true
+
+- name: arch | Installing iptables
+  pacman:
+    name: iptables
+    state: present
+  become: true

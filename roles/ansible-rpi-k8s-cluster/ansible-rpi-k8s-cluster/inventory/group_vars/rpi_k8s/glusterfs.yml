@@ -1,0 +1,16 @@
+---
+config_glusterfs: true
+
+glusterfs_client_mounts:
+  - mountpoint: /mnt/volume-1
+    src: "{{ glusterfs_primary_server }}:/volume-1"
+    fstype: glusterfs
+    opts: "defaults,_netdev,backupvolfile-server={{ glusterfs_secondary_server }}"
+    state: mounted
+
+glusterfs_create_bricks:
+  - name: volume-1
+    owner: root
+    group: root
+
+glusterfs_volume_force_create: true

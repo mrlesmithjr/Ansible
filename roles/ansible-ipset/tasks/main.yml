@@ -1,0 +1,31 @@
+---
+# tasks file for ansible-ipset
+- include: alpine.yml
+  when: ansible_os_family == "Alpine"
+
+- include: arch.yml
+  when: ansible_os_family == "Archlinux"
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: set_facts.yml
+
+- include: dshield.yml
+  when: ipset_enable_dshield_block_list
+
+- include: firehol.yml
+  when: ipset_enable_firehol_block_list
+
+- include: spamhaus.yml
+  when: ipset_enable_spamhaus_block_list
+
+- include: configure.yml
+
+- include: services.yml
+  when: ansible_service_mgr == "systemd"
+
+- include: save_rules.yml

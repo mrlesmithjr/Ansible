@@ -3,8 +3,11 @@
 {% endif %}
 
 check process {{ item['name'] }}
-{% if item['pidfile'] is defined %}
-    with pidfile {{ item['pidfile'] }}
+{%- if item['pidfile'] is defined %}
+ with pidfile {{ item['pidfile'] }}
+{% endif %}
+{%- if item['regex'] is defined %}
+ matching "{{ item['regex'] }}"
 {% endif %}
 {% if item['groups'] is defined %}
 {%   for group in item['groups'] %}

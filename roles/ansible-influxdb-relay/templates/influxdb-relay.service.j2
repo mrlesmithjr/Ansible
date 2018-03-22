@@ -1,0 +1,16 @@
+[Unit]
+Description=InfluxDB-Relay is a service to replicate InfluxDB data for high availability
+Documentation=https://github.com/influxdata/influxdb-relay
+After=network.target
+
+[Service]
+User=influxdb-relay
+Group=influxdb-relay
+LimitNOFILE=65536
+ExecStart={{ influxdb_relay_binary }} -config {{ influxdb_relay_config }}
+KillMode=control-group
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+Alias=influxdb-relay.service

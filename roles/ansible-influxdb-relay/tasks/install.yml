@@ -1,0 +1,88 @@
+---
+- name: install | Ensuring influxdb-relay Folders Exist
+  file:
+    path: "{{ item }}"
+    state: directory
+  become: true
+  with_items:
+    - "{{ influxdb_relay_data_dir }}"
+    - "{{ influxdb_relay_log_dir }}"
+
+- name: install | Ensuring {{ influxdb_relay_config|dirname }} Directory Exists
+  file:
+    path: "{{ influxdb_relay_config|dirname }}"
+    state: directory
+  become: true
+  
+- name: install | Creating influxdb-relay User
+  user:
+    name: influxdb-relay
+    createhome: false
+    home: "{{ influxdb_relay_data_dir }}"
+    shell: /bin/false
+    system: true
+  become: true
+
+- name: install | Setting Folder Permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: influxdb-relay
+    group: influxdb-relay
+  become: true
+  with_items:
+    - "{{ influxdb_relay_data_dir }}"
+    - "{{ influxdb_relay_log_dir }}"
+
+- name: install | Ensuring {{ influxdb_relay_gopath }} Exists
+  file:
+    path: "{{ influxdb_relay_gopath }}"
+    state: directory
+  become: true
+
+- name: install | Compiling influxdb-relay
+  shell: go get -u github.com/influxdata/influxdb-relay
+  become: true
+  args:
+    creates: "{{ influxdb_relay_gopath }}/bin/influxdb-relay"
+  environment:
+    GOPATH: "{{ influxdb_relay_gopath }}"
+
+- name: install | Copying influxdb-relay
+  copy:
+    src: "{{ influxdb_relay_gopath }}/bin/influxdb-relay"
+    dest: "{{ influxdb_relay_binary }}"
+    mode: u=rwx,g=rx,o=rx
+    remote_src: true
+  become: true
+
+- name: install | Configuring influxdb-relay
+  template:
+    src: influxdb-relay.conf.j2
+    dest: "{{ influxdb_relay_config }}"
+  become: true
+  notify:
+    - restart influxdb-relay
+
+- name: install | Configuring systemd Service
+  template:
+    src: influxdb-relay.service.j2
+    dest: /lib/systemd/system/influxdb-relay.service
+  become: true
+  register: _influxdb_relay_systemd
+  notify:
+    - restart influxdb-relay
+  when: ansible_service_mgr == "systemd"
+
+- name: install | Reloading systemd
+  systemd:
+    name: influxdb-relay
+    daemon_reload: true
+  become: true
+  when: _influxdb_relay_systemd['changed']
+
+- name: install | Ensuring influxdb-relay Service Is Enabled On Boot
+  service:
+    name: influxdb-relay
+    enabled: true
+  become: true

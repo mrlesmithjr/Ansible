@@ -71,7 +71,7 @@
   enabled = yes
 {% endif %}
 	# in memory max health log entries = 1000
-	script to execute on alarm = /usr/libexec/netdata/plugins.d/alarm-notify.sh
+	script to execute on alarm = {{ netdata_health_alarm_script }}
 	health configuration directory = /etc/netdata/health.d
 	# run at least every seconds = 10
 	# postpone alarms during hibernation for seconds = 60

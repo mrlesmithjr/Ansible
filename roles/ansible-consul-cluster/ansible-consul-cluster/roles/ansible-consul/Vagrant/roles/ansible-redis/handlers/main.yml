@@ -1,0 +1,23 @@
+---
+# handlers file for ansible-redis
+- name: "reload systemctl"
+  command: "systemctl daemon-reload"
+  become: true
+
+- name: "restart redis"
+  service:
+    name: "redis"
+    state: "restarted"
+  become: true
+
+- name: "restart redis-server"
+  service:
+    name: "redis-server"
+    state: "restarted"
+  become: true
+
+- name: "start redis"
+  service:
+    name: "redis"
+    state: "started"
+  become: true

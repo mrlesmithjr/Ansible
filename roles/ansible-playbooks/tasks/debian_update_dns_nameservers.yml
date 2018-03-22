@@ -1,0 +1,9 @@
+---
+- name: debian_update_dns_nameservers | setting dns nameservers
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    regexp: "^dns-nameservers"
+    line: "dns-nameservers {{ base_dns_nameservers|join (' ') }}"
+    state: "{{ base_dns_nameservers_state }}"
+  notify: "update resolvconf"
+  become: true

@@ -2,7 +2,7 @@ galaxy_info:
   author: Larry Smith Jr.
   description: An [Ansible](https://www.ansible.com) role to install [OpenJDK](http://openjdk.java.net/)
 
-  license: license (MIT)
+  license: MIT
 
   min_ansible_version: 1.2
   platforms:
@@ -20,7 +20,6 @@ galaxy_info:
         - 24
         - 25
         - 26
-        - 27
     - name: Ubuntu
       versions:
         - artful
@@ -29,6 +28,7 @@ galaxy_info:
         - xenial
         - zesty
 
-  galaxy_tags: []
+  galaxy_tags:
+    - platform
 
 dependencies: []

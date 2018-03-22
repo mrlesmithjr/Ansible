@@ -20,7 +20,7 @@
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
-  command: "update-initramfs -u"
+  command: "{{ update_initramfs }}"
   when: array_created.changed
 
 # Capture the raid array details to append to /etc/mdadm/mdadm.conf
@@ -97,6 +97,17 @@
         array_check.results[0].rc == 0 and
         array_removed.changed
 
+- name: arrays | Ensure /etc/mdadm/ directory exists
+  file:
+    path: /etc/mdadm/
+    state: directory
+
+- name: arrays | Ensure /etc/mdadm/mdadm.conf file exists
+  copy:
+    content: ""
+    dest: /etc/mdadm/mdadm.conf
+    force: no
+
 # Updating /etc/mdadm/mdadm.conf in order to persist between reboots
 - name: arrays | Updating /etc/mdadm/mdadm.conf
   lineinfile:
@@ -120,5 +131,16 @@
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
-  command: "update-initramfs -u"
-  when: array_removed.changed
+  command: "{{ update_initramfs }}"
+  when: array_removed.changed and ansible_os_family == "Debian"
+
+# Updates initramfs archives in /boot
+- name: arrays | Updating Initramfs
+  command: "mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r)-backup.img"
+  when: array_removed.changed and ansible_os_family == "RedHat"
+
+# Updates initramfs archives in /boot
+- name: arrays | Updating Initramfs
+  command: "dracut /boot/initramfs-$(uname -r).img $(uname -r)"
+  when: array_removed.changed and ansible_os_family == "RedHat"
+

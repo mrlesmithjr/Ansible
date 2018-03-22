@@ -2,6 +2,6 @@
 - name: service | ensuring redis is enabled and started
   service:
     name: "{{ redis_service }}"
-    state: "started"
+    state: started
     enabled: yes
   become: true

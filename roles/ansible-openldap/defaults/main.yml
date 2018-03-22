@@ -2,7 +2,9 @@
 # defaults file for ansible-openldap
 openldap_admin_password: 'P@55w0rd'
 openldap_admin_user: 'admin'
-openldap_base: 'dc=example,dc=org'
+openldap_org: 'example'
+openldap_tld: 'org'
+openldap_base: 'dc={{ openldap_org }},dc={{ openldap_tld }}'
 openldap_bind_id: 'cn={{ openldap_bind_user }},{{ openldap_base }}'
 openldap_bind_user: '{{ openldap_admin_user }}'
 openldap_debian_packages:
@@ -28,4 +30,4 @@ openldap_users:
     password: 'P@55w0rd'
     loginShell: /bin/bash
     homeDirectory: /home/john
-pri_domain_name: 'example.org'
+pri_domain_name: '{{ openldap_org }}.{{ openldap_tld }}'

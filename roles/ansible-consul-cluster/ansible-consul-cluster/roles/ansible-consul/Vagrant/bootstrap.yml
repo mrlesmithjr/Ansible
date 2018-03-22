@@ -1,0 +1,206 @@
+---
+- hosts: all
+  remote_user: vagrant
+  become: true
+  vars:
+    ansible_ver: '2.2.0.0'
+    debian_packages:
+      - 'build-essential'
+      - 'libffi-dev'
+      - 'libssl-dev'
+      - 'python-dev'
+      - 'python-pip'
+      - 'python-setuptools'
+    host_vars_directory: './host_vars'
+    host_vars_file: '{{ host_vars_directory }}/{{ inventory_hostname }}.yml'
+    pri_domain_name: 'vagrant.local'
+    redhat_packages:
+      - 'gmp-devel'
+      - 'libffi-devel'
+      - 'openssl-devel'
+      - 'python-crypto'
+      - 'python-devel'
+      - 'python-pip'
+      - 'python-setuptools'
+      - 'redhat-rpm-config'
+    ssh_key_path: '.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key'
+    suse_packages:
+      - 'gmp-devel'
+      - 'libffi-devel'
+      - 'openssl-devel'
+      - 'python-crypto'
+      - 'python-devel'
+      - 'python-pip'
+      - 'python-setuptools'
+    update_host_vars: true
+  roles:
+  tasks:
+# Update apt-cache to ensure up to date
+    - name: Updating Apt Cache (Debian)
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Debian)
+      apt:
+        name: "{{ item }}"
+        state: "present"
+      with_items: '{{ debian_packages }}'
+      when: ansible_os_family == "Debian"
+
+    - name: Installing EPEL Repo (RedHat)
+      yum:
+        name: "epel-release"
+        state: "present"
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (RedHat)
+      yum:
+        name: "{{ item }}"
+        state: "present"
+      with_items: '{{ redhat_packages }}'
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Fedora)
+      dnf:
+        name: "python-dnf"
+        state: "present"
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution == "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Fedora)
+      dnf:
+        name: "{{ item }}"
+        state: "present"
+      with_items: '{{ redhat_packages }}'
+      when: >
+            ansible_os_family == "RedHat" and
+            ansible_distribution == "Fedora"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (openSUSE)
+      zypper:
+        name: "{{ item }}"
+        state: "present"
+      with_items: '{{ suse_packages }}'
+      when: ansible_os_family == "Suse"
+
+# Upgrading these packages to ensure a successful Ansible install
+    - name: Updating Python Modules
+      pip:
+        name: "{{ item }}"
+        state: "latest"
+      with_items:
+        - 'pip'
+        - 'cffi'
+
+# Install Ansible to run Ansible related tasks within guest
+    - name: Installing Ansible
+      pip:
+        name: "ansible"
+        state: "present"
+        version: "{{ ansible_ver }}"
+
+# Check/create host_vars on localhost
+    - name: Ensuring host_vars Directory Exists
+      file:
+        path: "./host_vars"
+        state: "directory"
+      delegate_to: "localhost"
+      run_once: true
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars
+
+    - name: Ensuring Host File Exists In host_vars
+      stat:
+        path: "{{ host_vars_file }}"
+      delegate_to: "localhost"
+      register: "host_var"
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars
+
+    - name: Creating Missing host_vars
+      file:
+        path: "{{ host_vars_file }}"
+        state: "touch"
+      delegate_to: "localhost"
+      become: false
+      when: not host_var.stat.exists
+
+    - name: Updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1.ipv4.address }}"
+      delegate_to: "localhost"
+      become: false
+      register: "ansible_host_updated_eth1"
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            (ansible_eth1 is defined and
+            ansible_eth1.ipv4.address is defined)
+
+    - name: Updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8.ipv4.address }}"
+      delegate_to: "localhost"
+      become: false
+      register: "ansible_host_updated_enp0s8"
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            (ansible_enp0s8 is defined and
+            ansible_enp0s8.ipv4.address is defined)
+
+    - name: Updating ansible_ssh_port
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_port{{ ':' }}"
+        line: "ansible_ssh_port{{ ':' }} 22"
+      delegate_to: "localhost"
+      become: false
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            (ansible_host_updated_eth1.changed or
+              ansible_host_updated_enp0s8.changed)
+
+    - name: Updating ansible_ssh_key
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_private_key_file{{ ':' }}"
+        line: "ansible_ssh_private_key_file{{ ':' }} {{ ssh_key_path }}"
+      delegate_to: "localhost"
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars
+
+    - name: Ensuring host_vars Is YAML Formatted
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "---"
+        line: "---"
+        insertbefore: "BOF"
+      delegate_to: "localhost"
+      become: false
+      when: >
+            update_host_vars is defined and
+            update_host_vars

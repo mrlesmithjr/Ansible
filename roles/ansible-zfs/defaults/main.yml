@@ -45,6 +45,10 @@ zfs_filesystems: []
   #   recordsize: 16K
   #   sharenfs: on
   #   # standard (default) | always | disabled    sync: disabled
+  #   # Controls whether the snapshots devices of zvol's are hidden or visible. hidden (default) | visible
+  #   snapdev: visible
+  #   # Controls whether the .zfs directory is hidden or visible in the root of the file system. hidden (default) | visible
+  #   snapdir: visible
   #   state: present
   # - name: Shares/Movies
   #   compression: lz4

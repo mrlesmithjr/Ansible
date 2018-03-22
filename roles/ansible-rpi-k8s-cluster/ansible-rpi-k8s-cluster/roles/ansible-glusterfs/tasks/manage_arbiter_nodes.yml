@@ -1,0 +1,16 @@
+---
+- name: manage_arbiter_nodes | joining arbiter node
+  shell: gluster peer probe {{ item }}
+  register: gluster_peer_probe
+  changed_when: "'already in peer list' not in gluster_peer_probe.stdout"
+  ignore_errors: true  #added temporarily to get around Vagrant testing...may remove later
+  delegate_to: "{{ glusterfs_server_master }}"
+  with_items: '{{ groups[glusterfs_arbiter_group] }}'
+
+- name: manage_arbiter_nodes | creating arbiter brick mount (Only Meta-Data is stored)  ##This brick only contains meta-data for volumes
+  file:
+    path: "{{ glusterfs_brick_dir }}"
+    owner: root
+    group: root
+    state: directory
+  when: inventory_hostname in groups[glusterfs_arbiter_group]

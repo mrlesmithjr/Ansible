@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 # Windows Update parsing
 filter {
   if [type] == "eventlog" and [SourceName] == "Microsoft-Windows-WindowsUpdateClient" {

@@ -1,0 +1,8 @@
+---
+- name: save_rules | Saving ipset Rules To Load On Reboot
+  shell: "{{ _ipset_bin_path['stdout'] }} -file {{ ipset_config_file }} save"
+  become: true
+
+- name: save_rules | Saving iptables Rules To Load On Reboot
+  shell: "{{ _iptables_save_bin_path['stdout'] }} > {{ ipset_iptables_config_file }}"
+  become: true

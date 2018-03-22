@@ -1,0 +1,21 @@
+---
+- name: debian | installing apt-cacher-ng (Server)
+  apt:
+    name: "apt-cacher-ng"
+    state: "present"
+  when: >
+        enable_apt_caching is defined and
+        enable_apt_caching
+
+- name: debian | configuring apt-cacher-ng (Server)
+  template:
+    src: "etc/apt-cacher-ng/{{ item }}.j2"
+    dest: "/etc/apt-cacher-ng/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  notify: "restart apt-cacher-ng"
+  with_items: '{{ apt_cacher_configs }}'
+  when: >
+        enable_apt_caching is defined and
+        enable_apt_caching

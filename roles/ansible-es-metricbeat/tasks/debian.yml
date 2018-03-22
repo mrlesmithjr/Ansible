@@ -1,0 +1,24 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: apt-transport-https
+    state: present
+  become: true
+
+- name: debian | Adding Elastic Repo Key
+  apt_key:
+    url: "{{ es_metricbeat_repo_key }}"
+    state: present
+  become: true
+
+- name: debian | Adding Elastic Metricbeat Repo
+  apt_repository:
+    repo: "deb {{ es_metricbeat_repo_url }}/packages/{{ es_metricbeat['major_version'] }}/apt stable main"
+    state: present
+  become: true
+
+- name: debian | Installing Elastic Metricbeat {{ es_metricbeat['minor_version'] }}
+  apt:
+    name: "metricbeat={{ es_metricbeat['minor_version'] }}"
+    state: present
+  become: true

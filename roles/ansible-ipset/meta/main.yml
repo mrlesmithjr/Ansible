@@ -1,0 +1,43 @@
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install/configure [ipset](http://ipset.netfilter.org/)
+
+  license: MIT
+
+  min_ansible_version: 1.2
+
+  platforms:
+    - name: Alpine
+      versions:
+        - 3.4
+        - 3.5
+    - name: Archlinux
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+        - wheezy
+    - name: EL
+      versions:
+        - 7
+    - name: Fedora
+      versions:
+        - 23
+        - 24
+        - 25
+        - 26
+        - 27
+    - name: Ubuntu
+      versions:
+        - artful
+        - precise
+        - trusty
+        - xenial
+
+  galaxy_tags:
+    - security
+    - system
+
+dependencies: []

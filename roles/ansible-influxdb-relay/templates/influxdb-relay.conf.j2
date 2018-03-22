@@ -1,0 +1,17 @@
+{{ ansible_managed|comment }}
+{% for item in influxdb_relay_servers %}
+[[{{ item['protocol'] }}]]
+name = "{{ item['name'] }}"
+bind-addr = "{{ item['bind_addr'] }}:{{ item['bind_port'] }}"
+output = [
+{%   for output in item['outputs'] %}
+{%     if output['group'] is defined and output['group'] != [] %}
+{%       for host in output['group'] %}
+    { name="{{ hostvars[host]['inventory_hostname'] }}", location="http://{{ hostvars[host]['ansible_host'] }}:{{ output['port'] }}/write" },
+{%       endfor %}
+{%     else %}
+    { name="{{ output['name'] }}", location="{{ output['location'] }}" },
+{%     endif %}
+{%   endfor %}
+]
+{% endfor %}

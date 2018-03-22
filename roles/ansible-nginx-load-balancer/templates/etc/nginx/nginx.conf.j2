@@ -78,7 +78,7 @@ stream {
 {%       endfor %}
   }
   server {
-    listen {{ item1['frontend_listen_port'] }} {{ item1['protocol'] }};
+    listen {{ item1['frontend_listen_port'] }} {% if item1['protocol'] != "tcp" %}{{ item1['protocol'] }}{% endif %};
     proxy_pass {{ item1['name'] }};
   }
 {%     endif %}

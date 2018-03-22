@@ -1,0 +1,7 @@
+---
+- hosts: snort-nodes
+  become: true
+  vars:
+  roles:
+    - role: ansible-snort
+  tasks:

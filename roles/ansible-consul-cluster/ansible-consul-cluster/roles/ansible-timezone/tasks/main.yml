@@ -1,0 +1,19 @@
+---
+# tasks file for ansible-timezone
+
+- name: main | Setting Timezone
+  timezone:
+    name: "{{ timezone }}"
+  tags:
+    - configuration
+    - timezone
+  when: not timezone_update_hardware_clock
+
+- name: main | Setting Timezone And Hardware Clock
+  timezone:
+    name: "{{ timezone }}"
+    hwclock: true
+  tags:
+    - configuration
+    - timezone
+  when: timezone_update_hardware_clock

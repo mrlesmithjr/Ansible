@@ -23,3 +23,5 @@
   when: >
         enable_rundeck_plugins is defined and
         enable_rundeck_plugins
+
+- import_tasks: services.yml

@@ -1,0 +1,71 @@
+---
+- hosts: routers:compute
+  vars:
+    pri_domain_name: vagrant.local
+  roles:
+    - role: ansible-frr
+  tasks:
+    - name: Installing lldpd
+      apt:
+        name: lldpd
+        state: present
+      become: true
+      when: ansible_os_family == "Debian"
+
+    - name: Ensuring lldpd Is Started and Enabled On Boot
+      service:
+       name: lldpd
+       state: started
+       enabled: true
+      become: true
+
+    - name: Installing traceroute
+      apt:
+        name: traceroute
+        state: present
+      become: true
+      when: ansible_os_family == "Debian"
+
+- hosts: compute
+  roles:
+    - role: ansible-docker
+  tasks:
+    - name: Spinning Up InfluxDB Container
+      docker_container:
+        name: InfluxDB
+        image: influxdb
+        published_ports:
+          - 8086:8086
+      become: true
+      when: inventory_hostname == "compute1"
+
+    - name: Spinning Up Grafana Container
+      docker_container:
+        name: Grafana
+        image: grafana/grafana
+        published_ports:
+          - 3000:3000
+      become: true
+      when: inventory_hostname == "compute2"
+
+- hosts: routers:compute
+  roles:
+    - role: ansible-telegraf
+      tags:
+        - telegraf
+  tasks:
+    - name: Add telegraph to sudo users for vtysh fping lldpctl cl-netstat smonctl
+      lineinfile:
+        dest: /etc/sudoers
+        regexp: ^telegraf
+        line: "telegraf ALL=(root) NOPASSWD: /usr/bin/vtysh,/var/log/syslog"
+        validate: visudo -cf %s
+      become: true
+      tags:
+        - telegraf
+#
+# - hosts: monitoring
+#   roles:
+#     - role: ansible-influxdb
+#     - role: ansible-chronograf
+#     - role: ansible-grafana

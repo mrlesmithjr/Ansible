@@ -16,7 +16,7 @@
 
 - name: debian | Adding Elasticsearch Repo
   apt_repository:
-    repo: "deb {{ elasticsearch_repo_url }}/packages/{{ elasticsearch['version_major_version'] }}/apt stable main"
+    repo: "{{ elasticsearch_debian_repo }}"
     state: present
   become: true
 

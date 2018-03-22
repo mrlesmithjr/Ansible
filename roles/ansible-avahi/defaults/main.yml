@@ -1,0 +1,134 @@
+---
+# defaults file for ansible-avahi
+
+# If set to "true" an implicit TXT entry will be added to all locally registered
+# services, containing a cookie value which is chosen randomly on daemon startup
+avahi_add_service_cookie: false
+
+avahi_allow_interfaces: []
+  # - eth0
+  # - enp0s3
+  # - enp0s8
+
+avahi_alpine_packages:
+  - avahi
+  - avahi-tools
+  - nss-mdns
+
+# list of browsing domains (in addition to the default one and those announced
+# inside the default browsing domain).
+avahi_browse_domains: []
+  # - 0pointer.de
+  # - zeroconf.org
+
+avahi_config: false
+
+avahi_debian_packages:
+  - avahi-daemon
+  - avahi-discover
+  - avahi-utils
+  - libnss-mdns
+
+# If set to "true", no record will be published by Avahi, not even address records
+# for the local host
+avahi_disable_publishing: false
+
+# If  set to "true", Avahi will still publish address records and suchlike
+# but will not allow user applications to publish services
+avahi_disable_user_service_publishing: false
+
+# Set the default domain name avahi-daemon tries to register
+# its host name and services on the LAN in
+avahi_domain_name: local
+
+# If set to "true" avahi-daemon will reflect incoming mDNS requests to all local
+# network interfaces, effectively allowing clients to browse mDNS/DNS-SD
+# services on all networks connected to the gateway
+avahi_enable_reflector: false
+
+# If this is enabled only domains ending in .local will be resolved on mDNS,
+# all other domains are resolved via unicast DNS.
+avahi_enable_wide_area: true
+
+# define static host name to IP address mappings for multicast DNS
+avahi_hosts: []
+  # - host: router.local
+  #   ip: 192.168.0.1
+
+# If set to "true" avahi-daemon will publish an IPv4 A record via IPv6, i.e. the
+# local IPv4 addresses can be resolved using an IPv6 transport
+avahi_publish_a_on_ipv6: false
+
+# If set to "true" avahi-daemon will publish an IPv6 AAAA record via IPv4, i.e.
+# the local IPv6 addresses can be resolved using an IPv4 transport
+avahi_publish_aaaa_on_ipv4: true
+
+# If set to "true" avahi-daemon will register mDNS address records for all local
+# IP addresses
+avahi_publish_addresses: true
+
+# You can use this to announce unicast DNS servers via mDNS.
+avahi_publish_dns_servers: []
+  # - 192.168.50.1
+  # - 192.168.50.2
+
+# If set to "true" avahi-daemon will announce the locally used domain name
+avahi_publish_domain: true
+
+# If set to "true" avahi-daemon will register an mDNS HINFO record on all
+# interfaces which contains information about the local operating system and CPU,
+# which might be useful for administrative purposes
+avahi_publish_hinfo: false
+
+# If set to "true" avahi-daemon will publish the unicast DNS servers specified
+# in /etc/resolv.conf in addition to those specified with publish-dns-servers
+avahi_publish_resolv_conf_dns_servers: true
+
+# If set to "true" avahi-daemon will register a service of type "_workstation._tcp"
+# on the local LAN
+avahi_publish_workstation: false
+
+# Sets the per-interface packet rate-limiting burst parameter.
+avahi_ratelimit_burst: 1000
+
+avahi_ratelimit_interval_usec: 1000000
+
+avahi_redhat_packages:
+  - avahi
+  - avahi-tools
+  - nss-mdns
+
+# If set to "true" and enable-reflector is enabled, avahi-daemon will forward
+# mDNS traffic between IPv4 and IPv6, which is usually not recommended
+avahi_reflect_ipv: false
+
+avahi_rlimit_core: 0
+
+avahi_rlimit_data: 4194304
+
+avahi_rlimit_fsize: 0
+
+avahi_rlimit_nofile: 768
+
+avahi_rlimit_nproc: 3
+
+avahi_rlimit_stack: 4194304
+
+avahi_services: {}
+  # ipp:
+  #   type: _ipp._tcp
+  #   subtype: _colour._sub._ipp._tcp
+  #   port: 631
+  #   state: absent
+  # printer:
+  #   type: _printer._tcp
+  #   port: 515
+  #   state: absent
+  # ssh:
+  #   type: _ssh._tcp
+  #   port: 22
+  #   state: absent
+
+avahi_use_ipv4: true
+
+avahi_use_ipv6: true

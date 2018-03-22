@@ -1,0 +1,37 @@
+---
+# Define specific interfaces to listen on
+dnsmasq_bind_interfaces:
+  - "{{ rpi_wired_int }}"
+
+# Defines if DNSMasq only listens on specific interfaces instead of all interfaces
+dnsmasq_bind_listen_only_interfaces: true
+
+# Defines if DNSMASQ should be configured
+dnsmasq_config: true
+
+# Define DHCP options to set
+dnsmasq_dhcp_options:
+  - option: dns-server
+    value: "{{ dhcp_dns_servers }}"
+  - option: domain-name
+    value:
+      - "{{ dnsmasq_pri_domain_name }}"
+  - option: domain-search
+    value:
+      - "{{ dnsmasq_pri_domain_name }}"
+  - option: router
+    value:
+      - "{{ dhcp_scope_gateway }}"
+
+# Define dhcp scopes to be used if dhcp is enabled
+dnsmasq_dhcp_scopes:
+  - start: "{{ dhcp_scope_start_range }}"
+    end: "{{ dhcp_scope_end_range }}"
+    netmask: "{{ dhcp_scope_netmask }}"
+
+# Defines if DHCP services are provided by DNSMASQ
+dnsmasq_enable_dhcp: true
+
+dnsmasq_pri_bind_address: "{{ hostvars[inventory_hostname]['ansible_'+rpi_wired_int]['ipv4']['address'] }}"
+
+dnsmasq_pri_domain_name: "{{ pri_domain_name }}"

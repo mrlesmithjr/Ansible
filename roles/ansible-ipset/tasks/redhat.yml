@@ -1,0 +1,70 @@
+---
+- name: redhat | Non-Fedora Tasks
+  when: ansible_distribution != "Fedora"
+  block:
+    - name: redhat | Enabling EPEL Repo
+      yum:
+        name: epel-release
+        state: present
+      become: true
+
+    - name: redhat | Installing iptables-services
+      yum:
+        name: iptables-services
+        state: present
+      become: true
+      when: >
+            ansible_distribution_major_version|version_compare('6', '>')
+
+    - name: redhat | Installing ipset
+      yum:
+        name: ipset
+        state: present
+      become: true
+
+    - name: redhat | Installing ipset-service
+      yum:
+        name: ipset-service
+        state: present
+      become: true
+      when: >
+            ansible_distribution_major_version|version_compare('6', '>')
+
+    - name: redhat | Uninstalling FirewallD
+      yum:
+        name: firewalld
+        state: absent
+      become: true
+
+- name: rehat | Fedora Tasks
+  when: ansible_distribution == "Fedora"
+  block:
+    - name: redhat | Installing libselinux-python
+      dnf:
+        name: libselinux-python
+        state: present
+      become: true
+
+    - name: redhat | Installing iptables
+      dnf:
+        name: iptables
+        state: present
+      become: true
+
+    - name: redhat | Installing iptables-services
+      dnf:
+        name: iptables-services
+        state: present
+      become: true
+
+    - name: redhat | Installing ipset
+      dnf:
+        name: ipset
+        state: present
+      become: true
+
+    - name: redhat | Installing ipset-service
+      dnf:
+        name: ipset-service
+        state: present
+      become: true

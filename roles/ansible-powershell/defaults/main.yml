@@ -1,0 +1,7 @@
+---
+# defaults file for ansible-powershell
+
+powershell_modules: []
+  # - name: VMware.PowerCLI
+  #   scope: AllUsers
+  #   state: present

@@ -1,0 +1,39 @@
+---
+- hosts: glusterfs
+  vars:
+    config_glusterfs: true
+    etc_hosts_add_all_hosts: true
+    etc_hosts_pri_dns_name: "{{ pri_domain_name }}"
+    etc_hosts_static_ip: true
+    glusterfs_client_mounts:
+      - mountpoint: /mnt/volume-1
+        src: "{{ glusterfs_primary_server }}:/volume-1"
+        fstype: glusterfs
+        opts: "defaults,_netdev,backupvolfile-server={{ glusterfs_secondary_server }}"
+        state: mounted
+      - mountpoint: /mnt/volume-2
+        src: "{{ glusterfs_primary_server }}:/volume-2"
+        fstype: glusterfs
+        opts: "defaults,_netdev,backupvolfile-server={{ glusterfs_secondary_server }}"
+        state: mounted
+      - mountpoint: /mnt/volume-3
+        src: "{{ glusterfs_primary_server }}:/volume-3"
+        fstype: glusterfs
+        opts: "defaults,_netdev,backupvolfile-server={{ glusterfs_secondary_server }}"
+        state: mounted
+    glusterfs_create_bricks:
+      - name: volume-1
+        owner: root
+        group: root
+      - name: volume-2
+        owner: root
+        group: root
+      - name: volume-3
+        owner: root
+        group: root
+    glusterfs_volume_force_create: true
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-etc-hosts
+    - role: ansible-glusterfs
+      become: true

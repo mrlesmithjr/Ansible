@@ -1,3 +1,2 @@
 ---
-- src: https://github.com/mrlesmithjr/ansible-oracle-java8.git
-- src: https://github.com/mrlesmithjr/ansible-zookeeper.git
+- src: https://github.com/mrlesmithjr/ansible-openjdk.git

@@ -1,0 +1,16 @@
+---
+- name: firehol | Downloading FireHOL Block List
+  get_url:
+    url: https://iplists.firehol.org/files/firehol_level1.netset
+    dest: "{{ ipset_firehol_block_file }}"
+  delegate_to: localhost
+
+- name: firehol | Generating FireHOL YAML Block List
+  template:
+    src: firehol_level1.yml.j2
+    dest: "{{ ipset_firehol_block_file_yaml }}"
+  delegate_to: localhost
+
+- name: firehol | Importing firehol_block_list Variables
+  include_vars:
+    file: "{{ ipset_firehol_block_file_yaml }}"

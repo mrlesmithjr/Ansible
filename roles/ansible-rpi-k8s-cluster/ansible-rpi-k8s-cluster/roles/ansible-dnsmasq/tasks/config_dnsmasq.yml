@@ -1,0 +1,19 @@
+---
+- name: dnsmasq_config | Configuring DNSMasq
+  template:
+    src: "etc/dnsmasq.conf.j2"
+    dest: "/etc/dnsmasq.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify: "restart dnsmasq"
+  become: true
+
+- name: dnsmasq_config | Ensuring {{ dnsmasq_tftpboot_dir }} Exists
+  file:
+    path: "{{ dnsmasq_tftpboot_dir }}"
+    state: "directory"
+  become: true
+  when: >
+        (dnsmasq_enable_tftp is defined and
+        dnsmasq_enable_tftp)

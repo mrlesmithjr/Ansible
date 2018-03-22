@@ -1,0 +1,8 @@
+---
+- hosts: awx
+  vars:
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-docker
+    - role: ansible-awx
+  tasks:

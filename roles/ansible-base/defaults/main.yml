@@ -18,6 +18,12 @@ base_debian_packages:
   - 'ntp'
   - 'scsitools'
 
+# apt-get upgrade
+base_debian_upgrade: false
+
+# apt-get dist-upgrade
+base_debian_dist_upgrade: false
+
 # Define DNS servers to update to if update_dns_nameservers = true
 base_dns_nameservers:
   - '8.8.8.8'

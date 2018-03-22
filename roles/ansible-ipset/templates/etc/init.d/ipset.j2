@@ -1,0 +1,52 @@
+#!/sbin/openrc-run
+# Init script for ipset
+# Copyright (C) 2012 Kaarle Ritvanen
+# Licensed under the terms of the GPL2
+
+{{ ansible_managed|comment }}
+
+description="Manage IP sets in the Linux kernel"
+description_save="Save firewall IP sets"
+description_reload="Load firewall IP sets"
+
+extra_started_commands="save reload"
+
+IPSET=/usr/sbin/ipset
+DIR={{ ipset_config_file|dirname }}
+STATUS=0
+
+ipset() {
+	$IPSET $* || STATUS=1
+}
+
+depend() {
+	before iptables ip6tables
+}
+
+start() {
+	reload
+}
+
+stop() {
+	ebegin "Flushing firewall IP sets"
+
+  {{ _ipset_bin_path['stdout'] }} -file {{ ipset_config_file }} save
+
+	eend $STATUS
+}
+
+save() {
+	ebegin "Saving firewall IP sets"
+
+  {{ _ipset_bin_path['stdout'] }} -file {{ ipset_config_file }} save
+
+	eend $STATUS
+}
+
+reload() {
+	ebegin "Loading firewall IP sets"
+
+  {{ _ipset_bin_path['stdout'] }} restore -exist < {{ ipset_config_file }}
+
+	eend $STATUS
+}

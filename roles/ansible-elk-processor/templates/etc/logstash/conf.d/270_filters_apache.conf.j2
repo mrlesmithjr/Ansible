@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 # Setting up Apache web server parsing
 filter {
   if [type] =~ "apache" and "pre-processed" not in [tags] {

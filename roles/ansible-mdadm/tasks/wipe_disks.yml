@@ -9,5 +9,5 @@
 
 # Updates initramfs archives in /boot
 - name: wipe_disks | Updating Initramfs
-  command: "update-initramfs -u"
+  command: "{{ update_initramfs }}"
   when: disks_wiped.changed

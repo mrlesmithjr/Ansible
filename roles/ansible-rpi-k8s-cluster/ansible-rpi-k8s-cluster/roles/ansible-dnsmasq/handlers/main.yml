@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-dnsmasq
+- name: restart dnsmasq
+  service:
+    name: dnsmasq
+    state: restarted
+  become: true

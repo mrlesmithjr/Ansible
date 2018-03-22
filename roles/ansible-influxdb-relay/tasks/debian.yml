@@ -1,0 +1,12 @@
+---
+- name: Installing Git
+  apt:
+    name: git
+    state: present
+  become: true
+
+- name: Installing Go
+  apt:
+    name: golang
+    state: present
+  become: true

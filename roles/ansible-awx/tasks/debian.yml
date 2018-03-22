@@ -1,0 +1,7 @@
+---
+- name: debian | Installing AWX Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ awx['debian_pre_reqs'] }}"

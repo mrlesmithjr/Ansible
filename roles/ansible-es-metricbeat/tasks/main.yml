@@ -1,0 +1,9 @@
+---
+# tasks file for ansible-es-metricbeat
+- include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include_tasks: config.yml
+  when: es_metricbeat['config']
+
+- include_tasks: service.yml

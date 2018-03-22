@@ -1,13 +1,13 @@
 ---
 - name: plugins | Gather Installed Plugins
-  command: "grafana-cli plugins ls"
-  register: "grafana_plugin_list"
+  command: grafana-cli plugins ls
+  register: grafana_plugin_list
   changed_when: false
   become: true
 
 - name: plugins | Installing Plugins
   command: "grafana-cli plugins install {{ item['name'] }}"
-  notify: "restart grafana-server"
+  notify: restart grafana-server
   become: true
   with_items: '{{ grafana_plugins }}'
   when: >
@@ -16,7 +16,7 @@
 
 - name: plugins | Removing Plugins
   command: "grafana-cli plugins remove {{ item['name'] }}"
-  notify: "restart grafana-server"
+  notify: restart grafana-server
   become: true
   with_items: '{{ grafana_plugins }}'
   when: >

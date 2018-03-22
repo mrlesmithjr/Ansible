@@ -1,0 +1,62 @@
+ansible_ssh_host: 192.168.250.12
+ansible_ssh_port: 22
+ansible_ssh_private_key_file: .vagrant/machines/spine2/virtualbox/private_key
+ansible_user: vagrant
+
+frr_bgp:
+  asns:
+    65012:
+      log_neighbor_changes: true
+      maximum_paths: 64
+      neighbors:
+        192.168.2.1:
+          asn: 65023
+          default_originate: false
+          description: leaf3
+          next_hop_self: "{{ frr_next_hop_self }}"
+        192.168.2.3:
+          asn: 65024
+          default_originate: false
+          description: leaf4
+          next_hop_self: "{{ frr_next_hop_self }}"
+        192.168.2.5:
+          asn: 65021
+          default_originate: false
+          description: leaf1
+          next_hop_self: "{{ frr_next_hop_self }}"
+        192.168.2.7:
+          asn: 65022
+          default_originate: false
+          description: leaf2
+          next_hop_self: "{{ frr_next_hop_self }}"
+      networks: []
+        # - "{{ frr_router_id }}/32"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s9']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s9']['ipv4']['netmask']}}"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s10']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s10']['ipv4']['netmask'] }}"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s16']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s16']['ipv4']['netmask'] }}"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s17']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s17']['ipv4']['netmask'] }}"
+      redistribute:
+        # - bgp
+        - connected
+        # - kernel
+        # - ospf
+        # - static
+
+frr_interfaces:
+  enp0s9:
+    description: spine-2-leaf-3
+    ip: 192.168.2.0/31
+  enp0s10:
+    description: spine-2-leaf-4
+    ip: 192.168.2.2/31
+  enp0s16:
+    description: spine-2-leaf-1
+    ip: 192.168.2.4/31
+  enp0s17:
+    description: spine-2-leaf-2
+    ip: 192.168.2.6/31
+  lo:
+    description: router-id
+    ip: "{{ frr_router_id }}/32"
+
+frr_router_id: "{{ frr_spine_router_id_subnet }}.2"

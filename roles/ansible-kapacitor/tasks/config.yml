@@ -1,7 +1,7 @@
 ---
 - name: config | Configuring Kapacitor
   template:
-    src: "etc/kapacitor/kapacitor.conf.j2"
-    dest: "/etc/kapacitor/kapacitor.conf"
+    src: etc/kapacitor/kapacitor.conf.j2
+    dest: /etc/kapacitor/kapacitor.conf
   become: true
-  notify: "restart kapacitor"
+  notify: restart kapacitor

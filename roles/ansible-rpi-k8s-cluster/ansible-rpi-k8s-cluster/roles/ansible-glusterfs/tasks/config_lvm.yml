@@ -1,0 +1,73 @@
+---
+- name: config_lvm | installing packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+     - lvm2
+     - scsitools
+     - xfsprogs
+  when: ansible_os_family == "Debian"
+
+- name: config_lvm | installing lvm2
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - sg3_utils
+    - system-storage-manager
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+- name: config_lvm | installing lvm2
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - sg3_utils
+    - system-storage-manager
+  when: >
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+- name: config_lvm | rescanning for new disks
+  command: /sbin/rescan-scsi-bus
+  changed_when: false
+  when: ansible_os_family == "Debian"
+
+- name: config_lvm | rescanning for new disks
+  command: /usr/bin/rescan-scsi-bus.sh
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+
+- name: config_lvm | creating new LVM volume group
+  lvg:
+    vg: "{{ item.vgname }}"
+    pvs: "{{ item.disks|join(',') }}"
+    state: present
+  with_items: '{{ glusterfs_lvm_vols }}'
+
+- name: config_lvm | creating new LVM logical volume
+  lvol:
+    vg: "{{ item.vgname }}"
+    lv: "{{ item.lvname }}"
+    size: "{{ item.lvsize }}"
+  with_items: '{{ glusterfs_lvm_vols }}'
+
+- name: config_lvm | creating new filesystem on new LVM logical volume
+  filesystem:
+    fstype: "{{ item.filesystem }}"
+    dev: "/dev/{{ item.vgname }}/{{ item.lvname }}"
+  with_items: '{{ glusterfs_lvm_vols }}'
+
+- name: config_lvm | mounting new filesystem
+  mount:
+    name: "{{ item.mountpoint }}"
+    src: "/dev/{{ item.vgname }}/{{ item.lvname }}"
+    fstype: "{{ item.filesystem }}"
+    opts: "{{ item.opts }}"
+    dump: "1"
+    passno: "2"
+    state: mounted
+  with_items: '{{ glusterfs_lvm_vols }}'

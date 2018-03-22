@@ -1,0 +1,37 @@
+---
+- name: resize_lvm | rescanning iSCSI (if using)
+  shell: "iscsiadm -m node -R"
+  changed_when: false
+  when: glusterfs_iscsi_lvm
+
+- name: resize_lvm | rescanning for new disks
+  command: /sbin/rescan-scsi-bus
+  changed_when: false
+  when: ansible_os_family == "Debian"
+
+- name: resize_lvm | rescanning for new disks
+  command: /usr/bin/rescan-scsi-bus.sh
+  changed_when: false
+  when: ansible_os_family == "RedHat"
+
+- name: resize_lvm | increasing LVM volume group
+  lvg:
+    vg: "{{ item.vgname }}"
+    pvs: "{{ item.disks|join(',') }}"
+    state: present
+  with_items: '{{ glusterfs_lvm_vols }}'
+
+
+- name: resize_lvm | increasing LVM logical volume
+  lvol:
+    vg: "{{ item.vgname }}"
+    lv: "{{ item.lvname }}"
+    size: "{{ glusterfs_resize_lvm_size }}"
+  with_items: '{{ glusterfs_lvm_vols }}'
+
+- name: resize_lvm | resizing LVM volumes
+  filesystem:
+    fstype: "{{ item.filesystem }}"
+    dev: "/dev/{{ item.vgname }}/{{ item.lvname }}"
+    resizefs: yes  #requires Ansible 2.0+
+  with_items: '{{ glusterfs_lvm_vols }}'

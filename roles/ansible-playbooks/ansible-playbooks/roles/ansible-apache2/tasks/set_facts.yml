@@ -1,0 +1,43 @@
+---
+- name: Setting Alpine Facts
+  set_fact:
+    apache2_log_dir: "/var/log/apache2"
+    apache2_web_group: "apache"
+    apache2_web_owner: "apache"
+    apache2_web_root: "/var/www/localhost/htdocs"
+  when: ansible_os_family == "Alpine"
+
+- name: setting Debian facts
+  set_fact:
+    apache2_log_dir: "/var/log/apache2"
+    apache2_web_group: "www-data"
+    apache2_web_owner: "www-data"
+    apache2_web_root: "/var/www/html"
+  when: ansible_os_family == "Debian"
+
+- name: setting RedHat facts
+  set_fact:
+    apache2_log_dir: "/var/log/httpd"
+    apache2_web_group: "apache"
+    apache2_web_owner: "apache"
+    apache2_web_root: "/var/www/html"
+  when: ansible_os_family == "RedHat"
+
+- name: Setting PHP Version 5
+  set_fact:
+    #no leading / for template path
+    apache2_php_path: 'etc/php5'
+    apache2_php_version: '5'
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version < '16.04') or
+        ansible_os_family == "Alpine"
+
+- name: Setting PHP Version 7.0
+  set_fact:
+    #no leading / for template path
+    apache2_php_path: 'etc/php/7.0'
+    apache2_php_version: '7.0'
+  when: >
+        ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= '16.04'

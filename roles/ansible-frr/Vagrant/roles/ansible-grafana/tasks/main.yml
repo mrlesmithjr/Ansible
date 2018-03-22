@@ -1,0 +1,16 @@
+---
+# tasks file for ansible-grafana
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: vsphere_support.yml
+  when: grafana_enable_vsphere_support
+
+- include: config.yml
+  when: grafana_config
+
+- include: plugins.yml
+  when: grafana_enable_plugins

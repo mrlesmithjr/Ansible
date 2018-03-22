@@ -29,9 +29,7 @@ mydestination = {{ansible_fqdn}}, localhost
 relayhost = {{postfix_relayhost}}
 {% endif %}
 {% if postfix_mynetworks is defined %}
-{% for item in postfix_mynetworks %}
-mynetworks = {{item}}
-{% endfor %}
+mynetworks = {{ postfix_mynetworks|join(' ') }}
 {% endif %}
 mailbox_size_limit = 0
 recipient_delimiter = +

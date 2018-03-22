@@ -1,0 +1,28 @@
+---
+# tasks file for ansible-apache2
+- include: set_facts.yml
+
+- include: alpine.yml
+  when: ansible_os_family == "Alpine"
+
+- include: debian.yml
+  tags:
+    - install_apache2
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  tags:
+    - install_apache2
+  when: ansible_os_family == "RedHat"
+
+- include: opensuse.yml
+  when: ansible_os_family == "openSUSE Leap"
+
+- include: config_apache2.yml
+  when: apache2_config
+
+- include: php.yml
+  tags:
+    - apache2_config_php
+    - install_apache2_php5
+  when: apache2_install_php

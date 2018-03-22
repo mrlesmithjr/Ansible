@@ -1,0 +1,31 @@
+---
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install/configure [HAProxy](http://www.haproxy.org/)
+
+  license: MIT
+  min_ansible_version: 1.2
+
+  platforms:
+  - name: EL
+    versions:
+    - 6
+    - 7
+  - name: Fedora
+    versions:
+    - 22
+    - 23
+  - name: Ubuntu
+    versions:
+    - precise
+    - trusty
+    - vivid
+    - wily
+    - xenial
+  - name: Debian
+    versions:
+    - jessie
+
+  categories:
+  - networking
+dependencies: []

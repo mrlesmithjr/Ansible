@@ -1,0 +1,95 @@
+---
+# defaults file for ansible-es-metricbeat
+
+es_metricbeat:
+  # The location for configuration files.
+  config_dir: /etc/metricbeat
+
+  # Defines if metricbeat should be configured
+  config: true
+
+  # The location for persistent data files.
+  data_dir: /var/lib/metricbeat
+
+  elasticsearch_host: http://127.0.0.1:9200
+
+  # Home of the metricbeat installation.
+  home_dir: /usr/share/metricbeat
+
+  # The location for the logs created by metricbeat
+  log_dir: /var/log/metricbeat
+
+  # Define metricbeat Major Release
+  major_version: 5.x
+
+  # Define metricbeat Minor Release
+  minor_version: 5.6.4
+
+es_metricbeat_configuration:
+  metricbeat.config.modules:
+
+    # Glob pattern for configuration reloading
+    path: ${path.config}/conf.d/*.yml
+
+    # Period on which files under path should be checked for chagnes
+    reload.period: 10s
+
+    # Set to true to enable config reloading
+    reload.enabled: false
+
+  metricbeat.modules:
+    system:
+      cpu_ticks: false
+      enabled: true
+      metricsets:
+        # - core
+        - cpu
+        # - diskio
+        - load
+        - memory
+        - network
+        - process
+        - process_summary
+        # - socket
+      period: 10s
+      processes: ['.*']
+
+  output.elasticsearch:
+    # Boolean flag to enable or disable the output module.
+    enabled: true
+
+    # Array of hosts to connect to.
+    # Scheme and port can be left out and will be set to the default (http and 9200)
+    # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+    # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
+    hosts: ["{{ es_metricbeat['elasticsearch_host'] }}"]
+
+    # Number of workers per Elasticsearch host.
+    #worker: 1
+
+    # Optional index name. The default is "metricbeat" plus date
+    # and generates [metricbeat-]YYYY.MM.DD keys.
+    #index: "metricbeat-%{+yyyy.MM.dd}"
+
+    # A template is used to set the mapping in Elasticsearch
+    # By default template loading is enabled and the template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones.
+
+    # Set to false to disable template loading.
+    #template.enabled: true
+
+    # Template name. By default the template name is metricbeat.
+    #template.name: "metricbeat"
+
+    # Path to template file
+    #template.path: "${path.config}/metricbeat.template.json"
+
+    # Overwrite existing template
+    # template.overwrite: false
+
+  # setup.kibana:
+  #   host: "10.0.102.102:5601"
+
+es_metricbeat_repo_key: "{{ es_metricbeat_repo_url }}/GPG-KEY-elasticsearch"
+
+es_metricbeat_repo_url: https://artifacts.elastic.co

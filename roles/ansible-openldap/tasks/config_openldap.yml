@@ -23,6 +23,20 @@
     group: root
     mode: 0640
 
+- name: config_openldap | setting admin password
+  shell: slappasswd -s {{ openldap_admin_password }}
+  register: admin_password
+
+- name: config_openldap | restart slapd
+  systemd:
+    name: slapd
+    enabled: yes
+    daemon_reload: yes
+    state: restarted
+  when: >
+    admin_password is defined and
+    admin_password
+
 - name: config_openldap | populating openLDAP
   shell: 'ldapadd -x -D {{ openldap_bind_id }} -w {{ openldap_admin_password }} -f /etc/ldap/slapd.d/populate_content.ldif'
   ignore_errors: yes  #set to get around erroring out that items already exist

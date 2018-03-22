@@ -1,0 +1,8 @@
+---
+- name: config | Configuring Metricbeat
+  template:
+    src: etc/metricbeat/metricbeat.yml.j2
+    dest: /etc/metricbeat/metricbeat.yml
+  become: true
+  notify:
+    - restart metricbeat

@@ -1,0 +1,26 @@
+---
+# tasks file for ansible-redis
+- include: set_facts.yml
+
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: opensuse.yml
+  when: ansible_os_family == "Suse"
+
+- include: install_from_source.yml
+  when: redis_install_from_source
+
+# This may be needed for clustering
+- include: gem.yml
+  when: redis_cluster
+
+- include: pip.yml
+
+- include: config.yml
+  when: redis_config_redis
+
+- include: service.yml

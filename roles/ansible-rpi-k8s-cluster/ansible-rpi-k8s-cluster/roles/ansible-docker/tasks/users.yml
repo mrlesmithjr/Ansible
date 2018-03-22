@@ -1,0 +1,8 @@
+---
+- name: users | adding docker users (for use without sudo)
+  user:
+    name: "{{ item }}"
+    append: yes
+    groups: docker
+  become: true
+  with_items: '{{ docker_users }}'

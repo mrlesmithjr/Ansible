@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : sampleConfig.xml
+    Author     : bparimi
+    Description: Sample configuration file for StatsFeeder
+-->
+
+<statsfeeder>
+    <numberOfThreads>10</numberOfThreads>
+    <!--
+        <frequency> is the time between StatsFeeder invocations to vCenter. For example, if
+        this value is 600 seconds, then StatsFeeder issues new stats queries
+        to vCenter every 600 seconds (i.e., 10 minutes).
+
+        This value is used in conjunction with the intervalId
+        to determine how many samples to request at a time. The intervalId
+        parameter indicates whether to collect real-time statistics (i.e.,
+        statistics with new samples every 20s) vs. historical statistics (i.e.,
+        statistics with new samples every 5 minutes, 30 minutes, 2 hours, or 1 day).
+
+        For example,
+        if the intervalId is set to 20s and frequency is set to 600s, then
+        there are 600/20 = 30 new samples to retrieve.
+
+    -->
+    <frequency unit="second">60</frequency>
+    <!--
+        The feeder flag indicates whether to collect statistics once or
+        collect statistics continuously. If set to "true", then StatsFeeder
+        is invoked every <frequency> seconds to get new data. If set to "false",
+        StatsFeeder is invoked once.
+    -->
+    <feeder>true</feeder>
+    <receivers>
+        <!--
+            A receiver handles the data collected by StatsFeeder.
+            Multiple receivers can be defined. For example, the data could be written
+            to a file, to a message bus, etc. The default definition below
+            uses a "CSV" receiver, which writes information to a comma-separated-value
+            (CSV) file. The generated CSV files are rolled over every hour,
+            resulting in a set of files that each contain one hour of statistics.
+        -->
+        <receiver>
+            <name>graphite</name>
+            <class>de.synaxon.graphitereceiver.MetricsReceiver</class>
+            <properties>
+                <!--  Set the file name. Files will be rolled over on the hour -->
+                <property>
+                    <name>host</name>
+                    <value>{{graphite_host}}</value>
+                </property>
+		<property>
+                    <name>port</name>
+                    <value>2003</value>
+                </property>
+		<property>
+                    <name>prefix</name>
+                    <value>esxprefix</value>
+                </property>
+		<property>
+                    <name>use_fqdn</name>
+                    <value>false</value>
+                </property>
+                <!--
+                    if "use_entity_type_prefix" is set to true the receiver will prepend the type
+                    [HostSystem]    => "esx".<hostname>
+                    [VirtuaMachine] => "vm".<vm_name>
+                    [Datastore]     => "dts".<datastore_name>
+                    [ResourcePool]  => "rp".<resource_pool_name>
+                 -->
+		<property>
+                    <name>use_entity_type_prefix</name>
+                    <value>true</value>
+                </property>
+                <!--
+                    if "only_one_sample_x_period" is set to true the receiver do a sumarize process for each
+                    metric depending on the  rollup type
+                -->
+		<property>
+                    <name>only_one_sample_x_period</name>
+                    <value>false</value>
+                </property>
+            </properties>
+        </receiver>
+    </receivers>
+
+    <!--
+        Entities for which the statistics need to retrieved.
+
+        Entities can be specified individually (for example, a specific host or
+        VM), or in groups (for example, a list of hosts or VMs, or the set of VMs
+        within a given cluster).
+
+        Each individual entity or group of entities is specified between
+        <entity>...</entity> or <entities>...</entities> tags. The list of all
+        such entities is placed within
+        the <entityList>...</entityList> tags. So you would have
+        <entityList>
+               <entity>
+.                ...(info for entity 1) ...
+               </entity>
+               <entity>
+                 ...(info for entity 2) ...
+               </entity>
+               <entities>
+                 ...(info for another group of entities) ...
+               </entities>
+        </entityList>
+    -->
+
+    <entityList>
+
+        <!--
+            There are two options for specifying entities whose stats are to be collected.
+            1. If you want to specify an individual entity, use <entity>...</entity>
+            2. If you want to specify a group of entities, use <entities>...</entities>
+
+            Within the <entities>...</entities> tags, you have two options:
+            1. You can explicitly list the entities you care about (using a
+            comma-separated list of names between <name>...</name>).
+            For example, <name>vm1,vm2,vm3</name> (there are no spaces after the commas).
+
+            2. You can use the 'container' element if you want to get statistics for all entities
+            within a specified container (for example, all VMs within a datacenter/cluster).
+            * The name of the container should match the name as it appears in the vSphere client.
+            * The type of the container should match the managed object type as mentioned in the
+            reference guide.
+
+            For example, for a datacenter named "DC1", use DC1 for the name
+            field and specify the type as "Datacenter".
+
+            If you want to exclude certain entities within in a container
+            from stats collection, use the <exceptions> tag and list the
+            entities separated by commas (with no spaces). For example,
+            to exclude VMs named "vm1", "vm2", and "vm3", you would use
+            <exceptions>vm1,vm2,vm3</exceptions>
+        -->
+       <!--
+        To retrieve statistics within a vCenter instance, specify vCenter as the container name
+        and "Folder" as the type. This example will get the real-time (20s) statistics for all
+        hosts and VMs within the vCenter server.
+        -->
+        <entities>
+            <receivers>graphite</receivers>
+            <container>
+                <!--
+                Container name "vCenter" covers the entire vCenter server.
+                The type is Folder.
+                -->
+                <name>vCenter</name>
+                <type>Folder</type>
+            </container>
+            <childType>HostSystem,VirtualMachine</childType>
+            <exceptions></exceptions>
+            <!-- The intervalId indicates the type of statistic (real-time or historical)
+                 being collected. The default is 20s (i.e., real-time statistics).
+                 For performance providers that do not support real-time statistics
+                 (e.g., ResourcePool and ClusterComputeResource),
+                 the intervalId must be one of the historical intervals (300s, 1800s, 7200s,
+                 or 86400s).
+            -->
+            <intervalId>20</intervalId>
+
+            <!--
+              Every time StatsFeeder runs, it collects the last 'maxSamples' samples
+              of each statistic. This is computed above using intervalId and
+              frequency. You can override this by explicitly specifying maxSamples below.
+              In this example, we specify maxSamples to be greater than the actual number of samples
+              required (45 vs. 30) to avoid gaps in the data in the rare case in which a collection is delayed.
+              The duplicate samples are discarded by StatsFeeder automatically.
+
+              In general, it is probably desirable to add 10-15 additional samples.
+              In this example, we have added 15 (30 + 15 = 45 maxSamples).
+            -->
+            <maxSamples>45</maxSamples>
+            <statsList>
+                <!-- Stats common to both VMs and Hosts -->
+                <stat>cpu.used.summation</stat>
+
+                <!-- Stats specific to VMs -->
+                <stat>cpu.system.summation</stat>
+                <stat>cpu.wait.summation</stat>
+                <stat>cpu.ready.summation</stat>
+                <stat>cpu.extra.summation</stat>
+                <stat>cpu.guaranteed.latest</stat>
+                <stat>mem.swapped.average</stat>
+                <stat>mem.swaptarget.average</stat>
+                <stat>mem.vmmemctl.average</stat>
+
+                <!-- Stats specific to hosts -->
+                <stat>cpu.used.summation</stat>
+                <stat>cpu.idle.summation</stat>
+                <stat>disk.usage.average</stat>
+                <stat>disk.read.average</stat>
+                <stat>disk.write.average</stat>
+                <stat>disk.commands.summation</stat>
+                <stat>disk.numberRead.summation</stat>
+                <stat>disk.numberWrite.summation</stat>
+                <stat>disk.commandsAborted.summation</stat>
+                <stat>disk.busResets.summation</stat>
+                <stat>net.packetsRx.summation</stat>
+                <stat>net.packetsTx.summation</stat>
+                <stat>net.usage.average</stat>
+                <stat>net.received.average</stat>
+                <stat>net.transmitted.average</stat>
+            </statsList>
+        </entities>
+
+        <!--
+         To retrieve statistics for all VMs within a specific datacenter, uncomment the following lines,
+         provide the name of the datacenter container, and specify the statistics to be collected.
+
+        <entities>
+            <receivers>graphite</receivers>
+            <container>
+                <name>Fake</name>
+                <type>Datacenter</type>
+            </container>
+            <childType>VirtualMachine</childType>
+            <exceptions></exceptions>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.used.summation</stat>
+                <stat>cpu.ready.summation</stat>
+                <stat>mem.vmmemctl.average</stat>
+                <stat>mem.swapped.average</stat>
+                <stat>net.received.average</stat>
+                <stat>net.transmitted.average</stat>
+                <stat>disk.read.average</stat>
+                <stat>disk.write.average</stat>
+            </statsList>
+        </entities>
+        -->
+
+        <!--
+        If you would like to retrieve statistics for all hosts within a cluster,
+        uncomment the following lines, specify the appropriate ClusterComputeResource as
+        the container, and indicate the appropriate stats.
+
+        <entities>
+            <receivers>graphite</receivers>
+            <container>
+                <name>ha cluster</name>
+                <type>ClusterComputeResource</type>
+            </container>
+            <childType>HostSystem</childType>
+            <exceptions></exceptions>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+            </statsList>
+        </entities>
+        -->
+
+        <!--
+         To retrieve the statistics for a single VM, uncomment the following lines,
+         specify the appropriate VM name, and specify the appropriate stats to
+         be collected
+
+        <entity>
+            <receivers>graphite</receivers>
+            <name>win2k332-2</name>
+            <type>VirtualMachine</type>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+                <stat>mem.consumed.average</stat>
+                <stat>mem.usage.average</stat>
+            </statsList>
+        </entity>
+        -->
+
+        <!--
+         To retrieve the statistics of all VMs in a vApp, uncomment the following lines,
+         specify the vApp name as the container for the VMs, and specify the appropriate
+         statistics.
+
+        <entities>
+            <receivers>graphite</receivers>
+            <container>
+                <name>vAppTest</name>
+                <type>ResourcePool</type>
+            </container>
+            <childType>VirtualMachine</childType>
+            <exceptions></exceptions>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+            </statsList>
+        </entities>
+        -->
+
+        <!--
+         To retrieve statistics for all VMs on a given host, uncomment the following lines,
+         specify the host name or IP address of the host, and specify the appropriate
+         stats to be collected. The <exceptions> tag is used if you want to exclude certain VMs.
+
+        <entities>
+            <receivers>graphite</receivers>
+            <container>
+                <name>namib.eng.vmware.com</name>
+                <type>HostSystem</type>
+            </container>
+            <childType>VirtualMachine</childType>
+            <exceptions>dos-r-100,dos-r-101</exceptions>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+            </statsList>
+        </entities>
+        -->
+
+        <!--
+         To retrieve statistics for a specific list of VMs, uncomment the following lines,
+         provide the list of VMs as a comma-separated string, and change the list of
+         stats to be collected
+
+        <entity>
+            <receivers>graphite</receivers>
+            <name>dos-r-100,dos-r-101,dos-r-102,dos-r-103</name>
+            <type>VirtualMachine</type>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+            </statsList>
+        </entity>
+        -->
+
+        <!--
+         To retrieve statistics for a given host, uncomment the following lines and
+         provide the host name or IP address of the host along with the appropriate stats.
+        <entity>
+            <receivers>graphite</receivers>
+            <name>sahel.eng.vmware.com</name>
+            <type>HostSystem</type>
+            <intervalId>20</intervalId>
+            <maxSamples>3</maxSamples>
+            <statsList>
+                <stat>cpu.usage.average</stat>
+                <stat>cpu.usagemhz.average</stat>
+            </statsList>
+        </entity>
+        -->
+
+
+        <!--
+         To retrieve cluster-wide statistics for a cluster, uncomment the following lines and
+         provide the cluster name along with the appropriate stats. Note that the intervalId
+         is 300 since clusters do not support real-time stats.
+        <entity>
+            <receivers>graphite</receivers>
+            <name>ha cluster</name>
+            <type>ClusterComputeResource</type>
+            <intervalId>300</intervalId>
+            <maxSamples>10</maxSamples>
+            <statsList>
+                <stat>cpu.usagemhz.average</stat>
+            </statsList>
+        </entity>
+        -->
+
+    </entityList>
+</statsfeeder>

@@ -1,0 +1,52 @@
+---
+- name: monitor | Ensuring /opt/frr/monitoring exists
+  file:
+    path: /opt/frr/monitoring
+    state: directory
+  become: true
+
+- name: monitor | Capturing sudo Path
+  command: which sudo
+  register: _frr_sudo_path
+  changed_when: false
+
+- name: monitor | Capturing vtysh Path
+  command: which vtysh
+  register: _frr_vtysh_path
+  changed_when: false
+
+- name: monitor | Copying Monitoring Scripts
+  template:
+    src: "opt/frr/monitoring/{{ item }}.j2"
+    dest: "/opt/frr/monitoring/{{ item }}"
+    mode: u=rwx,g=rwx,o=rwx
+  become: true
+  with_items:
+    - bgp_neighbor_data.py
+    - output_module.py
+
+- name: monitor | Checking If FRR Service Is Running
+  service:
+    name: frr
+  register: _frr_service_status
+
+- name: monitor | Capturing BGP Peers
+  command: vtysh -c "sh ip bgp sum json"
+  become: true
+  register: _frr_bgp_summary
+  changed_when: false
+  when: >
+        frr_daemons['bgpd'] and
+        _frr_service_status['status']['SubState'] == "running"
+
+- debug: var=_frr_bgp_summary['stdout']
+  when: _frr_bgp_summary['stdout'] != ""
+
+# - name: monitoring | Caputuring BGP Peer Info
+#   command: vtysh -c "sh ip bgp {{ item }} json"
+#   become: true
+#   register: _frr_bgp_peer_info
+#   changed_when: false
+#   with_items: "{{ (_frr_bgp_summary['stdout']|from_json)['ipv4Unicast']['peers'] }}"
+
+# - debug: var=_frr_bgp_peer_info

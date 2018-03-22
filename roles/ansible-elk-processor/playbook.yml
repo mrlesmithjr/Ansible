@@ -1,19 +1,21 @@
 ---
-- hosts: all
+- hosts: elk-processor-nodes
   become: true
   vars:
     logstash_inputs:
-      - type: redis
-        batch_count: 1000
-        host: redis
-        threads: 2
+      - type: rabbitmq
+        exchange: logstash
+        host: 192.168.250.100
+        user: logstash
+        password: logstash
     logstash_outputs:
       - output: elasticsearch
-        hosts: 'elasticsearch:9200'
-        flush_size: 5000
-    logstash_server_fqdn: redis
+        hosts:
+          - 192.168.250.100:9200
+        # flush_size: 5000
     skip_validation: true
   roles:
+    - role: ansible-dnsmasq
     - role: ansible-logstash
     - role: ansible-elk-processor
   tasks:

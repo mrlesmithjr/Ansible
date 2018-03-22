@@ -16,6 +16,7 @@
 
 - name: checking to see if already clustered
   stat: path=/etc/rabbitmq/clustered
+  become: true
   register: clustered
 
 - include: rabbitmq_clustering.yml

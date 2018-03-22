@@ -1,0 +1,10 @@
+---
+- name: system_tuning | Managing Forwarding
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    state: present
+  become: true
+  with_items:
+    - net.ipv4.ip_forward
+    - net.ipv6.conf.all.forwarding

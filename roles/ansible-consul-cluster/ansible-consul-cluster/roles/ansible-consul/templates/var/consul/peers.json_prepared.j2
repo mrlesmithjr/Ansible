@@ -1,0 +1,8 @@
+{% set peers_json_prepared = [] %}
+{%   for fqdn in groups[consul_servers_group] %}
+{%   set nodeblock = {} %}
+{%     set _placeholder = nodeblock.update({"address": hostvars[fqdn]['consul_bind_address']}) %}
+{%     set _placeholder = nodeblock.update({"id": hostvars[fqdn]['consul_node_id']}) %}
+{%     set _placeholder = peers_json_prepared.append(nodeblock) %}
+{%   endfor %}
+{{ peers_json_prepared|to_nice_json }}

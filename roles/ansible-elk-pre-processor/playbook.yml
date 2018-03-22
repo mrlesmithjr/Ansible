@@ -1,10 +1,30 @@
 ---
-- hosts: all
+- hosts: elk-pre-processor-nodes
   become: true
   vars:
-    logstash_server_fqdn: redis
+    # defines if rsyslog should be reconfigured
+    configure_rsyslog: true
+    logstash_outputs:
+      - output: rabbitmq
+        exchange: logstash
+        exchange_type: direct
+        host: 192.168.250.100
+        user: logstash
+        password: logstash
+    # defines primary domain name
+    pri_domain_name: example.org
+    # defines if rsyslog should be configured to listen on tcp/514
+    rsyslog_allow_tcp: true
+    # defines if rsyslog should be configured to listen on udp/514
+    rsyslog_allow_udp: true
+    # defines remote syslog servers
+    syslog_servers:
+      - name: localhost
+        proto: tcp
+        port: 10514
     skip_validation: true
   roles:
+    - role: ansible-rsyslog
     - role: ansible-logstash
     - role: ansible-elk-pre-processor
   tasks:

@@ -1,0 +1,216 @@
+---
+telagraf_config: true
+
+telegraf_influxdb_host: "{{ hostvars['compute1']['ansible_enp0s8']['ipv4']['address'] }}"
+
+telegraf_inputs:
+  cpu:
+    enabled: true
+    fielddrop: time_*
+    ## Whether to report per-cpu stats or not
+    percpu: true
+    ## Define any specific tags you would like
+    # tags:
+    #   tag1: foo
+    #   tag2: bar
+    ## Whether to report total system cpu stats or not
+    totalcpu: true
+  disk:
+    enabled: true
+    ## Ignore some mountpoints by filesystem type
+    ignore_fs:
+      - devtmpfs
+      - tmpfs
+    ## Setting mountpoints will restrict the stats to the specified mountpoints
+    mount_points:
+      - /
+      # - /var
+    ## Define any specific tags you would like
+    # tags:
+    #   tag1: foo
+    #   tag2: bar
+  docker:
+    ## Only collect metrics for these containers, collect all if empty
+    container_names:
+      - ""
+    enabled: true
+    endpoint: unix:///var/run/docker.sock
+    ## Whether to report for each container per-device blkio (8:0, 8:1...) and
+    ## network (eth0, eth1, ...) stats or not
+    perdevice: true
+    ## Timeout for docker list, info, and stats commands
+    timeout: 5s
+    ## Whether to report for each container total blkio and network stats or not
+    total: false
+  elasticsearch:
+    ## set cluster_health to true when you want to also obtain cluster level stats
+    cluster_health: false
+    enabled: false
+    ## set local to false when you want to read the indices stats from all nodes
+    ## within the cluster
+    local: true
+    servers:
+      - localhost:9200
+  # Defines scripts to execute
+  exec:
+    commands:
+      - python /opt/frr/monitoring/bgp_neighbor_data.py
+    data_format: influx
+    enabled: true
+    timeout: 5s
+  haproxy:
+    enabled: false
+    servers:
+      - http://myhaproxy.com:1936/haproxy?stats
+      - socket:/run/haproxy/admin.sock
+  influxdb:
+    enabled: false
+    urls:
+      - http://localhost:8086/debug/vars
+  memcached:
+    enabled: false
+    servers:
+      - localhost:11211
+    unix_sockets:
+      - /var/run/memcached.sock
+  mongodb:
+    enabled: false
+    gather_perdb_stats: false
+    servers:
+      - 127.0.0.1:27017
+  net:
+    enabled: true
+    ## By default, telegraf gathers stats from any up interface (excluding loopback)
+    # interfaces:
+    #   - enp0s3
+    #   - eth0
+    #   - eth1
+  ping:
+    count: 1
+    enabled: true
+    interface: []
+    interval: 1.0
+    timeout: 1.0
+    urls:
+      - "{{ hostvars['spine1']['frr_router_id'] }}"
+      - "{{ hostvars['spine2']['frr_router_id'] }}"
+      - "{{ hostvars['leaf1']['frr_router_id'] }}"
+      - "{{ hostvars['leaf2']['frr_router_id'] }}"
+      - "{{ hostvars['leaf3']['frr_router_id'] }}"
+      - "{{ hostvars['leaf4']['frr_router_id'] }}"
+      - "{{ hostvars['compute1']['frr_router_id'] }}"
+      - "{{ hostvars['compute2']['frr_router_id'] }}"
+  powerdns:
+    enabled: false
+    unix_sockets:
+      - /var/run/pdns.controlsocket
+  prometheus:
+    ## Use bearer token for authorization
+    # bearer_token: /path/to/bearer/token
+    enabled: false
+    urls:
+      - http://localhost:9100/metrics
+  rabbitmq:
+    enabled: false
+    # optional tag
+    # name: rmq-server-1
+    nodes:
+      - rabbit@node1
+      - rabbit@node2
+    password: guest
+    url: http://localhost:15672
+    username: guest
+  redis:
+    enabled: false
+    servers:
+      - tcp://localhost:6379
+      # - tcp://:password@192.168.99.100
+      # - unix:///var/run/redis.sock
+  zfs:
+    enabled: false
+    kstatPath: /proc/spl/kstat/zfs
+    kstatMetrics:
+      - arcstats
+      - vdev_cache_stats
+      - zfetchstats
+    poolMetrics: false
+  zookeeper:
+    enabled: false
+    servers:
+      - :2181
+      # - 10.0.0.1:2181
+      # - localhost:2181
+
+telegraf_outputs:
+  elasticsearch:
+    ## HTTP basic authentication details (eg. when using Shield)
+    auth:
+      enabled: false
+      password: mypassword
+      username: telegraf
+    enabled: false
+    ## Set to true to ask Elasticsearch a list of all cluster nodes,
+    ## thus it is not necessary to list all nodes in the urls config option.
+    enable_sniffer: false
+    ## Set the interval to check if the Elasticsearch nodes are available
+    ## Setting to "0s" will disable the health check
+    ## (not recommended in production)
+    health_check_interval: 10s
+    ## Index Config
+    ## The target index for metrics (Elasticsearch will create if it not exists).
+    ## You can use the date specifiers below to create indexes per time frame.
+    ## The metric timestamp will be used to decide the destination index name
+      # %Y - year (2016)
+      # %y - last two digits of year (00..99)
+      # %m - month (01..12)
+      # %d - day of month (e.g., 01)
+      # %H - hour (00..23)
+    index_name: telegraf-%Y.%m.%d
+    ## Template Config
+    ## Set to true if you want telegraf to manage its index template.
+    ## If enabled it will create a recommended index template for telegraf indexes
+    manage_template: true
+    ## Set to true if you want telegraf to overwrite an existing template
+    overwrite_template: false
+    ## The template name used for telegraf indexes
+    template_name: telegraf
+    ## The full HTTP endpoint URL for your Elasticsearch instance
+    urls:
+      - http://node1.es.example.com:9200
+    ## Elasticsearch client timeout, defaults to "5s" if not set.
+    timeout: 5s
+  graphite:
+    enabled: false
+    ## Prefix metrics name
+    prefix: ""
+    servers:
+      - localhost:2003
+      # - remotehost:2003
+    ## Graphite output template
+    template: host.tags.measurement.field
+    ## timeout in seconds for the write connection to graphite
+    timeout: 2
+  graylog:
+    enabled: false
+    servers:
+      - 127.0.0.1:12201
+      # - remotehost:12201
+  influxdb:
+    database: telegraf
+    enabled: true
+    #Defines if influxdb login is required
+    login_required: false
+    password: metricsmetricsmetricsmetrics
+    retention_policy: ""
+    timeout: 5s
+    urls:
+      - "http://{{ telegraf_influxdb_host }}:8086"
+      # - http://localhost:8086
+      # - http://remotehost:8086
+    username: telegraf
+    user_agent: telegraf
+    write_consistency: any
+  prometheus_client:
+    enabled: false
+    ## Address to listen on
+    listen: :9126

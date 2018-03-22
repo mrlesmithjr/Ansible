@@ -1,0 +1,32 @@
+---
+dhcp_dns_fwd_zones:  #isc-dhcp
+  - dhcp_dns_fwd_zone: '{{ dhcp_domain_name }}'
+    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
+dhcp_dns_primary: 127.0.0.1
+dhcp_dns_rev_zones:  #isc-dhcp
+  - dhcp_dns_rev_zone: 0.0.10
+    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
+  - dhcp_dns_rev_zone: 101.0.10
+    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
+  - dhcp_dns_rev_zone: 125.0.10
+    dhcp_dns_primary: '{{ dhcp_dns_primary }}'
+dhcp_scopes:  #defines dhcp scopes to create...define here or in group_vars/group
+  - dhcp_range: '10.0.0.128 10.0.0.224'
+    dhcp_subnet: 10.0.0.0
+    dhcp_netmask: 255.255.255.0
+    dhcp_routers: 10.0.0.1
+    dhcp_subnet_mask: 255.255.255.0
+    dhcp_broadcast_address: 10.0.0.255
+    dhcp_domain_name_servers: '{{ dhcp_name_servers }}'
+    dhcp_default_lease_time: '{{ default_lease_time }}'
+    dhcp_max_lease_time: '{{ isc_dhcp_max_lease_time }}'
+  - dhcp_range: '10.0.101.128 10.0.101.224'
+    dhcp_subnet: 10.0.101.0
+    dhcp_netmask: 255.255.255.0
+    dhcp_routers: 10.0.101.1
+    dhcp_subnet_mask: 255.255.255.0
+    dhcp_broadcast_address: 10.0.101.255
+    dhcp_domain_name_servers: '{{ dhcp_name_servers }}'
+    dhcp_default_lease_time: '{{ default_lease_time }}'
+    dhcp_max_lease_time: '{{ isc_dhcp_max_lease_time }}'
+pxe_boot_server: 192.168.240.100  #defines tftp server to PXE/TFTP from......define here or in group_vars/group

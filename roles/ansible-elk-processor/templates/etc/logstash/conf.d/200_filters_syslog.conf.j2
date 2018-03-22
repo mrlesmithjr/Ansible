@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 # First layer of normal syslog parsing
 filter {
   if "syslog" in [tags] and "pre-processed" not in [tags] {
@@ -9,7 +10,7 @@ filter {
     syslog_pri { }
     date {
       match => [ "syslog_timestamp", "MMM d HH:mm:ss", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss", "MMM d HH:mm:ss,SSS", "MMM dd HH:mm:ss,SSS", "ISO8601" ]
-      timezone => "America/New_York"
+      timezone => "{{ logstash_timezone }}"
     }
     if !("_grokparsefailure" in [tags]) {
       mutate {

@@ -1,0 +1,22 @@
+---
+- hosts: squid_proxy
+  vars:
+    keepalived_config: true
+    keepalived_router_info:
+      - name: 'vrrp_1'
+        check_script:
+          - name: 'chk_haproxy'
+            script: 'killall -0 haproxy'
+            interval: 2
+            weight: 2
+        master_node: "{{ groups['squid_proxy'][0] }}"
+        router_id: '50'
+        router_pri_backup: '100'
+        router_pri_master: '150'
+        vip_int: '{{ ansible_enp0s8.device }}'
+        vip_addresses:
+          - '{{ haproxy_lb_vip }}'
+    pri_domain_name: 'test.vagrant.local'
+  roles:
+    - role: ansible-keepalived
+  tasks:

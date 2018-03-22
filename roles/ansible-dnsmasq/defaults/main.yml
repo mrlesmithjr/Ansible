@@ -99,6 +99,16 @@ dnsmasq_nameservers:
   - 8.8.4.4
   - 8.8.8.8
 
+# Define size of the dns cache
+# The default is 150 names
+dnsmasq_cache_size: 150
+
+# Defines if queries should be logged
+dnsmasq_log_queries: false
+
+# Defines location of logfile
+dnsmasq_log_facility: /var/log/dnsmasq.log
+
 dnsmasq_pri_bind_address: "{{ ansible_default_ipv4['address'] }}"
 dnsmasq_pri_domain_name: 'example.org'
 

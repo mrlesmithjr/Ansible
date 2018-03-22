@@ -1,7 +1,4 @@
-# rsyslog configuration file
-
-# For more information see /usr/share/doc/rsyslog-*/rsyslog_conf.html
-# If you experience problems, see http://www.rsyslog.com/doc/troubleshoot.html
+{{ ansible_managed|comment }}
 
 #### MODULES ####
 
@@ -88,7 +85,7 @@ local7.*                                                /var/log/boot.log
 #$ActionResumeRetryCount -1    # infinite retries if host is down
 # remote host is: name/ip:port, e.g. 192.168.0.1:514, port optional
 #*.* @@remote-host:514
-{% for item in syslog_servers %}
+{% for item in rsyslog_servers %}
 {% if item.proto == "tcp" %}
 *.* @@{{ item.name }}:{{ item.port }}
 {% endif %}

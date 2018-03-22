@@ -1,0 +1,6 @@
+---
+- name: alpine | Installing DNSMasq
+  apk:
+    name: "dnsmasq"
+    state: "present"
+  become: true

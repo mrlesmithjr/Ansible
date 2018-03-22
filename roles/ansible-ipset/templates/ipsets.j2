@@ -1,0 +1,81 @@
+{% if ipset_rules is defined %}
+{%   for _ipset_rule in ipset_rules %}
+{%     if _ipset_rule['state'] == "present" %}
+{%       if _ipset_rule['name'] in _ipset_list_names['stdout_lines'] %}
+create {{ _ipset_rule['name'] }}_temp {{ _ipset_rule['type'] }} maxelem {{ _ipset_rule['maxelem'] }}
+{%         if _ipset_rule['addresses'] is defined %}
+{%           for _ipset_rule_address in _ipset_rule['addresses'] %}
+add {{ _ipset_rule['name'] }}_temp {{ _ipset_rule_address }}
+{%           endfor %}
+swap {{ _ipset_rule['name'] }}_temp {{ _ipset_rule['name'] }}
+destroy {{ _ipset_rule['name'] }}_temp
+{%         endif %}
+{%       else %}
+create {{ _ipset_rule['name'] }} {{ _ipset_rule['type'] }} maxelem {{ _ipset_rule['maxelem'] }}
+{%         if _ipset_rule['addresses'] is defined %}
+{%           for _ipset_rule_address in _ipset_rule['addresses'] %}
+add {{ _ipset_rule['name'] }} {{ _ipset_rule_address }}
+{%           endfor %}
+{%         endif %}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if ipset_enable_dshield_block_list %}
+{%   if "dshield_block_list" in _ipset_list_names['stdout_lines'] %}
+create dshield_block_list_temp hash:net maxelem 65536
+{%     for _dshield_block_list in dshield_block_list %}
+add dshield_block_list_temp {{ _dshield_block_list['start'] }}-{{ _dshield_block_list['end'] }}
+{%     endfor %}
+swap dshield_block_list_temp dshield_block_list
+destroy dshield_block_list_temp
+{%   else %}
+create dshield_block_list hash:net maxelem 65536
+{%     for _dshield_block_list in dshield_block_list %}
+add dshield_block_list {{ _dshield_block_list['start'] }}-{{ _dshield_block_list['end'] }}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+{% if ipset_enable_firehol_block_list %}
+{%   if "firehol_block_list" in _ipset_list_names['stdout_lines'] %}
+create firehol_block_list_temp hash:net maxelem 65536
+{%     for _firehol_block_list in firehol_block_list %}
+add firehol_block_list_temp {{ _firehol_block_list }}
+{%     endfor %}
+swap firehol_block_list_temp firehol_block_list
+destroy firehol_block_list_temp
+{%    else %}
+create firehol_block_list hash:net maxelem 65536
+{%     for _firehol_block_list in firehol_block_list %}
+add firehol_block_list {{ _firehol_block_list }}
+{%     endfor %}
+{%   endif %}
+{% endif %}
+{% if ipset_enable_spamhaus_block_list %}
+{%   if "spamhaus_drop_block_list" in _ipset_list_names['stdout_lines'] %}
+create spamhaus_drop_block_list_temp hash:net maxelem 65536
+{%     for _spamhaus_drop_block_list in spamhaus_drop_block_list %}
+add spamhaus_drop_block_list_temp {{ _spamhaus_drop_block_list }}
+{%     endfor %}
+swap spamhaus_drop_block_list_temp spamhaus_drop_block_list
+destroy spamhaus_drop_block_list_temp
+{%   else %}
+create spamhaus_drop_block_list hash:net maxelem 65536
+{%     for _spamhaus_drop_block_list in spamhaus_drop_block_list %}
+add spamhaus_drop_block_list {{ _spamhaus_drop_block_list }}
+{%     endfor %}
+{%   endif %}
+{%   if "spamhaus_edrop_block_list" in _ipset_list_names['stdout_lines'] %}
+create spamhaus_edrop_block_list_temp hash:net maxelem 65536
+{%     for _spamhaus_edrop_block_list in spamhaus_edrop_block_list %}
+add spamhaus_edrop_block_list_temp {{ _spamhaus_edrop_block_list }}
+{%     endfor %}
+swap spamhaus_edrop_block_list_temp spamhaus_edrop_block_list
+destroy spamhaus_edrop_block_list_temp
+{%   else %}
+create spamhaus_edrop_block_list hash:net maxelem 65536
+{%     for _spamhaus_edrop_block_list in spamhaus_edrop_block_list %}
+add spamhaus_edrop_block_list {{ _spamhaus_edrop_block_list }}
+{%     endfor %}
+{%   endif %}
+{% endif %}

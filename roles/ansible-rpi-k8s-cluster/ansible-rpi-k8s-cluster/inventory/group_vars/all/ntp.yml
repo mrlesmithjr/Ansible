@@ -1,0 +1,2 @@
+---
+ntp_pri_domain_name: "{{ pri_domain_name }}"

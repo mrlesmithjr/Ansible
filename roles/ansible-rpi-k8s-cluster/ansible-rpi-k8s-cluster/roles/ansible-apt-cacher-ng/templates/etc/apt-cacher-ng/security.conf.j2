@@ -1,0 +1,5 @@
+{% if apt_cacher_ng_account is defined %}
+{%   for item in apt_cacher_ng_account %}
+AdminAuth: {{ item.name }}:{{ item.password }}
+{%   endfor %}
+{% endif %}

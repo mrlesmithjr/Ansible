@@ -1,0 +1,24 @@
+{% for _namespace in k8s_glusterfs_namespaces %}
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ k8s_glusterfs_cluster_name }}
+  namespace: {{ _namespace }}
+subsets:
+{%   for host in groups[glusterfs_server_group] %}
+  - addresses:
+      - ip: {{ hostvars[host]['ansible_'+rpi_wired_int]['ipv4']['address'] }}
+    ports:
+      - port: 1
+        protocol: TCP
+{%   endfor %}
+{% endfor %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ k8s_glusterfs_cluster_name }}
+spec:
+  ports:
+    - port: 1

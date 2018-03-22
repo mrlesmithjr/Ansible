@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-grafana
+- name: "restart grafana-server"
+  service:
+    name: "grafana-server"
+    state: "restarted"
+  become: true

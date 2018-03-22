@@ -4,7 +4,8 @@
     url: "{{ hashicorp_url }}/{{ item.name }}/{{ item.version }}/{{ item.name }}_{{ item.version }}_linux_386.zip"
     dest: "/opt/{{ item.name }}_{{ item.version }}_linux_386.zip"
     validate_certs: no
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "i386" and
         (item.state is defined and
@@ -16,7 +17,8 @@
     url: "{{ hashicorp_url }}/{{ item.name }}/{{ item.version }}/{{ item.name }}_{{ item.version }}_linux_amd64.zip"
     dest: "/opt/{{ item.name }}_{{ item.version }}_linux_amd64.zip"
     validate_certs: no
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "x86_64" and
         (item.state is defined and
@@ -27,7 +29,8 @@
   get_url:
     url: "{{ hashicorp_url }}/{{ item.name }}/{{ item.version }}/{{ item.name }}_{{ item.version }}_i686.deb"
     dest: "/opt/{{ item.name }}_{{ item.version }}_i686.deb"
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "i386" and
         (item.state is defined and
@@ -38,7 +41,8 @@
   get_url:
     url: "{{ hashicorp_url }}/{{ item.name }}/{{ item.version }}/{{ item.name }}_{{ item.version }}_x86_64.deb"
     dest: "/opt/{{ item.name }}_{{ item.version }}_x86_64.deb"
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "x86_64" and
         (item.state is defined and
@@ -50,7 +54,8 @@
     src: "/opt/{{ item.name }}_{{ item.version }}_linux_386.zip"
     dest: "{{ hashicorp_install_dir }}"
     copy: no
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "i386" and
         (item.state is defined and
@@ -63,7 +68,8 @@
     src: "/opt/{{ item.name }}_{{ item.version }}_linux_amd64.zip"
     dest: "{{ hashicorp_install_dir }}"
     copy: no
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "x86_64" and
         (item.state is defined and
@@ -75,7 +81,8 @@
   apt:
     deb: "/opt/{{ item.name }}_{{ item.version }}_i686.deb"
     state: "{{ item.state }}"
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "i386" and
         item.name == "vagrant" and
@@ -85,7 +92,8 @@
   apt:
     deb: "/opt/{{ item.name }}_{{ item.version }}_x86_64.deb"
     state: "{{ item.state }}"
-  with_items: '{{ hashicorp_tools }}'
+  become: true
+  with_items: "{{ hashicorp_tools }}"
   when: >
         ansible_machine == "x86_64" and
         item.name == "vagrant" and

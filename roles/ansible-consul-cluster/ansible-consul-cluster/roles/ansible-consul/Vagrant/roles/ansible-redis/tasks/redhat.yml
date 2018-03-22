@@ -1,0 +1,54 @@
+---
+- name: redhat | installing epel repo (RedHat)
+  yum:
+    name: "epel-release"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing dependencies
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'python-devel'
+    - 'python-pip'
+    - 'ruby'
+    - 'rubygems-integration'
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing dependencies
+  dnf:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'libselinux-python'
+    - 'python-devel'
+    - 'python-pip'
+    - 'ruby'
+    # - 'rubygems-integration'
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | installing redis
+  yum:
+    name: "redis"
+    state: "present"
+  notify:
+    - 'start redis'
+  become: true
+  when: >
+        ansible_distribution != "Fedora" and
+        not redis_install_from_source
+
+- name: redhat | installing redis
+  dnf:
+    name: "redis"
+    state: "present"
+  notify:
+    - 'start redis'
+  become: true
+  when: >
+        ansible_distribution == "Fedora" and
+        not redis_install_from_source

@@ -1,0 +1,18 @@
+---
+- hosts: zookeeper_cluster
+  vars:
+    pri_domain_name: test.vagrant.local
+    zookeeper_listen_interface: enp0s8
+  roles:
+    - role: ansible-openjdk
+    - role: ansible-zookeeper
+
+- hosts: kafka_cluster
+  vars:
+    kafka_cluster: true
+    kafka_cluster_group: kafka_cluster
+    kafka_zookeeper_cluster: true
+    kafka_zookeeper_cluster_bind_interface: enp0s8
+    kafka_zookeeper_cluster_group: zookeeper_cluster
+  roles:
+    - role: ansible-kafka

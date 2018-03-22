@@ -1,0 +1,6 @@
+---
+# Defines if all nodes in play should be added to each hosts /etc/hosts
+etc_hosts_add_all_hosts: true
+
+# Defines your primary dns suffix
+etc_hosts_pri_dns_name: "{{ pri_domain_name }}"

@@ -1,0 +1,32 @@
+---
+- name: set_facts | Registering Path To ipset
+  command: which ipset
+  become: true
+  register: _ipset_bin_path
+  changed_when: false
+
+- name: set_facts | Registering Path To iptables-restore
+  command: which iptables-restore
+  become: true
+  register: _iptables_restore_bin_path
+  changed_when: false
+
+- name: set_facts | Registering Path To iptables-save
+  command: which iptables-save
+  become: true
+  register: _iptables_save_bin_path
+  changed_when: false
+
+- name: set_facts | Setting Archlinux/RedHat Facts
+  set_fact:
+    _ipset_ipset_systemd_file: /usr/lib/systemd/system/ipset.service
+    _ipset_iptables_systemd_file: /usr/lib/systemd/system/iptables.service
+  when: >
+        ansible_os_family == "Archlinux" or
+        ansible_os_family == "RedHat"
+
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    _ipset_ipset_systemd_file: /etc/systemd/system/ipset.service
+    _ipset_iptables_systemd_file: /etc/systemd/system/iptables.service
+  when: ansible_os_family == "Debian"

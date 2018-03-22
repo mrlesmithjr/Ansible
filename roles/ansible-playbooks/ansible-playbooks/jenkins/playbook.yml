@@ -1,0 +1,7 @@
+---
+- hosts: jenkins-nodes
+  become: true
+  vars:
+  roles:
+    - role: ansible-jenkins
+  tasks:

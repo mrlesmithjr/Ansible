@@ -1,0 +1,50 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    redis_bin_path: "{{ redis_install_dir }}/bin"
+    redis_conf: "/etc/redis/redis.conf"
+    redis_log_file: "/var/log/redis/redis-server.log"
+    redis_pid_file: "/var/run/redis/{{ redis_port }}.pid"
+    redis_service: "redis-server"
+    redis_working_directory: "{{ redis_install_dir }}"
+  when: ansible_os_family == "Debian"
+
+- name: set_facts | Setting OpenSuse Facts
+  set_fact:
+    redis_conf: "/etc/redis.conf"
+  when: ansible_os_family == "Suse"
+
+- name: set_facts | Setting RedHat Facts
+  set_fact:
+    redis_bin_path: "{{ redis_install_dir }}/bin"
+    redis_conf: "/etc/redis.conf"
+    redis_log_file: "/var/log/redis/redis.log"
+    redis_pid_file: "/var/run/redis/{{ redis_port }}.pid"
+    redis_service: "redis"
+    redis_working_directory: "{{ redis_install_dir }}"
+  when: ansible_os_family == "RedHat"
+
+# Define the node which should act as primary
+# By default it will choose the first node listed in the redis_replication_ansible_group
+# redis_replication_master: "{{ groups[redis_replication_ansible_group][0] }}"
+- name: set_facts | Setting Replication Master
+  set_fact:
+    redis_replication_master: "{{ groups[redis_replication_ansible_group][0] }}"
+  when: >
+        redis_replication
+
+- name: set_facts | Setting Master Replication Address
+  set_fact:
+    redis_replication_master_address: "{{ redis_replication_address }}"
+  when: >
+        redis_replication and
+        (redis_replication_master is defined and
+        inventory_hostname == redis_replication_master)
+
+- name: set_facts | Setting Master Replication Address On Slaves
+  set_fact:
+    redis_replication_master_address: "{{ hostvars[redis_replication_master]['redis_replication_master_address'] }}"
+  when: >
+        redis_replication and
+        redis_replication_master is defined and
+        inventory_hostname != redis_replication_master

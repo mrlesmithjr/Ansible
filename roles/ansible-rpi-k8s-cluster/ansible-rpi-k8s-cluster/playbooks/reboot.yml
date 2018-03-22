@@ -1,0 +1,15 @@
+---
+- hosts: rpi_k8s
+  serial: 1
+  tasks:
+    - name: Restarting Host
+      shell: sleep 2 && shutdown -r now "rebooting"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+
+    # We need to wait long enough for K8s to rejoin cluster properly
+    - name: Waiting For Host To Become Reachable (Waits for 3 minutes to give K8s time to start)
+      wait_for_connection:
+        delay: 180

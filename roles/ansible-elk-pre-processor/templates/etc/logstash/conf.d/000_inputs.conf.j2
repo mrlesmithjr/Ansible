@@ -1,6 +1,5 @@
-# {{ ansible_managed }}
-#
-{% if logstash_file_inputs is defined %}
+{{ ansible_managed|comment }}
+{% if logstash_file_inputs != [] %}
 {%   for item in logstash_file_inputs %}
 input {
   file {
@@ -11,7 +10,7 @@ input {
 }
 {%   endfor %}
 {% endif %}
-{% if logstash_inputs is defined %}
+{% if logstash_inputs != [] %}
 {%   for item in logstash_inputs %}
 input {
   {{ item.prot }} {

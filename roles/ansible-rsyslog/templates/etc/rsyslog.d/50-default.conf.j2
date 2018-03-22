@@ -1,10 +1,8 @@
-#  Default rules for rsyslog.
-#
-#      			For more information see rsyslog.conf(5) and /etc/rsyslog.conf
+{{ ansible_managed|comment }}
 
 # Set our initial redirects here to ensure we catch everything
-{% if syslog_servers is defined %}
-{%   for item in syslog_servers %}
+{% if rsyslog_servers is defined %}
+{%   for item in rsyslog_servers %}
 {%     if item.proto == "tcp" %}
 *.* @@{{ item.name }}:{{ item.port }}
 {%     endif %}

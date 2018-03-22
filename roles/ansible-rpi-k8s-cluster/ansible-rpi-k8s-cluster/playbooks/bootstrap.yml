@@ -1,0 +1,350 @@
+---
+# We first calculate if the DHCP scope defined will accomodate the number of cluster nodes
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Capturing The Current DHCP Scope Ending IP
+      set_fact:
+        _current_dhcp_scope_end: "{{ dhcp_scope_end_range.split('.')[3] }}"
+
+# We need to subtract here to account for the starting ip as well as for the
+# first node as it will not need a DHCP address
+    - name: Calculating The Required DHCP Scope Ending IP
+      set_fact:
+        _required_dhcp_scope_end: "{{ (dhcp_scope_start_range.split('.')[3]|int - 1) + (rpi_nodes - 1) }}"
+
+# We fail here if the DHCP ending address is not correct based on the number of nodes.
+    - name: Fail When DHCP Scope Ending Is Not Correct
+      fail: msg="dhcp_scope_end_range should be set to {{ _required_dhcp_scope_end }}"
+      when: _required_dhcp_scope_end != _current_dhcp_scope_end
+
+- hosts: rpi_k8s_master
+  pre_tasks:
+    - name: Checking To Make Sure Both DNSMasq and ISC-DHCP Are Not True
+      fail: msg="Bailing out. Choose either DNSMasq or ISC-DHCP, not both"
+      when: >
+            rpi_k8s_use_isc_dhcp and
+            rpi_k8s_use_dnsmasq
+
+    - name: Updating APT Cache
+      apt:
+        cache_valid_time: 1800
+      become: true
+
+    - name: Installing iptables-persistent
+      apt:
+        name: iptables-persistent
+        state: present
+      become: true
+
+    - name: Ensuring netfilter-persistent Is Enabled and Starts On Reboot
+      service:
+        name: netfilter-persistent
+        enabled: true
+      become: true
+
+    - name: Setting Up IP Forwarding On Primary
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+      become: true
+
+    - name: Configuring Static IP On Primary
+      template:
+        src: templates/dhcpcd.conf.j2
+        dest: /etc/dhcpcd.conf
+      become: true
+      register: _dhcpcd_config
+
+    - name: Updating /etc/hosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+      become: true
+
+    - name: Restarting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _restarting_host
+      when: _dhcpcd_config['changed']
+
+    - name: Waiting For Host To Respond
+      wait_for_connection:
+        delay: 20
+      when: _restarting_host['changed']
+    # - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+    #   wait_for:
+    #     port: 22
+    #     host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+    #     search_regex: OpenSSH
+    #     delay: 10
+    #   connection: local
+    #   when: _restarting_host['changed']
+
+    - name: Configuring IPTables
+      iptables:
+        table: "{{ item['table']|default(omit) }}"
+        chain: "{{ item['chain']|default(omit) }}"
+        ctstate: "{{ item['ctstate']|default(omit) }}"
+        source: "{{ item['source']|default(omit) }}"
+        in_interface: "{{ item['in_interface']|default(omit) }}"
+        out_interface: "{{ item['out_interface']|default(omit) }}"
+        jump: "{{ item['jump']|default(omit) }}"
+        state: "{{ item['state']|default(omit) }}"
+      become: true
+      register: _iptables_configured
+      tags:
+        - rpi-iptables
+      with_items: "{{ jumphost_iptables_rules }}"
+
+    - name: Saving IPTables Rules
+      command: service netfilter-persistent save
+      become: true
+      tags:
+        - rpi-iptables
+      when: _iptables_configured['changed']
+
+    - name: Adding Local User SSH Key
+      authorized_key:
+        user: "{{ rpi_username }}"
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      become: true
+
+    - name: Managing WI-FI Connection
+      template:
+        src: templates/wpa_supplicant.conf.j2
+        dest: /etc/wpa_supplicant/wpa_supplicant.conf
+        mode: u=rw,g=,o=
+      become: true
+      register: _wifi_configured
+      tags:
+        - rpi-manage-wifi
+      when: >
+            k8s_wifi_country is defined and
+            k8s_wifi_password is defined and
+            k8s_wifi_ssid is defined
+
+    - name: Restarting Networking After WI-FI Configured
+      service:
+        name: networking
+        state: restarted
+        args: "{{ rpi_wireless_int }}"
+      become: true
+      async: 1
+      poll: 0
+      register: _wifi_restarted
+      tags:
+        - rpi-manage-wifi
+      when: _wifi_configured['changed']
+
+    # This will fail if the IP address changes on the host
+    - name: Waiting For WI-FI To Resume
+      wait_for_connection:
+        delay: 20
+      tags:
+        - rpi-manage-wifi
+      when: _wifi_restarted['changed']
+
+    - name: Uninstalling DNSMasq
+      apt:
+        name: dnsmasq
+        state: absent
+        purge: true
+      become: true
+      when: >
+            rpi_k8s_use_isc_dhcp and
+            not rpi_k8s_use_dnsmasq
+
+    - name: Uninstalling ISC-DHCP
+      apt:
+        name: isc-dhcp-server
+        state: absent
+        purge: true
+      become: true
+      when: >
+            rpi_k8s_use_dnsmasq and
+            not rpi_k8s_use_isc_dhcp
+
+  roles:
+    - role: ansible-change-hostname
+    - role: ansible-dnsmasq
+      when: >
+            rpi_k8s_use_dnsmasq and
+            not rpi_k8s_use_isc_dhcp
+    - role: ansible-isc-dhcp
+      when: >
+            rpi_k8s_use_isc_dhcp and
+            not rpi_k8s_use_dnsmasq
+
+  post_tasks:
+    - name: Ensuring dnsmasq Is Started And Enabled On Boot
+      service:
+        name: dnsmasq
+        state: started
+        enabled: true
+      become: true
+      when: >
+            rpi_k8s_use_dnsmasq and
+            not rpi_k8s_use_isc_dhcp
+
+    - name: Ensuring isc-dhcp-server Is Started And Enabled On Boot
+      service:
+        name: isc-dhcp-server
+        state: started
+        enabled: true
+      become: true
+      when: >
+            rpi_k8s_use_isc_dhcp and
+            not rpi_k8s_use_dnsmasq
+
+- hosts: rpi_k8s_master
+  vars:
+    rpi_update_inventory: false
+  tasks:
+    - name: Capturing DNSMasq DHCP Leases
+      shell: cat /var/lib/misc/dnsmasq.leases | awk '{ print $4,$3,$2 }'
+      register: _dnsmasq_dhcp_leases
+      changed_when: false
+      retries: 18
+      delay: 10
+      until: >
+             _dnsmasq_dhcp_leases['stdout_lines'] != [] and
+             _dnsmasq_dhcp_leases['stdout_lines']|length == (rpi_nodes - 1 )
+      when: rpi_k8s_use_dnsmasq
+
+- hosts: rpi_k8s_slaves
+  any_errors_fatal: true
+  tasks:
+    - name: Waiting For Slaves To Respond
+      wait_for_connection:
+
+    - name: Adding Local User SSH Key
+      authorized_key:
+        user: "{{ rpi_username }}"
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      become: true
+
+    # - command: ping -c 2 {{ hostvars[inventory_hostname]['ansible_host'] }}
+    #   register: _ping
+    #   until: _ping['rc'] == 0
+    #   retries: 30
+    #   delay: 2
+    #   with_items: "{{ groups['rpi_k8s_slaves'] }}"
+
+- hosts: rpi_k8s_slaves
+  any_errors_fatal: true
+  tasks:
+    - name: Updating /etc/hosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+      become: true
+
+- hosts: rpi_k8s
+  any_errors_fatal: true
+  roles:
+    - role: ansible-ntp
+    - role: ansible-apt-cacher-ng
+      become: true
+      tags:
+        - apt-cacher-ng
+
+- hosts: rpi_k8s_slaves
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Updating APT Cache
+      apt:
+        cache_valid_time: 1800
+      become: true
+  roles:
+    - role: ansible-change-hostname
+
+- hosts: rpi_k8s
+  any_errors_fatal: true
+  tasks:
+    - name: Installing vim
+      apt:
+        name: vim
+        state: present
+      become: true
+
+# We install dnsutils to provide us dig on the cluster nodes
+    - name: Installing dnsutils
+      apt:
+        name: dnsutils
+        state: present
+      become: true
+
+    - name: Disabling Swap
+      service:
+        name: dphys-swapfile
+        enabled: false
+        state: stopped
+      become: true
+
+    - name: Uninstalling dphys-swapfile
+      apt:
+        name: dphys-swapfile
+        state: absent
+      become: true
+
+    - name: Configuring cmdline Boot
+      template:
+        src: templates/cmdline.txt.j2
+        dest: /boot/cmdline.txt
+      become: true
+      register: _cmdline_boot
+
+    - name: Restarting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _reboot_slaves
+      when: >
+            _cmdline_boot['changed'] and
+            inventory_hostname in groups['rpi_k8s_slaves']
+
+    - name: Waiting For Host To Respond
+      wait_for_connection:
+        delay: 20
+      when: _reboot_slaves['changed']
+
+    # - command: ping -c 2 {{ hostvars[inventory_hostname]['ansible_host'] }}
+    #   register: _ping
+    #   until: _ping['rc'] == 0
+    #   retries: 30
+    #   delay: 2
+    #   with_items: "{{ groups['rpi_k8s_slaves'] }}"
+    #   when: _reboot_slaves['changed']
+
+    - name: Restarting Host
+      shell: sleep 2 && shutdown -r now "rebooting to complete hostname change"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      become: true
+      register: _reboot_master
+      when: >
+            _cmdline_boot['changed'] and
+            inventory_hostname in groups['rpi_k8s_master']
+
+    - name: Waiting For Host To Respond
+      wait_for_connection:
+        delay: 20
+      when: _reboot_master['changed']
+
+    # - name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
+    #   wait_for:
+    #     port: 22
+    #     host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+    #     search_regex: OpenSSH
+    #     delay: 10
+    #   connection: local
+    #   when: _reboot_master['changed']

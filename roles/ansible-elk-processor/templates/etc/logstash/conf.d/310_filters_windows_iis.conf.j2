@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 # Microsoft IIS logging....Use NXLOG for client side logging
 filter {
   if [type] == "iis" {

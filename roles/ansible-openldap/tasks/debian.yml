@@ -18,9 +18,15 @@
     - question: 'slapd/password1'
       value: '{{ openldap_admin_password }}'
       vtype: 'password'
+    - question: "slapd/domain"
+      value: "{{ pri_domain_name }}"
+      vtype: 'string'
+    - question: "shared/organization"
+      value: "{{ openldap_org }}"
+      vtype: 'string'
 
 - name: debian | installing packages
   apt:
     name: "{{ item }}"
     state: present
-  with_items: openldap_debian_packages
+  with_items: "{{ openldap_debian_packages }}"

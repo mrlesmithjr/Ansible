@@ -1,0 +1,28 @@
+{{ ansible_managed|comment }}
+
+{% set _groups = [] %}
+{% for vm in vms %}
+{%   if vm['groups'] is defined %}
+{%     for _group in vm['groups'] %}
+{%       set _ = _groups.append(_group) %}
+{%     endfor %}
+{%   endif %}
+{% endfor %}
+{% set _groups = _groups|unique|sort|list %}
+{% for _group in _groups %}
+[{{ _group }}]
+{%   for vm in vms %}
+{%     if vm['groups'] is defined %}
+{%       for __group in vm['groups'] %}
+{%         if __group == _group %}
+{{ vm['name'] }}
+{%         endif %}
+{%       endfor %}
+{%     endif %}
+{%   endfor %}
+
+{% endfor %}
+[vms]
+{% for vm in groups['provisioned_vms'] %}
+{{ vm }} ansible_host={{ hostvars[vm]['ansible_host'] }} mac_address={{ hostvars[vm]['mac_address'] }} uuid={{ hostvars[vm]['uuid'] }}
+{% endfor %}

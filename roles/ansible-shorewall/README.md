@@ -27,6 +27,8 @@ shorewall_config_options:  # http://shorewall.net/manpages/shorewall.conf.html
   startup_enabled: 'Yes'  # [Yes|No]
   startup_log: '/var/log/shorewall-init.log'  # [pathname]
   verbosity: '2'  # [0=Silent|1=Major|2=All]
+  add_snat_aliases: 'No'
+
 shorewall_interfaces:
   - name: 'eth0'
     zone: 'net'

@@ -225,7 +225,8 @@ if ($vmGuestFamily -eq $null) {
 $vmHostName=$vm.Guest.HostName
 if ($vmGuestFamily -eq 'linuxGuest') {
   if ($vmHostName -ne $vmNameShort) {
-    $vm | Invoke-VMScript -GuestCredential $SecureCreds -ScriptType Bash "sudo hostnamectl set-hostname $vmNameShort" | Out-File -Append {{ vsphere_management_log }}
+    $networking_service = "/etc/systemd/system/network-online.target.wants/networking.service"
+    $vm | Invoke-VMScript -GuestCredential $SecureCreds -ScriptType Bash "sudo hostnamectl set-hostname $vmNameShort && sudo sh -c 'sed -i s/TimeoutStartSec=5min/TimeoutStartSec=30sec/g $networking_service' && sudo systemctl daemon-reload" | Out-File -Append {{ vsphere_management_log }}
     $vm | Restart-VMGuest -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
     do {
 {%       if _vsphere_vcenter_available %}
@@ -251,7 +252,9 @@ if ($vmGuestFamily -eq 'linuxGuest') {
   $vmIPNetmaskCidr = "{{ hostvars[vm]['netmask_cidr'] }}"
   $vmInt = "{{ ansible_primary_interface }}"
   if ($vmIPs -notcontains $vmIP) {
-    $vm | Invoke-VMScript -GuestCredential $SecureCreds -ScriptType Bash "sudo ip addr flush dev $vmInt && sudo ip addr add $vmIP/$vmIPNetmaskCidr dev $vmInt && sudo ip route add default via $vmGateway dev $vmInt && sudo sh -c 'echo nameserver 8.8.8.8 > /etc/resolv.conf'" | Out-File -Append {{ vsphere_management_log }}
+    $interfaces = "/etc/network/interfaces"
+    $vm | Invoke-VMScript -GuestCredential $SecureCreds -ScriptType Bash "sudo ifdown $vmInt && sudo ip addr flush dev $vmInt && sudo sh -c 'echo auto lo > $interfaces' && sudo sh -c 'echo iface lo inet loopback >> $interfaces' && sudo sh -c 'echo >> $interfaces' && sudo sh -c 'echo allow-hotplug $vmInt >> $interfaces' && sudo sh -c 'echo iface $vmInt inet static >> $interfaces' && sudo sh -c 'echo address $vmIP/$vmIPNetmaskCidr >> $interfaces' && sudo sh -c 'echo gateway $vmGateway >> $interfaces ' && sudo sh -c 'echo dns-nameservers 8.8.8.8 >> $interfaces' && sudo sh -c 'echo nameserver 8.8.8.8 > /etc/resolv.conf' && sudo ifup $vmInt" | Out-File -Append {{ vsphere_management_log }}
+    $vm | Restart-VMGuest -Confirm:$false | Out-File -Append {{ vsphere_management_log }}
   }
   do {
 {%       if _vsphere_vcenter_available %}

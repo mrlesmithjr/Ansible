@@ -1,8 +1,5 @@
 ---
 - name: Installs Various HashiCorp apps/tools
   hosts: all
-  sudo: true
-  vars:
   roles:
     - role: ansible-hashicorp-toolbox
-  tasks:

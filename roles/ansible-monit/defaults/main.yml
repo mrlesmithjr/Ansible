@@ -115,6 +115,17 @@ monit_monitor_services: []
   #   pidfile: /var/spool/postfix/pid/master.pid
   #   start_program: /usr/sbin/service postfix start
   #   stop_program: /usr/sbin/service postfix stop
+  # - name: rabbitmq
+  #   action: restart
+  #   failed_host: 127.0.0.1
+  #   failed_host_port: 5672
+  #   failed_host_type:
+  #     - tcp
+  #   monitored: true
+  #   # pidfile: /var/run/rabbitmq/pid
+  #   regex: rabbitmq
+  #   start_program: /etc/init.d/rabbitmq-server start
+  #   stop_program: /etc/init.d/rabbitmq-server stop
   # - name: rsyslogd
   #   monitored: true
   #   pidfile: /var/run/rsyslogd.pid

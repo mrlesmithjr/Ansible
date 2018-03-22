@@ -1,0 +1,7 @@
+---
+# defaults file for ansible-chronograf
+chronograf_debian_file: "chronograf_{{ chronograf_version }}_amd64.deb"
+
+chronograf_dl_uri: https://dl.influxdata.com/chronograf/releases
+
+chronograf_version: 1.4.0.0

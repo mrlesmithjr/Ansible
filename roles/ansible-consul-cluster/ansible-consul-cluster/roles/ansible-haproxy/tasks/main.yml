@@ -1,0 +1,49 @@
+---
+# tasks file for ansible-haproxy
+- include: debian.yml
+  tags:
+    - haproxy
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  tags:
+    - haproxy
+  when: ansible_os_family == "RedHat"
+
+- include: opensuse.yml
+  tags:
+    - haproxy
+  when: ansible_os_family == "openSUSE Leap"
+
+- debug: var=haproxy_load_balancer_ssl
+  tags:
+    - haproxy
+
+- include: ssl.yml
+  tags:
+    - haproxy
+    - haproxy_config
+    - haproxy_ssl
+  when: >
+        (haproxy_load_balancer_ssl is defined and
+          haproxy_load_balancer_ssl != []) and
+        haproxy_load_balancer_ssl['enabled']
+
+- include: config_haproxy.yml
+  tags:
+    - haproxy
+    - haproxy_config
+    - haproxy_ssl
+  when: >
+        haproxy_config is defined and
+        haproxy_config
+
+- name: Allowing Running HAProxy Instances To Bind To A VIP For Failover
+  sysctl:
+    name: "net.ipv4.ip_nonlocal_bind"
+    value: 1
+    state: "present"
+    reload: yes
+  become: true
+  tags:
+    - haproxy

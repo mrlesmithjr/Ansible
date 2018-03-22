@@ -1,0 +1,15 @@
+---
+# handlers file for ansible-ntp
+- name: restart ntp
+  service:
+    name: "ntp"
+    state: "restarted"
+  become: true
+  when: not ansible_check_mode
+
+- name: restart ntpd
+  service:
+    name: "ntpd"
+    state: "restarted"
+  become: true
+  when: not ansible_check_mode

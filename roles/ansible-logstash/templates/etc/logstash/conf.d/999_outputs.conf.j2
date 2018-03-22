@@ -11,17 +11,18 @@ output {
 {%   for item in logstash_base_outputs %}
 output {
   {{ item.output }} {
-
-  {%     if item.output == "elasticsearch" %}
+{%     if item.output == "elasticsearch" %}
     hosts => ["{{ item.output_host }}"]
 {%     endif %}
-
 {%     if item.output == "redis" %}
-  host => "{{ item.output_host }}"
-  data_type => "list"
-  key => "logstash"
+    host => "{{ item.output_host }}"
+    data_type => "list"
+    key => "logstash"
 {%     endif %}
-
+{%     if item.output == "rabbitmq" %}
+    exchange => "{{ item.exchange }}"
+    exchange_type => "{{ item.exchange_type }}"
+{%     endif %}
   }
 }
 {%   endfor %}

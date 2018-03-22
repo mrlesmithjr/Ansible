@@ -1,0 +1,12 @@
+---
+- name: set_facts | Setting Facts (ES 2.x)
+  set_fact:
+    elasticsearch_repo_url: https://packages.elastic.co/elasticsearch
+    elasticsearch_debian_repo: "deb https://packages.elastic.co/elasticsearch/{{ elasticsearch['version_major_version'] }}/debian stable main"
+  when: elasticsearch['version_major_version'] == "2.x"
+
+- name: set_facts | Setting Facts (ES 5.x)
+  set_fact:
+    elasticsearch_repo_url: https://artifacts.elastic.co/packages
+    elasticsearch_debian_repo: "deb https://artifacts.elastic.co/packages/{{ elasticsearch['version_major_version'] }}/apt stable main"
+  when: elasticsearch['version_major_version'] == "5.x"

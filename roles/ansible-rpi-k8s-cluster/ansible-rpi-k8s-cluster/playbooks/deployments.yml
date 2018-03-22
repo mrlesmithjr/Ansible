@@ -1,0 +1,31 @@
+---
+- hosts: rpi_k8s
+  vars:
+    k8s_admin_config: /etc/kubernetes/admin.conf
+    k8s_master: "{{ groups[k8s_cluster_group][0] }}"
+  tasks:
+    - name: Ensuring {{ lookup('env','HOME') }}/.kube Exists
+      file:
+        dest: "{{ lookup('env','HOME') }}/.kube"
+        state: directory
+      become: false
+      delegate_to: localhost
+      run_once: true
+
+    - name: Fetching {{ k8s_admin_config }} From {{ k8s_master }}
+      fetch:
+        src: "{{ k8s_admin_config }}"
+        dest: "{{ lookup('env','HOME') }}/.kube/config"
+        flat: true
+      become: true
+      when: inventory_hostname == k8s_master
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Generating GlusterFS Deployment
+      template:
+        src: templates/glusterfs.yaml.j2
+        dest: ../deployments/glusterfs.yaml
+      when: rpi_k8s_use_glusterfs

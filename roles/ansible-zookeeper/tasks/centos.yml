@@ -1,5 +1,0 @@
----
-#- name: centos | installing zookeeper
-#  yum:
-#    name: "zookeeper"
-#    state: present

@@ -1,0 +1,7 @@
+---
+- name: alpine | Installing Avahi Packages
+  apk:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ avahi_alpine_packages }}"

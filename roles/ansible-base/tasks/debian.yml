@@ -17,6 +17,20 @@
         base_force_apt_update is defined and
         base_force_apt_update
 
+- name: debian | running apt-get dist-upgrade
+  apt:
+    upgrade: dist
+  become: true
+  when:
+    base_debian_dist_upgrade
+
+- name: debian | running apt-get upgrade
+  apt:
+    upgrade: safe
+  become: true
+  when:
+    base_debian_upgrade
+
 - name: debian | installing base packages
   apt:
     name: "{{ item }}"

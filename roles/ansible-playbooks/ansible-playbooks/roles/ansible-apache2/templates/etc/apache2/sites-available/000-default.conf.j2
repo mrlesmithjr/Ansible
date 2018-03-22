@@ -1,0 +1,26 @@
+{% if not apache2_config_virtual_hosts %}
+<VirtualHost *:{{ apache2_default_port }}>
+	ServerAdmin {{ apache2_server_admin }}
+	DocumentRoot {{ apache2_web_root }}
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+{% elif apache2_virtual_hosts is defined and apache2_config_virtual_hosts %}
+{%   for item in apache2_virtual_hosts %}
+<VirtualHost *:{{ item.port }}>
+	ServerAdmin {{ item.serveradmin }}
+	DocumentRoot {{ item.documentroot }}
+{%     if not item.default_site %}
+	ServerName {{ item.servername }}
+{%     endif %}
+{%     if not item.default_site %}
+	ErrorLog {{ apache2_log_dir }}/{{ item.servername }}_error.log
+	CustomLog {{ apache2_log_dir }}/{{ item.servername }}_access.log combined
+{%     elif item.default_site %}
+ErrorLog {{ apache2_log_dir }}/error.log
+CustomLog {{ apache2_log_dir }}/access.log combined
+{%     endif %}
+
+</VirtualHost>
+{%   endfor %}
+{% endif %}

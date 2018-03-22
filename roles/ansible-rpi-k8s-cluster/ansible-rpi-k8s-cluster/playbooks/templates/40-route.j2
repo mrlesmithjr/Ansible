@@ -1,0 +1,1 @@
+ip route add 10.96.0.1 via {{ hostvars[groups['rpi_k8s_master'][0]]['rpi_k8_static_ip_addr'] }}

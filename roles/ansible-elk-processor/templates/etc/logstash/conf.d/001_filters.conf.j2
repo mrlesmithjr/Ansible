@@ -1,4 +1,5 @@
-{% if logstash_pre_tagging is defined %}
+{{ ansible_managed|comment }}
+{% if logstash_pre_tagging != [] %}
 filter {
 {%   for item in logstash_pre_tagging %}
   if [type] == "{{ item.type }}" {
@@ -13,5 +14,5 @@ filter {
     }
   }
 {%   endfor %}
-{% endif %}
 }
+{% endif %}

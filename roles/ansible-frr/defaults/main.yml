@@ -1,0 +1,96 @@
+---
+# defaults file for ansible-frr
+frr_daemons:
+  bgpd: false
+  isisd: false
+  ldpd: false
+  nhrpd: false
+  ospf6d: false
+  ospfd: false
+  pimd: false
+  ripd: false
+  ripngd: false
+  zebra: true
+
+frr_bgp: []
+  # asns:
+  #   65000:
+  #     log_neighbor_changes: true
+  #     maximum_paths: 64
+  #     neighbors:
+  #       192.168.250.11:
+  #         asn: 65000
+  #         default_originate: false
+  #         description: node1
+  #         next_hop_self: true
+  #       192.168.250.12:
+  #         asn: 65000
+  #         default_originate: false
+  #         description: node2
+  #         next_hop_self: true
+  #     networks:
+  #       - "{{ frr_router_id }}/32"
+  #       - "{{ hostvars[inventory_hostname]['ansible_enp0s8']['ipv4']['address'] }}/24"
+  #     redistribute: []
+  #       # - bgp
+  #       # - connected
+  #       # - kernel
+  #       # - ospf
+  #       # - static
+
+frr_enable_vtysh: true
+
+# Define any interfaces which you would like IP addresses configured on
+frr_interfaces: []
+  # enp0s9:
+  #   description: network-1
+  #   ip: 192.168.1.10/24
+  # enp0s10:
+  #   description: network-2
+  #   ip: 192.168.2.10/24
+  # enp0s16:
+  #   description: network-3
+  #   ip: 192.168.3.10/24
+  # lo:
+  #   description: router-id
+  #   ip: "{{ frr_router_id }}/32"
+
+frr_logging: syslog
+
+# Defines OSPF configuration
+frr_ospf: []
+  # areas:
+  #   0:
+  #     networks:
+  #       - "{{ frr_router_id }}/32"
+  #   1:
+  #     networks:
+  #       - "{{ hostvars[inventory_hostname]['ansible_enp0s8']['ipv4']['address'] }}/24"
+  #   2:
+  #     networks:
+  #       - "{{ hostvars[inventory_hostname]['ansible_enp0s9']['ipv4']['address'] }}/24"
+  # log_adjacency_changes: true
+  # passive_interfaces: []
+  #   # - default
+  # redistribute: []
+  #   # - bgp
+  #   # - connected
+  #   # - kernel
+  #   # - ospf
+  #   # - static
+
+frr_package_url: "https://github.com/FRRouting/frr/releases/download/frr-{{ frr_version }}"
+
+frr_password: zebra
+
+# Defines release date for CentOS package
+# https://github.com/FRRouting/frr/releases
+frr_release_date: 2018010901
+
+# Defines router-id
+# ex. 1.1.1.1
+frr_router_id: []
+
+# Defines FRR version to install
+# https://github.com/FRRouting/frr/releases
+frr_version: 3.0.3

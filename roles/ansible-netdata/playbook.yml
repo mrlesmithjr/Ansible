@@ -1,0 +1,29 @@
+---
+- hosts: netdata_registry
+  vars:
+    netdata_registry_enabled: true
+    netdata_registry_to_announce: "http://{{ netdata_stream_master_node }}:{{ netdata_default_port }}"
+    pri_domain_name: test.vagrant.local
+    netdata_stream_enabled: true
+    netdata_stream_api_key: 359CCA67-C678-49E7-9A39-DEC1B92DFB34
+    netdata_stream_master_node: 192.168.250.10
+  roles:
+    - role: ansible-nodejs
+    - role: ansible-fail2ban
+    - role: ansible-nginx
+    - role: ansible-netdata
+  tasks:
+
+- hosts: netdata:!netdata_registry
+  vars:
+    netdata_registry_enabled: false
+    netdata_registry_to_announce: "http://{{ netdata_stream_master_node }}:{{ netdata_default_port }}"
+    pri_domain_name: test.vagrant.local
+    netdata_stream_enabled: true
+    netdata_stream_api_key: 359CCA67-C678-49E7-9A39-DEC1B92DFB34
+    netdata_stream_master_node: 192.168.250.10
+  roles:
+    - role: ansible-nodejs
+    - role: ansible-fail2ban
+    - role: ansible-nginx
+    - role: ansible-netdata

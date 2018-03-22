@@ -1,0 +1,24 @@
+---
+- name: redhat | Adding Powershell Repo Key
+  rpm_key:
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+  become: true
+
+- name: redhat | Adding Powershell Repo
+  yum_repository:
+    name: packages-microsoft-com-prod
+    description: packages-microsoft-com-prod
+    baseurl: "https://packages.microsoft.com/rhel/{{ ansible_distribution_major_version }}/prod/"
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: true
+    enabled: true
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Powershell
+  yum:
+    name: powershell
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"  

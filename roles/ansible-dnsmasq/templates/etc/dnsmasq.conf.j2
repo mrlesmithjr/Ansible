@@ -34,6 +34,13 @@ domain={{ dnsmasq_pri_domain_name }}
 domain={{ item['domain'] }},{{ item['network']|join (',') }}
 {%   endfor %}
 {% endif %}
+{% if dnsmasq_cache_size is defined %}
+cache-size={{ dnsmasq_cache_size }}
+{% endif %}
+{% if dnsmasq_log_queries %}
+log-queries
+log-facility={{ dnsmasq_log_facility }}
+{% endif %}
 {% if dnsmasq_enable_forwarders %}
 {%   for item in dnsmasq_nameservers %}
 server={{ item }}

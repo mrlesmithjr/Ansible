@@ -1,0 +1,31 @@
+---
+- name: config_apt_cacher | configuring apt caching (Client)
+  template:
+    src: "etc/apt/apt.conf.d/02aptcacherng.j2"
+    dest: "/etc/apt/apt.conf.d/02aptcacherng"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  register: "apt_caching_configured"
+  when: >
+        enable_apt_caching is defined and
+        enable_apt_caching
+
+- name: debian_client | removing apt caching (Client)
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  register: "apt_caching_configured"
+  with_items:
+    # configured when node is deployed using PXE/TFTP and proxy is defined
+    - '/etc/apt/apt.conf'
+    - '/etc/apt/apt.conf.d/02aptcacherng'
+  when: >
+        (enable_apt_caching is defined and
+          not enable_apt_caching) or
+          enable_apt_caching is not defined
+
+- name: config_apt_cacher | refreshing apt from cache server (Client)
+  apt:
+    update_cache: yes
+  when: apt_caching_configured.changed

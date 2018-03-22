@@ -1,0 +1,6 @@
+---
+- name: service | Ensuring Metricbeat Service Is Enabled and Starts On Boot
+  service:
+    name: metricbeat
+    enabled: true
+  become: true

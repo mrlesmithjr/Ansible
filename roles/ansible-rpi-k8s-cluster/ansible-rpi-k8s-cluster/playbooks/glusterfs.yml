@@ -1,0 +1,7 @@
+---
+- hosts: rpi_k8s
+  any_errors_fatal: true
+  roles:
+    - role: ansible-glusterfs
+      become: true
+      when: rpi_k8s_use_glusterfs

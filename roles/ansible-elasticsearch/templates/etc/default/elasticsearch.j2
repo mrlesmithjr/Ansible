@@ -2,6 +2,7 @@
 CONF_DIR={{ elasticsearch['config_dir'] }}
 DATA_DIR={{ elasticsearch['data_dir'] }}
 ES_HOME={{ elasticsearch['home_dir'] }}
+ES_JAVA_OPTS="-Xms{{ elasticsearch['heap_size'] }} -Xmx{{ elasticsearch['heap_size'] }}"
 ES_STARTUP_SLEEP_TIME={{ elasticsearch['startup_sleep_time'] }}
 LOG_DIR={{ elasticsearch['log_dir'] }}
 {% if elasticsearch['max_locked_memory'] is defined %}

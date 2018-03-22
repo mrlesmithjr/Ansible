@@ -1,5 +1,4 @@
-# {{ ansible_managed }}
-#
+{{ ansible_managed|comment }}
 output {
   if "metric" in [tags] {
     stdout {
@@ -9,7 +8,7 @@ output {
     }
   }
 }
-{% if logstash_outputs is defined %}
+{% if logstash_outputs != [] %}
 {%   for item in logstash_outputs %}
 output {
   {{ item.output }} {
@@ -23,6 +22,12 @@ output {
 {%     if item.output == "rabbitmq" %}
     exchange => "{{ item.exchange }}"
     exchange_type => "{{ item.exchange_type }}"
+{%       if item['user'] is defined %}
+    user => "{{ item['user'] }}"
+{%       endif %}
+{%       if item['password'] is defined %}
+    password => "{{ item['password'] }}"
+{%       endif %}
 {%     endif %}
   }
 }

@@ -1,0 +1,22 @@
+---
+- name: spamhaus | Downloading Spamhaus DROP List
+  get_url:
+    url: https://www.spamhaus.org/drop/drop.txt
+    dest: "{{ ipset_spamhaus_drop_block_file }}"
+  delegate_to: localhost
+
+- name: spamhaus | Downloading Spamhaus EDROP List
+  get_url:
+    url: https://www.spamhaus.org/drop/edrop.txt
+    dest: "{{ ipset_spamhaus_edrop_block_file }}"
+  delegate_to: localhost
+
+- name: spamhaus | Generating Spamhaus YAML Block List
+  template:
+    src: spamhaus.yml.j2
+    dest: "{{ ipset_spamhaus_block_file_yaml }}"
+  delegate_to: localhost
+
+- name: spamhaus | Importing Spamhaus Variables
+  include_vars:
+    file: "{{ ipset_spamhaus_block_file_yaml }}"

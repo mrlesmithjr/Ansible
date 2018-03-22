@@ -1,0 +1,8 @@
+---
+# handlers file for ansible-frr
+- name: restart frr
+  service:
+    name: frr
+    state: restarted
+    enabled: true
+  become: true

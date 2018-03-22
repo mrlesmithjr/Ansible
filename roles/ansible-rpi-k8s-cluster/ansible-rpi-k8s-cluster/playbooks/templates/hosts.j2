@@ -1,0 +1,10 @@
+127.0.0.1 localhost
+
+127.0.1.1 {{ inventory_hostname_short }}.{{ pri_domain_name }} {{ inventory_hostname_short }}
+
+{% for host in groups['rpi_k8s_master'] %}
+{{ hostvars[host]['ansible_' + docker_swarm_interface]['ipv4']['address'] }} {{ host }}.{{ pri_domain_name }} {{ host }}
+{% endfor %}
+{% for host in groups['rpi_k8s_slaves'] %}
+{{ hostvars[host]['ansible_host'] }} {{ host }}.{{ pri_domain_name }} {{ host }}
+{% endfor %}

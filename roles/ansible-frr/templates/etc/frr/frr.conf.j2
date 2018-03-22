@@ -1,0 +1,82 @@
+{{ ansible_managed|comment }}
+
+hostname {{ ansible_hostname }}
+password {{ frr_password }}
+log {{ frr_logging }}
+!
+{% if frr_daemons['bgpd'] %}
+{%   if frr_bgp is defined and frr_bgp != [] %}
+{%     for key, value in frr_bgp['asns'].iteritems() %}
+router bgp {{ key }}
+  bgp router-id {{ frr_router_id }}
+{%       if value['log_neighbor_changes']|default(False) %}
+  bgp log-neighbor-changes
+{%       endif %}
+{%       if value['maximum_paths'] is defined and value['maximum_paths'] != [] %}
+  maximum-paths {{ value['maximum_paths'] }}
+{%       endif %}
+{%       if value['neighbors'] is defined %}
+{%         for neighbor, values in value['neighbors'].iteritems() %}
+  neighbor {{ neighbor }} remote-as {{ values['asn'] }}
+{%           if values['default_originate']|default(False) %}
+  neighbor {{ neighbor }} default-originate
+{%           endif %}
+{%           if values['description'] is defined %}
+  neighbor {{ neighbor }} description {{ values['description'] }}
+{%           endif %}
+{%           if values['next_hop_self']|default(False) %}
+  neighbor {{ neighbor }} next-hop-self
+{%           endif %}
+{%         endfor %}
+{%       endif %}
+{%       if value['networks'] is defined %}
+  address-family ipv4 unicast
+{%         for network in value['networks'] %}
+    network {{ network }}
+{%         endfor %}
+{%       endif %}
+{%       if value['redistribute'] is defined %}
+{%         if value['networks'] is not defined %}
+  address-family ipv4 unicast
+{%         endif %}
+{%         for _redistribute in value['redistribute'] %}
+    redistribute {{ _redistribute }}
+{%         endfor %}
+{%       endif %}
+{%       if value['networks'] is defined or value['redistribute'] is defined %}
+  exit-address-family
+{%       endif %}
+  vnc defaults
+    response-lifetime 3600
+    exit-vnc
+{%     endfor %}
+{%   endif %}
+{% endif %}
+!
+{% if frr_daemons['ospfd'] %}
+router ospf
+  router-id {{ frr_router_id }}
+{%   if frr_ospf is defined and frr_ospf != [] %}
+{%     if frr_ospf['areas'] is defined %}
+{%       for key, value in frr_ospf['areas'].iteritems() %}
+{%         for _network in value['networks'] %}
+  network {{ _network }} area {{ key }}
+{%         endfor %}
+{%       endfor %}
+{%     endif %}
+{%     if frr_ospf['log_adjacency_changes'] %}
+  log-adjacency-changes
+{%     endif %}
+{%     if frr_ospf['passive_interfaces'] is defined %}
+{%       for _passive_interface in frr_ospf['passive_interfaces'] %}
+  passive-interface {{ _passive_interface }}
+{%       endfor %}
+{%     endif %}
+{%     if frr_ospf['redistribute'] is defined %}
+{%       for _redistribute in frr_ospf['redistribute'] %}
+  redistribute {{ _redistribute }}
+{%       endfor %}
+{%     endif %}
+{%   endif %}
+{% endif %}
+!

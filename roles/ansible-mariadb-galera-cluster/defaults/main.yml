@@ -82,15 +82,18 @@ galera_wsrep_node_address: '{{ galera_cluster_bind_address }}:{{ galera_wsrep_no
 galera_wsrep_node_address_port: 4567
 
 # MariaDB Repo Info
-mariadb_debian_repo: 'deb [arch=amd64,i386,ppc64el] https://mirrors.evowise.com/mariadb/repo/{{ mariadb_version }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} main'
+mariadb_debian_repo: "deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/{{ mariadb_version }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} main"
 mariadb_debian_repo_key: '0xF1656F24C74CD1D8'
 mariadb_debian_repo_keyserver: 'keyserver.ubuntu.com'
-mariadb_debian_repo_pin: 'mirrors.evowise.com'
-mariadb_redhat_repo: 'http://yum.mariadb.org/{{ mariadb_version }}/{{ ansible_distribution|lower }}{{ ansible_distribution_major_version|int}}-amd64'
+mariadb_debian_repo_pin: nyc2.mirrors.digitalocean.com
+mariadb_redhat_repo: 'http://yum.mariadb.org/{{ mariadb_version }}/{{ ansible_distribution|lower }}{{ ansible_distribution_major_version|int }}-amd64'
 mariadb_redhat_repo_key: 'https://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
 mariadb_version: '10.1'
 
 mariadb_mysql_mem_multiplier: .25
+
+# Add the posibility to adjust the OOM score (only works for SystemD)
+mariadb_oom_score_adjust: 0
 
 # Define listen port
 mariadb_mysql_port: 3306

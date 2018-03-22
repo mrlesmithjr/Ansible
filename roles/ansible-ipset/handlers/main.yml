@@ -1,0 +1,13 @@
+---
+# handlers file for ansible-ipset
+- name: reload ipset
+  systemd:
+    daemon_reload: true
+    name: ipset
+  become: true
+
+- name: reload iptables
+  systemd:
+    daemon_reload: true
+    name: iptables
+  become: true

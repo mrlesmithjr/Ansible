@@ -1,0 +1,206 @@
+*filter
+-F
+:INPUT {{ ipset_iptables_default_input_policy|upper }}
+:FORWARD {{ ipset_iptables_default_forward_policy|upper }}
+:OUTPUT {{ ipset_iptables_default_output_policy|upper }}
+{% if ipset_iptables_log_dropped %}
+-N {{ ipset_iptables_log_dropped_chain }}
+-A {{ ipset_iptables_log_dropped_chain }} -m limit --limit {{ ipset_iptables_log_dropped_limit }} -j LOG --log-prefix "{{ ipset_iptables_log_dropped_prefix }}: " --log-level {{ ipset_iptables_log_dropped_level }}
+-A {{ ipset_iptables_log_dropped_chain }} -j DROP
+{% endif %}
+{% if ipset_iptables_default_input_policy|upper != "ACCEPT" %}
+-A INPUT -i lo -j ACCEPT
+-A INPUT {{ ipset_iptables_connection_state_mode }} related,established -j ACCEPT
+{% endif %}
+{% if ipset_iptables_default_output_policy|upper != "ACCEPT" %}
+-A OUTPUT -o lo -j ACCEPT
+-A OUTPUT {{ ipset_iptables_connection_state_mode }} established -j ACCEPT
+{% endif %}
+{% if ipset_enable_dshield_block_list and ipset_iptables_dshield_chains is defined %}
+{%   for _chain in ipset_iptables_dshield_chains %}
+{%     if _chain|upper == "INPUT" %}
+-A {{ _chain|upper }} -m set --match-set dshield_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     elif _chain|upper == "FORWARD" %}
+-A {{ _chain|upper }} -m set --match-set dshield_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%-      if ipset_iptables_log_dropped %} {{ ipset_iptables_log_dropped_chain }}{% else %} DROP{% endif %}
+-A {{ _chain|upper }} -m set --match-set dshield_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     elif _chain|upper == "OUTPUT" %}
+-A {{ _chain|upper }} -m set --match-set dshield_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if ipset_enable_firehol_block_list and ipset_iptables_firehol_chains is defined %}
+{%   for _chain in ipset_iptables_firehol_chains %}
+{%     if _chain|upper == "INPUT" %}
+-A {{ _chain|upper }} -m set --match-set firehol_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     elif _chain|upper == "FORWARD" %}
+-A {{ _chain|upper }} -m set --match-set firehol_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+-A {{ _chain|upper }} -m set --match-set firehol_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     elif _chain|upper == "OUTPUT" %}
+-A {{ _chain|upper }} -m set --match-set firehol_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if ipset_enable_spamhaus_block_list and ipset_iptables_spamhaus_chains is defined %}
+{%   for _chain in ipset_iptables_spamhaus_chains %}
+{%     if _chain|upper == "INPUT" %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_drop_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_edrop_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     elif _chain|upper == "FORWARD" %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_drop_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_drop_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_edrop_block_list src
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_edrop_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     elif _chain|upper == "OUTPUT" %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_drop_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+-A {{ _chain|upper }} -m set --match-set spamhaus_edrop_block_list dst
+{%-      if ipset_iptables_log_dropped %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%       else %}
+ -j DROP
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if ipset_iptables_custom_rules is defined %}
+{%   for _ipset_iptables_custom_rule in ipset_iptables_custom_rules %}
+-A {{ _ipset_iptables_custom_rule['chain'] }} -p {{ _ipset_iptables_custom_rule['protocol'] }}
+{%-    if _ipset_iptables_custom_rule['dports'] != [] %} -m multiport --dports {{ _ipset_iptables_custom_rule['dports']|join(',') }}{% endif %}
+{%-    if _ipset_iptables_custom_rule['sports'] != [] %} -m multiport --sports {{ _ipset_iptables_custom_rule['sports']|join(',') }}{% endif %}
+{%-    if _ipset_iptables_custom_rule['states'] != [] %} {{ ipset_iptables_connection_state_mode }} {{ _ipset_iptables_custom_rule['states']|join(',') }}{% endif %}
+{%     if ipset_iptables_log_dropped and _ipset_iptables_custom_rule['policy']|upper == "DROP" %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%     else %}
+ -j {{ _ipset_iptables_custom_rule['policy'] }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if ipset_rules is defined %}
+{%   for _ipset_rule in ipset_rules %}
+{%     if _ipset_rule['state'] == "present" %}
+-A {{ _ipset_rule['chain']|upper }}
+{%-      if _ipset_rule['protocol'] is defined %} -p {{ _ipset_rule['protocol'] }}{% endif %}
+{%-      if _ipset_rule['sports'] is defined %} -m multiport --sports {{ _ipset_rule['sports']|join(',') }}{% endif %}
+{%-      if _ipset_rule['dports'] is defined %} -m multiport --dports {{ _ipset_rule['dports']|join(',') }}{% endif %}
+{%-      if _ipset_rule['chain']|upper == "INPUT" %}
+{%-        if _ipset_rule['states'] != [] %} {{ ipset_iptables_connection_state_mode }} {{ _ipset_rule['states']|join(',') }}{% endif %}
+ -m set --match-set {{ _ipset_rule['name'] }} src
+{%-        if ipset_iptables_log_dropped and _ipset_rule['policy']|upper == "DROP" %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%         else %}
+ -j {{ _ipset_rule['policy']|upper }}
+{%         endif %}
+{%       elif _ipset_rule['chain']|upper == "FORWARD" %}
+{%-        if _ipset_rule['states'] != [] %} {{ ipset_iptables_connection_state_mode }} {{ _ipset_rule['states']|join(',') }}{% endif %}
+ -m set --match-set {{ _ipset_rule['name'] }} src
+{%-        if ipset_iptables_log_dropped and _ipset_rule['policy']|upper == "DROP" %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%         else %}
+ -j {{ _ipset_rule['policy']|upper }}
+{%         endif %}
+{%-        if _ipset_rule['states'] != [] %} {{ ipset_iptables_connection_state_mode }} {{ _ipset_rule['states']|join(',') }}{% endif %}
+ -m set --match-set {{ _ipset_rule['name'] }} dst
+{%-        if ipset_iptables_log_dropped and _ipset_rule['policy']|upper == "DROP" %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%         else %}
+ -j {{ _ipset_rule['policy']|upper }}
+{%         endif %}
+{%       elif _ipset_rule['chain']|upper == "OUTPUT" %}
+{%-        if _ipset_rule['states'] != [] %} {{ ipset_iptables_connection_state_mode }} {{ _ipset_rule['states']|join(',') }}{% endif %}
+ -m set --match-set {{ _ipset_rule['name'] }} dst
+{%-        if ipset_iptables_log_dropped and _ipset_rule['policy']|upper == "DROP" %}
+ -j {{ ipset_iptables_log_dropped_chain }}
+{%         else %}
+ -j {{ _ipset_rule['policy']|upper }}
+{%         endif %}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+{% if ipset_iptables_log_dropped %}
+{%   if ipset_iptables_default_input_policy|upper == "DROP" %}
+-A INPUT -j {{ ipset_iptables_log_dropped_chain }}
+{%   endif %}
+{%   if ipset_iptables_default_forward_policy|upper == "DROP" %}
+-A FORWARD -j {{ ipset_iptables_log_dropped_chain }}
+{%   endif %}
+{%   if ipset_iptables_default_output_policy|upper == "DROP" %}
+-A OUTPUT -j {{ ipset_iptables_log_dropped_chain }}
+{%   endif %}
+{% endif %}
+COMMIT

@@ -1,0 +1,28 @@
+---
+- name: redhat | installing epel repo (RedHat)
+  yum:
+    name: "epel-release"
+    state: present
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | installing nginx
+  dnf:
+    name: "nginx"
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing NGINX
+  yum:
+    name: "nginx"
+    state: "present"
+  become: true
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | ensuring nginx is started and enabled on boot
+  service:
+    name: "nginx"
+    state: started
+    enabled: yes
+  become: true

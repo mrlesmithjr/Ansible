@@ -1,0 +1,7 @@
+---
+- hosts: docker-nodes
+  become: true
+  vars:
+  roles:
+    - role: ansible-docker
+  tasks:

@@ -1,0 +1,13 @@
+---
+dshield_block_list:
+{% for item in ipset_dshield_block_list.split('\n') %}
+{%   if '#' not in item %}
+{%     set list = item.split('\t') %}
+{%     if list[0]|ipaddr %}
+  - start: {{ list[0] }}
+    end: {{ list[1] }}
+    netmask: {{ list[2] }}
+    attacks: {{ list[3] }}
+{%     endif %}
+{%   endif %}
+{% endfor %}

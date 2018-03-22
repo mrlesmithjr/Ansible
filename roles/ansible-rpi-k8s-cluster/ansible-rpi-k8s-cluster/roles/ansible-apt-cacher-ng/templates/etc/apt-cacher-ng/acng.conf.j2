@@ -1,0 +1,21 @@
+{% if apt_cacher_ng_cachedir is defined %}
+CacheDir: {{ apt_cacher_ng_cachedir }}
+{% endif %}
+{% if apt_cacher_ng_cachedir is not defined %}
+CacheDir: /var/cache/apt-cacher-ng
+{% endif %}
+LogDir: /var/log/apt-cacher-ng
+{% if apt_cacher_ng_port is defined %}
+Port:{{ apt_cacher_ng_port }}
+{% endif %}
+{% if apt_cacher_ng_port is not defined %}
+Port:3142
+{% endif %}
+ReportPage: acng-report.html
+ExTreshold: 4
+LocalDirs: acng-doc /usr/share/doc/apt-cacher-ng
+{% if apt_cacher_passthrough_patterns is defined %}
+{%   for item in apt_cacher_passthrough_patterns %}
+PassThroughPattern: {{ item }}
+{%   endfor %}
+{% endif %}

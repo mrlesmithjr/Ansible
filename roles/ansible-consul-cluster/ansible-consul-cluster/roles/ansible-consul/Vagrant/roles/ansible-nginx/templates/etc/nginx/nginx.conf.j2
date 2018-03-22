@@ -1,0 +1,28 @@
+user {{ nginx_web_owner }};
+worker_processes {{ nginx_worker_processes }};
+pid /run/nginx.pid;
+
+events {
+{% for item in nginx_events_block %}
+  {{ item }};
+{% endfor %}
+}
+
+http {
+
+{% for item in nginx_http_block.basic_settings %}
+  {{ item }};
+{% endfor %}
+
+{% for item in nginx_http_block.logging_settings %}
+  {{ item }};
+{% endfor %}
+
+{% for item in nginx_http_block.gzip_settings %}
+  {{ item }};
+{% endfor %}
+
+{% for item in nginx_http_block.vhost_configs %}
+  {{ item }};
+{% endfor %}
+}

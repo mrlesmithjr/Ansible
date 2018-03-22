@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+  gather_facts: false
+  become: false
+  # vars:
+  #   ansible_python_interpreter: /usr/local/bin/python2
+  tasks:
+    - name: Creating VMs
+      vmware_guest:
+        cluster: "{{ vcenter_cluster }}"
+        customization: "{{ item['customization']|default(omit) }}"
+        datacenter: "{{ vcenter_datacenter }}"
+        folder: "/{{ vcenter_datacenter }}/vm"
+        hardware: "{{ item['vm_hardware']|default(omit) }}"
+        hostname: "{{ vcenter_host }}"
+        name: "{{ item['name'] }}"
+        networks: "{{ item['networks']|default(omit) }}"
+        password: "{{ vcenter_password }}"
+        template: "{{ vm_template }}"
+        username: "{{ vcenter_username }}"
+        validate_certs: false
+        wait_for_ip_address: true
+      with_items: "{{ vms }}"
+      when: item['state']|lower == "present"
+
+    - name: Capturing VM Info
+      vmware_guest_facts:
+        datacenter: "{{ vcenter_datacenter }}"
+        folder: "/{{ vcenter_datacenter }}/vm"
+        hostname: "{{ vcenter_host }}"
+        name: "{{ item['name'] }}"
+        password: "{{ vcenter_password }}"
+        username: "{{ vcenter_username }}"
+        validate_certs: false
+      register: _vms_info
+      with_items: "{{ vms }}"
+      when: item['state']|lower == "present"
+
+    - name: Generating Dynamic Group
+      add_host:
+        ansible_host: "{{ item['instance']['ipv4'] }}"
+        groups: provisioned_vms
+        mac_address: "{{ item['instance']['hw_eth0']['macaddress_dash'] }}"
+        name: "{{ item['instance']['hw_name'] }}"
+        uuid: "{{ item['instance']['hw_product_uuid'] }}"
+      with_items: "{{ _vms_info['results'] }}"
+
+    - name: Generating Inventory
+      template:
+        src: ./hosts.inv.j2
+        dest: ./hosts.inv

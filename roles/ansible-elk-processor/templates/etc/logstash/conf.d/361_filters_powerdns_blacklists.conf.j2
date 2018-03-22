@@ -1,3 +1,4 @@
+{{ ansible_managed|comment }}
 {%   if powerdns_blacklists is defined %}
 {%     for item in powerdns_blacklists %}
 filter{

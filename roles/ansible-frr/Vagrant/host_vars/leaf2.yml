@@ -1,0 +1,53 @@
+ansible_ssh_host: 192.168.250.22
+ansible_ssh_port: 22
+ansible_ssh_private_key_file: .vagrant/machines/leaf2/virtualbox/private_key
+ansible_user: vagrant
+
+frr_bgp:
+  asns:
+    65022:
+      log_neighbor_changes: true
+      maximum_paths: 64
+      neighbors:
+        192.168.1.2:
+          asn: 65011
+          default_originate: false
+          description: spine1
+          next_hop_self: "{{ frr_next_hop_self }}"
+        192.168.10.3:
+          asn: 65031
+          default_originate: false
+          description: compute1
+          next_hop_self: "{{ frr_next_hop_self }}"
+        192.168.2.6:
+          asn: 65012
+          default_originate: false
+          description: spine2
+          next_hop_self: "{{ frr_next_hop_self }}"
+      networks: []
+        # - "{{ frr_router_id }}/32"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s9']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s9']['ipv4']['netmask']}}"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s10']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s10']['ipv4']['netmask'] }}"
+        # - "{{ hostvars[inventory_hostname]['ansible_enp0s16']['ipv4']['address'] }}/{{ hostvars[inventory_hostname]['ansible_enp0s16']['ipv4']['netmask'] }}"
+      redistribute:
+        # - bgp
+        - connected
+        # - kernel
+        # - ospf
+        # - static
+
+frr_interfaces:
+  enp0s9:
+    description: spine-1-leaf-2
+    ip: 192.168.1.3/31
+  enp0s10:
+    description: leaf-2-compute
+    ip: 192.168.10.2/31
+  enp0s16:
+    description: spine-2-leaf-2
+    ip: 192.168.2.7/31
+  lo:
+    description: router-id
+    ip: "{{ frr_router_id }}/32"
+
+frr_router_id: "{{ frr_leaf_router_id_subnet }}.4"

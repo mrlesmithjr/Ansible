@@ -5,3 +5,5 @@
 
 - include: config.yml
   when: kapacitor_config
+
+- include: service.yml

@@ -1,0 +1,95 @@
+---
+- name: debian | updating apt-cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+  become: true
+
+- name: debian | installing pre-reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - 'apt-transport-https'
+    - 'ca-certificates'
+    - 'software-properties-common'
+
+# We are removing the old Docker info
+- name: debian | Removing Legacy Docker apt-key
+  apt_key:
+    keyserver: "hkp://p80.pool.sks-keyservers.net:80"
+    id: "58118E89F3A912897C070ADBF76221572C52609D"
+    state: "absent"
+  become: true
+
+# We are removing the old Docker info
+- name: debian | Removing Legacy Docker Repo
+  apt_repository:
+    repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main"
+    state: "absent"
+  become: true
+
+- name: debian | adding docker apt-key
+  apt_key:
+    url: "{{ docker_ubuntu_repo_info['url'] }}"
+    id: "{{ docker_ubuntu_repo_info['id'] }}"
+    state: "present"
+  become: true
+
+- name: debian | adding docker repo
+  apt_repository:
+    repo: "{{ docker_ubuntu_repo_info['repo'] }}"
+    state: present
+  become: true
+
+# We remove docker-engine as this is old package to install. The new package is
+# docker-ce
+- name: debian | uninstalling old docker package (if exists)
+  apt:
+    name: "{{ item }}"
+    state: "absent"
+    purge: yes
+  become: true
+  with_items:
+    - 'docker-engine'
+    - 'lxc-docker'
+
+- name: debian | installing docker pre-reqs
+  apt:
+    name: "linux-image-extra-{{ ansible_kernel }}"
+    state: present
+  become: true
+  when: >
+        ansible_distribution == "Ubuntu" and
+        (ansible_distribution_version >= '14.04')
+
+- name: debian | installing docker
+  apt:
+    name: "docker-ce={{ docker_version_debian }}"
+    state: "present"
+  become: true
+
+- name: debian | setting grub memory limit (if set)
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: "^GRUB_CMDLINE_LINUX_DEFAULT"
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="cgroup_enable=memory swapaccount=1"'
+  register: grub_updated
+  become: true
+  when: >
+        docker_set_grub_memory_limit is defined and
+        docker_set_grub_memory_limit
+
+- name: debian | updating grub (if updated)
+  command: update-grub
+  become: true
+  when: grub_updated['changed']
+
+- name: debian | installing additonal packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - bridge-utils

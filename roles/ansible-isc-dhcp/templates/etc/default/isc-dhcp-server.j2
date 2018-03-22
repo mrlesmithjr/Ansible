@@ -1,0 +1,5 @@
+{{ ansible_managed|comment }}
+
+DHCPD_CONF={{ isc_dhcp_dhcpd_conf }}
+
+INTERFACES="{{ isc_dhcp_listen_interfaces|join(' ') }}"

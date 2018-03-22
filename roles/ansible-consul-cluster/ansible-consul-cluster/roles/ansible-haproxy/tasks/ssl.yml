@@ -1,0 +1,146 @@
+---
+- name: ssl | Installing Python Modules
+  pip:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'pyOpenSSL'
+  when: haproxy_load_balancer_ssl['generate_keys']
+
+- name: ssl | Ensuring SSL Keys Folders Exist
+  file:
+    path: "{{ item|dirname }}"
+    state: "directory"
+  become: true
+  with_items:
+    - "{{ haproxy_load_balancer_ssl['private_key_file'] }}"
+    - "{{ haproxy_load_balancer_ssl['public_key_file'] }}"
+  when: haproxy_load_balancer_ssl['generate_keys']
+
+- name: ssl | Generating SSL Private Key
+  openssl_privatekey:
+    force: "{{ haproxy_load_balancer_ssl['regenerate_keys'] }}"
+    path: "{{ haproxy_load_balancer_ssl['private_key_file'] }}"
+    size: "{{ haproxy_load_balancer_ssl['private_key_size'] }}"
+    state: "present"
+    type: "{{ haproxy_load_balancer_ssl['private_key_type'] }}"
+  become: true
+  register: "_haproxy_load_balancer_ssl_priv_key"
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+        (not haproxy_load_balancer_ha or
+          (haproxy_load_balancer_ha and
+            inventory_hostname == haproxy_load_balancer_ha_primary ))
+
+# This module is included in Ansible 2.4 so for now it is included in library/
+- name: ssl | Generating SSL CSR
+  openssl_csr:
+    force: "{{ haproxy_load_balancer_ssl['regenerate_keys'] }}"
+    commonName: "{{ inventory_hostname }}"
+    path: "{{ haproxy_load_balancer_ssl['csr_key_file'] }}"
+    privatekey_path: "{{ haproxy_load_balancer_ssl['private_key_file'] }}"
+  become: true
+  register: "_haproxy_load_balancer_ssl_csr"
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+        (not haproxy_load_balancer_ha or
+          (haproxy_load_balancer_ha and
+            inventory_hostname == haproxy_load_balancer_ha_primary ))
+
+# The below module does not work as expected
+# - name: ssl | Generating SSL Public Key
+#   openssl_publickey:
+#     force: "{{ haproxy_load_balancer_ssl['regenerate_keys'] }}"
+#     path: "{{ haproxy_load_balancer_ssl['public_key_file'] }}"
+#     privatekey_path: "{{ haproxy_load_balancer_ssl['private_key_file'] }}"
+#     state: "present"
+#   become: true
+#   when: haproxy_load_balancer_ssl['generate_keys']
+
+- name: ssl | Generating SSL Public Key
+  command: >
+           openssl req
+           -x509
+           -days {{ haproxy_load_balancer_ssl['public_key_valid_days'] }}
+           -key {{ haproxy_load_balancer_ssl['private_key_file'] }}
+           -in {{haproxy_load_balancer_ssl['csr_key_file'] }}
+           -out {{ haproxy_load_balancer_ssl['public_key_file'] }}
+  become: true
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+        (not haproxy_load_balancer_ha or
+          (haproxy_load_balancer_ha and
+            inventory_hostname == haproxy_load_balancer_ha_primary )) and
+        (_haproxy_load_balancer_ssl_priv_key['changed'] or
+        _haproxy_load_balancer_ssl_csr['changed'])
+
+# We capture the ha primary private key in order to sync to all other load
+# balancers. This will ensure that all load balancers use the same key for SSL.
+- name: ssl | Capturing Private SSL Key On Primary
+  slurp:
+    src: "{{ haproxy_load_balancer_ssl['private_key_file'] }}"
+  become: true
+  register: "_haproxy_load_balancer_ssl_priv_key_"
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+          ((haproxy_load_balancer_ha and
+            inventory_hostname == haproxy_load_balancer_ha_primary) or
+            not haproxy_load_balancer_ha)
+
+# We capture the ha primary public key in order to sync to all other load
+# balancers. This will ensure that all load balancers use the same key for SSL.
+- name: ssl | Capturing Public SSL Key On Primary
+  slurp:
+    src: "{{ haproxy_load_balancer_ssl['public_key_file'] }}"
+  become: true
+  register: "_haproxy_load_balancer_ssl_pub_key_"
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+          ((haproxy_load_balancer_ha and
+            inventory_hostname == haproxy_load_balancer_ha_primary) or
+            not haproxy_load_balancer_ha)
+
+- name: ssl | Creating Primary SSL Bundle
+  template:
+    src: "bundle.j2"
+    dest: "{{ haproxy_load_balancer_ssl['bundled_cert'] }}"
+  become: true
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+          ((haproxy_load_balancer_ha and
+            inventory_hostname == haproxy_load_balancer_ha_primary) or
+            not haproxy_load_balancer_ha)
+
+# We now sync the ha primary private key to all load balancers. This will ensure
+# that all load balancers are configured to use the same key for SSL.
+- name: ssl | Syncing Primary SSL Private Key
+  template:
+    src: "key.j2"
+    dest: "{{ haproxy_load_balancer_ha_key_file_prefix }}-key.pem"
+  become: true
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+        haproxy_load_balancer_ha
+
+# We now sync the ha primary public key to all load balancers. This will ensure
+# that all load balancers are configured to use the same key for SSL.
+- name: ssl | Syncing Primary SSL Public Key
+  template:
+    src: "cert.j2"
+    dest: "{{ haproxy_load_balancer_ha_key_file_prefix }}-cert.pem"
+  become: true
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+        haproxy_load_balancer_ha
+
+# We now sync the ha primary bundle to all load balancers. This will ensure
+# that all load balancers are configured to use the same SSL bundled keys.
+- name: ssl | Syncing Primary SSL Bundle
+  template:
+    src: "bundle.j2"
+    dest: "{{ haproxy_load_balancer_ssl['bundled_cert'] }}"
+  become: true
+  when: >
+        haproxy_load_balancer_ssl['generate_keys'] and
+        haproxy_load_balancer_ha

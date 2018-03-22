@@ -1,0 +1,6 @@
+---
+- name: debian | Installing Chronograf
+  apt:
+    deb: "{{ chronograf_dl_uri }}/{{ chronograf_debian_file }}"
+    state: present
+  become: true

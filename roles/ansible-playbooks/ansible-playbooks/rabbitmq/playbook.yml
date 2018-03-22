@@ -1,0 +1,7 @@
+---
+- hosts: rabbitmq-nodes
+  become: true
+  vars:
+  roles:
+    - role: ansible-rabbitmq
+  tasks:

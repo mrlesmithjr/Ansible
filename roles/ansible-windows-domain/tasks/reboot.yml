@@ -1,8 +1,25 @@
 ---
 - name: reboot | Rebooting Server
   win_reboot:
-    reboot_timeout_sec: 3600
-    shutdown_timeout_sec: 3600
+    reboot_timeout_sec: "{{ reboot_timeout }}"
+    shutdown_timeout_sec: "{{ shutdown_timeout }}"
   when: >
-        _windows_domain['reboot_required'] is defined and
-        _windows_domain['reboot_required']
+    ansible_user_id != "vagrant" and
+    _windows_domain['reboot_required'] is defined and
+    _windows_domain['reboot_required']
+
+- name: reboot | Vagrant style reboot
+  win_shell: Restart-Computer -Force
+  when: >
+    ansible_user_id == "vagrant" and
+    _windows_domain['reboot_required'] is defined and
+    _windows_domain['reboot_required']
+  register: vagrant_reboot
+
+- name: reboot | Wait 2 min for Vagrant reboot.yml
+  pause:
+    seconds: 120
+  when: >
+    ansible_user_id == "vagrant" and
+    vagrant_reboot is defined and
+    vagrant_reboot

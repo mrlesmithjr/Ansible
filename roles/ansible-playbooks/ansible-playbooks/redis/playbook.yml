@@ -1,0 +1,7 @@
+---
+- hosts: redis-nodes
+  become: true
+  vars:
+  roles:
+    - role: ansible-redis
+  tasks:

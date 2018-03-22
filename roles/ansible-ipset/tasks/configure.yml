@@ -1,0 +1,71 @@
+---
+- name: configure | Capturing ipset Names
+  command: ipset list -n
+  become: true
+  register: _ipset_list_names
+  changed_when: false
+
+- name: configure | Ensuring {{ ipset_config_file|dirname }} Directory Exists
+  file:
+    path: "{{ ipset_config_file|dirname }}"
+    state: directory
+  become: true
+
+- name: configure | Generating ipset Rules {{ ipset_config_file }}
+  template:
+    src: ipsets.j2
+    dest: "{{ ipset_config_file }}"
+  become: true
+
+- name: configure | Ensuring {{ ipset_iptables_config_file|dirname }} Directory Exists
+  file:
+    path: "{{ ipset_iptables_config_file|dirname }}"
+    state: directory
+  become: true
+
+- name: configure | Generating IPTables Rules {{ ipset_iptables_config_file }}
+  template:
+    src: iptables.j2
+    dest: "{{ ipset_iptables_config_file }}"
+  become: true
+  register: _ipset_iptables_rules_generated
+
+# We clear all existing IPTables rules and ipset rules to ensure that we are in
+# a default state to allow proper configuration of new rules.
+- name: configure | Clearing iptables Rules and ipset Rules
+  shell: >
+         iptables -P INPUT ACCEPT &&
+         iptables -P FORWARD ACCEPT &&
+         iptables -P OUTPUT ACCEPT &&
+         iptables -F &&
+         iptables -X &&
+         ipset destroy
+  become: true
+  when: ipset_clear
+
+- name: configure | Restoring ipset Rules {{ ipset_config_file }}
+  shell: ipset restore -exist < {{ ipset_config_file }}
+  become: true
+  # We always need to restore to ensure that current rules are loaded. This
+  # will account for someone removing rules on a host and the configuration does
+  # not change from above. We allow this task to not trigger a change to maintain
+  # idempotency.
+  changed_when: ipset_clear
+
+# We need to do this the first time when setting up connection tracking in order
+# to not lose connection over SSH.
+- name: configure | Setting Up Default Connection Tracking (One-Time)
+  shell: >
+         iptables -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED &&
+         iptables -I OUTPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED
+  become: true
+  when: _ipset_iptables_rules_generated['changed']
+
+- name: configure | Restoring IPTables Rules {{ ipset_iptables_config_file }}
+  command: iptables-restore {{ ipset_iptables_config_file }}
+  become: true
+  # We always need to restore to ensure that current rules are loaded. This
+  # will account for someone removing rules on a host and the configuration does
+  # not change from above. We allow this task to not trigger a change to maintain
+  # idempotency.
+  changed_when: ipset_clear

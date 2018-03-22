@@ -1,0 +1,23 @@
+---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - iproute
+    - libc-ares2
+
+- name: debian | Installing FRR {{ frr_version }}
+  apt:
+    deb: "{{ frr_package_url }}/frr_{{ frr_version }}-1_{{ ansible_distribution|lower }}{{ ansible_distribution_major_version }}.1_amd64.deb"
+    state: present
+  become: true
+  when: ansible_distribution == "Debian"
+
+- name: debian | Installing FRR {{ frr_version }}
+  apt:
+    deb: "{{ frr_package_url }}/frr_{{ frr_version }}-1_{{ ansible_distribution|lower }}{{ ansible_distribution_version }}.1_amd64.deb"
+    state: present
+  become: true
+  when: ansible_distribution == "Ubuntu"

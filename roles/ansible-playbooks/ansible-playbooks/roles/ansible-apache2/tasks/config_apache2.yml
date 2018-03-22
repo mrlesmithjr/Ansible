@@ -1,0 +1,60 @@
+---
+- name: config_apache2 | Ensuring Apache2 Website(s) DocumentRoot Folders Exist
+  file:
+    path: "{{ item.documentroot }}"
+    state: "directory"
+    owner: "{{ apache2_web_owner }}"
+    group: "{{ apache2_web_group }}"
+  become: true
+  with_items: '{{ apache2_virtual_hosts }}'
+  when: >
+        apache2_config_virtual_hosts and
+        apache2_virtual_hosts is defined
+
+- name: config_apache2 | Ensuring Apache2 Logs Folder Exists
+  file:
+    path: "{{ apache2_log_dir }}"
+    state: "directory"
+  become: true
+
+- name: config_apache2 | Configuring Apache2 Main Settings
+  template:
+    src: "etc/apache2/httpd.conf.j2"
+    dest: "/etc/apache2/httpd.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart apache2"
+  when: ansible_os_family == "Alpine"
+
+- name: config_apache2 | Configuring Apache2 Default Settings
+  template:
+    src: "etc/apache2/conf.d/default.conf.j2"
+    dest: "/etc/apache2/conf.d/default.conf"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  become: true
+  notify:
+    - "restart apache2"
+  when: ansible_os_family == "Alpine"
+
+- name: config_apache2 | Configuring Apache2 Website(s)
+  template:
+    src: "etc/apache2/sites-available/000-default.conf.j2"
+    dest: "/etc/apache2/sites-available/000-default.conf"
+  become: true
+  notify:
+    - "restart apache2"
+  when: ansible_os_family == "Debian"
+
+- name: config_apache2 | Configuring Apache2 Website(s)
+  template:
+    src: "etc/httpd/conf/httpd.conf.j2"
+    dest: "/etc/httpd/conf/httpd.conf"
+  become: true
+  notify:
+    - "restart httpd"
+  when: ansible_os_family == "RedHat"

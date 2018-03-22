@@ -1,0 +1,67 @@
+---
+- hosts: rpi_k8s_slaves
+  tasks:
+    - name: Resetting K8s Slaves
+      command: kubeadm reset
+      become: true
+
+    - name: Ensuring All Default IPTABLES Chains Are Set To ACCEPT
+      iptables:
+        chain: "{{ item }}"
+        policy: ACCEPT
+      become: true
+      with_items:
+        - INPUT
+        - FORWARD
+        - OUTPUT
+
+    - name: Flushing IPTABLES
+      command: iptables -F
+      become: true
+
+    - name: Removing Custom IPTABLES Rules
+      command: iptables -X
+      become: true
+
+- hosts: rpi_k8s_master
+  tasks:
+    - name: Resetting K8s Master
+      command: kubeadm reset
+      become: true
+
+    - name: Ensuring All Default IPTABLES Chains Are Set To ACCEPT
+      iptables:
+        chain: "{{ item }}"
+        policy: ACCEPT
+      become: true
+      with_items:
+        - INPUT
+        - FORWARD
+        - OUTPUT
+
+    - name: Flushing IPTABLES
+      command: iptables -F
+      become: true
+
+    - name: Removing Custom IPTABLES Rules
+      command: iptables -X
+      become: true
+
+    - name: Configuring IPTables
+      iptables:
+        table: "{{ item['table']|default(omit) }}"
+        chain: "{{ item['chain']|default(omit) }}"
+        ctstate: "{{ item['ctstate']|default(omit) }}"
+        source: "{{ item['source']|default(omit) }}"
+        in_interface: "{{ item['in_interface']|default(omit) }}"
+        out_interface: "{{ item['out_interface']|default(omit) }}"
+        jump: "{{ item['jump']|default(omit) }}"
+        state: "{{ item['state']|default(omit) }}"
+      become: true
+      register: _iptables_configured
+      with_items: "{{ jumphost_iptables_rules }}"
+
+    - name: Saving IPTables Rules
+      command: service netfilter-persistent save
+      become: true
+      when: _iptables_configured['changed']

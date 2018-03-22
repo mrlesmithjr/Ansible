@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-change-hostname
+
+# Defines if the node should reboot after changing the hostname
+change_hostname_reboot: true

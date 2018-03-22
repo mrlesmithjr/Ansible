@@ -20,6 +20,7 @@
 
 - name: galera_monitoring | waiting for mysql to start on master
   wait_for:
+    host: "{{ galera_cluster_bind_address }}"
     port: 3306
   when: inventory_hostname == galera_mysql_master_node
 

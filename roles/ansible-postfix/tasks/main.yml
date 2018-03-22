@@ -73,10 +73,10 @@
         configure_postfix is defined and
         configure_postfix
 
-- name: Checking to make sure postfix is running and enabled on boot
+- name: Checking to make sure postfix is started and enabled on boot
   service:
     name: "postfix"
-    state: "running"
+    state: started
     enabled: yes
   tags: [postfix]
   when: not ansible_check_mode

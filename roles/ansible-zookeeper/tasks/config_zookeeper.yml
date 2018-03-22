@@ -1,20 +1,22 @@
 ---
 - name: config_zookeeper | configuring zookeeper_myid
   template:
-    src: "etc/zookeeper/conf/myid.j2"
-    dest: "/etc/zookeeper/conf/myid"
+    src: etc/zookeeper/conf/myid.j2
+    dest: /etc/zookeeper/conf/myid
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - restart zookeeper
 
 - name: config_zookeeper | configuring zookeeper zoo.cfg
   template:
-    src: "etc/zookeeper/conf/zoo.cfg.j2"
-    dest: "/etc/zookeeper/conf/zoo.cfg"
+    src: etc/zookeeper/conf/zoo.cfg.j2
+    dest: /etc/zookeeper/conf/zoo.cfg
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - restart zookeeper

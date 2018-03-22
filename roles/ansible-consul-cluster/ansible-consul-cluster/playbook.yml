@@ -1,0 +1,9 @@
+---
+- hosts: consul_cluster
+  roles:
+    - role: ansible-ntp
+    - role: ansible-timezone
+    - role: ansible-etc-hosts
+    - role: ansible-consul
+    - role: ansible-keepalived
+    - role: ansible-haproxy

@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+# Create an additional socket in haproxy's chroot in order to allow logging via
+# /dev/log to chroot'ed HAProxy processes
+$AddUnixListenSocket /var/lib/haproxy/dev/log
+
+# Send HAProxy messages to a dedicated logfile
+{% if (haproxy_enable_remote_syslog is defined and not haproxy_enable_remote_syslog) or haproxy_enable_remote_syslog is not defined %}
+if $programname startswith 'haproxy' then /var/log/haproxy.log
+{% endif %}
+{% if (haproxy_enable_remote_syslog is defined and haproxy_enable_remote_syslog) %}
+#if $programname startswith 'haproxy' then /var/log/haproxy.log
+{% endif %}
+&~

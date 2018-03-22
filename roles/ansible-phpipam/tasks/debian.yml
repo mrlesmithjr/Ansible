@@ -44,3 +44,4 @@
     name: rewrite
     state: present
   notify: restart apache2
+  when: phpipam_prettify_links

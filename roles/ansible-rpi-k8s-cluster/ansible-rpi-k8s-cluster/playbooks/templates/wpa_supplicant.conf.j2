@@ -1,0 +1,11 @@
+{{ ansible_managed|comment }}
+
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country={{ k8s_wifi_country }}
+
+network={
+	ssid="{{ k8s_wifi_ssid }}"
+	psk="{{ k8s_wifi_password }}"
+	key_mgmt=WPA-PSK
+}

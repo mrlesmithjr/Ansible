@@ -1,0 +1,29 @@
+---
+- name: manage_modules | Capturing Installed Modules
+  shell: pwsh -c "Get-Module -ListAvailable | Select-Object Name | ft -hidetableheaders"
+  register: _powershell_installed_modules_currentuser
+
+- name: manage_modules | Capturing Installed Modules
+  shell: pwsh -c "Get-Module -ListAvailable | Select-Object Name | ft -hidetableheaders"
+  become: true
+  register: _powershell_installed_modules_allusers
+
+- name: manage_modules | Installing Modules
+  shell: pwsh -c "Install-Module -Name {{ item['name'] }} -Scope AllUsers -Force"
+  become: true
+  with_items: "{{ powershell_modules }}"
+  when: >
+        powershell_modules != [] and
+        (item['name'] not in _powershell_installed_modules_allusers['stdout'] and
+        item['state']|lower == "present" and
+        item['scope']|lower == "allusers")
+
+- name: manage_modules | Installing Modules
+  shell: pwsh -c "Install-Module -Name {{ item['name'] }} -Scope CurrentUser -Force"
+  become: false
+  with_items: "{{ powershell_modules }}"
+  when: >
+        powershell_modules != [] and
+        (item['name'] not in _powershell_installed_modules_currentuser['stdout'] and
+        item['state']|lower == "present" and
+        item['scope']|lower == "currentuser")

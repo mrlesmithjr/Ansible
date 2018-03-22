@@ -1,0 +1,72 @@
+---
+- name: set_facts | Setting Docker Version To Install (Debian)
+  set_fact:
+    docker_version_debian: '{{ docker_version }}-0~{{ ansible_distribution_release|lower }}'
+  when: >
+        ansible_os_family == "Debian" and
+        (docker_version < '1.12.4')
+
+- name: set_facts | Setting Docker Version To Install (Debian)
+  set_fact:
+    docker_version_debian: '{{ docker_version }}-0~{{ ansible_distribution|lower }}-{{ ansible_distribution_release|lower }}'
+  when: >
+        ansible_os_family == "Debian" and
+        (docker_version >= '1.12.4' and
+        docker_version <= '1.13.1')
+
+- name: set_facts | Setting Docker Version To Install (Debian)
+  set_fact:
+    docker_version_debian: '{{ docker_version }}~ce-0~{{ ansible_distribution|lower }}-{{ ansible_distribution_release|lower }}'
+  when: >
+        ansible_os_family == "Debian" and
+        (docker_version >= '17.03' and
+        docker_version < '17.06')
+
+- name: set_facts | Setting Docker Version To Install (Debian)
+  set_fact:
+    docker_version_debian: '{{ docker_version }}~ce-0~{{ ansible_distribution|lower }}'
+  when: >
+        ansible_os_family == "Debian" and
+        (docker_version >= '17.06')
+
+- name: set_facts | Setting Docker Version To Install (Fedora)
+  set_fact:
+    docker_version_redhat: '{{ docker_version }}-1.el7.centos'
+  when: >
+        (ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora") and
+        (docker_version < '17.03')
+
+- name: set_facts | Setting Docker Version To Install (Fedora)
+  set_fact:
+    docker_version_redhat: '{{ docker_version }}.ce-1.fc{{ ansible_distribution_major_version }}'
+  when: >
+        (ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora") and
+        (docker_version >= '17.03')
+
+- name: set_facts | Setting Docker Version To Install (RedHat)
+  set_fact:
+    docker_version_redhat: '{{ docker_version }}-1.el7.centos'
+  when: >
+        (ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora") and
+        (docker_version < '17.03') and
+        ansible_distribution_major_version == '7'
+
+- name: set_facts | Setting Docker Version To Install (RedHat)
+  set_fact:
+    docker_version_redhat: '{{ docker_version }}.ce-1.el7.centos'
+  when: >
+        (ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora") and
+        (docker_version >= '17.03') and
+        ansible_distribution_major_version == '7'
+
+- name: Installing Docker Version On Debian
+  debug: msg="Installing Docker Version {{ docker_version_debian }}"
+  when: ansible_os_family == "Debian"
+
+- name: Installing Docker Version On RedHat
+  debug: msg="Installing Docker Version {{ docker_version_redhat }}"
+  when: ansible_os_family == "RedHat"

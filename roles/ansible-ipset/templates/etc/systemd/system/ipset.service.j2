@@ -1,0 +1,17 @@
+{{ ansible_managed|comment }}
+
+[Unit]
+Description=IP sets for iptables
+Before=network-pre.target iptables.service ip6tables.service
+Wants=network-pre.target
+ConditionFileNotEmpty={{ ipset_config_file }}
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart={{ _ipset_bin_path['stdout'] }} -exist -file {{ ipset_config_file }} restore
+ExecReload={{ _ipset_bin_path['stdout'] }} -exist -file {{ ipset_config_file }} restore
+ExecStop={{ _ipset_bin_path['stdout'] }} -file {{ ipset_config_file }} save
+
+[Install]
+WantedBy=multi-user.target

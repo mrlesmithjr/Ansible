@@ -1,0 +1,12 @@
+---
+# tasks file for ansible-keepalived
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include: config_keepalived.yml
+  tags:
+    - config_keepalived
+  when: keepalived_config

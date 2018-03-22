@@ -1,0 +1,73 @@
+---
+- hosts: test_nodes
+  vars:
+    ipset_enable_dshield_block_list: true
+    ipset_enable_firehol_block_list: true
+    ipset_enable_spamhaus_block_list: true
+    ipset_iptables_custom_rules:
+      - dports: []
+        sports: []
+        protocol: icmp
+        chain: OUTPUT
+        policy: ACCEPT
+        states:
+          - new
+          # - related
+          # - established
+      - dports:
+          - 53
+          - 123
+        sports: []
+        protocol: udp
+        chain: OUTPUT
+        policy: ACCEPT
+        states:
+          - new
+          # - related
+          # - established
+      - dports:
+          - 22
+          - 80
+          - 443
+        sports: []
+        protocol: tcp
+        chain: OUTPUT
+        policy: ACCEPT
+        states:
+          - new
+          # - related
+          # - established
+    ipset_iptables_default_input_policy: DROP
+    ipset_iptables_default_output_policy: DROP
+    ipset_iptables_dshield_chains:
+      - INPUT
+      - OUTPUT
+    ipset_iptables_firehol_chains:
+      - INPUT
+      - OUTPUT
+    ipset_iptables_log_dropped: true
+    ipset_iptables_spamhaus_chains:
+      - INPUT
+      - OUTPUT
+    ipset_rules:
+      - name: safe_input
+        addresses:
+          - 10.0.0.0/8
+        chain: INPUT
+        maxelem: 65536
+        policy: ACCEPT
+        dports:
+          - 22
+          - 2202
+          - 2222
+        protocol: tcp
+        # sports:
+        #   - 22
+        state: present
+        states:
+          - new
+          # - related
+          # - established
+        type: hash:net
+  roles:
+    - role: ansible-ipset

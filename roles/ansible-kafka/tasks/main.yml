@@ -1,0 +1,4 @@
+---
+# tasks file for ansible-kafka
+
+- include: install.yml

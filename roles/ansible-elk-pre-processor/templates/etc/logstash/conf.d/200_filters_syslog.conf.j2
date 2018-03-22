@@ -1,5 +1,4 @@
-# {{ ansible_managed }}
-#
+{{ ansible_managed|comment }}
 filter {
   if "syslog" in [tags] {
     grok {
@@ -12,7 +11,7 @@ filter {
     mutate {
       add_field => [ "pre-msg", "%{message}" ]
     }
-{% if logstash_custom_tagging is defined %}
+{% if logstash_custom_tagging != [] %}
 {%   for item in logstash_custom_tagging %}
 {%     for name in item.naming %}
     if "{{ name }}" in [syslog_host_id] {

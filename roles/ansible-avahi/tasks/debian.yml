@@ -1,0 +1,7 @@
+---
+- name: debian | Installing Avahi Packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ avahi_debian_packages }}"

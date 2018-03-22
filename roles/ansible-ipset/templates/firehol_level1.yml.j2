@@ -1,0 +1,9 @@
+---
+firehol_block_list:
+{% for item in ipset_firehol_block_list.split('\n') %}
+{%   if '#' not in item %}
+{%     if '0.0.0.0' not in item %}
+  - {{ item }}
+{%     endif %}
+{%   endif %}
+{% endfor %}

@@ -1,0 +1,18 @@
+---
+frr_daemons:
+  bgpd: true
+  isisd: false
+  ldpd: false
+  nhrpd: false
+  ospf6d: false
+  ospfd: false
+  pimd: false
+  ripd: false
+  ripngd: false
+  zebra: true
+
+frr_next_hop_self: true
+frr_compute_router_id_subnet: 10.0.30
+frr_leaf_router_id_subnet: 10.0.20
+frr_spine_router_id_subnet: 10.0.10
+frr_advertise_cidr: 24

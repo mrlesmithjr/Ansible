@@ -1,0 +1,6 @@
+---
+- name: debian | installing nginx
+  apt:
+    name: "nginx"
+    state: present
+  become: true

@@ -1,0 +1,35 @@
+driftfile /var/lib/ntp/ntp.drift
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+{% if ntp_master %}
+{%   if ntp_master_servers is defined %}
+{%     for server in ntp_master_servers %}
+server {{ server }}
+{%     endfor %}
+# Below 127.127.1.1 setting refer to the system time on the current machine in
+# case of network isolation.
+server 127.127.1.1
+fudge 127.127.1.1 stratum 5
+{%   endif %}
+{% endif %}
+{% if not ntp_master %}
+{%   if ntp_servers is defined %}
+{%     for server in ntp_servers %}
+server {{ server }}
+{%     endfor %}
+{%   endif %}
+{%   if ntp_servers is not defined %}
+server 0.ubuntu.pool.ntp.org
+server 1.ubuntu.pool.ntp.org
+server 2.ubuntu.pool.ntp.org
+server 3.ubuntu.pool.ntp.org
+{%   endif %}
+{% endif %}
+# Use Ubuntu's ntp server as a fallback.
+server ntp.ubuntu.com
+restrict -4 default kod notrap nomodify nopeer noquery
+restrict -6 default kod notrap nomodify nopeer noquery
+restrict 127.0.0.1
+restrict ::1

@@ -1,0 +1,17 @@
+---
+- name: opensuse | installing haproxy and socat
+  zypper:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'haproxy'
+    - 'hatop'
+    - 'socat'
+
+- name: opensuse | ensuring haproxy is enabled
+  service:
+    name: "haproxy"
+    enabled: yes
+  become: true
+  when: not ansible_check_mode

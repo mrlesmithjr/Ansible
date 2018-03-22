@@ -1,0 +1,19 @@
+---
+# handlers file for ansible-apache2
+- name: restart apache2
+  service:
+    name: "apache2"
+    state: "restarted"
+  become: true
+
+- name: reload apache2
+  service:
+    name: "apache2"
+    state: "reloaded"
+  become: true
+
+- name: "restart httpd"
+  service:
+    name: "httpd"
+    state: "restarted"
+  become: true

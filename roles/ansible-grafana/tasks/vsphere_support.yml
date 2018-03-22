@@ -1,47 +1,47 @@
 ---
 - name: vsphere_support | Installing Pre-Reqs
   apt:
-    name: "default-jdk-headless"
-    state: "present"
+    name: default-jdk-headless
+    state: present
   become: true
   when: ansible_distribution == "Ubuntu"
 
 - name: vsphere_support | Installing Pre-Reqs
   apt:
-    name: "default-jdk"
-    state: "present"
+    name: default-jdk
+    state: present
   become: true
   when: ansible_distribution == "Debian"
 
 - name: vsphere_support | installing python pip module pysphere
   pip:
-    name: "pysphere"
-    state: "present"
+    name: pysphere
+    state: present
   become: true
 
 - name: vsphere_support | create /opt/statsfeeder if not present
   file:
-    path: "/opt/statsfeeder"
-    state: "directory"
+    path: /opt/statsfeeder
+    state: directory
   become: true
 
 - name: vsphere_support | downloading statsfeeder
   get_url:
-    url: "http://download3.vmware.com/software/vmw-tools/statsfeeder/StatsFeeder-4.1.697.zip"
-    dest: "/opt/statsfeeder/statsfeeder.zip"
+    url: http://download3.vmware.com/software/vmw-tools/statsfeeder/StatsFeeder-4.1.697.zip
+    dest: /opt/statsfeeder/statsfeeder.zip
     mode: 0644
   become: true
 
 - name: vsphere_support | extracting statsfeeder
-  command: "unzip /opt/statsfeeder/statsfeeder.zip -d /opt/statsfeeder"
+  command: unzip /opt/statsfeeder/statsfeeder.zip -d /opt/statsfeeder
   args:
-    creates: "/opt/statsfeeder/StatsFeeder.sh"
+    creates: /opt/statsfeeder/StatsFeeder.sh
   become: true
 
 - name: vsphere_support | pulling graphitereceiver from github
   git:
-    repo: "https://github.com/SYNAXON/GraphiteReceiver"
-    dest: "~/GraphiteReceiver"
+    repo: https://github.com/SYNAXON/GraphiteReceiver
+    dest: ~/GraphiteReceiver
   become: false
 
 - name: vsphere_support | creating build folders
@@ -66,10 +66,10 @@
       dest: '~/.m2/repository/com/vmware/tools/vsphere-sdk/4.1'
 
 - name: vsphere_support | building GraphiteReceiver maven package
-  shell: "mvn package"
+  shell: mvn package
   args:
-    chdir: "~/GraphiteReceiver"
-    creates: "~/GraphiteReceiver/target/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar"
+    chdir: ~/GraphiteReceiver
+    creates: ~/GraphiteReceiver/target/statsfeeder-GraphiteReceiver-1.0-IPM-4.0.jar
   become: false
 
 - name: vsphere_support | copying files to tmp

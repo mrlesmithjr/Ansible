@@ -1,0 +1,30 @@
+---
+- name: lockdown | changing root password (Archlinux)
+  user:
+    name: "root"
+    password: "{{ bootstrap_root_password }}"
+  become: true
+  when: >
+        ansible_os_family == "Archlinux" and
+        bootstrap_root_password is defined and
+        bootstrap_set_root_pw
+
+- name: lockdown | changing root password (RedHat)
+  user:
+    name: "root"
+    password: "{{ bootstrap_root_password }}"
+  become: true
+  when: >
+        ansible_os_family == "RedHat" and
+        bootstrap_root_password is defined and
+        bootstrap_set_root_pw
+
+- name: lockdown | changing/setting root password (Debian)
+  user:
+    name: "root"
+    password: "{{ bootstrap_root_password }}"
+  become: true
+  when: >
+        ansible_os_family == "Debian" and
+        bootstrap_root_password is defined and
+        bootstrap_debian_set_root_pw

@@ -1,0 +1,39 @@
+---
+- name: debian | running apt-get update
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+  tags:
+    - apt_update
+  become: true
+
+- name: debian | running apt-get update (forced)
+  apt:
+    update_cache: yes
+  tags:
+    - force-apt-update
+  become: true
+  when: >
+        base_force_apt_update is defined and
+        base_force_apt_update
+
+- name: debian | installing base packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items: '{{ base_debian_packages }}'
+
+- name: debian | resetting /etc/dhcp/dhclient.conf to default
+  template:
+    src: "etc/dhcp/dhclient.conf.j2"
+    dest: "/etc/dhcp/dhclient.conf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  tags:
+    - update_dhcpclient_conf
+  become: true
+  when: >
+        base_update_dhcpclient_conf is defined and
+        base_update_dhcpclient_conf

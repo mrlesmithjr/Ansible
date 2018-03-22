@@ -1,0 +1,44 @@
+---
+- name: alpine | Installing ipset
+  apk:
+    name: ipset
+    state: present
+  become: true
+
+- name: alpine | Installing iptables
+  apk:
+    name: iptables
+    state: present
+  become: true
+
+- include_tasks: set_facts.yml
+
+- name: alpine | Configuring ipset Service
+  template:
+    src: etc/init.d/ipset.j2
+    dest: /etc/init.d/ipset
+    owner: root
+    group: root
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+
+- name: alpine | Configuring iptables Service
+  template:
+    src: etc/init.d/iptables.j2
+    dest: /etc/init.d/iptables
+    owner: root
+    group: root
+    mode: "u=rwx,g=rx,o=rx"
+  become: true
+
+- name: alpine | Ensuring ipset Service Is Enabled On Boot
+  service:
+    name: ipset
+    enabled: true
+  become: true
+
+- name: alpine | Ensuring iptables Service Is Enabled On Boot
+  service:
+    name: iptables
+    enabled: true
+  become: true
