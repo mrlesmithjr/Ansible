@@ -104,3 +104,9 @@ samba_users: []
   #   # Define samba user password
   #   smbpasswd: P@55w0rd
 samba_workgroup: "{{ samba_netbios_domain_name[0]|upper }}"
+
+# Printers options
+samba_use_printers: False
+samba_printer_type: cups
+samba_cups_server: 'localhost:631'
+

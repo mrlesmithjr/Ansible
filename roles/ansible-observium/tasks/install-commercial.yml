@@ -1,0 +1,20 @@
+---
+# This allows us to install the commercial version of observium
+
+- name: Force fail when svn user not defined
+  fail:
+    msg: "observium_commercial_svn_user variable is undefined, this means we cannot clone from observium SVN"
+  when: not observium_commercial_svn_user | length > 0
+
+- name: Force fail when svn password not defined
+  fail:
+    msg: "observium_commercial_svn_password variable is undefined, this means we cannot clone from observium SVN"
+  when: not observium_commercial_svn_password | length > 0
+
+- name: install-commercial | Downloading Observium to {{ observium_dl_dir }}
+  subversion:
+    repo: "{{ observium_commercial_svn_repo }}"
+    dest: "{{ observium_base_dir }}"
+    username: "{{ observium_commercial_svn_user }}"
+    password: "{{ observium_commercial_svn_password }}"
+    update: no

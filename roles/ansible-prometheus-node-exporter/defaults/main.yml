@@ -7,6 +7,19 @@ prometheus_node_exporter_listen_port: '9100'
 prometheus_node_exporter_source_dir: '/usr/local/src'
 prometheus_node_exporter_version: '0.14.0'
 
+# set for textfile collector
+# prometheus_node_exporter_collector_textfile_directory: "/var/lib/prometheus"
+
+# for a list of all node_exporter Collectors
+# https://github.com/prometheus/node_exporter
+prometheus_node_exporter_enabled_collectors:
+  - "systemd"
+
+# for a list of all node_exporter Collectors
+# https://github.com/prometheus/node_exporter
+prometheus_node_exporter_disabled_collectors:
+  - "wifi"
+
 prometheus_node_exporter_user_info:
   group: 'prometheus'
   user: 'prometheus'

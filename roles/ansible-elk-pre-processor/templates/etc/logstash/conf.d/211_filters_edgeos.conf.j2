@@ -1,0 +1,52 @@
+filter {
+  if "EdgeOS" in [tags] {
+    grok {
+      match => { "message" => "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    syslog_pri { }
+    date {
+      match => [ "syslog_timestamp", "MMM d HH:mm:ss", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss", "MMM d HH:mm:ss,SSS", "MMM dd HH:mm:ss,SSS", "ISO8601" ]
+      timezone => "America/New_York"
+    }
+    mutate {
+      replace => [ "message", "%{syslog_message}" ]
+    }
+    if [syslog_program] == "kernel" {
+      grok {
+        match => [
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT=%{NOTSPACE:out_interface} MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} %{WORD:fragment_flags} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} WINDOW=%{INT:tcp_window_length} RES=%{NOTSPACE:reserved_bits} %{DATA:tcp_flags} URGP=%{INT:urgent_pointer}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT=%{NOTSPACE:out_interface} MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} WINDOW=%{INT:tcp_window_length} RES=%{NOTSPACE:reserved_bits} %{DATA:tcp_flags} URGP=%{INT:urgent_pointer}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT= MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} %{WORD:fragment_flags} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} LEN=%{INT:packet_length}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT= MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} %{WORD:fragment_flags} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} WINDOW=%{INT:tcp_window_length} RES=%{NOTSPACE:reserved_bits} %{DATA:tcp_flags} URGP=%{INT:urgent_pointer}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT= MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} WINDOW=%{INT:tcp_window_length} RES=%{NOTSPACE:reserved_bits} %{DATA:tcp_flags} URGP=%{INT:urgent_pointer}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT=%{NOTSPACE:out_interface} MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} LEN=%{INT:packet_length}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT= MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} PROTO=%{WORD:proto} SPT=%{INT:src_port} DPT=%{INT:dst_port} LEN=%{INT:packet_length}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT= MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} %{WORD:fragment_flags} PROTO=%{WORD:proto} TYPE=%{INT:icmp_type} CODE=%{INT:icmp_code} ID=%{INT:icmp_id} SEQ=%{INT:icmp_sequence}",
+          "message", ".*\[%{NOTSPACE:fw_rule}]IN=%{NOTSPACE:in_interface} OUT= MAC=%{NOTSPACE:mac_address} SRC=%{IPORHOST:src_ip} DST=%{IPORHOST:dst_ip} LEN=%{INT:packet_length} TOS=%{NOTSPACE:type_of_service} PREC=%{NOTSPACE:packet_precedence} TTL=%{INT:ttl} ID=%{INT:packet_id} PROTO=%{WORD:proto} TYPE=%{INT:icmp_type} CODE=%{INT:icmp_code} ID=%{INT:icmp_id} SEQ=%{INT:icmp_sequence}",
+          "message", "%{WORD:ip_version}: martian destination %{IPORHOST:martian_dest} from %{IPORHOST:martian_src}, dev %{WORD:in_interface}",
+          "message", "%{GREEDYDATA}"
+        ]
+      }
+      if [src_ip]  {
+        geoip {
+          source => "src_ip"
+          target => "geoip"
+          add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+          add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+        }
+        mutate {
+          convert => [ "[geoip][coordinates]", "float" ]
+        }
+      }
+      mutate {
+        add_tag => [ "firewall" ]
+      }
+    }
+    mutate {
+      add_tag => [ "pre-processed" ]
+      replace => [ "host", "%{syslog_hostname}" ]
+    }
+  }
+}

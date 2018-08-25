@@ -7,11 +7,20 @@ rsyslog_config: false
 # defines primary domain name
 rsyslog_pri_domain_name: example.org
 
+# defines if high precision timestamps should be used instead of the traditional log format
+rsyslog_highprecision: false
+
 # defines if rsyslog should be configured to listen on tcp/514
 rsyslog_allow_tcp: false
 
+# sets the TCP port rsyslog should listen on if TCP is enabled. 514 is the IANA assigned port
+rsyslog_tcp_port: 514
+
 # defines if rsyslog should be configured to listen on udp/514
 rsyslog_allow_udp: false
+
+# sets the UDP port rsyslog should listen on if UDP is enabled. 514 is the IANA assigned port
+rsyslog_udp_port: 514
 
 # defines remote syslog servers
 rsyslog_servers: []

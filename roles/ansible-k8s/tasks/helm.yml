@@ -1,4 +1,21 @@
 ---
+- name: helm | Generating RBAC Config For Tiller
+  template:
+    src: tiller-rbac-config.yaml.j2
+    dest: /etc/kubernetes/tiller-rbac-config.yaml
+  become: true
+  register: _k8s_tiller_rbac_config_generated
+  when: inventory_hostname == k8s_master
+
+- name: helm | Configuring RBAC For Tiller
+  shell: >
+    kubectl --kubeconfig {{ k8s_admin_config }} \
+    create -f /etc/kubernetes/tiller-rbac-config.yaml
+  become: true
+  when: >
+        inventory_hostname == k8s_master and
+        _k8s_tiller_rbac_config_generated['changed']
+
 - name: helm | Checking If Helm Is Already Installed
   stat:
     path: "{{ k8s_helm_install_dir }}/helm"
@@ -72,7 +89,7 @@
 # helm init --service-account tiller --upgrade
 
 - name: helm | Initializing Helm
-  command: helm init
+  command: helm init --service-account tiller
   args:
     creates: "/home/{{ item['user'] }}/.helm"
   become: true

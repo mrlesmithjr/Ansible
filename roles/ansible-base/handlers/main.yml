@@ -3,3 +3,5 @@
 - name: update resolvconf
   shell: resolvconf -u
   become: true
+  tags:
+  - skip_ansible_lint

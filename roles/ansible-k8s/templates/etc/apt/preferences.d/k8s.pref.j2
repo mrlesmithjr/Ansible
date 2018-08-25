@@ -1,0 +1,11 @@
+Package: kubeadm
+Pin: version {{ k8s_version }}*
+Pin-Priority: 900
+
+Package: kubectl
+Pin: version {{ k8s_version }}*
+Pin-Priority: 900
+
+Package: kubelet
+Pin: version {{ k8s_version }}*
+Pin-Priority: 900

@@ -5,9 +5,9 @@
     path: /etc/systemd/system/mariadb.service.d
     state: directory
     recurse: yes
-    user: root
+    owner: root
     group: root
-    mode: u=rwx,g=rx,o=rx
+    mode: "u=rwx,g=rx,o=rx"
   become: true
 
 - name: oom_score_adjust | Add the overriding file

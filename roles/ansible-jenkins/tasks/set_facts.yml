@@ -1,12 +1,12 @@
 ---
 - name: set_facts | Setting Jenkins Facts (Debian)
   set_fact:
-    jenkins_config_file: "/etc/default/jenkins"
-    jenkins_java_options: "JAVA_ARGS"
+    jenkins_config_file: /etc/default/jenkins
+    jenkins_java_options: JAVA_ARGS
   when: ansible_os_family == "Debian"
 
 - name: set_facts | Setting Jenkins Facts (RedHat)
   set_fact:
-    jenkins_config_file: "/etc/sysconfig/jenkins"
-    jenkins_java_options: "JENKINS_JAVA_OPTIONS"
+    jenkins_config_file: /etc/sysconfig/jenkins
+    jenkins_java_options: JENKINS_JAVA_OPTIONS
   when: ansible_os_family == "RedHat"

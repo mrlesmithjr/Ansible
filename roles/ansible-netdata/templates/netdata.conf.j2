@@ -22,8 +22,8 @@
 	debug log = /var/log/netdata/debug.log
 	error log = /var/log/netdata/error.log
 	access log = /var/log/netdata/access.log
-	# errors flood protection period = 1200
-	# errors to trigger flood protection = 200
+	errors flood protection period = {{ netdata_errors_flood_protection_period }}
+	errors to trigger flood protection = {{ netdata_errors_to_trigger_flood_protection }}
 	# pthread stack size = 8388608
 	# run as user = netdata
 	# OOM score = 1000
@@ -97,6 +97,7 @@
 	# max URL name length = 50
 
 [backend]
+{% if not netdata_configure_archive %}
 	# enabled = no
 	# data source = average
 	# type = graphite
@@ -106,7 +107,17 @@
 	# update every = 10
 	# buffer on failures = 10
 	# timeout ms = 20000
-
+{% else %}
+	enabled = {{ netdata_archive_enabled }}
+	type = {{ netdata_archive_type }}
+	destination = {{ netdata_archive_destination|join(' ') }}
+	data source = {{ netdata_archive_data_source }}
+	prefix = {{ netdata_archive_prefix }}
+	update every = {{ netdata_archive_update }}
+	buffer on failures = {{ netdata_archive_buffer_on_failures }}
+	timeout ms = {{ netdata_archive_timeout }}
+	send names instead of ids = {{ netdata_archive_send_names }}
+{% endif %}
 
 # per plugin configuration
 

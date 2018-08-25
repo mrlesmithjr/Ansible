@@ -1,25 +1,25 @@
 galaxy_info:
-  author: Larry Smith Jr.
-  description: An [Ansible](https://www.ansible.com) role to install/configure [Elasticsearch](https://www.elastic.co/products/elasticsearch)
+  author:               Larry Smith Jr.
+  description:          An [Ansible](https://www.ansible.com) role to install/configure [Elasticsearch](https://www.elastic.co/products/elasticsearch)
 
-  license: license (MIT)
+  license:              license (MIT)
 
-  min_ansible_version: 1.2
+  min_ansible_version:  1.2
 
   platforms:
-    - name: Debian
+    - name:             Debian
       versions:
         - jessie
         - stretch
-    - name: EL
+    - name:             EL
       versions:
         - 6
         - 7
-    - name: Fedora
+    - name:             Fedora
       versions:
         - 22
         - 23
-    - name: Ubuntu
+    - name:             Ubuntu
       versions:
         - trusty
         - vivid
@@ -29,4 +29,4 @@ galaxy_info:
     - database
     - database:nosql
 
-dependencies: []
+dependencies:           []

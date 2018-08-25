@@ -1,17 +1,17 @@
 ---
 - name: users | Generating Jenkins SSH Keys
   user:
-    name: "jenkins"
+    name: jenkins
     generate_ssh_key: yes
   become: true
 
 - name: users | Adding Jenkins Account To Sudoers
   lineinfile:
-    dest: "/etc/sudoers"
+    dest: /etc/sudoers
     regexp: "^jenkins ALL"
     line: "jenkins ALL=(ALL) NOPASSWD:ALL"
     validate: "visudo -cf %s"
-    state: "present"
+    state: present
   become: true
   when: >
         enable_jenkins_sudo is defined and
@@ -22,3 +22,4 @@
     src: "{{ jenkins_home_dir }}/.ssh/id_rsa.pub"
     dest: "./ssh_pub_keys/jenkins@{{ ansible_hostname }}.pub"
     flat: yes
+  become: true

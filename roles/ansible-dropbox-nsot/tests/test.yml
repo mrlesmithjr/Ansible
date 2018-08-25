@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts:       localhost
   remote_user: root
   roles:
     - ansible-dropbox-nsot

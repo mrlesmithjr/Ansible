@@ -5,11 +5,11 @@
 - include: debian.yml
   when: ansible_os_family == "Debian"
   tags:
-    - 'openstack_dashboard'
-    - 'openstack_dashboard_debian'
+    - openstack_dashboard
+    - openstack_dashboard_debian
 
 - include: config.yml
   tags:
-    - 'openstack_dashboard'
-    - 'openstack_dashboard_config'
-    - 'openstack_dashboard_debian'
+    - openstack_dashboard
+    - openstack_dashboard_config
+    - openstack_dashboard_debian

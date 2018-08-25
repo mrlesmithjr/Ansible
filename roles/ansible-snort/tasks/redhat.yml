@@ -1,26 +1,9 @@
 ---
 - name: redhat | installing pre-reqs
-  yum:
+  package:
     name: "{{ item }}"
     state: present
-  with_items:
-    - libpcap
-    - libpcap-devel
-    - perl
-    - tcpdump
-  when: ansible_distribution != "Fedora"
-
-- name: redhat | installing pre-reqs
-  dnf:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - libpcap
-    - libpcap-devel
-    - perl
-    - tcpdump
-    - wget
-  when: ansible_distribution == "Fedora"
+  with_items: "{{ snort_redhat_prereqs }}"
 
 - name: redhat | installing snort daq
   yum:
@@ -46,7 +29,7 @@
     state: present
   when: ansible_distribution == "Fedora"
 
-- name: debian | ensuring directory exists (/usr/local/lib/snort_dynamicrules)
+- name: redhat | ensuring directory exists (/usr/local/lib/snort_dynamicrules)
   file:
     dest: "/usr/local/lib/snort_dynamicrules"
     state: directory
@@ -54,6 +37,13 @@
     group: root
     mode: 0755
     recurse: yes
+
+# Has Snort been packaged incorrectly? Shouldn't need to do this
+- name: redhat | ensuring libdnet.1 symlink exists
+  file:
+    dest: "/usr/lib64/libdnet.1"
+    src: "/usr/lib64/libdnet.so.1"
+    state: link
 
 - name: redhat | ensuring snort is enabled
   service:

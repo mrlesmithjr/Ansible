@@ -1,29 +1,27 @@
 ---
-- name: install | installing python pip
-  easy_install:
-    name: "pip"
-    state: "present"
-
-- name: install | installing nsot
+- name:       install | installing nsot
   pip:
-    name: "nsot"
-    state: "present"
+    name:     nsot
+    state:    present
+  become:     true
 
-- name: install | installing additional python modules
+- name:       install | installing additional python modules
   pip:
-    name: "{{ item }}"
-    state: "present"
-  with_items: '{{ dropbox_nsot_python_modules }}'
+    name:     "{{ item }}"
+    state:    present
+  become:     true
+  with_items: "{{ dropbox_nsot_python_modules }}"
 
-#- name: install | initializing nsot
-#  command: "nsot-server init {{ dropbox_nsot_conf_file }}"
+#- name:      install | initializing nsot
+#  command:   "nsot-server init {{ dropbox_nsot_conf_file }}"
 #  args:
 #    creates: "{{ dropbox_nsot_conf_file }}"
 
-- name: install | configuring nsot
+- name:       install | configuring nsot
   template:
-    src: "etc/nsot.conf.py.j2"
-    dest: "/etc/nsot.conf.py"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
+    src:      etc/nsot.conf.py.j2
+    dest:     /etc/nsot.conf.py
+    owner:    root
+    group:    root
+    mode:     u=rw,g=r,o=r
+  become:     true

@@ -4,22 +4,22 @@
 consul_acl_master_token: 7A993C85-1EA6-412D-85DB-DA14EFCD03AB
 
 # Define interface to bind to...(eth0|eth1|enp0s8)
-consul_bind_interface: "{{ ansible_pri_interface }}"
+consul_bind_interface:   "{{ ansible_pri_interface }}"
 
 # Needs 127.0.0.1 in addition to the bind address. If this is changed, HAProxy
 # will fail to bind because HAProxy is running on each of the Consul servers.
-consul_client_address: "{{ consul_bind_address }} 127.0.0.1"
+consul_client_address:   "{{ consul_bind_address }} 127.0.0.1"
 
 # Generate using 'consul keygen'
 # make sure to generate a new key and replace this
 # also update key if you changed the it in your cluster via 'consul keyring',
 # otherwise the role may deploy an outdated key to additional nodes which then
 # can't join the cluster
-consul_encryption_key: OJVXXkKdwifyqc9BrDe1VQ==
+consul_encryption_key:   OJVXXkKdwifyqc9BrDe1VQ==
 
 # Defines the Ansible group which contains the consul server(s)
-consul_servers_group: consul_cluster
+consul_servers_group:    consul_cluster
 
-consul_ui: true
+consul_ui:               true
 
-consul_version: 1.0.6
+consul_version:          1.0.6

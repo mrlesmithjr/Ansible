@@ -16,6 +16,7 @@
     lv: "{{ item[1]['lvname'] }}"
     size: "{{ item[1]['size'] }}"
     shrink: no
+    opts: "{{ item[1]['opts'] | default('') }}"
     state: "present"
   become: true
   register: lvm
@@ -53,6 +54,7 @@
     src: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
     fstype: "{{ item[1]['filesystem'] }}"
     state: "mounted"
+    opts: "{{ item[1]['mopts'] | default('defaults') }}"
   become: true
   with_subelements:
     - "{{ lvm_groups }}"

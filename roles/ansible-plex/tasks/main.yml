@@ -16,3 +16,8 @@
   tags:
     - ferm
   when: enable_firewall
+
+- name: Start plexmediaserver
+  service:
+    name: plexmediaserver
+    state: started

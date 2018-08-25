@@ -2,6 +2,6 @@
 # handlers file for ansible-openstack-dashboard
 - name: reload apache2
   service:
-    name: "apache2"
-    state: "reloaded"
+    name: apache2
+    state: reloaded
   become: true

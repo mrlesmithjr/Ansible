@@ -27,3 +27,6 @@
     - jenkins_plugins
 
 - include: finalize.yml
+  when: >
+        (jenkins_config_info['use_security'] is defined and
+        jenkins_config_info['use_security'])

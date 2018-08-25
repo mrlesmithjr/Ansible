@@ -1,65 +1,65 @@
 ---
-- name: configure_root_access | ensuring MySQL service is running
+- name:       configure_root_access | ensuring MySQL service is running
   service:
-    name: "mysql"
-    state: "started"
-    enabled: yes
-  become: true
-  when: ansible_os_family == "Debian"
+    name:     mysql
+    state:    started
+    enabled:  yes
+  become:     true
+  when:       ansible_os_family == "Debian"
 
-- name: configure_root_access | ensuring MySQL service is running
+- name:       configure_root_access | ensuring MySQL service is running
   service:
-    name: "mysqld"
-    state: "started"
-    enabled: yes
-  become: true
-  when: >
+    name:     mysqld
+    state:    started
+    enabled:  yes
+  become:     true
+  when:       >
         (ansible_os_family == "RedHat" and
-        ansible_distribution_release != "Fedora") and
+        ansible_distribution != "Fedora") and
         (ansible_distribution_version < '7')
 
-- name: configure_root_access | ensuring MySQL service is running
+- name:       configure_root_access | ensuring MySQL service is running
   service:
-    name: "mariadb"
-    state: "started"
-    enabled: yes
-  become: true
-  when: >
+    name:     mariadb
+    state:    started
+    enabled:  yes
+  become:     true
+  when:       >
         ((ansible_os_family == "RedHat" and
-        ansible_distribution_release != "Fedora") and
+        ansible_distribution != "Fedora") and
         (ansible_distribution_version >= '7')) or
         ansible_os_family == "Alpine"
 
-- name: configure_root_access | waiting for MySQL service
+- name:       configure_root_access | waiting for MySQL service
   wait_for:
-    port: "{{ mysql_port }}"
-    delay: 10
+    port:     "{{ mysql_port }}"
+    delay:    10
 
-- name: configure_root | configuring root my.cnf
+- name:       configure_root | configuring root my.cnf
   template:
-    src: "root/my.cnf.j2"
-    dest: "/root/.my.cnf"
-    owner: "root"
-    group: "root"
-    mode: 0600
-  become: true
-  when: ansible_os_family == "Debian"
+    src:      root/my.cnf.j2
+    dest:     /root/.my.cnf
+    owner:    root
+    group:    root
+    mode:     0600
+  become:     true
+  when:       ansible_os_family == "Debian"
 
-- name: configure_root_access | updating root passwords
+- name:       configure_root_access | updating root passwords
   mysql_user:
-    name: "root"
-    host: "{{ item }}"
+    name:     root
+    host:     "{{ item }}"
     password: "{{ mysql_root_password }}"
-  become: true
+  become:     true
   with_items: "{{ mysql_allow_root_access_from_hosts }}"
-  when: not ansible_check_mode
+  when:       not ansible_check_mode
 
-- name: configure_root | configuring root my.cnf
+- name:       configure_root | configuring root my.cnf
   template:
-    src: "root/my.cnf.j2"
-    dest: "/root/.my.cnf"
-    owner: "root"
-    group: "root"
-    mode: 0600
-  become: true
-  when: ansible_os_family != "Debian"
+    src:      root/my.cnf.j2
+    dest:     /root/.my.cnf
+    owner:    root
+    group:    root
+    mode:     0600
+  become:     true
+  when:       ansible_os_family != "Debian"

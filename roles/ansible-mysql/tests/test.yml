@@ -1,7 +1,5 @@
 ---
-- hosts: localhost
+- hosts:      localhost
   connection: local
-  become: true
-  remote_user: root
   roles:
     - ansible-mysql

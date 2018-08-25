@@ -14,7 +14,11 @@ $ModLoad imklog   # provides kernel logging support
 #$UDPServerRun 514
 {% elif rsyslog_allow_udp is defined and rsyslog_allow_udp %}
 $ModLoad imudp
+{% if rsyslog_udp_port is defined %}
+$UDPServerRun {{ rsyslog_udp_port }}
+{% else %}
 $UDPServerRun 514
+{% endif %}
 {% endif %}
 
 # provides TCP syslog reception
@@ -23,7 +27,11 @@ $UDPServerRun 514
 #$InputTCPServerRun 514
 {% elif rsyslog_allow_tcp is defined and rsyslog_allow_tcp %}
 $ModLoad imtcp
+{% if rsyslog_tcp_port is defined %}
+$InputTCPServerRun {{ rsyslog_tcp_port }}
+{% else %}
 $InputTCPServerRun 514
+{% endif %}
 {% endif %}
 
 # Enable non-kernel facility klog messages
@@ -33,11 +41,19 @@ $KLogPermitNonKernelFacility on
 #### GLOBAL DIRECTIVES ####
 ###########################
 
+{% if (rsyslog_highprecision is defined and not rsyslog_highprecision) %}
 #
 # Use traditional timestamp format.
 # To enable high precision timestamps, comment out the following line.
 #
 $ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+{% elif rsyslog_highprecision is defined and rsyslog_highprecision %}
+#
+# Use high precision timestamp format.
+# To enable traditional low-precision timestamps, uncomment the following line.
+#
+#$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+{% endif %}
 
 # Filter duplicated messages
 $RepeatedMsgReduction on

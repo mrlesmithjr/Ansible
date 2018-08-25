@@ -9,6 +9,7 @@
       collation_server: 'latin1_swedish_ci'
       character_set_client: 'latin1'
       expire_logs_days: '10'
+      innodb_buffer_pool_size: 125M
       # ON|OFF
       innodb_doublewrite: 'OFF'
       innodb_flush_log_at_timeout: '3'

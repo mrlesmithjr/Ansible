@@ -164,7 +164,7 @@ snort_dynamic_library_rules: []
   #- web-iis.rules
   #- web-misc.rules
 snort_external_net: '!$HOME_NET'  #define external networks..if snort_home_net is any then set this to any
-snort_fedora_package: 'https://www.snort.org/downloads/snort/snort-{{ snort_version }}-1.f21.x86_64.rpm'
+snort_fedora_package: 'https://www.snort.org/downloads/snort/snort-{{ snort_version }}-1.f25.x86_64.rpm'
 snort_fedora_daq_package: 'https://www.snort.org/downloads/snort/daq-{{ snort_daq_version }}-1.f21.x86_64.rpm'
 snort_home_net: 192.168.0.0/16  #define your home_net..if snort_external_net is any then set this to any
 snort_interface: '{{ ansible_default_ipv4.interface }}'  #defines snort interface to listen on
@@ -178,6 +178,13 @@ snort_preproc_rules: []
   #- preprocessor.rules
   #- decoder.rules
   #- sensitive-data.rules
+snort_redhat_prereqs:
+  # libpcap-devel has required libpcap dep anyway
+  - libdnet
+  - libpcap-devel
+  - perl
+  - tcpdump
+  - wget
 snort_redhat_daq_package: 'https://www.snort.org/downloads/snort/daq-{{ snort_daq_version }}-1.centos7.x86_64.rpm'
 snort_redhat_package: 'https://www.snort.org/downloads/snort/snort-{{ snort_version }}-1.centos7.x86_64.rpm'
 snort_redhat_rules:  #defines rules downloaded from emerging threats using oinkmaster
@@ -241,5 +248,5 @@ snort_send_stats: true  #true/false
 snort_src_dir: '/opt/snort_src'  #defines where to download source packages to compile
 snort_startup: boot
 snort_stats_threshold: 1
-snort_version: 2.9.8.2
+snort_version: 2.9.11.1
 snort_whitelist_path: '/etc/snort/rules'

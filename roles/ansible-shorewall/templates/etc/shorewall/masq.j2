@@ -14,5 +14,12 @@
 #INTERFACE:DEST		SOURCE		ADDRESS		PROTO	PORT(S)	IPSEC	MARK	USER/	SWITCH	ORIGINAL
 #											GROUP		DEST
 {% if shorewall_masquerade_info.enabled %}
+{%  if shorewall_masquerade_info.rules is defined %}
+{%    for rule in shorewall_masquerade_info.rules %}
+{{ rule.interface }}  {{ rule.sources|join (',') }}{% if rule.address is defined %}  {{ rule.address }}{% endif %}
+
+{%    endfor %}
+{%  else %}
 {{ shorewall_masquerade_info.interface }}   {{ shorewall_masquerade_info.sources|join (',') }} {% if shorewall_masquerade_info.address is defined %} {{ shorewall_masquerade_info.address }}{% endif %}
+{%  endif %}
 {% endif %}

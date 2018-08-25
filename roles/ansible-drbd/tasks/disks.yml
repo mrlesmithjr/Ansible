@@ -6,3 +6,4 @@
     state: "{{ item['state'] }}"
   become: true
   with_items: "{{ drbd_disks }}"
+  when: drbd_use_parted

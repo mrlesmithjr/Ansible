@@ -1,10 +1,12 @@
 ---
+# Deprecated as phpipam 1.3.1+ has submodules and it will not install those submodules
 - name: config_phpipam | downloading phpipam {{ phpipam_version }}
   get_url:
     url: "{{ phpipam_download }}"
     dest: "/opt/{{ phpipam_download_file }}"
   when: not phpipam_install_from_git
 
+# Deprecated as phpipam 1.3.1+ has submodules and it will not install those submodules
 - name: config_phpipam | extracting phpipam package to {{ web_root }}
   unarchive:
     src: "/opt/{{ phpipam_download_file }}"
@@ -16,6 +18,7 @@
   when: not phpipam_install_from_git
   register: extract_phpipam
 
+# Deprecated as phpipam 1.3.1+ has submodules and it will not install those submodules
 - name: create link to {{ phpipam_root }}-{{ phpipam_version }} on {{ web_root }}
   file:
     state: link
@@ -30,6 +33,7 @@
     dest: "{{ phpipam_root }}"
     version: "{{ phpipam_install_git_version|default ('HEAD') }}"
     depth: 1 # Shallow clone
+    recursive: yes # Required as phpipam 1.3.1+ has submodules
   when: phpipam_install_from_git
 
 - name: config_phpipam | creating phpipam web config

@@ -40,6 +40,7 @@
     owner: kafka
     src: server.properties.j2
   become: true
+  notify: restart kafka
 
 - name: install | Configuring Directory Permissions
   file:

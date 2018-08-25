@@ -12,8 +12,8 @@
 
 - name: ext_pack | Installing Extension Pack
   shell: >
-         VBoxManage extpack install \
-         --replace /opt/{{ virtualbox_ext_pack }} \
-         --accept-license={{ virtualbox_ext_pack_license_agreement }}
+         echo y | VBoxManage extpack install \
+         --replace /opt/{{ virtualbox_ext_pack }}
   become: true
+  # ignore_errors: true
   when: _virtualbox_extpacks_list['stdout'] == 'Extension Packs{{ ':' }} 0'

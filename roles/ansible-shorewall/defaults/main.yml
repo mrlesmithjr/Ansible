@@ -1,112 +1,146 @@
 ---
 # defaults file for ansible-shorewall
-shorewall_config: true
-shorewall_config_options:  # http://shorewall.net/manpages/shorewall.conf.html
-  accounting: 'Yes'  # [Yes|No]
-  ip_forwarding: 'On' # [On|Off|Keep]
-  logformat: 'Shorewall:%s:%s:'  # ["formattemplate"]
-  logfile: '/var/log/syslog'  # [pathname] - Default is /var/log/messages
-  logtagonly: 'No'  # [Yes|No]
-  log_martians: 'Yes' # [Yes|No|Keep]
-  log_verbosity: '2'  # [-1=disabled|0=Silent|1=Major|2=All]
-  multicast: 'No'  # [Yes|No]
-  startup_enabled: 'Yes'  # [Yes|No]
-  startup_log: '/var/log/shorewall-init.log'  # [pathname]
-  verbosity: '2'  # [0=Silent|1=Major|2=All]
-  docker: 'Yes'  # only valid for shorewall5, enables docker support
-  add_snat_aliases: 'No'
+shorewall_config:             true
+
+shorewall_config_options:     # http://shorewall.net/manpages/shorewall.conf.html
+  accounting:                 'Yes'  # [Yes|No]
+  ip_forwarding:              'On'  # [On|Off|Keep]
+  logformat:                  'Shorewall:%s:%s:'  # ["formattemplate"]
+  logfile:                    /var/log/syslog  # [pathname] - Default is /var/log/messages
+  loglevel:                   'info' # One of the syslog levels or NFLOG/ULOG settings, see Shorewall manual about logging
+  logtagonly:                 'No'  # [Yes|No]
+  log_martians:               'Yes'  # [Yes|No|Keep]
+  log_verbosity:              2  # [-1=disabled|0=Silent|1=Major|2=All]
+  multicast:                  'No'  # [Yes|No]
+  startup_enabled:            'Yes'  # [Yes|No]
+  startup_log:                /var/log/shorewall-init.log  # [pathname]
+  verbosity:                  2  # [0=Silent|1=Major|2=All]
+  docker:                     'Yes'  # only valid for shorewall5, enables docker support
+  add_snat_aliases:           'No'
+
+#
+# You can specify extra parameters and variables this way
+#
+#shorewall_params:
+ # LOG: NFLOG
+ # MyIPAddress: 192.168.123.34
 
 shorewall_interfaces:
-  - name: 'eth0'
-    zone: 'net'
+  - name:                     eth0
+    zone:                     net
     options:
-      - 'dhcp'
-      - 'logmartians'
-      - 'nosmurfs'
-      - 'sourceroute=0'
-      - 'tcpflags'
-  - name: 'eth1'
-    zone: 'loc'
+      - dhcp
+      - logmartians
+      - nosmurfs
+      - sourceroute=0
+      - tcpflags
+  - name:                     eth1
+    zone:                     loc
     options:
-      - 'logmartians'
-      - 'nosmurfs'
-      - 'routefilter=2'
-      - 'tcpflags'
+      - logmartians
+      - nosmurfs
+      - routefilter=2
+      - tcpflags
+
 shorewall_main_configuration: true
+
 shorewall_masquerade_info:
-  enabled: true
-  interface: 'eth0'
+  enabled:                    true
+  interface:                  eth0
   sources:
-    - '10.0.0.0/8'
-    - '169.254.0.0/16'
-    - '172.16.0.0/16'
-    - '192.168.0.0/16'
+    - 10.0.0.0/8
+    - 169.254.0.0/16
+    - 172.16.0.0/16
+    - 192.168.0.0/16
+#
+# it's possible to create multiples masquerade rules this way
+#
+#shorewall_masquerade_info:
+#  enabled:                    true
+#  rules:
+#    - interface:                  eth0:0
+#      source:
+#        - 192.168.122.0/24
+#      address:                    10.123.123.250
+#    - interface:                  eth0
+#      sources:
+#        - 10.0.0.0/8
+#        - 169.254.0.0/16
+#        - 172.16.0.0/16
+#        - 192.168.0.0/16
+
 shorewall_policies:
-  - source: '$FW'
-    dest: 'net'
-    policy: 'ACCEPT'
-    log_level: ''
-    limit_burst: ''
-  - source: 'loc'
-    dest: 'net'
-    policy: 'ACCEPT'
-    log_level: ''
-    limit_burst: ''
-  - source: 'net'
-    dest: 'all'
-    policy: 'DROP'
-    log_level: 'info'
-    limit_burst: ''
-  - source: 'all'
-    dest: 'all'
-    policy: 'REJECT'
-    log_level: 'info'
-    limit_burst: ''
+  - source:                   $FW
+    dest:                     net
+    policy:                   ACCEPT
+    log_level:
+    limit_burst:
+  - source:                   loc
+    dest:                     net
+    policy:                   ACCEPT
+    log_level:
+    limit_burst:
+  - source:                   net
+    dest:                     all
+    policy:                   DROP
+    log_level:                info
+    limit_burst:
+  - source:                   all
+    dest:                     all
+    policy:                   REJECT
+    log_level:                info
+    limit_burst:              ''
+
 shorewall_rules:
-  - section: 'NEW'
+  - section:                  NEW
     rules:
-#      - source: '$FW'
-#        dest: 'net'
-#        action: 'ACCEPT'
-#        proto: 'tcp'
-#        dest_ports:
-#          - '53'
-#      - source: '$FW'
-#        dest: 'net'
-#        action: 'ACCEPT'
-#        proto: 'udp'
-#        dest_ports:
-#          - '53'
-      - source: 'loc'
-        dest: '$FW'
-        action: 'ACCEPT'
-        proto: 'tcp'
+      # - source:             $FW
+      #   dest:               net
+      #   action:             ACCEPT
+      #   proto:              tcp
+      #   dest_ports:
+      #     - 53
+      # - source:             $FW
+      #   dest:               net
+      #   action:             ACCEPT
+      #   proto:              udp
+      #   dest_ports:
+      #     - 53
+      - source:               loc
+        dest:                 $FW
+        action:               ACCEPT
+        proto:                tcp
         dest_ports:
-          - '22'
-          - '80'
-          - '443'
-      - source: 'net'
-        dest: 'loc:192.168.202.200'
-        action: 'DNAT'
-        proto: 'tcp'
+          - 22
+          - 80
+          - 443
+      - source:               net
+        dest:                 loc:192.168.202.200
+        action:               DNAT
+        proto:                tcp
         dest_ports:
-          - '80'
-          - '443'
-shorewall_startup: true
-shorewall_version: 4
+          - 80
+          - 443
+
+shorewall_startup:            true
+
+shorewall_immediate_restart:  false
+
+shorewall_version:            4
+
 shorewall_zones:
-  - name: 'fw'
+  - name:                     fw
     in_options:
     options:
     out_options:
-    type: 'firewall'
-  - name: 'net'
+    type:                     firewall
+  - name:                     net
     in_options:
     options:
     out_options:
-    type: 'ipv4'
-  - name: 'loc'
+    type:                     ipv4
+  - name:                     loc
     in_options:
     options:
     out_options:
-    type: 'ipv4'
+    type:                     ipv4

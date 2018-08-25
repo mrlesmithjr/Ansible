@@ -1,6 +1,13 @@
 ---
 # defaults file for ansible-ntp
 # Defines if host is ntp_master
+
+# Defines whether a fallback server should be configured or not
+ntp_enable_fallback_server: false
+
+# Defines an ntp fallback to server use when ntp_enable_fallback_server is true
+ntp_fallback_server: ntp.ubuntu.com
+
 # set ntp_master to true on specific group_vars/group
 ntp_master: false
 

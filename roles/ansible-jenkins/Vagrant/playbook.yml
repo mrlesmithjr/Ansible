@@ -1,36 +1,48 @@
 ---
 - hosts: jenkins
   vars:
+    # Defines if jenkins will be configured from templates or left as default install
     config_jenkins: true
+
     jenkins_config_info:
-      auth_strategy: 'FullControlOnceLoggedInAuthorizationStrategy'
+      # AuthorizationStrategy$Unsecured or FullControlOnceLoggedInAuthorizationStrategy
+      auth_strategy: FullControlOnceLoggedInAuthorizationStrategy
       disable_remember_me: false
+      # Defines if setup wizard is disabled
       disable_setup_wizard: true
       num_executors: 2
-      system_message: 'Welcome to the Jenkins lab'
+      system_message: Welcome to the Jenkins lab
       use_security: false
-    jenkins_fqdn: 'http://192.168.250.10:{{ jenkins_port }}'
+    # Defines if plugins will be managed using Ansible...
     jenkins_manage_plugins: true
+
+    # Defines plugins to install if jenkins_manage_plugins: true
     jenkins_plugins:
-      # - 'active-directory'
-      - 'ansible'
-      - 'build-pipeline-plugin'
-      - 'docker-plugin'
-      - 'git'
-      - 'gitlab-plugin'
-      - 'job-dsl'
-      # - 'ldap'
-      # - 'logstash'
-      # - 'PowerShell'
-      # - 'rundeck'
-      - 'ssh'
-      # - 'travis-yml'
-      - 'vagrant'
-      # - 'vmware-vrealize-automation-plugin'
-      # - 'vmware-vrealize-codestream'
-      # - 'vsphere-cloud'
-      - 'workflow-aggregator'
-    pri_domain_name: 'test.vagrant.local'
+      # - active-directory
+      - ansicolor
+      - ansible
+      - build-pipeline-plugin
+      - git
+      - gitlab-plugin
+      # - job-dsl
+      # - ldap
+      # - logstash
+      - PowerShell
+      # - rundeck
+      - slack
+      - ssh
+      - ssh-credentials
+      - terraform
+      # - travis-yml
+      # - vagrant
+      # - vmware-vrealize-automation-plugin
+      # - vmware-vrealize-codestream
+      - vsphere-cloud
+      - workflow-aggregator
+    jenkins_script_approvals:
+      - method hudson.plugins.git.GitSCM getBranches
+      - method hudson.plugins.git.GitSCM getUserRemoteConfigs
+    pri_domain_name: test.vagrant.local
   roles:
     - role: ansible-jenkins
   tasks:

@@ -15,7 +15,7 @@ Role Variables
 ---
 # defaults file for ansible-plex
 enable_firewall: false
-plex_centos_file: 'plexmediaserver_{{ plex_version }}.x86_64.rpm'
+plex_centos_file: 'plexmediaserver-{{ plex_version }}.x86_64.rpm'
 plex_deb_file: 'plexmediaserver_{{ plex_version }}_amd64.deb'
 plex_deb_url: '{{ plex_dl_url }}/{{ plex_deb_file }}'
 plex_dl_dir: /opt  #define folder/dir to download plex to and install from

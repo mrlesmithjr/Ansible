@@ -14,6 +14,9 @@ k8s_helm_install: true
 k8s_helm_version: 2.8.1
 
 k8s_pod_network_config: "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+# k8s_pod_network_config: https://gist.githubusercontent.com/mrlesmithjr/eab451b45641db6c108ca3f362563621/raw/93569a17d4085975fc2305ae117ce720766174ec/weave-daemonset-2.2.0.yaml
 
 k8s_users:
   - user: pi
+
+k8s_version: 1.11.2

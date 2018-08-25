@@ -222,3 +222,28 @@ sshd_x11_display_offset: '10'
 # Specifies whether X11 forwarding is permitted. The argument must be yes or no.
 # The default is no.
 sshd_x11_forwarding: 'yes'
+
+# Sets the number of client alive messages (see below) which may be sent
+# without sshd receiving any messages back from the client. If this threshold
+# is reached while client alive messages are being sent, sshd will disconnect
+# the client, terminating the session. It is important to note that the use of
+# client alive messages is very different from TCPKeepAlive (below).
+# The client alive messages are sent through the encrypted channel and therefore
+# will not be spoofable. The TCP keepalive option enabled by TCPKeepAlive is spoofable.
+# The client alive mechanism is valuable when the client or server
+# depend on knowing when a connection has become inactive.
+sshd_client_alive_count_max: '3'
+
+# Specifies the maximum number of authentication attempts permitted per connection.
+# Once the number of failures reaches half this value, additional failures are logged.
+# The default is 6.
+sshd_max_auth_tries: '6'
+
+# Specifies the maximum number of open sessions permitted per network connection.
+# The default is 10.
+sshd_max_sessions: '10'
+
+# Specifies whether ssh-agent(1) forwarding is permitted. The default is ''yes''.
+# Note that disabling agent forwarding does not improve security unless users are
+# also denied shell access, as they can always install their own forwarders.
+sshd_allow_agent_forwarding: 'yes'

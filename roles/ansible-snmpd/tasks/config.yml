@@ -8,4 +8,5 @@
     mode: 0644
   notify: "restart snmpd"
   tags:
-    - snmpd_config,snmpd
+    - snmpd_config
+    - snmpd

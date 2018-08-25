@@ -10,20 +10,20 @@
 
 - name: mountsmb | mounting shares
   mount:
-    name: "{{ plex_mount_root }}/{{ item }}"
+    path: "{{ plex_mount_root }}/{{ item }}"
     src: "//{{ plex_smb_server }}/{{ item }}"
     fstype: cifs
     opts: "iocharset=utf8,credentials=/root/.smbcredentials,uid=1000"
     state: mounted
-  with_items: plex_smb_mounts
+  with_items: "{{plex_smb_mounts }}"
   when: plex_smb_mounts is defined and (plex_mount_smb is defined and plex_mount_smb)
 
 - name: mountsmb | unmounting shares
   mount:
-    name: "{{ plex_mount_root }}/{{ item }}"
+    path: "{{ plex_mount_root }}/{{ item }}"
     src: "//{{ plex_smb_server }}/{{ item }}"
     fstype: cifs
     opts: "iocharset=utf8,credentials=/root/.smbcredentials,uid=1000"
     state: absent
-  with_items: plex_smb_mounts
+  with_items: "{{ plex_smb_mounts }}"
   when: plex_smb_mounts is defined and (plex_mount_smb is defined and not plex_mount_smb)

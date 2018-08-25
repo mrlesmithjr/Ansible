@@ -1,0 +1,14 @@
+---
+- name: rhel | Installing DRBD packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items: "{{ drbd_rpm_packages }}"
+
+- name: rhel | Installing Heartbeat Package
+  yum:
+    name: heartbeat
+    state: present
+  become: true
+  when: drbd_use_heartbeat

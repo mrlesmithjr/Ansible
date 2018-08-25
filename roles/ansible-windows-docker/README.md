@@ -30,6 +30,10 @@ An [Ansible](https://www.ansible.com) role to install [Docker](https://www.docke
   roles:
     - role: ansible-windows-docker
       when: ansible_os_family == "Windows"
+  vars:
+    proxy_url: http://www.someproxy.com:80
+    proxy_username: someUsername
+    proxy_password: somePassword
 ```
 
 ## License

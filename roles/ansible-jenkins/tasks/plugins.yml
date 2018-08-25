@@ -1,8 +1,8 @@
 ---
 - name: plugins | Ensuring Jenkins Is Running
   service:
-    name: "jenkins"
-    state: "started"
+    name: jenkins
+    state: started
   become: true
 
 - name: plugins | Waiting For Jenkins To Start
@@ -12,20 +12,20 @@
 
 - name: plugins | Downloading jenkins-cli
   get_url:
-    url: "http://localhost:8080/jnlpJars/jenkins-cli.jar"
+    url: http://localhost:8080/jnlpJars/jenkins-cli.jar
     dest: "{{ jenkins_home_dir }}/jenkins-cli.jar"
-    owner: "jenkins"
-    group: "jenkins"
+    owner: jenkins
+    group: jenkins
   become: true
 
 - name: config_jenkins | Checking If Secure Setup
   stat:
     path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
-  register: "_jenkins_secure_setup_plugins"
+  register: _jenkins_secure_setup_plugins
 
 - name: plugins | Gathering Plugins With Updates Available
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 list-plugins | grep -e ')$' | awk '{ print $1 }'"
-  register: "jenkins_plugin_updates"
+  register: jenkins_plugin_updates
   changed_when: false
   when: >
         not _jenkins_secure_setup_plugins['stat']['exists']
@@ -33,14 +33,14 @@
 - name: plugins | Upgrading Installed Plugins
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 install-plugin {{ item }}"
   notify:
-    - 'restart jenkins'
+    - restart jenkins
   with_items: "{{ jenkins_plugin_updates['stdout_lines'] }}"
   when: >
         not _jenkins_secure_setup_plugins['stat']['exists']
 
 - name: plugins | Gathering Installed Plugins
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 list-plugins | cut -f 1 -d ' '"
-  register: "jenkins_installed_plugins"
+  register: jenkins_installed_plugins
   changed_when: false
   when: >
         not _jenkins_secure_setup_plugins['stat']['exists']
@@ -48,8 +48,8 @@
 - name: plugins | Installing Plugins
   shell: "java -jar {{ jenkins_cli_path }} -s http://localhost:8080 install-plugin {{ item }}"
   notify:
-    - 'restart jenkins'
-  with_items: '{{ jenkins_plugins }}'
+    - restart jenkins
+  with_items: "{{ jenkins_plugins }}"
   when: >
         not _jenkins_secure_setup_plugins['stat']['exists'] and
         item not in jenkins_installed_plugins['stdout_lines']

@@ -2,25 +2,25 @@
 # defaults file for ansible-hashicorp-toolbox
 hashicorp_install_dir: /usr/local/bin/
 
-hashicorp_tools:
-  - name: consul
-    version: 1.0.6
-    state: present
-  - name: nomad
-    version: 0.7.1
-    state: present
-  - name: packer
-    version: 1.2.1
-    state: present
-  - name: terraform
-    version: 0.11.4
-    state: present
-    #Debian package
-  - name: vagrant
-    version: 2.0.3
-    state: present
-  - name: vault
-    version: 0.9.5
-    state: present
+hashicorp_tools: []
+  # - name: consul
+  #   version: 1.2.0
+  #   state: present
+  # - name: nomad
+  #   version: 0.8.4
+  #   state: present
+  # - name: packer
+  #   version: 1.2.4
+  #   state: present
+  # - name: terraform
+  #   version: 0.11.7
+  #   state: present
+  #   #Debian package
+  # - name: vagrant
+  #   version: 2.1.2
+  #   state: present
+  # - name: vault
+  #   version: 0.10.3
+  #   state: present
 
 hashicorp_url: https://releases.hashicorp.com

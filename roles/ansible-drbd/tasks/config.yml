@@ -7,7 +7,6 @@
     group: root
     mode: "u=rw,g=r,o=r"
   become: true
-  when: ansible_os_family == "Debian"
 
 - name: config | Loading DRBD Kernel Module
   modprobe:

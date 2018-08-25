@@ -61,6 +61,33 @@ drbd_interface: enp0s8
 drbd_network_shared_secret: wXE8MqVa
 
 drbd_vip: 192.168.250.100
+
+```
+
+Additional variables include
+
+```
+drbd_use_heartbeat: true
+drbd_use_parted: true
+```
+
+## Platform Specific Notes
+
+Debian Stretch and Ubuntu Xenial contains DRBD in kernel, and supports Heartbeat.  They have the most out of the box support for the defaults.
+
+DRBD packages for CentOS can be built from [linbit](https://www.linbit.com), or from [ELREPO](http://elrepo.org/) repository. These should be included in the `drbd_rpm_packages` list.  See vagrant-box-templates `playbook.yml` examples below.
+
+Heartbeat is available for CentOS6, but not for CentOS7.  Heartbeat is now optional through a toggle `drbd_use_heartbeat`. You will be required to handle reboots and failover by other means. Toggle is `true` by default.
+
+The behaviour of loop disk partitions is has only become more consistent in later linux distributions. To maintain compatibility, the option to toggle off parted `drbd_use_parted` is provided. Toggle is `true` by default.
+
+## Unicast Mode
+
+For platforms supporting Heartbeat, but not multi-cast UDP, we support a toggle for unicast support. Toggle is `false` by default.
+
+```
+drbd_unicast_mode: true
+drbd_unicast_port: 694
 ```
 
 ## Dependencies
@@ -81,6 +108,16 @@ drbd_vip: 192.168.250.100
     - role: ansible-etc-hosts
     - role: ansible-drbd
 ```
+
+## Testing
+
+Testing makes use of [vagrant-box-templates](https://github.com/mrlesmithjr/vagrant-box-templates.git), where the following systems have been tested.
+
+* CentOS6 / CentOS7
+* Debian stretch64
+* Ubuntu xenial64
+
+The `nodes.yml` and `playbook.yml` files have been included as working examples. See the `tests/` directory for further information.
 
 ## License
 

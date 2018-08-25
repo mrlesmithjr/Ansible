@@ -1,0 +1,11 @@
+---
+- name: Install cifs-utils
+  package:
+   name: cifs-utils
+   state: present
+
+- name: CentOS | Installing Plex
+  package:
+    name: "{{ plex_dl_url }}/{{ plex_centos_file }}"
+    state: present
+  tags: [ 'skip-plex-install' ]

@@ -17,10 +17,5 @@
 - name: debian | Installing Plex
   apt:
     deb: "{{ plex_deb_url }}"
-    state: "present"
+    state: present
     force: yes
-
-- name: debian | starting plex
-  service:
-    name: plexmediaserver
-    state: started

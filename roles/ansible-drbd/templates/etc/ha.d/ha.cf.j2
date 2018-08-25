@@ -8,7 +8,16 @@ initdead 60
 
 auto_failback off
 
+{% if drbd_unicast_mode %}
+
+udpport {{ drbd_unicast_port }}
+{% for host in groups[drbd_group] %}
+ucast {{ drbd_interface }} {{ hostvars[host]['ansible_' + drbd_interface]['ipv4']['address'] }}
+{% endfor %}
+
+{% else %}
 bcast {{ drbd_interface }}
+{% endif %}
 
 {% for host in groups[drbd_group] %}
 node {{ hostvars[host]['inventory_hostname_short'] }}

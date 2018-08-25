@@ -16,9 +16,36 @@
   become: true
   when: ansible_distribution != "Fedora"
 
+- name: redhat | Adding Powershell Repo
+  yum_repository:
+    name: packages-microsoft-com-prod
+    description: packages-microsoft-com-prod
+    baseurl: "https://packages.microsoft.com/rhel/7/prod/"
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    gpgcheck: true
+    enabled: true
+  become: true
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing compat-openssl10
+  dnf:
+    name: compat-openssl10
+    state: present
+  become: true
+  when: >
+        ansible_distribution == "Fedora" and
+        ansible_distribution_major_version is version('26', '>=')
+
 - name: redhat | Installing Powershell
   yum:
     name: powershell
     state: present
   become: true
-  when: ansible_distribution != "Fedora"  
+  when: ansible_distribution != "Fedora"
+
+- name: redhat | Installing Powershell
+  dnf:
+    name: powershell
+    state: present
+  become: true
+  when: ansible_distribution == "Fedora"

@@ -1,6 +1,6 @@
 ---
-- name: debian | installing nginx
+- name:    debian | installing nginx
   apt:
-    name: "nginx"
+    name:  nginx
     state: present
-  become: true
+  become:  true

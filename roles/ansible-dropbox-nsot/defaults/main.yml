@@ -1,14 +1,31 @@
 ---
 # defaults file for ansible-dropbox-nsot
-dropbox_nsot_conf_file: '/etc/nsot.conf.py'
+
+dropbox_nsot_conf_file:        /etc/nsot.conf.py
+
 dropbox_nsot_debian_pre_reqs:
-  - 'build-essential'
-  - 'git'
-  - 'libffi-dev'
-  - 'libssl-dev'
-  - 'python-dev'
-dropbox_nsot_host: '0.0.0.0'
-dropbox_nsot_port: 8990
+  - build-essential
+  - git
+  - libffi-dev
+  - libssl-dev
+  - python-dev
+  - python-pip
+
+# The address on which the application will listen.
+# Default:                     localhost
+dropbox_nsot_host:             0.0.0.0
+
+# The port on which the application will be accessed.
+# Default:                     8990
+dropbox_nsot_port:             8990
+
 dropbox_nsot_python_modules:
-  - 'mrproxy'
-  - 'pynsot'
+  - mrproxy
+  - pynsot
+
+# A URL-safe base64-encoded 32-byte key. This must be kept secret. Anyone with
+# this key is able to create and read messages. This key is used for
+# encryption/decryption of sessions and auth tokens. A unique key is randomly
+# generated for you when you utilize ``nsot-server init``
+# https://cryptography.io/en/latest/fernet/#cryptography.fernet.Fernet.generate_key
+dropbox_nsot_secret_key:       u'fMK68NKgazLCjjTXjDtthhoRUS8IV4lwD-9G7iVd2Xs='

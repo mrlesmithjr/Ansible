@@ -1,6 +1,6 @@
 ---
 ansible_pri_interface: ens160
 
-consul_vip: 10.0.102.200
+consul_vip:            10.0.102.200
 
-pri_domain_name: lab.etsbv.internal
+pri_domain_name:       lab.etsbv.internal

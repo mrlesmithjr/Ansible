@@ -29,10 +29,10 @@ netdata_debian_pre_reqs:
   - autogen
   - automake
   - build-essential
+  - cron
   - curl
   - gcc
   - git
-  - iproute
   - libmnl-dev
   - libmnl0
   - libuuid1
@@ -93,6 +93,7 @@ netdata_default_port: 19999
 netdata_redhat_pre_reqs:
   - autoconf
   - automake
+  - cronie
   - curl
   - gcc
   - git
@@ -161,3 +162,46 @@ netdata_updater: ./netdata-updater.sh
 netdata_user_info:
   group: netdata
   user: netdata
+
+# Defines if Netdata should store data in a backend
+netdata_configure_archive: false
+
+# Defines Netdata backend for long term datastorage
+# https://github.com/firehol/netdata/wiki/netdata-backends
+# Defines if the Netdata backend is enabled
+netdata_archive_enabled: 'yes'
+
+# Defines the backend type as one of
+# graphite | opentsdb | json
+netdata_archive_type: 'opentsdb'
+
+# Defines the host(s) and ports netdata should send data to
+netdata_archive_destination:
+  - localhost
+  # - "{{ vip }}:5252"
+
+# Defines how to send the archive data as one of
+# as collected, average, sum
+netdata_archive_data_source: 'average'
+
+# Defines a prefix for the archive data
+netdata_archive_prefix: 'netdata'
+
+# Defines how often to send archive data in seconds
+netdata_archive_update: 1
+
+# Defines the number of update intervals
+# after which dataloss occurs
+netdata_archive_buffer_on_failures: 30
+
+# Defines when to timeout sending to a backend in milliseconds
+netdata_archive_timeout: 20000
+
+# Defines if Netdata sends metric names or UUIDs
+netdata_archive_send_names: true
+
+# Defines the flood protection period
+netdata_errors_flood_protection_period: 1200
+
+# Defines when to trigger flood proctection
+netdata_errors_to_trigger_flood_protection: 200

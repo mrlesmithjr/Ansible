@@ -26,6 +26,18 @@ rabbitmq_listeners: []
   # - '127.0.0.1'
   # - '::1'
 
+rabbitmq_ssl_enable: false
+rabbitmq_ssl_port: 5671
+rabbitmq_ssl_listeners: []
+  # - '127.0.0.1'
+  # - '::1'
+rabitmq_ssl_options: {}
+  # cacertfile: '"/path/to/testca/cacert.pem"'
+  # certfile: '"/path/to/server/cert.pem"'
+  # keyfile: '"/path/to/server/key.pem"'
+  # verify: verify_peer
+  # fail_if_no_peer_cert: "false"
+
 # Defines the inventory host that should be considered master
 rabbitmq_master: []
 

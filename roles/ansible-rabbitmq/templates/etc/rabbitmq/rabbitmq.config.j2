@@ -1,9 +1,25 @@
 [
  {rabbit, [
-{% if rabbitmq_listeners is not defined %}
+{% if rabbitmq_listeners is not defined or (rabbitmq_listeners | length) == 0 %}
    {tcp_listeners, [{{ rabbitmq_listen_port }}]}
 {% elif rabbitmq_listeners is defined %}
    {tcp_listeners, [{% for item in rabbitmq_listeners %}{"{{ item }}", {{ rabbitmq_listen_port }}}{% if not loop.last %}, {% endif %}{% endfor %}]}
+{% endif %}
+{% if rabbitmq_ssl_enable %}
+   ,
+   {num_ssl_acceptors, 10},
+{% if rabbitmq_ssl_listeners is not defined or (rabbitmq_ssl_listeners | length) == 0 %}
+   {ssl_listeners, [{{ rabbitmq_ssl_port }}]},
+{% elif rabbitmq_listeners is defined %}
+   {tcp_listeners, [{% for item in rabbitmq_ssl_listeners %}{"{{ item }}", {{ rabbitmq_ssl_port }}}{% if not loop.last %}, {% endif %}{% endfor %}]},
+{% endif %}
+{% if rabbitmq_ssl_options is defined and (rabbitmq_ssl_options | length ) > 0 %}
+   {ssl_options, [
+{% for key in rabbitmq_ssl_options %}
+        { {{ key }}, {{ rabbitmq_ssl_options[key] }}}{% if not loop.last %}, {% endif %}
+{% endfor %}
+   ]}
+{% endif %}
 {% endif %}
   ]}
 ].

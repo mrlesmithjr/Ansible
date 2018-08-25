@@ -86,7 +86,7 @@ glusterfs_ubuntu_repo_info:
   id: F7C73FCC930AC9F83B387A5613E01B7B3FE869A9
   repo: "deb http://ppa.launchpad.net/gluster/glusterfs-{{ glusterfs_version }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} main "
 
-glusterfs_version: '3.10'
+glusterfs_version: 3.13
 
 # If brick is being created in the root partition, module will fail.
 # Set force to true to override this behaviour.

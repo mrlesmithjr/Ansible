@@ -66,6 +66,8 @@
            -in {{nginx_load_balancer_ssl['csr_key_file'] }}
            -out {{ nginx_load_balancer_ssl['public_key_file'] }}
   become: true
+  tags:
+    - skip_ansible_lint
   when: >
         nginx_load_balancer_ssl['generate_keys'] and
         (not nginx_load_balancer_ha or

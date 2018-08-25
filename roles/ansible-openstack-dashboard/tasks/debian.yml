@@ -3,6 +3,7 @@
 
 - name: debian | Installing openstack-dashboard
   apt:
-    name: "openstack-dashboard"
-    state: "present"
+    name: openstack-dashboard
+    state: present
+    force: true
   become: true

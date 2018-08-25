@@ -1,8 +1,8 @@
 ---
-- name: 'node0'
+- name: node0
   ansible_groups:
-    - 'jenkins'
-  box: 'mrlesmithjr/xenial64'
+    - jenkins
+  box: mrlesmithjr/xenial64
   desktop: false
   # disks:
   #   - size: 10
@@ -20,8 +20,8 @@
   mem: 1024
   provision: true
   vcpu: 1
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
+  port_forwards:
+    - guest: 8080
+      host: 8080
   #   - guest: 443
   #     host: 4433

@@ -141,12 +141,6 @@
   become: true
   when: _gerrit_systemd_service['changed']
 
-- name: install_gerrit | ensuring gerrit service is started and starts on boot
-  service:
-    name: "{{ gerrit_service_name }}"
-    state: started
-    enabled: yes
-
 - name: install_gerrit | installing gerrit plugins
   get_url:
     url: "{{ item.url }}/{{ item.name }}"
@@ -155,11 +149,18 @@
   with_items: '{{ gerrit_plugins }}'
   when: gerrit_install_plugins is defined and gerrit_install_plugins
 
-- name: install_gerrit | validating permissions on gerrit plugins
+- name: install_gerrit | Ensuring Permissions Are Correct For {{ gerrit_site_dir }}
   file:
-    path: "{{ gerrit_site_dir }}/plugins"
+    path: "{{ gerrit_site_dir }}"
+    owner: "{{ gerrit_account_info['name'] }}"
+    group: "{{ gerrit_account_info['group'] }}"
     state: directory
-    recurse: yes
-    owner: "{{ gerrit_account_info.name }}"
-    group: "{{ gerrit_account_info.group }}"
+    recurse: true
+  become: true
   notify: restart gerrit
+
+- name: install_gerrit | ensuring gerrit service is started and starts on boot
+  service:
+    name: "{{ gerrit_service_name }}"
+    state: started
+    enabled: yes

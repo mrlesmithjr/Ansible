@@ -1,0 +1,15 @@
+---
+- hosts: rpi_k8s
+  vars:
+    glusterfs_versions_to_remove:
+      - "3.8"
+      - "3.9"
+      - "3.10"
+  tasks:
+    - name: debian | removing glusterfs apt repo
+      apt_repository:
+        repo: "deb http://download.gluster.org/pub/gluster/glusterfs/{{ item }}/LATEST/Debian/stretch/apt stretch main"
+        state: absent
+      become: true
+      with_items: "{{ glusterfs_versions_to_remove }}"
+      when: ansible_distribution == "Debian"

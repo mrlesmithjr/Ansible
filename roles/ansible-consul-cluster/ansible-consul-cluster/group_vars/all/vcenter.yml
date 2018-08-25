@@ -1,9 +1,9 @@
 ---
 # Defines the vCenter cluster
-vcenter_cluster: LAB-Cluster
+vcenter_cluster:    LAB-Cluster
 
 # Defines the vCenter datacenter
 vcenter_datacenter: LAB
 
 # Define the vCenter IP|hostname
-vcenter_host: 10.0.102.60
+vcenter_host:       10.0.102.60

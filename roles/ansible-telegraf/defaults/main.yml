@@ -69,8 +69,8 @@ telegraf_inputs:
       - devtmpfs
       - tmpfs
     ## Setting mountpoints will restrict the stats to the specified mountpoints
-    mount_points:
-      - /
+    mount_points: []
+      # - /
       # - /var
     ## Define any specific tags you would like
     # tags:

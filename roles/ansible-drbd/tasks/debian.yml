@@ -1,6 +1,14 @@
 ---
-- name: debian | Installing DRBD
+- name: debian | Installing DRBD packages
   apt:
-    name: drbd8-utils
+    name: "{{ item }}"
     state: present
   become: true
+  with_items: "{{ drbd_deb_packages }}"
+
+- name: debian | Installing Heartbeat Package
+  apt:
+    name: heartbeat
+    state: present
+  become: true
+  when: drbd_use_heartbeat

@@ -2112,5 +2112,5 @@ digital_rebar_dl_url: https://github.com/digitalrebar/provision/releases/downloa
 digital_rebar_dl: "{{ digital_rebar_dl_url }}/{{ digital_rebar_version }}/{{ digital_rebar_package }}"
 digital_rebar_install_dir: /usr/local/bin
 digital_rebar_package: dr-provision.zip
-digital_rebar_sha256: 5d86073d835bf3b5bac43ab71aeddea5528c4026832d31a7a702362c5db2ffae
+digital_rebar_sha256: fe338b28ce3b1df4af0b5426bfc0cb395601fff10ca3c6b1886e207a2282be4a
 digital_rebar_version: stable

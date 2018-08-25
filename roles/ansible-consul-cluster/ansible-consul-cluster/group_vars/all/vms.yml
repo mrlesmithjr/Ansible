@@ -1,63 +1,63 @@
 ---
 # Defines the vSphere Virtual PortGroup that the VMs should be configured on.
-vm_network: VSS-VLAN-102
+vm_network:          VSS-VLAN-102
 
 # Defines the vSphere template to use for spinning up VMs
-vm_template: ubuntu1604-packer-template
+vm_template:         ubuntu1604-packer-template
 
 # Defines the VMs which to build
 vms:
-  - name: consul-1
+  - name:            consul-1
     # customization:
     #   dns_servers: "{{ dns_nameservers }}"
-    #   domain: "{{ pri_domain_name }}"
+    #   domain:      "{{ pri_domain_name }}"
     groups:
       - ansible_provisioned
       - consul_cluster
     networks:
-      - name: "{{ vm_network }}"
-        type: dhcp
+      - name:        "{{ vm_network }}"
+        type:        dhcp
         device_type: vmxnet3
         # ip:
         # netmask:
         # gateway:
-    state: present
+    state:           present
     vm_hardware:
-      memory_mb: 1024
-      num_cpus: 1
-  - name: consul-2
+      memory_mb:     1024
+      num_cpus:      1
+  - name:            consul-2
     # customization:
     #   dns_servers: "{{ dns_nameservers }}"
-    #   domain: "{{ pri_domain_name }}"
+    #   domain:      "{{ pri_domain_name }}"
     groups:
       - ansible_provisioned
       - consul_cluster
     networks:
-      - name: "{{ vm_network }}"
-        type: dhcp
+      - name:        "{{ vm_network }}"
+        type:        dhcp
         device_type: vmxnet3
         # ip:
         # netmask:
         # gateway:
-    state: present
+    state:           present
     vm_hardware:
-      memory_mb: 1024
-      num_cpus: 1
-  - name: consul-3
+      memory_mb:     1024
+      num_cpus:      1
+  - name:            consul-3
     # customization:
     #   dns_servers: "{{ dns_nameservers }}"
-    #   domain: "{{ pri_domain_name }}"
+    #   domain:      "{{ pri_domain_name }}"
     groups:
       - ansible_provisioned
       - consul_cluster
     networks:
-      - name: "{{ vm_network }}"
-        type: dhcp
+      - name:        "{{ vm_network }}"
+        type:        dhcp
         device_type: vmxnet3
         # ip:
         # netmask:
         # gateway:
-    state: present
+    state:           present
     vm_hardware:
-      memory_mb: 1024
-      num_cpus: 1
+      memory_mb:     1024
+      num_cpus:      1

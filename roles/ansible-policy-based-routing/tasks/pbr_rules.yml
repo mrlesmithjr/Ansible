@@ -116,7 +116,7 @@
         item.state == "present" and
         (item.source is not defined and
         item.destination is defined) and
-        item.source not in ip_rule_list.results[0].stdout
+        item.destination not in ip_rule_list.results[0].stdout
 
 # We do this to automatically enable rules and not require a reboot or
 # restarting networking
@@ -128,7 +128,7 @@
         item.state == "present" and
         (item.source is defined and
         item.destination is defined) and
-        item.source not in ip_rule_list.results[0].stdout
+        item.source + ' to ' +  item.destination not in ip_rule_list.results[0].stdout
 
 # We do this to automatically enable rules and not require a reboot or
 # restarting networking
@@ -308,4 +308,5 @@
     state: "absent"
   with_items: '{{ policy_based_routing_rules }}'
   when: >
-        item.state == "absent"
+        item.state == "absent" and
+        item.table not in ip_rule_list.results[0].stdout

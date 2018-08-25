@@ -2,3 +2,9 @@
 # defaults file for ansible-windows-dns-server
 
 windows_dns_server_state: present
+
+# Defines if all DNS subfeatures should be installed
+windows_dns_sub_features: no
+
+# Defines if DNS Management tools should be installed
+windows_dns_management_tools: no

@@ -1,71 +1,93 @@
 ---
-- name: shorewall_config | Configuring Shorewall startup
+- name:     shorewall_config | Configuring Shorewall startup
   template:
-    src: "etc/default/shorewall.j2"
-    dest: "/etc/default/shorewall"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    etc/default/shorewall.j2
+    dest:   /etc/default/shorewall
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
   notify:
-    - 'restart shorewall'
+    - restart shorewall
 
-- name: shorewall_config | Configuring Shorewall
+- name:     shorewall_config | Configuring Shorewall
   template:
-    src: "etc/shorewall/shorewallv{{shorewall_version}}.conf.j2"
-    dest: "/etc/shorewall/shorewall.conf"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    "etc/shorewall/shorewallv{{ shorewall_version }}.conf.j2"
+    dest:   /etc/shorewall/shorewall.conf
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
   notify:
-    - 'restart shorewall'
-  when: shorewall_main_configuration
+    - restart shorewall
+  when:     shorewall_main_configuration
 
-- name: shorewall_config | Configuring Shorewall interfaces
+- name: shorewall_config | Configuring Shorewall extra parameters and variables
   template:
-    src: "etc/shorewall/interfaces.j2"
-    dest: "/etc/shorewall/interfaces"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    etc/shorewall/params.j2
+    dest:   /etc/shorewall/params
+    owner:  root
+    group:  root
+    mode:   0640
+  become: true
   notify:
-    - 'restart shorewall'
+    - restart shorewall
 
-- name: shorewall_config | Configuring Shorewall zones
+- name:     shorewall_config | Configuring Shorewall interfaces
   template:
-    src: "etc/shorewall/zones.j2"
-    dest: "/etc/shorewall/zones"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    etc/shorewall/interfaces.j2
+    dest:   /etc/shorewall/interfaces
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
   notify:
-    - 'restart shorewall'
+    - restart shorewall
 
-- name: shorewall_config | Configuring Shorewall policies
+- name:     shorewall_config | Configuring Shorewall zones
   template:
-    src: "etc/shorewall/policy.j2"
-    dest: "/etc/shorewall/policy"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    etc/shorewall/zones.j2
+    dest:   /etc/shorewall/zones
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
   notify:
-    - 'restart shorewall'
+    - restart shorewall
 
-- name: shorewall_config | Configuring Shorewall rules
+- name:     shorewall_config | Configuring Shorewall policies
   template:
-    src: "etc/shorewall/rules.j2"
-    dest: "/etc/shorewall/rules"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    etc/shorewall/policy.j2
+    dest:   /etc/shorewall/policy
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
   notify:
-    - 'restart shorewall'
+    - restart shorewall
 
-- name: shorewall_config | Configuring Shorewall masquerading
+- name:     shorewall_config | Configuring Shorewall rules
   template:
-    src: "etc/shorewall/masq.j2"
-    dest: "/etc/shorewall/masq"
-    owner: "root"
-    group: "root"
-    mode: 0640
+    src:    etc/shorewall/rules.j2
+    dest:   /etc/shorewall/rules
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
   notify:
-    - 'restart shorewall'
+    - restart shorewall
+
+- name:     shorewall_config | Configuring Shorewall masquerading
+  template:
+    src:    etc/shorewall/masq.j2
+    dest:   /etc/shorewall/masq
+    owner:  root
+    group:  root
+    mode:   0640
+  become:   true
+  notify:
+    - restart shorewall
+
+- meta:     flush_handlers
+  become:   true
+  when:     shorewall_immediate_restart

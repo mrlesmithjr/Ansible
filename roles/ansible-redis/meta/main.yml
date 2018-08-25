@@ -1,33 +1,38 @@
 ---
 galaxy_info:
-  author: Larry Smith Jr.
-  description: An Ansible role to install Redis
+  author:              Larry Smith Jr.
+  description:         An Ansible role to install Redis
 
-  license: MIT
+  license:             MIT
   min_ansible_version: 1.2
 
   platforms:
-  - name: EL
+  - name:              EL
     versions:
     - 6
     - 7
-  - name: Fedora
+  - name:              Fedora
     versions:
     - 22
     - 23
-  - name: Ubuntu
+    - 24
+    - 25
+    - 26
+  - name:              Ubuntu
     versions:
+    - bionic
     - precise
     - trusty
     - vivid
     - wily
     - xenial
-  - name: Debian
+  - name:              Debian
     versions:
     - jessie
+    - stretch
     - wheezy
 
   categories:
   - database
   - database:nosql
-dependencies: []
+dependencies:          []

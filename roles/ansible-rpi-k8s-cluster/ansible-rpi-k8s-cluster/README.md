@@ -26,6 +26,7 @@
       - [Gotchas](#gotchas)
         - [sshpass error](#sshpass-error)
         - [SSH Key Missing](#ssh-key-missing)
+        - [Fixing Broken GlusterFS Repo](#fixing-broken-glusterfs-repo)
     - [Managing WI-FI On First Node](#managing-wi-fi-on-first-node)
   - [Routing](#routing)
     - [Adding Static Route On macOS](#adding-static-route-on-macos)
@@ -423,6 +424,12 @@ The key's randomart image is:
 |      o.B@==.oo  |
 +----[SHA256]-----+
 ```
+
+##### Fixing Broken GlusterFS Repo
+If you experience the following [issue](https://github.com/mrlesmithjr/ansible-rpi-k8s-cluster/issues/7) you can
+run the playbook [fix_glusterfs_repo.yml](playbooks/fix_glusterfs_repo.yml) which
+will remove the broken `3.10` repo. Once that is done you should be good to go
+and be able to run [deploy.yml](playbooks/deploy.yml) once again.
 
 ### Managing WI-FI On First Node
 

@@ -1,10 +1,4 @@
 ---
-- name: heartbeat | Installing Heartbeat Package
-  apt:
-    name: heartbeat
-    state: present
-  become: true
-
 - name: heartbeat | Checking For Existing Heartbeat Authkey
   stat:
     path: /etc/ha.d/authkeys

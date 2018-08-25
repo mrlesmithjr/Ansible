@@ -8,7 +8,16 @@ After=network-online.target
 User={{ prometheus_node_exporter_user_info['user'] }}
 Restart=on-failure
 ExecStart={{ prometheus_node_exporter_install_dir }}/node_exporter/node_exporter \
-          -web.listen-address ":{{ prometheus_node_exporter_listen_port }}"
+  {% for collector in prometheus_node_exporter_enabled_collectors %}
+    --collector.{{ collector }} \
+  {% endfor %}
+  {% for collector in prometheus_node_exporter_disabled_collectors %}
+    --no-collector.{{ collector }} \
+  {% endfor %}
+  {% if prometheus_node_exporter_collector_textfile_directory != None %}
+    --collector.textfile.directory "{{ prometheus_node_exporter_collector_textfile_directory }}" \
+  {% endif %}
+    --web.listen-address ":{{ prometheus_node_exporter_listen_port }}"
 
 [Install]
 WantedBy=multi-user.target

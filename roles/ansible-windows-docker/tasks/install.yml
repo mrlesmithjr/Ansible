@@ -3,3 +3,6 @@
   win_chocolatey:
     name: "docker"
     state: "present"
+    proxy_url: "{{ proxy_url |  default('') }}"
+    proxy_username: "{{ proxy_username |  default('') }}"
+    proxy_password: "{{ proxy_password |  default('') }}"

@@ -27,8 +27,10 @@ server 2.ubuntu.pool.ntp.org
 server 3.ubuntu.pool.ntp.org
 {%   endif %}
 {% endif %}
-# Use Ubuntu's ntp server as a fallback.
-server ntp.ubuntu.com
+{% if ntp_enable_fallback_server %}
+# The following is added as a fallback server
+server {{ ntp_fallback_server }}
+{% endif %}
 restrict -4 default kod notrap nomodify nopeer noquery
 restrict -6 default kod notrap nomodify nopeer noquery
 restrict 127.0.0.1

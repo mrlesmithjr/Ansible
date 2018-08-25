@@ -1,40 +1,40 @@
 ---
-haproxy_config: true
+haproxy_config:                true
 
 haproxy_configs:
-  - name: consul-8500
-    backend_backups: false
-    backend_backups_primary: node1
-    backend_checks: true
-    backend_name: consul-servers
+  - name:                      consul-8500
+    backend_backups:           false
+    backend_backups_primary:   node1
+    backend_checks:            true
+    backend_name:              consul-servers
     backend_servers_bind_port: 8500
-    backend_servers: "{{ groups['consul_cluster'] }}"
-    balance: roundrobin
+    backend_servers:           "{{ groups['consul_cluster'] }}"
+    balance:                   roundrobin
     default_server_options:
-      - name: maxconn
-        value: 256
-      - name: maxqueue
-        value: 128
-      - name: weight
-        value: 100
-    enabled: true
-    frontend_bind_address: "{{ haproxy_lb_vip }}"
-    frontend_bind_port: 8500
-    frontend_name: consul-in
-    # frontend_ssl: false
-    # frontend_ssl_cert: "{{ haproxy_load_balancer_ssl['bundled_cert'] }}"
-    mode: http
+      - name:                  maxconn
+        value:                 256
+      - name:                  maxqueue
+        value:                 128
+      - name:                  weight
+        value:                 100
+    enabled:                   true
+    frontend_bind_address:     "{{ haproxy_lb_vip }}"
+    frontend_bind_port:        8500
+    frontend_name:             consul-in
+    # frontend_ssl:            false
+    # frontend_ssl_cert:       "{{ haproxy_load_balancer_ssl['bundled_cert'] }}"
+    mode:                      http
     options:
       # - tcplog
       - httplog
       - httpchk
-    stickiness: false
+    stickiness:                false
     # tcp_checks:
     #   - connect
     #   - send PING\r\n
 
-haproxy_lb_vip: "{{ consul_vip }}"
+haproxy_lb_vip:                "{{ consul_vip }}"
 
-haproxy_pri_domain_name: "{{ pri_domain_name }}"
+haproxy_pri_domain_name:       "{{ pri_domain_name }}"
 
-haproxy_version: 1.8
+haproxy_version:               1.8

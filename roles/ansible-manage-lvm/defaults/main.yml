@@ -14,6 +14,8 @@ lvm_groups: []
   #       # Define size of lvol
   #       # 100%FREE, 10g, 1024 (megabytes by default)
   #       size: 5g
+  #       # Defines additional lvcreate options (e.g. stripes, stripesize, etc)
+  #       opts: ''
   #       # Defines if lvol should exist or be removed
   #       # true or false
   #       create: true
@@ -23,6 +25,8 @@ lvm_groups: []
   #       mount: false
   #       # Defines mountpoint for lvol
   #       mntp: []
+  #       # Defines additional mount options (e.g. noatime, noexec, etc)
+  #       mopts: ''
   #     - lvname: root
   #       size: 40g
   #       create: true

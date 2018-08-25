@@ -4,3 +4,13 @@
     deb: "{{ virtualbox_dl_url }}/{{ virtualbox_debian_package }}"
     state: "present"
   become: true
+  when: ansible_distribution != "Linux Mint"
+
+- name: debian | Installing Virtualbox
+  apt:
+    deb: "{{ virtualbox_dl_url }}/virtualbox-{{ virtualbox_major_ver }}_{{ virtualbox_minor_ver }}-{{ virtualbox_build_ver }}~Ubuntu~bionic_amd64.deb"
+    state: "present"
+  become: true
+  when: >
+        ansible_distribution == "Linux Mint" and
+        ansible_distribution_major_version == "19"

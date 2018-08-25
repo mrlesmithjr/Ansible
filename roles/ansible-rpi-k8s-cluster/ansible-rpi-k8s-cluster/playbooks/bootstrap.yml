@@ -236,7 +236,7 @@
     #   delay: 2
     #   with_items: "{{ groups['rpi_k8s_slaves'] }}"
 
-- hosts: rpi_k8s_slaves
+- hosts: rpi_k8s
   any_errors_fatal: true
   tasks:
     - name: Updating /etc/hosts

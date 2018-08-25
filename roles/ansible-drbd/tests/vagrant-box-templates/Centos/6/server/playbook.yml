@@ -1,0 +1,90 @@
+---
+- hosts: test_nodes
+  vars:
+    pri_domain_name: test.vagrant.local
+    drbd_disks:
+      - device: /dev/drbd0
+        disk: /dev/loop1
+        meta_disk: /dev/loop0
+        filesystem: ext4
+        partitions: 1
+        mountpoint: /opt/nfs
+        resource: r0
+        state: present
+        use_partition: /dev/loop1
+    drbd_interface: eth1
+    drbd_use_heartbeat: true
+    drbd_use_parted: false
+    drbd_vip: ""
+    losetup:
+      - name: disk0
+        device: /dev/loop0
+        image: /var/disk0.img
+        mode: "0600"
+        owner: root
+        group: root
+        size: 128m
+      - name: disk1
+        device: /dev/loop1
+        image: /var/disk1.img
+        mode: "0600"
+        owner: root
+        group: root
+        size: 2g
+  pre_tasks:
+    - name: python 2.6 SNI support | install pip and required devel packages
+      yum: >
+        pkg={{item}}
+        state=installed
+      with_items:
+        - python-pip
+        - python-devel
+        - libffi-devel
+        - openssl-devel
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == "6"
+    - name: python 2.6 SNI support | install modules
+      pip: >
+        name={{item}}
+        state=present
+      with_items:
+        - urllib3
+        - pyopenssl
+        - ndg-httpsclient
+        - pyasn1
+      become: true
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == "6"
+    - name: elrepo | yum-plugin-fastestmirror installed
+      yum:
+        name: yum-plugin-fastestmirror
+        state: present
+      when:
+        - ansible_os_family == "RedHat"
+    - name: elrepo | GPG key imported
+      rpm_key:
+        key: http://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+        state: present
+      become: true
+      when:
+        - ansible_os_family == "RedHat"
+    - name: elrepo | package installed (CentOS 6 ver)
+      yum:
+        name: http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == "6"
+      become: true
+    - name: elrepo | package installed (CentOS 7 ver)
+      yum:
+        name: http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution_major_version == "7"
+      become: true
+  roles:
+    - role: rooprob.loopdev
+    - role: mrlesmithjr.drbd
+  tasks:

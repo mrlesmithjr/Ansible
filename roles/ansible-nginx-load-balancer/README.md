@@ -26,6 +26,10 @@
 
 An [Ansible](https://www.ansible.com) role to install/configure an [NGINX](https://nginx.org) load balancer for HTTP/HTTPS/TCP/UDP
 
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-nginx-load-balancer.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-nginx-load-balancer)
+
 ## Requirements
 
 None

@@ -2,7 +2,7 @@
 # defaults file for ansible-mysql
 
 # Defines if mysql should listen on loopback (default) or allow remove connections
-mysql_allow_remote_connections: false
+mysql_allow_remote_connections:     false
 
 # Defines hosts where root can login from
 mysql_allow_root_access_from_hosts:
@@ -13,101 +13,104 @@ mysql_allow_root_access_from_hosts:
 #  - "%"
 
 # Defines if replication should be configured
-mysql_config_replication: false
+mysql_config_replication:           false
 
 # Defines if mysqlchk scripts should be configured for load balancer monitoring
-mysql_config_mysqlchk: false
+mysql_config_mysqlchk:              false
 
 # Defines database users to manage. Under privs you may define specific db
 # permissions for the user.
-mysql_db_users: []
-  # - name: test-user
-  #   password: testpass
-  #   state: present
+mysql_db_users:                     []
+  # - name:                         test-user
+  #   password:                     testpass
+  #   state:                        present
   #   privs:
-  #     - db: test-db
-  #       append_privs: true
-  #       host: localhost
-  #       table: "*"
-  #       priv: ALL
-  #     - db: test-db
-  #       append_privs: true
-  #       host: 127.0.0.1
-  #       table: "*"
-  #       priv: ALL
-  #     - db: test-db
-  #       append_privs: true
-  #       host: "%"
-  #       table: "*"
-  #       priv: ALL
+  #     - db:                       test-db
+  #       append_privs:             true
+  #       host:                     localhost
+  #       table:                    "*"
+  #       priv:                     ALL
+  #     - db:                       test-db
+  #       append_privs:             true
+  #       host:                     127.0.0.1
+  #       table:                    "*"
+  #       priv:                     ALL
+  #     - db:                       test-db
+  #       append_privs:             true
+  #       host:                     "%"
+  #       table:                    "*"
+  #       priv:                     ALL
 
 # Defines databases to manage
-mysql_dbs: []
-  # - name: test-db
-  #   state: present
+mysql_dbs:                          []
+  # - name:                         test-db
+  #   state:                        present
 
 # Defines debian db password
 # generate using echo password | mkpasswd -s -m sha-512
-mysql_deb_db_password: "{{ mysql_root_password }}"
+mysql_deb_db_password:              "{{ mysql_root_password }}"
 
 # Defines the percentage of memory to use for memory calculations.
-mysql_mem_multiplier: .25
+mysql_mem_multiplier:               .25
 
 # Defines the port for mysql to listen on
-mysql_port: 3306
+mysql_port:                         3306
 
 mysql_replication_account_info:
-  user: replicator
-  password: mysqlreplication
+  user:                             replicator
+  password:                         mysqlreplication
+
 mysql_replication_dbs:
   - test1
   - test2
-mysql_replication_master_node: node0
+
+mysql_replication_master_node:      node0
+
 mysql_replication_nodes:
-  - name: node0
-    role: master
-    server_id: 1
-  - name: node1
-    role: slave
-    server_id: 2
+  - name:                           node0
+    role:                           master
+    server_id:                      1
+  - name:                           node1
+    role:                           slave
+    server_id:                      2
 
 # Defines mysql root password
 # generate using echo password | mkpasswd -s -m sha-512
-mysql_root_password: root
+mysql_root_password:                root
 
 mysql_settings:
-  collation_server: latin1_swedish_ci
-  character_set_client: latin1
-  expire_logs_days: 10
+  collation_server:                 latin1_swedish_ci
+  character_set_client:             latin1
+  expire_logs_days:                 10
   # ON|OFF
-  innodb_buffer_pool_size: 128M
-  innodb_doublewrite: "ON"
-  innodb_flush_log_at_timeout: 1
-  innodb_read_io_threads: 4
-  innodb_write_io_threads: 4
-  join_buffer_size: 1M
+  innodb_buffer_pool_size:          128M
+  innodb_doublewrite:               "ON"
+  innodb_flush_log_at_timeout:      1
+  innodb_read_io_threads:           4
+  innodb_write_io_threads:          4
+  join_buffer_size:                 1M
   #Default is 16M
-  key_buffer_size: "{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M"
-  max_allowed_packet: 16M
-  max_binlog_size: 100M
-  max_connections: 150
-  max_heap_table_size: 16M
-  query_cache_limit: 1M
-  query_cache_size: 16M
-  thread_cache_size: 8
-  thread_stack: 192K
-  tmp_table_size: 16M
+  key_buffer_size:                  "{{ (ansible_memtotal_mb | int * mysql_mem_multiplier) | round | int }}M"
+  max_allowed_packet:               16M
+  max_binlog_size:                  100M
+  max_connections:                  150
+  max_heap_table_size:              16M
+  query_cache_limit:                1M
+  query_cache_size:                 16M
+  thread_cache_size:                8
+  thread_stack:                     192K
+  tmp_table_size:                   16M
 
 # Defines the host to run mysqlchk against...usually localhost
-mysql_mysqlchk_host: 127.0.0.1
+mysql_mysqlchk_host:                127.0.0.1
 
 # Defines mysqlchk options to pass
-mysql_mysqlchk_opts: "-N -q -A"
+mysql_mysqlchk_opts:                "-N -q -A"
 
 # Defines mysqlchk user
-mysql_mysqlchk_user: cmon
+mysql_mysqlchk_user:                cmon
 
 # Defines mysqlchk user password
-mysql_mysqlchk_pass: cmon
+mysql_mysqlchk_pass:                cmon
 
-mysql_pri_domain_name: example.org
+mysql_pri_domain_name:              example.org

@@ -9,7 +9,7 @@
     regexp: "^{{ jenkins_java_options }}="
     line: "{{ jenkins_java_options }}=\"-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false\""
   become: true
-  register: "jenkins_setup_wizard_disabled"
+  register: jenkins_setup_wizard_disabled
   when: jenkins_config_info['disable_setup_wizard']
 
 - name: config_jenkins | Enabling Jenkins Setup Wizard
@@ -18,13 +18,13 @@
     regexp: "^{{ jenkins_java_options }}="
     line: "{{ jenkins_java_options }}=\"-Djava.awt.headless=true\""
   become: true
-  register: "jenkins_setup_wizard_enabled"
+  register: jenkins_setup_wizard_enabled
   when: not jenkins_config_info['disable_setup_wizard']
 
 - name: config_jenkins | Restarting Jenkins (Setup Wizard Disabled)
   service:
-    name: "jenkins"
-    state: "restarted"
+    name: jenkins
+    state: restarted
   become: true
   when: >
         jenkins_setup_wizard_disabled['changed'] or
@@ -34,22 +34,31 @@
   template:
     src: "{{ item }}.j2"
     dest: "{{ jenkins_home_dir }}/{{ item }}"
-    owner: "jenkins"
-    group: "jenkins"
+    owner: jenkins
+    group: jenkins
   become: true
   notify:
-    - 'restart jenkins'
-  with_items: '{{ jenkins_config_files }}'
+    - restart jenkins
+  with_items: "{{ jenkins_config_files }}"
+
+- name: config_jenkins | Disabling Secure Setup
+  file:
+    path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
+    state: absent
+  become: true
+  when: >
+        (jenkins_config_info['use_security'] is defined and
+        not jenkins_config_info['use_security'])
 
 - name: config_jenkins | Checking If Secure Setup
   stat:
     path: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
-  register: "_jenkins_secure_setup_config"
+  register: _jenkins_secure_setup_config
 
 - name: config_jenkins | Marking As Secure Setup
   file:
     dest: "{{ jenkins_home_dir }}/.jenkins_secure_setup"
-    state: "touch"
+    state: touch
   become: true
   when: >
         not _jenkins_secure_setup_config['stat']['exists'] and

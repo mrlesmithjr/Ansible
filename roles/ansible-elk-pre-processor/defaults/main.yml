@@ -2,26 +2,26 @@
 # defaults file for ansible-elk-pre-processor
 
 # Defines if logstash_config_dir should be cleared out
-clear_logstash_config: false
+clear_logstash_config:    false
 
 # Defines if logstash should be configured
-config_logstash: true
+config_logstash:          true
 
 # define your VMware ESXi naming standards if used
 # this should be set to host pattern
 # example - esxi01.everythingshouldbevirtual.local - define as esxi
-esxinaming: []
+esxinaming:               []
   # - esxi
 
 # define your Hadoop naming standards if used
 # this should be set to host pattern
 # example - hd01.everythingshouldbevirtual.local - define as hd
-hadoopnaming: []
+hadoopnaming:             []
   # - hd
 
-logstash_config_dir: /etc/logstash/conf.d
+logstash_config_dir:      /etc/logstash/conf.d
 
-logstash_log_dir: /var/log/logstash
+logstash_log_dir:         /var/log/logstash
 
 # define configs to load
 # either comment out the ones to not load or move them to logstash_configs_remove
@@ -30,6 +30,7 @@ logstash_configs:
   - 001_filters
   - 200_filters_syslog
   # - 210_filters_pfsense
+  # - 211_filters_edgeos
   # - 220_filters_esxi
   # - 230_filters_vcenter
   # - 240_filters_quagga
@@ -46,23 +47,26 @@ logstash_configs_remove:
 # Define ESXi, Hadoop, vCenter, Netscaler and etc type specific
 # replaces old naming methods.
 # Uses DNS naming to define.
-logstash_custom_tagging: []
-  # - tag: ESXi
+logstash_custom_tagging:  []
+  # - tag:                ESXi
   #   naming:
   #     - esxi
   #     - ESXi
-  # - tag: Hadoop
+  # - tag:                Hadoop
   #   naming:
   #     - hd-prod
   #     - hd-dev
-  # - tag: NSX
+  # - tag:                NSX
   #   naming:
   #     - nsx-rt
   #     - vShield-edge
-  # - tag: PFSense
+  # - tag:                PFSense
   #   naming:
   #     - pfsense
-  # - tag: vCenter
+  # - tag:                EdgeOS
+  #   naming:
+  #     - ubnt
+  # - tag:                vCenter
   #   naming:
   #     - vcsa
   #     - atl-vc
@@ -71,101 +75,101 @@ logstash_custom_tagging: []
 # defines if a custom elasticsearch template for logstash is desired.
 logstash_custom_template: false
 
-logstash_file_inputs: []
-  # - path: /var/log/nginx/access.log
-  #   type: nginx-access
-  # - path: /var/log/nginx/error.log
-  #   type: nginx-error
-  # - path: /var/log/mail.log
-  #   type: postfix-log
-  # - path: /var/log/redis/redis-server.log
-  #   type: redis-server
+logstash_file_inputs:     []
+  # - path:               /var/log/nginx/access.log
+  #   type:               nginx-access
+  # - path:               /var/log/nginx/error.log
+  #   type:               nginx-error
+  # - path:               /var/log/mail.log
+  #   type:               postfix-log
+  # - path:               /var/log/redis/redis-server.log
+  #   type:               redis-server
 
-logstash_grok_patterns: []
+logstash_grok_patterns:   []
   # - IPTABLES
   # - NGINXERROR
 
 logstash_inputs:
-  - prot: tcp
+  - prot:                 tcp
     # Gets around port < 1024 (Note...Configure clients to send
     # to 10514 instead of default 514)
-    port: 10514
-    type: syslog
-  - prot: udp
+    port:                 10514
+    type:                 syslog
+  - prot:                 udp
     # Gets around port < 1024 (Note...Configure clients to send to 10514
     # instead of default 514)
-    port: 10514
-    type: syslog
-  # - type: beats
-  #   port: 5044
-  # - type: redis
-  #   batch_count: 1000
-  #   host: "{{ logstash_server_fqdn }}"
-  #   threads: 2
-  # - type: syslog
+    port:                 10514
+    type:                 syslog
+  # - type:               beats
+  #   port:               5044
+  # - type:               redis
+  #   batch_count:        1000
+  #   host:               "{{ logstash_server_fqdn }}"
+  #   threads:            2
+  # - type:               syslog
   #   # reminder....ports < 1024 require root access..
-  #   port: 514
-  # - prot: tcp
-  #   port: 1514
-  #   type: VMware
-  # - prot: tcp
-  #   port: 1515
-  #   type: vCenter
-  # - prot: tcp
-  #   port: 1517
-  #   type: Netscaler
-  # - prot: tcp
-  #   port: 28778
-  #   type: elasticsearch-curator
-  # - prot: tcp
-  #   codec: json
-  #   port: 3515
-  #   type: eventlog
-  # - prot: tcp
-  #   codec: json_lines
-  #   port: 3525
-  #   type: iis
-  # - prot: tcp
-  #   codec: json
-  #   port: '{{ rundeck_logstash_port }}'
-  #   type: rundeck
+  #   port:               514
+  # - prot:               tcp
+  #   port:               1514
+  #   type:               VMware
+  # - prot:               tcp
+  #   port:               1515
+  #   type:               vCenter
+  # - prot:               tcp
+  #   port:               1517
+  #   type:               Netscaler
+  # - prot:               tcp
+  #   port:               28778
+  #   type:               elasticsearch-curator
+  # - prot:               tcp
+  #   codec:              json
+  #   port:               3515
+  #   type:               eventlog
+  # - prot:               tcp
+  #   codec:              json_lines
+  #   port:               3525
+  #   type:               iis
+  # - prot:               tcp
+  #   codec:              json
+  #   port:               '{{ rundeck_logstash_port }}'
+  #   type:               rundeck
 
 # Define major version installed (2.x|5.x)
-logstash_major_ver: 5.x
+logstash_major_ver:       5.x
 
 logstash_outputs:
-  - output: redis
-    host: 192.168.250.100
-  # - output: rabbitmq
-  #   exchange: logstash
-  #   exchange_type: direct
-  #   host: 192.168.250.100
-  #   user: logstash
-  #   password: logstash
+  - output:               redis
+    host:                 192.168.250.100
+  # - output:             rabbitmq
+  #   exchange:           logstash
+  #   exchange_type:      direct
+  #   host:               192.168.250.100
+  #   user:               logstash
+  #   password:           logstash
 
 # define your Citrix Netscaler naming standards if used
 # this should be set to host pattern
 # example - nsvpx01.everythingshouldbevirtual.local - define as nsvpx
-netscalernaming: []
+netscalernaming:          []
 #  - nsvpx
 
 # define your VMware NSX naming standards if used
 # this should be set to host pattern
 # example - nsx-rt01.everythingshouldbevirtual.local - define as nsx-rt
-nsxnaming: []
+nsxnaming:                []
   # - vShield-edge
   # - nsx-rt
 
 # define your PFSense firewall naming standards if used
 # this should be set to host pattern
 # example - pfsense01.everythingshouldbevirtual.local - define as pfsense
-pfsensenaming: []
+pfsensenaming:            []
   # - pfsense
 
-reset_logstash_config: false
+reset_logstash_config:    false
 
-rundeck_logstash_port: 9700
+rundeck_logstash_port:    9700
 
 # defines vcenter version
 # options- windows_5, windows_6, vcsa_5 or vcsa_6
-vcenter_version: vcsa_6
+vcenter_version:          vcsa_6

@@ -1,22 +1,22 @@
 ---
 # handlers file for ansible-mysql
-- name: "restart mariadb"
+- name:    restart mariadb
   service:
-    name: "mariadb"
-    state: "restarted"
-  become: true
-  when: not ansible_check_mode
+    name:  mariadb
+    state: restarted
+  become:  true
+  when:    not ansible_check_mode
 
-- name: "restart mysql"
+- name:    restart mysql
   service:
-    name: "mysql"
-    state: "restarted"
-  become: true
-  when: not ansible_check_mode
+    name:  mysql
+    state: restarted
+  become:  true
+  when:    not ansible_check_mode
 
-- name: "reload mysql"
+- name:    reload mysql
   service:
-    name: "mysql"
-    state: "reloaded"
-  become: true
-  when: not ansible_check_mode
+    name:  mysql
+    state: reloaded
+  become:  true
+  when:    not ansible_check_mode

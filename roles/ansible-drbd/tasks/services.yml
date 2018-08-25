@@ -10,3 +10,4 @@
     name: heartbeat
     enabled: true
   become: true
+  when: drbd_use_heartbeat

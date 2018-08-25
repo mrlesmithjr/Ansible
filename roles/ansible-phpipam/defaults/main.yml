@@ -28,6 +28,7 @@ phpipam_db_user: phpipam
 # Defines if cron jobs for scanning and etc. should be defined.
 phpipam_define_cron_jobs: false
 
+# Deprecated as phpipam 1.3.1+ has submodules and it will not install those submodules
 phpipam_download: 'https://github.com/phpipam/phpipam/archive/{{ phpipam_download_file }}'
 phpipam_download_file: '{{ phpipam_version }}.tar.gz'
 

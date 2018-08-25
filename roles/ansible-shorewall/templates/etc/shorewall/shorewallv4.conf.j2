@@ -39,19 +39,19 @@ LOGTAGONLY={{ shorewall_config_options.logtagonly }}
 
 LOGLIMIT=
 
-MACLIST_LOG_LEVEL=info
+MACLIST_LOG_LEVEL={{ shorewall_config_options.loglevel|default('info') }}
 
 RELATED_LOG_LEVEL=
 
-RPFILTER_LOG_LEVEL=info
+RPFILTER_LOG_LEVEL={{ shorewall_config_options.loglevel|default('info') }}
 
-SFILTER_LOG_LEVEL=info
+SFILTER_LOG_LEVEL={{ shorewall_config_options.loglevel|default('info') }}
 
-SMURF_LOG_LEVEL=info
+SMURF_LOG_LEVEL={{ shorewall_config_options.loglevel|default('info') }}
 
 STARTUP_LOG={{ shorewall_config_options.startup_log }}
 
-TCP_FLAGS_LOG_LEVEL=info
+TCP_FLAGS_LOG_LEVEL={{ shorewall_config_options.loglevel|default('info') }}
 
 UNTRACKED_LOG_LEVEL=
 

@@ -1,5 +1,6 @@
 ---
-- name: debian | Installing Shorewall
+- name:    debian | Installing Shorewall
   apt:
-    name: "shorewall"
-    state: "present"
+    name:  shorewall
+    state: present
+  become:  true

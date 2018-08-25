@@ -7,7 +7,7 @@
       - 'libffi-dev'
       - 'openssl-dev'
       - 'py-setuptools'
-    ansible_ver: 2.2.0.0
+    ansible_ver: 2.6.1
     debian_packages:
       - 'build-essential'
       - 'libffi-dev'

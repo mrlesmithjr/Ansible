@@ -87,7 +87,9 @@
 {% endif %}
 {% if telegraf_inputs.disk.enabled %}
 [[inputs.disk]]
+{%   if telegraf_inputs.disk.mountpoints is defined and telegraf_inputs.disk.mountpoints != [] %}
   mount_points = ["{{ telegraf_inputs.disk.mount_points|join ('", "')}}"]
+{%   endif %}
   ignore_fs = ["{{ telegraf_inputs.disk.ignore_fs|join ('", "')}}"]
 {%   if telegraf_inputs['disk']['tags'] is defined %}
   [inputs.disk.tags]

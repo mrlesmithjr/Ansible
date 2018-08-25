@@ -28,13 +28,13 @@ log-facility local7;
 failover peer "failover" {
   primary;
   address {{ isc_dhcp_failover_info.failover_address }};
-  port 519;
+  port {{ isc_dhcp_failover_info.primary_port|default('519') }};
 {%     for host in groups[isc_dhcp_failover_info.failover_group] %}
 {%       if inventory_hostname != host %}
   peer address {{ host }};
 {%       endif %}
 {%     endfor %}
-  peer port 520;
+  peer port {{ isc_dhcp_failover_info.secondary_port|default('520') }};
   mclt 3600;
   split 128;
   load balance max seconds 3;
@@ -45,13 +45,13 @@ failover peer "failover" {
 failover peer "failover" {
   secondary;
   address {{ isc_dhcp_failover_info.failover_address }};
-  port 520;
+  port {{ isc_dhcp_failover_info.secondary_port|default('520') }};
 {%     for host in groups[isc_dhcp_failover_info.failover_group] %}
 {%       if inventory_hostname != host %}
   peer address {{ host }};
 {%       endif %}
 {%     endfor %}
-  peer port 519;
+  peer port {{ isc_dhcp_failover_info.primary_port|default('519') }};
   load balance max seconds 3;
 }
 {%   endif %}

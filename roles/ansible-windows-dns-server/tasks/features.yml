@@ -3,4 +3,6 @@
   win_feature:
     name: DNS
     state: "{{ windows_dns_server_state }}"
+    include_management_tools: "{{ windows_dns_management_tools }}"
+    include_sub_features: "{{ windows_dns_sub_features }}"
   register: _windows_dns_server

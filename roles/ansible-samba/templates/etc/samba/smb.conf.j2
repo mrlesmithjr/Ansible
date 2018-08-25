@@ -8,6 +8,15 @@
         server role = {{ samba_server_role }}
         workgroup = {{ samba_ad_info.netbios_domain_name|upper }}
 
+{% if samba_use_printers %}
+        load printers = yes
+        printing = {{ samba_printer_type|upper }}
+        printcap name = {{ samba_printer_type }}
+        {% if samba_printer_type == 'cups' %}
+        cups server = {{ samba_cups_server }}
+        {% endif %}
+{% endif %}
+
 [netlogon]
 	path = /var/lib/samba/sysvol/{{ samba_ad_info.kerberos_realm|lower }}/scripts
 	read only = No

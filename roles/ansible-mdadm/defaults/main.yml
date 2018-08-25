@@ -18,6 +18,8 @@ mdadm_arrays:
     mountpoint: '/mnt/md0'
     # Define if array should be present or absent
     state: 'present'
+    # Set mount options (optional)
+    opts: 'noatime'
   # - name: 'md0'
   #   devices:
   #     - '/dev/sdb'

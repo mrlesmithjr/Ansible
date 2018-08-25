@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Role Name](#role-name)
+  - [Build Status](#build-status)
   - [Requirements](#requirements)
   - [Role Variables](#role-variables)
   - [Dependencies](#dependencies)
@@ -15,6 +16,10 @@
 # Role Name
 
 An [Ansible](https://www.ansible.com) role to install/configure [Netdata](https://my-netdata.io/)
+
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-netdata.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-netdata)
 
 ## Requirements
 

@@ -1,49 +1,49 @@
 ---
-- name: debian | Installing Pre-Reqs
+- name:           debian | Installing Pre-Reqs
   apt:
-    name: apt-transport-https
-    state: present
-  become: true
+    name:         apt-transport-https
+    state:        present
+  become:         true
   with_items:
     - apt-transport-https
     - software-properties-common
 
-- name: debian | Adding Elasticsearch Repo Key
+- name:           debian | Adding Elasticsearch Repo Key
   apt_key:
-    url: "{{ elasticsearch_repo_key }}"
-    state: present
-  become: true
+    url:          "{{ elasticsearch_repo_key }}"
+    state:        present
+  become:         true
 
-- name: debian | Adding Elasticsearch Repo
+- name:           debian | Adding Elasticsearch Repo
   apt_repository:
-    repo: "{{ elasticsearch_debian_repo }}"
-    state: present
-  become: true
+    repo:         "{{ elasticsearch_debian_repo }}"
+    state:        present
+  become:         true
 
-- name: debian | Enabling deb http://http.debian.net/debian jessie-backports main
+- name:           debian | Enabling deb http://http.debian.net/debian jessie-backports main
   apt_repository:
-    repo: deb http://http.debian.net/debian jessie-backports main
-    state: present
-  become: true
-  when: >
+    repo:         deb http://http.debian.net/debian jessie-backports main
+    state:        present
+  become:         true
+  when:           >
         ansible_distribution == "Debian" and
         ansible_distribution_release == "jessie"
 
-- name: debian | Adding OpenJDK PPA
+- name:           debian | Adding OpenJDK PPA
   apt_repository:
-    repo: ppa:openjdk-r/ppa
-    state: present
-  become: true
-  when: ansible_distribution == "Ubuntu"
+    repo:         ppa:openjdk-r/ppa
+    state:        present
+  become:         true
+  when:           ansible_distribution == "Ubuntu"
 
-- name: debian | Installing Java
+- name:           debian | Installing Java
   apt:
-    name: openjdk-8-jre-headless
-    state: present
-  become: true
+    name:         openjdk-8-jre-headless
+    state:        present
+  become:         true
 
-- name: debian | Installing Elasticsearch {{ elasticsearch['version_minor_version'] }}
+- name:           debian | Installing Elasticsearch {{ elasticsearch['version_minor_version'] }}
   apt:
-    name: "elasticsearch={{ elasticsearch['version_minor_version'] }}"
-    state: present
-  become: true
+    name:         "elasticsearch={{ elasticsearch['version_minor_version'] }}"
+    state:        present
+  become:         true

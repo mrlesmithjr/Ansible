@@ -25,6 +25,7 @@ mdadm_arrays:
       - '/dev/sdc'
     # Define filesystem to partition array with
     filesystem: 'ext4'
+    filesystem_opts: ''
     # Define the array raid level
     # 0|1|4|5|6|10
     level: '1'
@@ -32,6 +33,8 @@ mdadm_arrays:
     mountpoint: '/mnt/md0'
     # Define if array should be present or absent
     state: 'present'
+    # Set mount options (optional)
+    opts: 'noatime'
   # - name: 'md0'
   #   devices:
   #     - '/dev/sdb'

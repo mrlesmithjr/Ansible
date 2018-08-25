@@ -7,8 +7,22 @@ galaxy_info:
   min_ansible_version: 1.2
 
   platforms:
+    - name: EL
+      versions:
+        - 7
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Fedora
+      versions:
+        - 24
+        - 25
+        - 26
+        - 27
     - name: Ubuntu
       versions:
+        - trusty
         - xenial
 
   galaxy_tags:

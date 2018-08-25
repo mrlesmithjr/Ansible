@@ -3,6 +3,10 @@ Role Name
 
 Installs and configures Shorewall firewall (http://shorewall.net)
 
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-shorewall.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-shorewall)
+
 Requirements
 ------------
 
@@ -11,117 +15,7 @@ None
 Role Variables
 --------------
 
-````
----
-# defaults file for ansible-shorewall
-shorewall_config: true
-shorewall_config_options:  # http://shorewall.net/manpages/shorewall.conf.html
-  accounting: 'Yes'  # [Yes|No]
-  ip_forwarding: 'On' # [On|Off|Keep]
-  logformat: 'Shorewall:%s:%s:'  # ["formattemplate"]
-  logfile: '/var/log/syslog'  # [pathname] - Default is /var/log/messages
-  logtagonly: 'No'  # [Yes|No]
-  log_martians: 'Yes' # [Yes|No|Keep]
-  log_verbosity: '2'  # [-1=disabled|0=Silent|1=Major|2=All]
-  multicast: 'No'  # [Yes|No]
-  startup_enabled: 'Yes'  # [Yes|No]
-  startup_log: '/var/log/shorewall-init.log'  # [pathname]
-  verbosity: '2'  # [0=Silent|1=Major|2=All]
-  add_snat_aliases: 'No'
-
-shorewall_interfaces:
-  - name: 'eth0'
-    zone: 'net'
-    options:
-      - 'dhcp'
-      - 'logmartians'
-      - 'nosmurfs'
-      - 'sourceroute=0'
-      - 'tcpflags'
-  - name: 'eth1'
-    zone: 'loc'
-    options:
-      - 'logmartians'
-      - 'nosmurfs'
-      - 'routefilter=2'
-      - 'tcpflags'
-shorewall_masquerade_info:
-  enabled: true
-  interface: 'eth0'
-  sources:
-    - '10.0.0.0/8'
-    - '169.254.0.0/16'
-    - '172.16.0.0/16'
-    - '192.168.0.0/16'
-shorewall_policies:
-  - source: '$FW'
-    dest: 'net'
-    policy: 'ACCEPT'
-    log_level: ''
-    limit_burst: ''
-  - source: 'loc'
-    dest: 'net'
-    policy: 'ACCEPT'
-    log_level: ''
-    limit_burst: ''
-  - source: 'net'
-    dest: 'all'
-    policy: 'DROP'
-    log_level: 'info'
-    limit_burst: ''
-  - source: 'all'
-    dest: 'all'
-    policy: 'REJECT'
-    log_level: 'info'
-    limit_burst: ''
-shorewall_rules:
-  - section: 'NEW'
-    rules:
-#      - source: '$FW'
-#        dest: 'net'
-#        action: 'ACCEPT'
-#        proto: 'tcp'
-#        dest_ports:
-#          - '53'
-#      - source: '$FW'
-#        dest: 'net'
-#        action: 'ACCEPT'
-#        proto: 'udp'
-#        dest_ports:
-#          - '53'
-      - source: 'loc'
-        dest: '$FW'
-        action: 'ACCEPT'
-        proto: 'tcp'
-        dest_ports:
-          - '22'
-          - '80'
-          - '443'
-      - source: 'net'
-        dest: 'loc:192.168.202.200'
-        action: 'DNAT'
-        proto: 'tcp'
-        dest_ports:
-          - '80'
-          - '443'
-shorewall_startup: true
-shorewall_zones:
-  - name: 'fw'
-    in_options:
-    options:
-    out_options:
-    type: 'firewall'
-  - name: 'net'
-    in_options:
-    options:
-    out_options:
-    type: 'ipv4'
-  - name: 'loc'
-    in_options:
-    options:
-    out_options:
-    type: 'ipv4'
-````
+[defaults/main.yml](defaults/main.yml)
 
 Dependencies
 ------------

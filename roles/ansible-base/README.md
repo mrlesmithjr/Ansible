@@ -1,8 +1,9 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [ansible-base](#ansible-base)
+  - [Build Status](#build-status)
   - [Requirements](#requirements)
   - [Role Variables](#role-variables)
   - [Dependencies](#dependencies)
@@ -17,6 +18,10 @@
 An [Ansible](https://www.ansible.com) role to define a base configuration state.
 
 -   Configure/update dhcp client,update dns servers
+
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-base.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-base)
 
 ## Requirements
 

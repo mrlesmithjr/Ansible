@@ -3,12 +3,19 @@ galaxy_info:
   description: An [Ansible](https://www.ansible.com) role to install/configure [DRBD](https://docs.linbit.com/)
   license: license (MIT)
 
-  min_ansible_version: 1.2
+  min_ansible_version: 2.4
 
   platforms:
     - name: Ubuntu
       versions:
         - xenial
+    - name: Debian
+      versions:
+        - stretch
+    - name: EL
+      versions:
+        - 6
+        - 7
 
   galaxy_tags:
     - clustering

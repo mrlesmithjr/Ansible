@@ -44,8 +44,12 @@ isc_dhcp_failover_info:
   failover_group: dhcp-nodes
   # Define the node in which should be considered the primary
   primary: "{{ groups['dhcp-nodes'][0] }}"
+  # Define the port to be used on primary node
+  primary_port: "519"
   # Define the node in which should be considered the secondary
   secondary: "{{ groups['dhcp-nodes'][1] }}"
+  # Define the port to be used on secondary node
+  secondary_port: "520"
 ```
 
 ## Role Variables

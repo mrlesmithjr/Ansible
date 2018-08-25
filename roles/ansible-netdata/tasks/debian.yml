@@ -5,3 +5,12 @@
     state: present
   become: true
   with_items: "{{ netdata_debian_pre_reqs }}"
+
+- name: debian | Installing iproute Package
+  apt:
+    name: iproute
+    state: present
+  become: true
+  when: >
+        not ansible_distribution == "Ubuntu" and
+        ansible_distribution_version is version('18.04', '<', strict=True)

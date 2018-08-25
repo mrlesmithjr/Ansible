@@ -1,0 +1,8 @@
+FROM fedora:26
+
+RUN dnf -y install gmp-devel libffi-devel openssl-devel python-crypto \
+    python-devel python-dnf python-pip python-setuptools python-virtualenv \
+    redhat-rpm-config && \
+    dnf -y group install "C Development Tools and Libraries"
+
+RUN pip install ansible

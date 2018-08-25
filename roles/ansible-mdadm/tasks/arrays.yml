@@ -34,6 +34,7 @@
 - name: arrays | Creating Array(s) Filesystem
   filesystem:
     fstype: "{{ item.filesystem }}"
+    opts: "{{ item.filesystem_opts | default(omit) }}"
     dev: "/dev/{{ item.name }}"
   with_items: '{{ mdadm_arrays }}'
   when: item.state|lower == "present"
@@ -45,8 +46,11 @@
     src: "/dev/{{ item.name }}"
     fstype: "{{ item.filesystem }}"
     state: "mounted"
+    opts: "{{ item.opts | default(omit) }}"
   with_items: '{{ mdadm_arrays }}'
-  when: item.state|lower == "present"
+  when:
+  - item.state|lower == "present"
+  - item.mountpoint is defined
 
 # Unmounting raid arrays in preparation of destroying
 - name: arrays | Unmounting Array(s)
@@ -55,7 +59,9 @@
     src: "/dev/{{ item.name }}"
     state: "unmounted"
   with_items: '{{ mdadm_arrays }}'
-  when: item.state|lower == "absent"
+  when:
+  - item.state|lower == "absent"
+  - item.mountpoint is defined
 
 # Stopping raid arrays in preparation of destroying
 - name: arrays | Stopping Array(s)

@@ -1,12 +1,12 @@
 agentAddress udp:161,udp6:[::1]:161
 view   systemonly  included   .1.3.6.1.2.1.1
 view   systemonly  included   .1.3.6.1.2.1.25.1
-rocommunity public  default    -V systemonly
 {% if snmpd_authorized_networks is defined and snmpd_enable %}
 {%   for item in snmpd_authorized_networks %}
 rocommunity {{ item.community }} {{ item.network }}
 {%   endfor %}
 {% endif %}
+rocommunity public  default    -V systemonly
 rouser   authOnlyUser
 {% if snmpd_sysLocation is defined %}
 sysLocation    {{ snmpd_sysLocation }}

@@ -1,0 +1,13 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<scriptApproval plugin="script-security@1.44">
+  <approvedScriptHashes/>
+  <approvedSignatures>
+{% for item in jenkins_script_approvals %}
+    <string>{{ item }}</string>
+{% endfor %}
+  </approvedSignatures>
+  <aclApprovedSignatures/>
+  <approvedClasspathEntries/>
+  <pendingScripts/>
+  <pendingSignatures/>
+  <pendingClasspathEntries/>

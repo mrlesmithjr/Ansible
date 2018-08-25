@@ -1,18 +1,18 @@
 ---
-keepalived_config: true
+keepalived_config:       true
 
 keepalived_router_info:
-  - name: vrrp_1
+  - name:                vrrp_1
     check_script:
-      - name: chk_haproxy
-        script: 'killall -0 haproxy'
-        interval: 2
-        weight: 2
+      - name:            chk_haproxy
+        script:          'killall -0 haproxy'
+        interval:        2
+        weight:          2
     # Define inventory_hostname of node to be considered Master
-    master_node: "{{ groups['consul_cluster'][0] }}"
-    router_id: 70
-    router_pri_backup: 100
-    router_pri_master: 150
-    vip_int: "{{ ansible_pri_interface }}"
+    master_node:         "{{ groups['consul_cluster'][0] }}"
+    router_id:           70
+    router_pri_backup:   100
+    router_pri_master:   150
+    vip_int:             "{{ ansible_pri_interface }}"
     vip_addresses:
       - "{{ consul_vip }}"

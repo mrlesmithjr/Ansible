@@ -1,0 +1,39 @@
+---
+- name: install | Checking For Previously Installed Tools
+  stat:
+    path: "{{ hashicorp_install_dir }}/{{ item['name'] }}"
+  register: _hashicorp_tools_installed
+  with_items: "{{ hashicorp_tools }}"
+
+- name: install | Capturing Installed Versions of Tools
+  shell: "{{ hashicorp_install_dir }}/{{ item['item']['name'] }} version | awk 'NR==1{ print substr($2,2) }'"
+  register: _hashicorp_tools_installed_versions
+  changed_when: false
+  with_items: "{{ _hashicorp_tools_installed['results'] }}"
+  when: item['stat']['exists']
+
+- name: install | Upgrading Existing Tools
+  unarchive:
+    src: "{{ hashicorp_url }}/{{ item['item']['item']['name'] }}/{{ item['item']['item']['version'] }}/{{ item['item']['item']['name'] }}_{{ item['item']['item']['version'] }}_{{ ansible_system|lower }}_amd64.zip"
+    dest: "{{ hashicorp_install_dir }}"
+    remote_src: true
+  become: true
+  with_items: "{{ _hashicorp_tools_installed_versions['results'] }}"
+  when: >
+        item['item']['item']['name']|lower != "vagrant" and
+        item['item']['item']['state']|lower == "present" and
+        item['item']['stat']['exists'] and
+        (item['stdout'] is defined and
+        item['item']['item']['version'] != item['stdout'])
+
+- name: install | Installing Tools
+  unarchive:
+    src: "{{ hashicorp_url }}/{{ item['item']['item']['name'] }}/{{ item['item']['item']['version'] }}/{{ item['item']['item']['name'] }}_{{ item['item']['item']['version'] }}_{{ ansible_system|lower }}_amd64.zip"
+    dest: "{{ hashicorp_install_dir }}"
+    remote_src: true
+  become: true
+  with_items: "{{ _hashicorp_tools_installed_versions['results'] }}"
+  when: >
+        item['item']['item']['name']|lower != "vagrant" and
+        item['item']['item']['state']|lower == "present" and
+        not item['item']['stat']['exists']

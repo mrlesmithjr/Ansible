@@ -58,3 +58,5 @@ k8s_token_file: /etc/kubernetes/.k8s_token
 
 k8s_users:
   - user: vagrant
+
+k8s_version: 1.10.2
