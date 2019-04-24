@@ -4,19 +4,13 @@ global {
 }
 
 common {
-	handlers {
-	}
-
-	startup {
-	}
-
-	options {
-	}
-
-	net {
-    cram-hmac-alg sha1;
-    shared-secret "{{ drbd_network_shared_secret }}";
-	}
+{% for section in drbd_common.keys() %}
+  {{ section }} {
+{%   for line in drbd_common[section].splitlines() %}
+    {{ line }}
+{%   endfor %}
+  }
+{% endfor %}
 }
 
 {% for disk in drbd_disks %}

@@ -3,10 +3,10 @@
 - include: debian.yml
   when: ansible_os_family == "Debian"
   tags:
-    - 'ansible_chrony'
-    - 'ansible_chrony_debian'
+    - ansible_chrony
+    - ansible_chrony_debian
 
 - include: config_chrony.yml
   tags:
-    - 'ansible_chrony'
-    - 'ansible_chrony_config'
+    - ansible_chrony
+    - ansible_chrony_config

@@ -1,4 +1,6 @@
 ---
+influxdb_version: "1.7.2"
+
 influxdb_admin:
   # Determines whether the admin service is enabled.
   enabled: false
@@ -43,7 +45,7 @@ influxdb_continuous_queries:
   enabled: true
   # Controls whether queries are logged when executed by the CQ service.
   log_enabled: true
-  # interval for how often continuous queries will be checked if they need to run
+  # interval for how often continuous queries will be checked
   run_interval: 1s
 
 influxdb_coordinator:
@@ -51,7 +53,7 @@ influxdb_coordinator:
   # limit can be set to help discover slow or resource intensive queries.
   # Setting the value to 0 disables the slow query logging.
   log_queries_after: 0s
-  # The maximum number of concurrent queries allowed to be executing at one time.
+  # The maximum number of concurrent queries allowed at one time.
   # If a query is executed and exceeds this limit, an error is returned to the
   # caller.  This limit can be disabled by setting it to 0.
   max_concurrent_queries: 0
@@ -97,7 +99,8 @@ influxdb_data:
   # dropped.  This limit can prevent high cardinality tag values from being
   # written to a measurement.  This limit can be disabled by setting it to 0.
   max_values_per_tag: 100000
-  # Whether queries should be logged before execution. Very useful for troubleshooting, but will
+  # Whether queries should be logged before execution.
+  #   Very useful for troubleshooting, but will
   # log any sensitive data contained within a query.
   query_log_enabled: true
   # Trace logging provides more verbose output around the tsm engine. Turning
@@ -110,11 +113,11 @@ influxdb_databases:
   - host: localhost
     name: site
     state: present
- # Defines the retention policy
+    # Defines the retention policy
     retention_policy:
       enabled: true
       name: test-1w
- # Define in hour(h), days(d), weeks(w) or Infinite(INF)
+      # Define in hour(h), days(d), weeks(w) or Infinite(INF)
       duration: 1w
       replication: 1
 
@@ -122,7 +125,8 @@ influxdb_debian_pre_reqs:
   - apt-transport-https
   - python-pip
 
-influxdb_debian_repo: "deb https://repos.influxdata.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} stable"
+# yamllint disable-line rule:line-length
+influxdb_debian_repo: "{{ 'deb https://repos.influxdata.com/' +  ansible_distribution|lower + ' ' + ansible_distribution_release|lower + ' stable' }}"
 
 influxdb_debian_repo_key: https://repos.influxdata.com/influxdb.key
 
@@ -137,27 +141,33 @@ influxdb_graphite:
   bind_port: 2003
   consistency_level: one
   database: graphite
-  #Determines whether the graphite endpoint is enabled.
+  # Determines whether the graphite endpoint is enabled.
   enabled: false
   protocol: tcp
   retention_policy: ""
-  ### This string joins multiple matching 'measurement' values providing more control over the final measurement name.
+  ### This string joins multiple matching 'measurement' values
+  ###    providing more control over the final measurement name.
   separator: .
-  ### Default tags that will be added to all metrics.  These can be overridden at the template level
-  ### or by tags extracted from metric
+  ### Default tags that will be added to all metrics.
+  ###   These can be overridden at the template level
+  ###   or by tags extracted from metric
   tags:
     - region=us-east
     - zone=1c
-  ### Each template line requires a template pattern.  It can have an optional
-  ### filter before the template and separated by spaces.  It can also have optional extra
-  ### tags following the template.  Multiple tags should be separated by commas and no spaces
-  ### similar to the line protocol format.  There can be only one default template.
+  ### Each template line requires a template pattern.  It can have an
+  ### optional filter before the template and separated by spaces.  It
+  ### can also have optional extra tags following the template.
+  ### Multiple tags should be separated by commas and no spaces
+  ### similar to the line protocol format.  There can be only one
+  ### default template.
   # templates: [
   #   "*.app env.service.resource.measurement",
   #   # Default template
   #   "server.*",
   # ]
-  # UDP Read buffer size, 0 means OS default. UDP listener will fail if set above OS max.
+
+  # UDP Read buffer size, 0 means OS default. UDP listener will fail
+  # if set above OS max.
   udp_read_buffer: 0
 
 influxdb_http:
@@ -239,6 +249,8 @@ influxdb_python_modules:
   - influxdb
 influxdb_redhat_pre_reqs:
   - python-pip
+
+# yamllint disable-line rule:line-length
 influxdb_redhat_repo: https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable
 influxdb_redhat_repo_key: https://repos.influxdata.com/influxdb.key
 
@@ -248,7 +260,7 @@ influxdb_retention:
   # Determines whether retention policy enforcment enabled.
   enabled: true
 
-influxdb_rpc_port: 8088
+influxdb_rpc_addr: "127.0.0.1:8088"
 
 influxdb_shard_precreation:
   # The default period ahead of the endtime of a shard group that its successor
@@ -267,8 +279,8 @@ influxdb_subscriber:
   enabled: true
   # The default timeout for HTTP writes to subscribers.
   http_timeout: 30s
-  # Allows insecure HTTPS connections to subscribers.  This is useful when testing with self-
-  # signed certificates.
+  # Allows insecure HTTPS connections to subscribers.  This is useful
+  # when testing with self-signed certificates.
   insecure_skip_verify: false
   # The number of in-flight writes buffered in the write channel.
   write_buffer_size: 1000
@@ -290,5 +302,3 @@ influxdb_udp:
   # above OS max.
   read_buffer: 0
   retention_policy: ""
-
-influxdb_version: 1.4.2

@@ -8,9 +8,9 @@
     safe_mode_password: "{{ windows_domain_info['safe_mode_password'] }}"
   register: _windows_domain
   failed_when: >
-               _windows_domain['rc'] is defined and
-               ((_windows_domain['rc'] == 1) and
-               "already in use on this network" not in _windows_domain['module_stderr'])
+    _windows_domain['rc'] is defined and
+    ((_windows_domain['rc'] == 1) and
+    "already in use on this network" not in _windows_domain['module_stderr'])
 
 - include: reboot.yml
 

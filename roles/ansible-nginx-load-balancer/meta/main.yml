@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Larry Smith Jr.
   description: An [Ansible](https://www.ansible.com) role to install/configure an [NGINX](https://nginx.org) load balancer for HTTP/HTTPS/TCP/UDP
@@ -7,6 +8,10 @@ galaxy_info:
   min_ansible_version: 1.2
 
   platforms:
+    # - name: Debian
+    #   versions:
+    #     - jessie
+    #     - stretch
     - name: Ubuntu
       versions:
         - bionic
@@ -15,6 +20,6 @@ galaxy_info:
         - zesty
 
   galaxy_tags:
-    - load-balancing
+    - loadbalancing
 
 dependencies: []

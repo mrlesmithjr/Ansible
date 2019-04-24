@@ -10,14 +10,15 @@ logstash_config_dir: /etc/logstash/conf.d
 
 logstash_base_configs:
   - 000_inputs
-#  - 001_filters
-    # comment out if metrics for logstash processing are not required
-    # good for keeping track of throughput...removed because of
-    # incompatabilities w/ES 2.x
-#  - 002_metrics
+  #  - 001_filters
+  # comment out if metrics for logstash processing are not required
+  # good for keeping track of throughput...removed because of
+  # incompatabilities w/ES 2.x
+  #  - 002_metrics
   - 999_outputs
 
-logstash_base_file_inputs: []
+logstash_base_file_inputs:
+  []
   # - path: /var/log/nginx/access.log
   #   type: nginx-access
   # - path: /var/log/nginx/error.log
@@ -28,7 +29,8 @@ logstash_base_file_inputs: []
   #   type: redis-server
 
 # Define inputs below to configure
-logstash_base_inputs: []
+logstash_base_inputs:
+  []
   # - prot: tcp
   #   # Gets around port < 1024 (Note...Configure clients to send
   #   # to 10514 instead of default 514)
@@ -49,25 +51,29 @@ logstash_base_inputs: []
   #   # reminder....ports < 1024 require root access..
   #   port: 514
 
-logstash_custom_inputs: []
+logstash_custom_inputs:
+  []
   # - input: someinput
   #   lines:
   #     - 'somekey => "value"'
 
-logstash_custom_filters: []
+logstash_custom_filters:
+  []
   # - lines:
   #     - 'somekey => "value"'
 
-logstash_base_outputs: []
+logstash_base_outputs:
+  []
   # - output: redis
   #   output_host: "{{ logstash_server_fqdn }}"
 
-logstash_custom_outputs: []
+logstash_custom_outputs:
+  []
   # - output: someoutput
   #   lines:
   #     - 'somekey => "value"'
 
-logstash_deb_repo: "deb https://artifacts.elastic.co/packages/{{ logstash_major_ver }}/apt stable main"
+logstash_deb_repo: "{{ 'deb https://artifacts.elastic.co/packages/' + logstash_major_ver + '/apt stable main' }}"
 logstash_folder: /opt/logstash
 logstash_log_dir: /var/log/logstash
 
@@ -78,19 +84,29 @@ logstash_major_ver: 5.x
 logstash_min_memory_required: 1024
 
 # Define minor version to install also defines Pin priority on APT Preferences.d
-logstash_minor_ver: 1:5.6.4-1
+logstash_minor_ver: 1:5.6.14-1
 
 logstash_plugins:
-  # - logstash-codec-nmap
-  - logstash-filter-elasticsearch
-  - logstash-filter-json_encode
-  # - logstash-filter-multiline
-  - logstash-filter-translate
-  # - logstash-filter-zeromq
-  - logstash-input-beats
-  - logstash-output-email
-#  - logstash-output-jira
-#  - logstash-output-slack
+  - name: logstash-codec-nmap
+    state: absent
+  - name: logstash-filter-elasticsearch
+    state: present
+  - name: logstash-filter-json_encode
+    state: present
+  - name: logstash-filter-multiline
+    state: absent
+  - name: logstash-filter-translate
+    state: present
+  - name: logstash-filter-zeromq
+    state: absent
+  - name: logstash-input-beats
+    state: present
+  - name: logstash-output-email
+    state: present
+  - name: logstash-output-jira
+    state: absent
+  - name: logstash-output-slack
+    state: absent
 
 # https://github.com/elastic/logstash/issues/6528
 logstash_plugin_cmd_vars: "JARS_SKIP='true'"
@@ -98,13 +114,15 @@ logstash_plugin_cmd_vars: "JARS_SKIP='true'"
 # Options to work with proxy
 # logstash_plugin_cmd_vars: "JARS_SKIP='true' JRUBY_OPTS='-J-Dhttps.proxyHost=user:password@proxy.com -J-Dhttps.proxyPort=8080 -J-Dhttp.proxyHost=user:password@proxy.com -J-Dhttp.proxyPort=8080'"
 
-logstash_redhat_repo_url: "https://artifacts.elastic.co/packages/{{ logstash_major_ver }}/yum"
+logstash_redhat_repo_url: "{{ 'https://artifacts.elastic.co/packages/' + logstash_major_ver + '/yum' }}"
 
 logstash_repo_key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
 # Defines logstash server to send to...fqdn or localhost
-logstash_server_fqdn: "logstash.{{ pri_domain_name }}"
-pri_domain_name: example.org
+logstash_server_fqdn: "logstash.{{ logstash_pri_domain_name }}"
+logstash_pri_domain_name: example.org
 
-openjdk_version: 8
 logstash_install_java: true
+
+# Defines the system groups the logstash user should be part of
+logstash_system_groups: []

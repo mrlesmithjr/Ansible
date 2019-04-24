@@ -49,4 +49,9 @@
    </portgroup>
 {%   endfor %}
 {% endif %}
+{% if item['vlan'] is defined %}
+  <vlan>
+    <tag id="{{ item['vlan'] }}" />
+  </vlan>
+{% endif %}
 </network>

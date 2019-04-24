@@ -13,6 +13,9 @@
   blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK"
     path: "{{ netdata_alarm_config_file }}"
+    create: yes
+    owner: "{{ netdata_user_info['user'] }}"
+    group: root
     content: |
       {% for key in netdata_alarm_notify_configs %}
       {{ key }}="{{ netdata_alarm_notify_configs[key] }}"

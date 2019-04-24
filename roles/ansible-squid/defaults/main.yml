@@ -1,6 +1,15 @@
 ---
 # defaults file for ansible-squid
 
+# squid auth parameters  
+# squid_auth_param:
+#   - name: 'basic'
+#     type: 'program'
+#     arg: '/usr/lib/squid3/basic_ncsa_auth /etc/squid/htpasswd'
+#   - name: 'basic'
+#     type: 'realm'
+#     arg: 'Authentication REQUIRED'
+
 # acl aclname acltype argument
 squid_acl:
   - name: 'SSL_ports'
@@ -126,3 +135,6 @@ squid_transparent_proxy: false
 
 # Defines if squid transparent should configure ferm firewall for masquerading
 squid_transparent_proxy_ferm: false
+
+# Defines how much time squid should wait before reboot
+squid_shutdown_lifetime: 5

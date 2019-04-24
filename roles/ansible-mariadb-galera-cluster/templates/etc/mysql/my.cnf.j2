@@ -10,7 +10,7 @@ socket = /var/run/mysqld/mysqld.sock
 
 [mysqld]
 basedir = /usr
-datadir	= /var/lib/mysql
+datadir	= {{ mariadb_mysql_settings['datadir'] }}
 expire_logs_days = {{ mariadb_mysql_settings['expire_logs_days'] }}
 key_buffer = {{ mariadb_mysql_settings['key_buffer_size'] }}
 lc-messages-dir = /usr/share/mysql

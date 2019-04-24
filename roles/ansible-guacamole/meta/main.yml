@@ -1,12 +1,17 @@
+---
 galaxy_info:
   author: Larry Smith Jr.
-  description: An [Ansible](https://www.ansible.com) role to install/configure [Guacamole](https://guacamole.incubator.apache.org/)
+  description: An Ansible role to install/configure Apache Guacamole
 
-  license: license (MIT)
+  license: MIT
 
   min_ansible_version: 1.2
 
   platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
     - name: EL
       versions:
         - 7
@@ -15,6 +20,6 @@ galaxy_info:
         - xenial
 
   galaxy_tags:
-    - remote desktop
+    - remote
 
 dependencies: []

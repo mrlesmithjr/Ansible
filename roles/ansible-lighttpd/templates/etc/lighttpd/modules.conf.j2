@@ -129,9 +129,9 @@ server.modules = (
 ##
 ## FastCGI (mod_fastcgi)
 ##
-{% if lighttpd_enable_php5 %}
+{% if lighttpd_enable_php %}
 include "conf.d/fastcgi.conf"
-{% elif not lighttpd_enable_php5 %}
+{% elif not lighttpd_enable_php %}
 #include "conf.d/fastcgi.conf"
 {% endif %}
 

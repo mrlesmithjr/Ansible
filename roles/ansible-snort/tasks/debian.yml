@@ -1,18 +1,37 @@
----
 - name: debian | updating apt-cache
   apt:
-    update_cache: "yes"
+    update_cache: true
     cache_valid_time: 86400
+  become: true
+
+- name: debian | Installing iproute
+  apt:
+    name: iproute
+    state: present
+  become: true
+  when: >
+    ansible_distribution != "Ubuntu" or
+    (ansible_distribution == "Ubuntu" and
+    ansible_distribution_major_version < "18")
+
+- name: debian | Installing iproute2
+  apt:
+    name: iproute2
+    state: present
+  become: true
+  when: >
+    ansible_distribution == "Ubuntu" and
+    ansible_distribution_major_version >= "18"
 
 - name: debian | installing pre-reqs
   apt:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
     - build-essential
     - ethtool
     - flex
-    - iproute
     - libpcap-dev
     - libpcre3-dev
     - libdumbnet-dev
@@ -22,27 +41,32 @@
   apt:
     name: "{{ item }}"
     state: present
+  become: true
+  # We need to skip errors as Snort tries to start and is not configured yet
+  ignore_errors: true
   with_items:
     - oinkmaster
     - snort
 
 - name: debian | configuring snort daemon
   template:
-    src: "etc/snort/snort.debian.conf.j2"
-    dest: "/etc/snort/snort.debian.conf"
+    src: etc/snort/snort.debian.conf.j2
+    dest: /etc/snort/snort.debian.conf
     owner: root
     group: root
     mode: 0600
+  become: true
   notify: restart snort
 
 - name: debian | ensuring directory exists (/usr/lib/snort_dynamicrules)
   file:
-    dest: "/usr/lib/snort_dynamicrules"
+    dest: /usr/lib/snort_dynamicrules
     state: directory
     owner: root
     group: root
     mode: 0755
     recurse: yes
+  become: true
   when: >
-        ansible_distribution_release == "precise" or
-        ansible_distribution_release == "wheezy"
+    ansible_distribution_release == "precise" or
+    ansible_distribution_release == "wheezy"

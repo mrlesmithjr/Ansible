@@ -1,52 +1,33 @@
-Role Name
-=========
+# ansible-oracle-java8
 
 Installs Oracle Java8
 
-Requirements
-------------
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-oracle-java8.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-oracle-java8)
+
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-```
----
-# defaults file for ansible-oracle-java8
-oracle_java8_debian_repo_info:
-  id: 'EEA14886'
-  keyserver: 'hkp://keyserver.ubuntu.com:80'
-  repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main'
-```
+[defaults/main.yml](defaults/main.yml)
 
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
----
-- hosts: all
-  become: true
-  vars:
-  roles:
-    - role: ansible-oracle-java8
-  tasks:
-```
+## License
 
-License
--------
+MIT
 
-BSD
-
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
+
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

@@ -1,0 +1,10 @@
+{{ ansible_managed|comment }}
+search {{ pdns_auth_pri_domain_name }}
+{% if pdns_auth_resolv_conf_nameservers is defined %}
+{%   for nameserver in pdns_auth_resolv_conf_nameservers %}
+nameserver {{ nameserver }}
+{%   endfor %}
+{% else %}
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+{% endif %}

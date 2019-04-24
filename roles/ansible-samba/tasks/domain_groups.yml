@@ -25,5 +25,5 @@
     - "{{ _samba_domain_group_members['results'] }}"
     - item.members
   when: >
-        item[1] != [] and
-        item[1] not in item[0]['stdout']
+    item[1] != [] and
+    item[1] not in item[0]['stdout']

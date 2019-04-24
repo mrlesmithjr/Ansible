@@ -1,13 +1,31 @@
 ---
 - hosts: test-nodes
-  become: true
   vars:
-    es_major_version: '2.x'
-    es_minor_version: '2.4.1'
-    graylog_rest_listen_uri: 'http://0.0.0.0:9000/api/'
-    graylog_web_listen_uri: 'http://0.0.0.0:9000/'
-    graylog_version: '2.2'
-    pri_domain_name: 'test.vagrant.local'
+    elasticsearch:
+      config: true
+      config_dir: /etc/elasticsearch
+      data_dir: /var/lib/elasticsearch
+      heap_size: "{{ (ansible_memtotal_mb * elasticsearch_heap_size_multiplier)|round|int }}m"
+      home_dir: /usr/share/elasticsearch
+      listen_interface: enp0s8
+      log_dir: /var/log/elasticsearch
+      pid_dir: /var/run/elasticsearch
+      startup_sleep_time: 5
+      version_major_version: 5.x
+      version_minor_version: 5.6.14
+    elasticsearch_configuration:
+      action.auto_create_index: false
+      cluster.name: graylog
+      # # Define a specific interface to bind elasticsearch on for clustering
+      # # Usually not required
+      # # Vagrant instances requires this...
+      # # examples....(_eth1_|_enp0s8_)
+      network.publish_host: "{{ '_' + elasticsearch['listen_interface'] + '_' }}"
+      node.name: "{{ ansible_hostname }}"
+    elasticsearch_heap_size_multiplier: 0.5
+    elasticsearch_repo_key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    graylog_server_password_secret: OjGhjkX3augZSLGcC7YJNzC1DMJ8KgvX8TeJlP7KCaqcrj5Z32MPSfqFTYBDbhNkuKN4FtR7DNSO7OUG3P8qFPfilmrvcJ2l
+    graylog_server_root_password: 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
   roles:
     - role: ansible-timezone
     - role: ansible-oracle-java8

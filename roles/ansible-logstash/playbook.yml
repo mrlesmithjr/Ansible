@@ -2,7 +2,7 @@
 - hosts: all
   sudo: true
   vars:
-    - config_logstash: true
+    config_logstash: true
   roles:
     - role: ansible-logstash
   tasks:

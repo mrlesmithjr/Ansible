@@ -35,7 +35,7 @@
   filesystem:
     fstype: "{{ item[1]['filesystem'] }}"
     dev: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
-#    resizefs: yes  #coming in 2.0 which will replace the resizing filesystem task below
+    # resizefs: yes  #coming in 2.0 which will replace the resizing filesystem task below
   become: true
   with_subelements:
     - "{{ lvm_groups }}"
@@ -46,7 +46,10 @@
         (item[1] is defined and
         item[1] != 'None') and
         (item[1]['create'] is defined and
-        item[1]['create']))
+        item[1]['create']) and
+        (item[1]['filesystem'] is defined and
+        item[1]['filesystem'] != 'None') and
+        item[1]['filesystem'] != "swap")
 
 - name: manage_lvm | mounting new filesystem(s)
   mount:
@@ -77,6 +80,8 @@
     - lvnames
   when: >
         lvm['changed'] and
+        item[1]['filesystem'] is defined and
+        item[1]['filesystem'] != "None" and
         item[1]['filesystem'] != "swap" and
         item[1]['filesystem'] != "xfs" and
         item[1]['filesystem'] != "btrfs"
@@ -89,6 +94,7 @@
     - lvnames
   when: >
         lvm['changed'] and
+        item[1]['filesystem'] is defined and
         item[1]['filesystem'] == "xfs"
 
 - name: manage_lvm | resizing swap
@@ -99,6 +105,7 @@
     - lvnames
   when: >
         lvm['changed'] and
+        item[1]['filesystem'] is defined and
         item[1]['filesystem'] == "swap"
 
 - name: manage_lvm | resizing btrfs
@@ -109,13 +116,14 @@
     - lvnames
   when: >
         lvm['changed'] and
+        item[1]['filesystem'] is defined and
         item[1]['filesystem'] == "btrfs"
 
 - name: manage_lvm | unmounting filesystem(s)
   mount:
     name: "{{ item[1]['mntp'] }}"
     src: "/dev/{{ item[0]['vgname'] }}/{{ item[1]['lvname'] }}"
-    fstype: "{{ item[1]['filesystem'] }}"
+    fstype: "{{ item[1]['filesystem'] | default(omit) }}"
     state: "absent"
   become: true
   with_subelements:
@@ -125,7 +133,8 @@
         (item[1] is defined and
         item[1] != 'None') and
         (item[1]['create'] is defined and
-        not item[1]['create'])
+        not item[1]['create'] and
+        item[1]['filesystem'] != "swap")
 
 - name: manage_lvm | Removing LVM logical volume(s)
   lvol:

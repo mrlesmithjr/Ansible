@@ -1,14 +1,16 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [ansible-grafana](#ansible-grafana)
+  - [Build Status](#build-status)
   - [Requirements](#requirements)
   - [Information](#information)
   - [Vagrant](#vagrant)
   - [Usage](#usage)
-      - [Vagrant](#vagrant-1)
-      - [Non-Vagrant](#non-vagrant)
+    - [Vagrant Login](#vagrant-login)
+    - [Non-Vagrant Login](#non-vagrant-login)
   - [Role Variables](#role-variables)
   - [Dependencies](#dependencies)
   - [Example Playbook](#example-playbook)
@@ -20,6 +22,10 @@
 # ansible-grafana
 
 An [Ansible](https://www.ansible.com) role to install/configure [Grafana](https://grafana.com/)
+
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-grafana.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-grafana)
 
 ## Requirements
 
@@ -49,11 +55,11 @@ username: admin
 password: admin
 ```
 
-#### Vagrant
+### Vagrant Login
 
 <http://127.0.0.1:3000>
 
-#### Non-Vagrant
+### Non-Vagrant Login
 
 <http://iporhostname:3000>
 
@@ -90,6 +96,6 @@ MIT
 
 Larry Smith Jr.
 
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   <mailto:mrlesmithjr@gmail.com>
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

@@ -2,7 +2,7 @@
 # /usr/share/doc/lighttpd/fastcgi.txt.gz
 # http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions#mod_fastcgi-fastcgi
 
-{% if not lighttpd_enable_php5 %}
+{% if not lighttpd_enable_php %}
 ## Start an FastCGI server for php (needs the php5-cgi package)
 fastcgi.server += ( ".php" =>
 	((
@@ -19,7 +19,7 @@ fastcgi.server += ( ".php" =>
 		"broken-scriptfilename" => "enable"
 	))
 )
-{% elif lighttpd_enable_php5 %}
+{% elif lighttpd_enable_php %}
 ## Start an FastCGI server for php (needs the php5-cgi package)
 fastcgi.server += ( ".php" =>
   ((

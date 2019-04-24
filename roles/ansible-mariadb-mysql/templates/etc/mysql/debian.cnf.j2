@@ -1,13 +1,13 @@
-# {{ ansible_managed }}
+{{ ansible_managed|comment }}
 # Automatically generated for Debian scripts. DO NOT TOUCH! (opps)
 [client]
 host     = localhost
 user     = debian-sys-maint
-password = {{ mariadb_deb_db_password }}
+password = {{ mariadb_mysql_deb_db_password }}
 socket   = /var/run/mysqld/mysqld.sock
 [mysql_upgrade]
 host     = localhost
 user     = debian-sys-maint
-password = {{ mariadb_deb_db_password }}
+password = {{ mariadb_mysql_deb_db_password }}
 socket   = /var/run/mysqld/mysqld.sock
 basedir  = /usr

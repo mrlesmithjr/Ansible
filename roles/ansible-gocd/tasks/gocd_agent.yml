@@ -1,20 +1,24 @@
 ---
 - name: gocd_agent | installing go-agent
   apt:
-    name: "go-agent"
+    name: go-agent
     state: present
+  become: true
 
 - name: gocd_agent | configuring go-agent
   template:
-    src: "etc/default/go-agent.j2"
-    dest: "/etc/default/go-agent"
+    src: etc/default/go-agent.j2
+    dest: /etc/default/go-agent
     owner: go
     group: go
     mode: 0644
+  become: true
   notify:
     - restart go-agent
 
-- name: gocd_agent | ensuring go-agent is running
+- name: gocd_agent | Ensuring go-agent Is Started and Enabled on Boot
   service:
-    name: "go-agent"
+    name: go-agent
     state: started
+    enabled: true
+  become: true

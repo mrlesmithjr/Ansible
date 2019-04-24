@@ -1,0 +1,39 @@
+---
+- name: config_storage_pools | defining storage pools
+  virt_pool:
+    command: define
+    name: "{{ item['name'] }}"
+    xml: "{{ lookup('template', 'vm-pool.xml.j2') }}"
+  register: kvm_pools_defined
+  become: true
+  with_items: "{{ kvm_storage_pools }}"
+
+- name: config_virtual networks | setting state of storage pools
+  virt_pool:
+    state: "{{ item['state'] }}"
+    name: "{{ item['name'] }}"
+  become: true
+  with_items: "{{ kvm_storage_pools }}"
+  when: item['state'] is defined
+
+- name: config_storage pools | setting storage pools to autostart
+  virt_pool:
+    autostart: yes
+    name: "{{ item['name'] }}"
+  become: true
+  with_items: "{{ kvm_storage_pools }}"
+  when: >
+    (item['autostart'] is defined and
+      item['autostart']) and
+      (item['state'] is defined and
+        item['state'] == "active")
+
+- name: config_storage pools | setting storage pools to not autostart
+  virt_pool:
+    autostart: no
+    name: "{{ item['name'] }}"
+  become: true
+  with_items: "{{ kvm_storage_pools }}"
+  when: >
+    item['autostart'] is defined and
+    not item['autostart']

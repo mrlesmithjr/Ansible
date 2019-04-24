@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [ansible-config-interfaces](#ansible-config-interfaces)
   - [Requirements](#requirements)
@@ -19,9 +20,9 @@
 
 An [Ansible](https://www.ansible.com) role to configure network interfaces
 
--   Define dhcp, static, and manual settings
--   Create VLAN, bonds, bridges, and interfaces
--   Create Open vSwitch bridges, bonds, and interfaces
+- Define dhcp, static, and manual settings
+- Create VLAN, bonds, bridges, and interfaces
+- Create Open vSwitch bridges, bonds, and interfaces
 
 ## Requirements
 
@@ -32,193 +33,7 @@ network configurations.
 
 ## Role Variables
 
-```yaml
----
-# defaults file for ansible-config-interfaces
-
-# Defines if network bonds should be configured as defined
-config_network_bonds: false
-
-# Defines if network bridges should be configured as defined
-config_network_bridges: false
-
-# Defines if interfaces should be configured as defined
-config_network_interfaces: false
-
-# Defines if vlans should be configured as defined
-config_network_vlans: false
-
-# Defines if Open vSwitch bonds should be configured as defined
-config_ovs_bonds: false
-
-# Defines if Open vSwitch bridges should be configured as defined
-config_ovs_bridges: false
-
-# Defines if Open vSwitch interfaces should be configured as defined
-config_ovs_interfaces: false
-
-# Defines all dns servers to configure
-dns_nameservers:
-  - '8.8.8.8'
-  - '8.8.4.4'
-
-# Defines your global dns suffix search
-dns_search: '{{ pri_domain_name }}'
-
-# Defines if interfaces, bonds, bridges, vlans, ovs_bonds, ovs_bridges and
-# ovs_interfaces should be brought up after defining.
-enable_configured_interfaces_after_defining: false
-
-# Defines non Open vSwitch network bonds
-network_bonds: []
-  # - name: 'bond0'
-  #   address: '192.168.1.10'
-  #   netmask: '255.255.255.0'
-  #   configure: true
-  #   comment: 'Bond Group 0'
-  #   method: 'static'
-  #   parameters:
-  #     - param: 'bond_mode'
-  #       val: 'active-backup'
-  #     - param: 'bond_miimon'
-  #       val: '100'
-  #     # - param: 'miimon'
-  #     #   val: '100'
-  #     # - param: 'mode'
-  #     #   val: 'active-backup'
-  #     - param: 'primary'
-  #       val: 'enp0s9'
-  #   slaves:
-  #     - 'enp0s9'
-  #     - 'enp0s10'
-
-# Defines non Open vSwitch network bridges
-network_bridges: []
-  # - name: 'br0'
-  #   configure: true
-  #   comment: 'Bridge 0'
-  #   method: 'static'
-  #   address: '192.168.1.11'
-  #   netmask: '255.255.255.0'
-  #   netmask_cidr: '24'
-  #   # gateway: '192.168.1.1'
-  #   parameters:
-  #     - param: 'bridge_stp'
-  #       val: 'off'
-  #     - param: 'bridge_fd'
-  #       val: '0'
-  #     # - param: 'up route add default gw'
-  #     #   val: '10.0.106.1'
-  #   ports:
-  #     - 'enp0s16'
-
-# Defines non Open vSwitch network interfaces
-network_interfaces: []
-  # - name: 'enp0s3'
-  #   configure: true
-  #   method: 'dhcp'
-  #   parameters:
-  #     - param: 'pre-up sleep'
-  #       val: '2'
-  # - name: 'enp0s8'
-  #   configure: true
-  #   method: 'static'
-  #   address: '192.168.250.10'
-  #   netmask: '255.255.255.0'
-  # - name: 'enp0s9'
-  #   configure: true
-  #   comment: 'bond0 member'
-  #   method: 'manual'
-  #   parameters:
-  #     - param: 'bond_master'
-  #       val: 'bond0'
-  # - name: 'enp0s10'
-  #   configure: true
-  #   comment: 'bond0 member'
-  #   method: 'manual'
-  #   parameters:
-  #     - param: 'bond_master'
-  #       val: 'bond0'
-  # - name: 'enp0s16'
-  #   configure: true
-  #   comment: 'br0 member'
-  #   method: 'manual'
-
-# Defines non Open vSwitch network vlans
-network_vlans: []
-  # - name: 'enp0s8.100'
-  #   configure: true
-  #   comment: 'VLAN 100'
-  #   method: 'manual'
-  #   address:
-  #   netmask:
-  #   netmask_cidr:
-  #   gateway:
-  #   vlan_device: 'enp0s8'
-
-# Defines Open vSwitch bonds
-ovs_bonds: []
-  # - name: 'bond0'
-  #   # address:
-  #   bridge: 'vmbr0'
-  #   comment: 'OVS Bond'
-  #   configure: true
-  #   # gateway:
-  #   method: 'manual'
-  #   # netmask:
-  #   # netmask_cidr:
-  #   options:
-  #     - opt: 'bond_mode'
-  #       val: 'active-backup'
-  #     - opt: 'lacp'
-  #       val: 'off'
-  #   # parameters:
-  #   #   - param: ''
-  #   #     val: ''
-  #   ports:
-  #     - 'enp0s9'
-  #     - 'enp0s10'
-
-# Defines Open vSwitch bridges
-ovs_bridges: []
-  # - name: 'vmbr0'
-  #   # address:
-  #   comment: 'OVS Bridge'
-  #   configure: true
-  #   # gateway:
-  #   method: 'manual'
-  #   # netmask:
-  #   # netmask_cidr:
-  #   # options:
-  #   #   - opt: ''
-  #   #     val: ''
-  #   # parameters:
-  #   #   - param: ''
-  #   #     val: ''
-  #   ports:
-  #     # - 'enp0s9'
-  #     # - 'enp0s10'
-  #     - 'bond0'
-  #     - 'vlan1'
-
-# Defines Open vSwitch interfaces
-ovs_interfaces: []
-  # - name: 'vlan1'
-  #   address:
-  #   bridge: 'vmbr0'
-  #   comment: 'VLAN1'
-  #   configure: true
-  #   gateway:
-  #   method: 'static'
-  #   netmask:
-  #   netmask_cidr:
-  #   # options:
-  #   #   - opt: 'vlan_mode'
-  #   #     val: 'access'
-  #   # parameters:
-
-pri_domain_name: 'example.org'
-```
+[defaults/main.yml](defaults/main.yml)
 
 ## Dependencies
 
@@ -227,11 +42,11 @@ SSID and key.
 
 ## Example Playbook
 
-[Example Playbook](./playbook.yml)
+[Example Playbook](playbook.yml)
 
 ## Examples
 
-### Example (standard) `/etc/network/interfaces`:
+### Example (standard) `/etc/network/interfaces`
 
 ```bash
 # Ansible managed
@@ -296,7 +111,7 @@ dns-nameservers 8.8.8.8 8.8.4.4
 dns-search test.vagrant.local
 ```
 
-### Example (Open vSwitch) `/etc/network/interfaces`:
+### Example (Open vSwitch) `/etc/network/interfaces`
 
 ```bash
 # Ansible managed
@@ -364,7 +179,6 @@ MIT
 
 Larry Smith Jr.
 
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   [mrlesmithjr.com](http://mrlesmithjr.com)
--   mrlesmithjr [at] gmail.com
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

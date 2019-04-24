@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Larry Smith Jr.
   description: An [Ansible](https://www.ansible.com) role to install [Virtualbox](https://www.virtualbox.org/)
@@ -7,6 +8,14 @@ galaxy_info:
   min_ansible_version: 1.2
 
   platforms:
+    - name: Archlinux
+      versions:
+        - 18
+    - name: Fedora
+      versions:
+        - 26
+        - 27
+        - 28
     - name: Ubuntu
       versions:
         - trusty

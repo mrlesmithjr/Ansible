@@ -1,15 +1,18 @@
 ---
-- name:       redhat | Enabling EPEL
+- name: redhat | Enabling EPEL
   yum:
-    name:     epel-release
-    state:    present
-  become:     true
-  when:       ansible_distribution != "Fedora"
+    name: epel-release
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution != "Fedora"
 
-- name:       redhat | Installing AWX Pre-Reqs
+- name: redhat | Installing AWX Pre-Reqs
   yum:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items: "{{ awx['redhat_pre_reqs'] }}"
-  when:       ansible_distribution != "Fedora"
+    name: "{{ awx['redhat_pre_reqs'] }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution != "Fedora"

@@ -6,4 +6,4 @@
     state: "{{ item['state'] }}"
     reload: yes
   become: true
-  with_items: '{{ kvm_sysctl_settings }}'
+  with_items: "{{ kvm_sysctl_settings }}"

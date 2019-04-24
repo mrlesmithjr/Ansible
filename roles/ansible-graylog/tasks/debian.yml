@@ -1,37 +1,38 @@
 ---
 - name: debian | installing pre-reqs
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["apt-transport-https", "pwgen", "uuid-runtime"]
+    state: present
   become: true
-  with_items:
-    - 'apt-transport-https'
-    - 'pwgen'
+  register: result
+  until: result is successful
 
 - name: debian | Installing Default Java JRE
   apt:
-    name: "default-jre-headless"
-    state: "present"
+    name: ["openjdk-8-jre-headless"]
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: graylog_install_default_java_jre
 
 - name: debian | installing graylog repo
   apt:
-    deb: "{{ graylog_debian_package_info.url }}/{{ graylog_debian_package_info.file }}"
-    state: "present"
+    deb: "{{ graylog_debian_package_info['url'] + '/' +  graylog_debian_package_info['file'] }}"
+    state: present
   become: true
-  register: "graylog_repo"
+  register: graylog_repo
 
 - name: debian | updating apt-cache
   apt:
-    update_cache: yes
+    update_cache: true
   become: true
-  when: graylog_repo.changed
+  when: graylog_repo['changed']
 
 - name: debian | installing graylog
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["graylog-server"]
+    state: present
   become: true
-  with_items:
-    - graylog-server
+  register: result
+  until: result is successful

@@ -20,11 +20,11 @@
   become: true
   with_items: "{{ _hashicorp_tools_installed_versions['results'] }}"
   when: >
-        item['item']['item']['name']|lower != "vagrant" and
-        item['item']['item']['state']|lower == "present" and
-        item['item']['stat']['exists'] and
-        (item['stdout'] is defined and
-        item['item']['item']['version'] != item['stdout'])
+    item['item']['item']['name']|lower != "vagrant" and
+    item['item']['item']['state']|lower == "present" and
+    item['item']['stat']['exists'] and
+    (item['stdout'] is defined and
+    item['item']['item']['version'] != item['stdout'])
 
 - name: install | Installing Tools
   unarchive:
@@ -34,6 +34,6 @@
   become: true
   with_items: "{{ _hashicorp_tools_installed_versions['results'] }}"
   when: >
-        item['item']['item']['name']|lower != "vagrant" and
-        item['item']['item']['state']|lower == "present" and
-        not item['item']['stat']['exists']
+    item['item']['item']['name']|lower != "vagrant" and
+    item['item']['item']['state']|lower == "present" and
+    not item['item']['stat']['exists']

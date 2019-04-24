@@ -1,21 +1,26 @@
 ---
 - name: alpine | Ensuring Edge Repo Is Enabled
   lineinfile:
-    path: "/etc/apk/repositories"
+    path: /etc/apk/repositories
     regexp: "^http://dl-cdn.alpinelinux.org/alpine/edge/community"
-    line: "http://dl-cdn.alpinelinux.org/alpine/edge/community"
-    state: "present"
-  register: "_apk_repos_updated"
+    line: http://dl-cdn.alpinelinux.org/alpine/edge/community
+    state: present
   become: true
+  register: _apk_repos_updated
+  until: _apk_repos_updated is successful
 
 - name: alpine | Updating APK Cache
   apk:
     update_cache: true
   become: true
+  register: result
+  until: result is successful
   when: _apk_repos_updated['changed']
 
 - name: alpine | Installing Docker
   apk:
-    name: "docker"
-    state: "present"
+    name: docker
+    state: present
   become: true
+  register: result
+  until: result is successful

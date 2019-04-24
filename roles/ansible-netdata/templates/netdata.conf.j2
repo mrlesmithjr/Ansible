@@ -4,7 +4,7 @@
 [global]
 	# glibc malloc arena max for plugins = 1
 	# glibc malloc arena max for netdata = 1
-	hostname = {{ ansible_hostname }}
+	hostname = {{ netdata_hostname }}
 	history = {{ netdata_history }}
 	update every = {{ netdata_update_every }}
 	config directory = /etc/netdata
@@ -36,7 +36,7 @@
 [web]
 	# web files owner = netdata
 	# web files group = netdata
-	# mode = multi-threaded
+	mode = {{ netdata_web_mode }}
 	# listen backlog = 4096
 	default port = {{ netdata_default_port }}
 	bind to = {{ netdata_bind_to|join(' ') }}
@@ -91,7 +91,7 @@
 	# registry expire idle persons days = 365
 	# registry domain =
 	registry to announce = {{ netdata_registry_to_announce }}
-	registry hostname = {{ ansible_hostname }}
+	registry hostname = {{ netdata_hostname }}
 	# verify browser cookies support = yes
 	# max URL length = 1024
 	# max URL name length = 50
@@ -103,7 +103,7 @@
 	# type = graphite
 	# destination = localhost
 	# prefix = netdata
-	hostname = {{ ansible_hostname }}
+	hostname = {{ netdata_hostname }}
 	# update every = 10
 	# buffer on failures = 10
 	# timeout ms = 20000

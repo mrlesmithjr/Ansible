@@ -2,22 +2,22 @@
 - name: config_vms | Defining VM(s)
   virt:
     name: "{{ item['name'] }}"
-    command: "define"
+    command: define
     xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
   become: true
-  with_items: '{{ kvm_vms }}'
+  with_items: "{{ kvm_vms }}"
   when: item['host'] is not defined
 
 - name: config_vms | Defining VM(s)
   virt:
     name: "{{ item['name'] }}"
-    command: "define"
+    command: define
     xml: "{{ lookup('template', 'vm-template.xml.j2') }}"
   become: true
-  with_items: '{{ kvm_vms }}'
+  with_items: "{{ kvm_vms }}"
   when: >
-        item['host'] is defined and
-        inventory_hostname == item['host']
+    item['host'] is defined and
+    inventory_hostname == item['host']
 
 - name: config_vms | Creating VM Disk(s)
   qemu_img:
@@ -26,7 +26,7 @@
     format: "{{ kvm_images_format_type }}"
   become: true
   with_subelements:
-    - '{{ kvm_vms }}'
+    - "{{ kvm_vms }}"
     - disks
   when: item[0]['host'] is not defined
 
@@ -37,18 +37,18 @@
     format: "{{ kvm_images_format_type }}"
   become: true
   with_subelements:
-    - '{{ kvm_vms }}'
+    - "{{ kvm_vms }}"
     - disks
   when: >
-        item[0]['host'] is defined and
-        inventory_hostname == item[0]['host']
+    item[0]['host'] is defined and
+    inventory_hostname == item[0]['host']
 
 - name: config_vms | Setting VM State
   virt:
     name: "{{ item['name'] }}"
     state: "{{ item['state'] }}"
   become: true
-  with_items: '{{ kvm_vms }}'
+  with_items: "{{ kvm_vms }}"
   when: item['host'] is not defined
 
 - name: config_vms | Setting VM State
@@ -56,30 +56,30 @@
     name: "{{ item['name'] }}"
     state: "{{ item['state'] }}"
   become: true
-  with_items: '{{ kvm_vms }}'
+  with_items: "{{ kvm_vms }}"
   when: >
-        item['host'] is defined and
-        inventory_hostname == item['host']
+    item['host'] is defined and
+    inventory_hostname == item['host']
 
 - name: config_vms | Setting autostart status
   virt:
     name: "{{ item['name'] }}"
     autostart: "{{ item['autostart']|default(omit) }}"
-    command: "info"
+    command: info
   become: true
-  with_items: '{{ kvm_vms }}'
+  with_items: "{{ kvm_vms }}"
   when: >
-        item['host'] is not defined and
-        (ansible_version.full | version_compare('2.3', '>='))
+    item['host'] is not defined and
+    (ansible_version.full | version_compare('2.3', '>='))
 
 - name: config_vms | Setting autostart status
   virt:
     name: "{{ item['name'] }}"
     autostart: "{{ item['autostart']|default(omit) }}"
-    command: "info"
+    command: info
   become: true
-  with_items: '{{ kvm_vms }}'
+  with_items: "{{ kvm_vms }}"
   when: >
-        item['host'] is defined and
-        inventory_hostname == item['host'] and
-        (ansible_version.full | version_compare('2.3', '>='))
+    item['host'] is defined and
+    inventory_hostname == item['host'] and
+    (ansible_version.full | version_compare('2.3', '>='))

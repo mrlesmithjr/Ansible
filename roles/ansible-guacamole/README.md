@@ -1,9 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [ansible-guacamole](#ansible-guacamole)
+  - [Build Status](#build-status)
   - [Requirements](#requirements)
+    - [If using MySQL for authentication](#if-using-mysql-for-authentication)
   - [Role Variables](#role-variables)
   - [Dependencies](#dependencies)
   - [Example Playbook](#example-playbook)
@@ -19,7 +20,19 @@ An [Ansible](https://www.ansible.com) role to install/configure [Guacamole](http
 > NOTE: Apache Guacamole is a clientless remote desktop gateway. It supports
 > standard protocols like VNC, RDP, and SSH.
 
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-guacamole.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-guacamole)
+
 ## Requirements
+
+### If using MySQL for authentication
+
+> NOTE: A working MySQL DB must be available as this role does not install MySQL.
+> The DB, DB user, and DB populated with this role.
+
+The following Ansible role [ansible-mysql](https://github.com/mrlesmithjr/ansible-mysql)
+is what I test with.
 
 ## Role Variables
 
@@ -29,6 +42,8 @@ An [Ansible](https://www.ansible.com) role to install/configure [Guacamole](http
 
 ## Example Playbook
 
+[playbook.yml](playbook.yml)
+
 ## License
 
 MIT
@@ -37,6 +52,6 @@ MIT
 
 Larry Smith Jr.
 
--   [@mrlesmithjr](https://twitter.com/mrlesmithjr)
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   mrlesmithjr [at] gmail.com
+- [@mrlesmithjr](https://twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

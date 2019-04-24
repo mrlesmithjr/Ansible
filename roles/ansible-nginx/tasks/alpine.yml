@@ -1,6 +1,8 @@
 ---
-- name:    alpine | Installing NGINX
+- name: alpine | Installing NGINX
   apk:
-    name:  nginx
+    name: nginx
     state: present
-  become:  true
+  become: true
+  register: result
+  until: result is successful

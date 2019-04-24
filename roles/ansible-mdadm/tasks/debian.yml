@@ -4,6 +4,8 @@
     name: "mdadm"
     state: "present"
 
-- name: arrays | Set update_initramfs cmd to update-initramfs -u
+- name: arrays | Setting distribution-specific facts
   set_fact:
     update_initramfs: "update-initramfs -u"
+    mdadm_conf: "/etc/mdadm/mdadm.conf"
+    mdadm_conf_path: "/etc/mdadm"

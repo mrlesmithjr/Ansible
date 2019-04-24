@@ -1,19 +1,19 @@
 ---
 - name: ext_pack | Capture Installed Extension Packs
-  command: "VBoxManage list extpacks"
+  command: VBoxManage list extpacks
   changed_when: false
-  register: "_virtualbox_extpacks_list"
+  register: _virtualbox_extpacks_list
 
 - name: ext_pack | Downloading Extension Pack
   get_url:
-    url: "{{ virtualbox_dl_url }}/{{ virtualbox_ext_pack }}"
-    dest: "/opt/{{ virtualbox_ext_pack }}"
+    url: "{{ virtualbox_dl_url + '/' + virtualbox_ext_pack }}"
+    dest: "{{ '/opt/' + virtualbox_ext_pack }}"
   become: true
 
 - name: ext_pack | Installing Extension Pack
   shell: >
-         echo y | VBoxManage extpack install \
-         --replace /opt/{{ virtualbox_ext_pack }}
+    echo y | VBoxManage extpack install \
+    --replace {{ '/opt/' + virtualbox_ext_pack }}
   become: true
   # ignore_errors: true
-  when: _virtualbox_extpacks_list['stdout'] == 'Extension Packs{{ ':' }} 0'
+  when: _virtualbox_extpacks_list['stdout'] == "Extension Packs{{ ':' }} 0"

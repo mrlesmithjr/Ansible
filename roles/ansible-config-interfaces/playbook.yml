@@ -6,71 +6,78 @@
     config_network_interfaces: true
     enable_configured_interfaces_after_defining: true
     network_bonds:
-      - name: 'bond0'
-        address: '192.168.1.10'
-        netmask: '255.255.255.0'
+      - name: bond0
+        address: 192.168.1.10
+        netmask: 255.255.255.0
         configure: true
-        comment: 'Bond Group 0'
-        method: 'static'
+        enable: false
+        comment: Bond Group 0
+        method: static
         parameters:
-          - param: 'miimon'
-            val: '100'
-          - param: 'mode'
-            val: 'active-backup'
-          - param: 'primary'
-            val: 'enp0s9'
+          - param: bond_mode
+            val: active-backup
+          - param: bond_miimon
+            val: 100
+          # - param: miimon
+          #   val: 100
+          # - param: mode
+          #   val: active-backup
+          - param: primary
+            val: enp0s9
         slaves:
-          - 'enp0s9'
-          - 'enp0s10'
-        primary: 'enp0s9'
-        addl_settings:
-          - 'bond_mode active-backup'
-          - 'bond_miimon 100'
+          - enp0s9
+          - enp0s10
     network_bridges:
-      - name: 'br0'
+      - name: br0
         configure: true
-        comment: 'Bridge 0'
-        method: 'static'
-        address: '192.168.1.11'
-        netmask: '255.255.255.0'
-        netmask_cidr: '24'
-        # gateway: '192.168.1.1'
+        enable: false
+        comment: Bridge 0
+        method: static
+        address: 192.168.1.11
+        netmask: 255.255.255.0
+        netmask_cidr: 24
+        # gateway: 192.168.1.1
+        parameters:
+          - param: bridge_stp
+            val: off
+          - param: bridge_fd
+            val: 0
+          # - param: up route add default gw
+          #   val: 10.0.106.1
         ports:
-          - 'enp0s16'
-        addl_settings:
-          # - 'up route add default gw 10.0.106.1'
-          - 'bridge_stp off'
-          - 'bridge_fd 0'
+          - enp0s16
     network_interfaces:
-      - name: 'enp0s3'
+      - name: enp0s3
         configure: true
-        method: 'dhcp'
-        addl_settings:
-          - 'pre-up sleep 2'
-      - name: 'enp0s8'
+        enable: false
+        method: dhcp
+        parameters:
+          - param: pre-up sleep
+            val: 2
+      - name: enp0s8
         configure: true
-        method: 'static'
-        address: '192.168.250.10'
-        netmask: '255.255.255.0'
-      - name: 'enp0s9'
+        method: static
+        address: 192.168.250.10
+        netmask: 255.255.255.0
+      - name: enp0s9
         configure: true
-        comment: 'bond0 member'
-        method: 'manual'
-        addl_settings:
-          - 'bond_master bond0'
-      - name: 'enp0s10'
+        comment: bond0 member
+        method: manual
+        parameters:
+          - param: bond_master
+            val: bond0
+      - name: enp0s10
         configure: true
-        comment: 'bond0 member'
-        method: 'manual'
-        addl_settings:
-          - 'bond_master bond0'
-      - name: 'enp0s16'
+        comment: bond0 member
+        method: manual
+        parameters:
+          - param: bond_master
+            val: bond0
+      - name: enp0s16
         configure: true
-        comment: 'br0 member'
-        method: 'manual'
-        addl_settings:
-          - 'bond_master bond0'
-    pri_domain_name: 'test.vagrant.local'
+        comment: br0 member
+        method: manual
+    pri_domain_name: test.vagrant.local
   roles:
     - role: ansible-openvswitch
     - role: ansible-config-interfaces

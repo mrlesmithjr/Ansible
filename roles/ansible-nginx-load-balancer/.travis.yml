@@ -1,45 +1,56 @@
 ---
-language:        python
-python:          "2.7"
+language: python
+python: "2.7"
 
 # Use the new container infrastructure
-sudo:            required
+sudo: required
 
 services:
   - docker
 
 env:
   # - distribution: centos
-  #   init:        /usr/lib/systemd/systemd
-  #   version:     7
+  #   init: /usr/lib/systemd/systemd
+  #   version: 7
   # - distribution: fedora
-  #   init:        /usr/lib/systemd/systemd
-  #   version:     26
+  #   init: /usr/lib/systemd/systemd
+  #   version: 29
   # - distribution: fedora
-  #   init:        /usr/lib/systemd/systemd
-  #   version:     25
+  #   init: /usr/lib/systemd/systemd
+  #   version: 28
   # - distribution: fedora
-  #   init:        /usr/lib/systemd/systemd
-  #   version:     24
+  #   init: /usr/lib/systemd/systemd
+  #   version: 27
+  # - distribution: fedora
+  #   init: /usr/lib/systemd/systemd
+  #   version: 26
+  # - distribution: fedora
+  #   init: /usr/lib/systemd/systemd
+  #   version: 25
+  # - distribution: fedora
+  #   init: /usr/lib/systemd/systemd
+  #   version: 24
   - distribution: ubuntu
-    init:        /lib/systemd/systemd
-    version:     bionic
+    init: /lib/systemd/systemd
+    version: bionic
   - distribution: ubuntu
-    init:        /lib/systemd/systemd
-    version:     xenial
+    init: /lib/systemd/systemd
+    version: xenial
   - distribution: ubuntu
-    init:        /sbin/init
-    version:     trusty
+    init: /sbin/init
+    version: trusty
   # - distribution: debian
-  #   init:        /lib/systemd/systemd
-  #   version:     stretch
+  #   init: /lib/systemd/systemd
+  #   version: stretch
   # - distribution: debian
-  #   init:        /lib/systemd/systemd
-  #   version:     jessie
+  #   init: /lib/systemd/systemd
+  #   version: jessie
 
 before_install:
-  - 'sudo docker pull ${distribution}:${version}'
-  - 'sudo docker build --no-cache --rm --file=tests/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible tests'
+  - "sudo pip install yamllint"
+  - yamllint -c .yamllint.yml .
+  - "sudo docker pull ${distribution}:${version}"
+  - "sudo docker build --no-cache --rm --file=tests/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible tests"
 
 script:
   - container_id=$(mktemp)
@@ -49,11 +60,11 @@ script:
   - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/${role_name}/tests/test.yml --syntax-check'
   - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/${role_name}/tests/test.yml'
   - >
-      sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/${role_name}/tests/test.yml
-      | grep -q 'changed=0.*failed=0'
-      && (echo 'Idempotence test: pass' && exit 0)
-      || (echo 'Idempotence test: fail' && exit 1)
+    sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/${role_name}/tests/test.yml
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
   - 'sudo docker rm -f "$(cat ${container_id})"'
 
 notifications:
-  webhooks:      https://galaxy.ansible.com/api/v1/notifications/
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

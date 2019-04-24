@@ -44,12 +44,21 @@
     src: "mariadb_repo.j2"
     dest: "/etc/apt/preferences.d/mariadb"
   become: true
+  when: galera_enable_mariadb_repo == 'true'
 
 - name: debian | adding mariadb repo
   apt_repository:
     repo: "{{ mariadb_debian_repo }}"
     state: "present"
   become: true
+  when: galera_enable_mariadb_repo == 'true'
+
+- name: redhat | add an overrides file
+  template:
+    src: "etc/mariadb_overrides.cnf.j2"
+    dest: "/etc/my.cnf.d/overrides.cnf"
+  become: true
+  when: mariadb_config_overrides is defined
 
 - name: debian | installing mariadb-galera packages
   apt:
@@ -59,6 +68,7 @@
   with_items:
     - 'mariadb-server'
     # - 'galera-3'
+  when: galera_enable_mariadb_repo == 'true'
 
 - name: debian | configuring root my.cnf
   template:

@@ -1,12 +1,15 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [ansible-elasticsearch](#ansible-elasticsearch)
+  - [Build Status](#build-status)
   - [Requirements](#requirements)
   - [Role Variables](#role-variables)
   - [Dependencies](#dependencies)
   - [Example Playbook](#example-playbook)
+  - [Molecule Testing](#molecule-testing)
   - [License](#license)
   - [Author Information](#author-information)
 
@@ -20,6 +23,10 @@ An [Ansible](https://www.ansible.com) role to install/configure [Elasticsearch](
 > `ansible-elasticsearch` role which has been renamed to [ansible-elasticsearch-old](https://github.com/mrlesmithjr/ansible-elasticsearch-old.git).
 > I decided to rewrite this role as the original had a lot of residuals from years
 > of different usages. The original will remain for historical purposes.
+
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-elasticsearch.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-elasticsearch)
 
 ## Requirements
 
@@ -41,6 +48,17 @@ None
 
 [playbook.yml](playbook.yml)
 
+## Molecule Testing
+
+If you have [Molecule](https://github.com/metacloud/molecule) installed, you
+can easily spin up a 3-node cluster for testing.
+
+Simply run the following to spin up:
+
+```bash
+molecule converge
+```
+
 ## License
 
 MIT
@@ -49,6 +67,6 @@ MIT
 
 Larry Smith Jr.
 
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   mrlesmithjr [at] gmail.com
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

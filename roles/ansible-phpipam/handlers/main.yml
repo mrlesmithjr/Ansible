@@ -1,16 +1,19 @@
 ---
 # handlers file for ansible-phpipam
-- name: "restart apache2"
+- name: restart apache2
   service:
-    name: "apache2"
+    name: apache2
     state: restarted
+  become: true
 
-- name: "restart httpd"
+- name: restart httpd
   service:
-    name: "httpd"
+    name: httpd
     state: restarted
+  become: true
 
-- name: "restart_php5-fpm"
+- name: restart_php5-fpm
   service:
-    name: "php5-fpm"
+    name: php5-fpm
     state: restarted
+  become: true

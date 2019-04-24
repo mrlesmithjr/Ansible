@@ -7,13 +7,13 @@
 
 - name: pdns_recursor | configuring powerdns recursor
   template:
-    src: "etc/powerdns/recursor.conf.j2"
-    dest: "/etc/powerdns/recursor.conf"
-    owner: "root"
-    group: "root"
+    src: etc/powerdns/recursor.conf.j2
+    dest: /etc/powerdns/recursor.conf
+    owner: root
+    group: root
   become: true
-  notify: restart pdns recursor
-  register: "pdns_recursor_configured_1"
+  notify: restart pdns_recursor
+  register: pdns_recursor_configured_1
   when: >
         ansible_os_family == "Debian" or
         (ansible_os_family == "RedHat" and
@@ -21,27 +21,27 @@
 
 - name: pdns_recursor | configuring powerdns recursor
   template:
-    src: "etc/powerdns/recursor.conf.j2"
-    dest: "/etc/pdns-recursor/recursor.conf"
-    owner: "root"
-    group: "root"
+    src: etc/powerdns/recursor.conf.j2
+    dest: /etc/pdns-recursor/recursor.conf
+    owner: root
+    group: root
   become: true
-  notify: restart pdns recursor
-  register: "pdns_recursor_configured_2"
+  notify: restart pdns_recursor
+  register: pdns_recursor_configured_2
   when: >
         (ansible_os_family == "RedHat" and
         pdns_recursor_version == "4.x")
 
 - name: pdns_recursor | ensuring pdns recursor is enabled
   service:
-    name: "pdns-recursor"
-    enabled: yes
+    name: pdns-recursor
+    enabled: true
   become: true
 
 - name: pdns_recursor | restarting powerdns recursor
   service:
-    name: "pdns-recursor"
-    state: "restarted"
+    name: pdns-recursor
+    state: restarted
   become: true
   when: >
         pdns_recursor_configured_1['changed'] or

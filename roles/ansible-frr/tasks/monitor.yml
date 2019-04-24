@@ -21,6 +21,7 @@
     dest: "/opt/frr/monitoring/{{ item }}"
     mode: u=rwx,g=rwx,o=rwx
   become: true
+  when: not ansible_check_mode
   with_items:
     - bgp_neighbor_data.py
     - output_module.py

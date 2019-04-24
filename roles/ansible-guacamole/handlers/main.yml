@@ -1,5 +1,11 @@
 ---
 # handlers file for ansible-guacamole
+- name: restart guacd
+  service:
+    name: guacd
+    state: restarted
+  become: true
+
 - name: restart tomcat
   service:
     name: tomcat
@@ -9,5 +15,11 @@
 - name: restart tomcat7
   service:
     name: tomcat7
+    state: restarted
+  become: true
+
+- name: restart tomcat8
+  service:
+    name: tomcat8
     state: restarted
   become: true

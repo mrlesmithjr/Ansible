@@ -3,8 +3,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [ansible-logstash](#ansible-logstash)
+  - [Build Status](#build-status)
   - [Requirements](#requirements)
-  - [Vagrant](#vagrant)
   - [Role Variables](#role-variables)
   - [Dependencies](#dependencies)
   - [Example Playbook](#example-playbook)
@@ -16,6 +16,10 @@
 # ansible-logstash
 
 An [Ansible](https://www.ansible.com) role that Installs/configures [Logstash](https://www.elastic.co/products/logstash)
+
+## Build Status
+
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-logstash.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-logstash)
 
 ## Requirements
 
@@ -39,20 +43,6 @@ send to a different port. See example below:
 *.* @localhost:10514
 ```
 
-## Vagrant
-
-Spin up a Vagrant test environment
-
-```bash
-vagrant up
-```
-
-When done testing you can tear-down
-
-```bash
-./cleanup.sh
-```
-
 ## Role Variables
 
 [default vars](./defaults/main.yml)
@@ -63,7 +53,7 @@ Example:
 
 ```yaml
 logstash_custom_outputs:
-  - output: 'gelf'
+  - output: "gelf"
     lines:
       - 'host => "localhost"'
       - 'port => "12201"'
@@ -97,12 +87,12 @@ None
 
 ## License
 
-BSD
+MIT
 
 ## Author Information
 
 Larry Smith Jr.
 
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   mrlesmithjr [at] gmail.com
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

@@ -2,10 +2,11 @@
 # defaults file for ansible-tftpd-hpa
 
 # Defines tftp root directory
-tftp_directory: '/var/lib/tftpboot'
+tftp_directory: /var/lib/tftpboot
 
 # Defines tftp options for daemon...(-c allow new files to be created)
-tftp_options: '--secure -c'
+tftp_options: --secure -c
 
-tftp_netboot_file: 'netboot.tar.gz'
-tftp_netboot_url: 'http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot'
+tftp_netboot_enable: false
+tftp_netboot_file: netboot.tar.gz
+tftp_netboot_url: http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot

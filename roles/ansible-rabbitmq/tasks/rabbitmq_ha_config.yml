@@ -4,48 +4,52 @@
     path: /usr/sbin/rabbitmqadmin
   register: rabbitmqadmin_check
 
-- name: rabbitmq_ha_config | install rabbitMQ admin
-  shell: wget http://guest:guest@localhost:15672/cli/rabbitmqadmin
+- name: rabbit_ha_config | Installing rabbitMQ admin
+  get_url:
+    url: http://guest:guest@localhost:15672/cli/rabbitmqadmin
+    dest: /usr/sbin/rabbitmqadmin
+    mode: u=rwx,g=rw,o=rw
   become: true
-  when: not rabbitmqadmin_check['stat']['exists']
-
-- name: rabbitmq_ha_config | moving the rabbitMQ Admin
-  shell: mv rabbitmqadmin /usr/sbin
-  become: true
-  when: not rabbitmqadmin_check['stat']['exists']
-
-- name: rabbitmq_ha_config | making executable rabbitMQ Admin
-  shell: chmod +x /usr/sbin/rabbitmqadmin
   notify: restart rabbitmq-server
-  become: true
   when: not rabbitmqadmin_check['stat']['exists']
-
-- name: rabbitmq_ha_config | creating queue(s)
-  command: rabbitmqadmin declare queue name={{ item['queue_name'] }} durable={{ item['durable']|lower }}
-  run_once: true
-  become: true
-  with_items: "{{ rabbitmq_config }}"
-
-- name: rabbitmq_ha_config | setting up ha on queue(s)
-  rabbitmq_policy:
-    name: "ha-all"
-    pattern: "{{ item['queue_name'] }}"
-    tags: "{{ item['tags'] }}"
-    state: present
-  run_once: true
-  become: true
-  with_items: "{{ rabbitmq_config }}"
 
 - name: rabbitmq_ha_config | creating exchange(s)
-  command: rabbitmqadmin declare exchange name={{ item['exchange_name'] }} type={{ item['type'] }}
+  command: rabbitmqadmin declare exchange name={{ item['exchange_name'] }} type={{ item['type'] }} --vhost={{ item['vhost'] | default('/') }}
   run_once: true
+  delegate_to: "{{ rabbitmq_master }}"
   become: true
   with_items: "{{ rabbitmq_config }}"
   when: item['exchange_name'] is defined
 
-- name: rabbitmq_ha_config | creating binding(s)
-  command: rabbitmqadmin declare binding source={{ item['exchange_name'] }} destination_type="queue" destination={{ item['queue_name'] }} routing_key={{ item['routing_key'] }}
+- name: rabbitmq_ha_config | creating queue(s)
+  command: rabbitmqadmin declare queue name={{ item['queue_name'] }} durable={{ item['durable']|lower }} --vhost={{ item['vhost'] | default('/') }}
   run_once: true
+  delegate_to: "{{ rabbitmq_master }}"
+  become: true
+  when:
+    - item['queue_name'] is defined
+  with_items: "{{ rabbitmq_config }}"
+
+- name: rabbitmq_ha_config | setting up ha on queue(s)
+  rabbitmq_policy:
+    name: "ha-all{{ policy_name }}"
+    pattern: "{{ item.queue_name | default(item.policy_pattern) }}"
+    vhost: "{{ item.vhost | default('/') }}"
+    tags: "{{ item.tags }}"
+    state: present
+  vars:
+    policy_vhost: "{{ item.vhost | default('/') }}"
+    policy_name: "{{ item.policy_pattern is defined | ternary(policy_vhost + item.policy_pattern|default(''),item.queue_name|default('')) }}"
+  run_once: true
+  delegate_to: "{{ rabbitmq_master }}"
+  become: true
+  when: item.queue_name is defined or item.policy_pattern is defined
+  with_items: "{{ rabbitmq_config }}"
+
+- name: rabbitmq_ha_config | creating binding(s)
+  command: rabbitmqadmin declare binding source={{ item['exchange_name'] }} destination_type="queue" destination={{ item['queue_name'] }} routing_key={{ item['routing_key'] }} --vhost={{ item['vhost'] | default('/') }}
+  run_once: true
+  delegate_to: "{{ rabbitmq_master }}"
   become: true
   with_items: "{{ rabbitmq_config }}"
   when: item['exchange_name'] is defined

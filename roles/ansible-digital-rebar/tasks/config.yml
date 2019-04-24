@@ -1,4 +1,11 @@
 ---
+- name: config | Ensure /usr/share/dr-provision exists
+  file:
+    path: /usr/share/dr-provision
+    state: directory
+    mode: "u=rwx,go=rx"
+  become: true
+
 - name: config | Configuring Digital Rebar
   template:
     src: default.yaml.j2

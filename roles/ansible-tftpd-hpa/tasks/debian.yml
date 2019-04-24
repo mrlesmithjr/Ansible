@@ -1,12 +1,6 @@
 ---
-- name: debian | updating apt-cache
+- name: debian | Installing tftpd-hpa
   apt:
-    update_cache: true
-    cache_valid_time: 86400
-
-- name: debian | installing packages
-  apt:
-    name: "{{ item }}"
-  with_items:
-    - tftpd-hpa
-    - inetutils-inetd
+    name: tftpd-hpa
+    state: present
+  become: true

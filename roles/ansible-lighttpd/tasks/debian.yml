@@ -1,5 +1,8 @@
 ---
 - name: debian | installing lighttpd
   apt:
-    name: "lighttpd"
+    name: lighttpd
     state: present
+  register: result
+  until: result is successful
+  become: true

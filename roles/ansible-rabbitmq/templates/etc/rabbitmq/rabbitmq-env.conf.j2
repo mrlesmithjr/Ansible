@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+# Note that the variables do not have the RABBITMQ_ prefix.
+#
+{% for key,value in rabbitmq_env_config.iteritems() %}
+{{ key }}={{ value }}
+{% endfor %}

@@ -10,18 +10,25 @@ output {
 {% if logstash_base_outputs is defined %}
 {%   for item in logstash_base_outputs %}
 output {
-  {{ item.output }} {
+  {{ item['output'] }} {
 {%     if item.output == "elasticsearch" %}
-    hosts => ["{{ item.output_host }}"]
+    hosts => ["{{ item['output_host'] }}"]
 {%     endif %}
 {%     if item.output == "redis" %}
-    host => "{{ item.output_host }}"
+    host => "{{ item['output_host'] }}"
     data_type => "list"
     key => "logstash"
 {%     endif %}
 {%     if item.output == "rabbitmq" %}
-    exchange => "{{ item.exchange }}"
-    exchange_type => "{{ item.exchange_type }}"
+    host => "{{ item['output_host'] }}"
+    exchange => "{{ item['exchange'] }}"
+    exchange_type => "{{ item['exchange_type'] }}"
+{%       if item['user'] is defined %}
+    user => "{{ item['user'] }}"
+{%       endif %}
+{%       if item['password'] is defined %}
+    password => "{{ item['password'] }}"
+{%       endif %}
 {%     endif %}
   }
 }
@@ -36,7 +43,7 @@ output {
   if {{ item.if_condition }} {
   {% endif %}
 
-  {{ item.output }} {
+  {{ item['output'] }} {
   {% for line in item.lines %}
       {{ line }}
   {% endfor %}

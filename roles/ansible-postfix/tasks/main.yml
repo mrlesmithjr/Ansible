@@ -2,34 +2,32 @@
 # tasks file for ansible-postfix
 - name: Checking to make sure postfix is installed
   apt:
-    name: "{{ item }}"
+    name:
+      - 'postfix'
+      - 'mailutils'
     state: "present"
   tags: [postfix]
-  with_items:
-    - 'postfix'
-    - 'mailutils'
   when: ansible_os_family == 'Debian'
 
 - name: Checking to make sure postfix is installed
   yum:
-    name: "{{ item }}"
+    name:
+      - 'postfix'
+      - 'mailx'
     state: "present"
   tags: [postfix]
-  with_items:
-    - 'postfix'
-    - 'mailx'
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution != "Fedora"
 
 - name: Checking to make sure postfix is installed
   dnf:
-    name: "{{ item }}"
+    name:
+      - 'postfix'
+      - 'mailx'
     state: "present"
   tags: [postfix]
-  with_items:
-    - 'postfix'
-    - 'mailx'
+
   when: >
         ansible_os_family == "RedHat" and
         ansible_distribution == "Fedora"

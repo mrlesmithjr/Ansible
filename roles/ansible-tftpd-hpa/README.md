@@ -1,39 +1,22 @@
-Role Name
-=========
+# ansible-tftpd-hpa
 
-An [Ansible] role to install/configure [tftpd-hpa]
+An [Ansible](https://www.ansible.com) role to install/configure `tftpd-hpa`.
 
-Requirements
-------------
+## Requirements
 
 None
 
-Role Variables
---------------
+## Role Variables
 
-```
----
-# defaults file for ansible-tftpd-hpa
+[defaults/main.yml](defaults/main.yml)
 
-# Defines tftp root directory
-tftp_directory: '/var/lib/tftpboot'
-
-# Defines tftp options for daemon...(-c allow new files to be created)
-tftp_options: '--secure -c'
-
-tftp_netboot_file: 'netboot.tar.gz'
-tftp_netboot_url: 'http://archive.ubuntu.com/ubuntu/dists/trusty-updates/main/installer-amd64/current/images/netboot'
-```
-
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 ---
 - hosts: tftp_servers
   become: true
@@ -43,18 +26,14 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
-[tftpd-hpa]: <https://help.ubuntu.com/community/TFTP>
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://www.everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

@@ -4,24 +4,28 @@
     name: epel-release
     state: present
   become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_os_family == "RedHat" and
-        ansible_distribution != "Fedora"
+    ansible_os_family == "RedHat" and
+    ansible_distribution != "Fedora"
 
 - name: redhat | Installing Pre-Reqs
   dnf:
-    name: "{{ item }}"
+    name: "{{ influxdb_redhat_pre_reqs }}"
     state: present
   become: true
-  with_items: "{{ influxdb_redhat_pre_reqs }}"
+  register: result
+  until: result is successful
   when: ansible_distribution == "Fedora"
 
 - name: redhat | Installing Pre-Reqs
   yum:
-    name: "{{ item }}"
+    name: "{{ influxdb_redhat_pre_reqs }}"
     state: present
   become: true
-  with_items: "{{ influxdb_redhat_pre_reqs }}"
+  register: result
+  until: result is successful
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Adding InfluxDB Repo
@@ -29,9 +33,9 @@
     name: influxdb
     baseurl: "{{ influxdb_redhat_repo }}"
     description: InfluxDB
-    gpgcheck: yes
+    gpgcheck: true
     gpgkey: "{{ influxdb_redhat_repo_key }}"
-    enabled: yes
+    enabled: true
     priority: 90
     state: present
   become: true
@@ -42,4 +46,6 @@
     name: influxdb
     state: present
   become: true
-  when: ansible_distribution != Fedora
+  register: result
+  until: result is successful
+  when: ansible_distribution != "Fedora"

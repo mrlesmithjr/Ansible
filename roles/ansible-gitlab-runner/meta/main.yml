@@ -10,11 +10,13 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
+        - bionic
         - trusty
         - xenial
     - name: Debian
       versions:
         - jessie
+        - stretch
 
   galaxy_tags:
     - ci/cd

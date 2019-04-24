@@ -21,7 +21,7 @@ bind-interfaces
 except-interface={{ item }}
 {%   endfor %}
 {% endif %}
-{% if dnsmasq_forward_nonrouted_addresses %}
+{% if not dnsmasq_forward_nonrouted_addresses %}
 bogus-priv
 {% endif %}
 {% if dnsmasq_pri_domain_name is defined %}

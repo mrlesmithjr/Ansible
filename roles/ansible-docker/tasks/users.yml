@@ -5,4 +5,4 @@
     append: yes
     groups: docker
   become: true
-  with_items: '{{ docker_users }}'
+  with_items: "{{ docker_users }}"

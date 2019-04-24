@@ -1,98 +1,107 @@
 ---
 - name: debian | Installing Pre-Req Packages
   apt:
-    name: "lldpd"
-    state: "present"
+    name: ["lldpd"]
+    state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | Installing bridge-utils
   apt:
-    name: "bridge-utils"
+    name: ["bridge-utils"]
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: config_network_bridges
 
 - name: debian | Installing Bonding Packages
   apt:
-    name: "ifenslave"
-    state: "present"
+    name: ["ifenslave"]
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: config_network_bonds
 
 - name: debian | Installing VLAN Packages
   apt:
-    name: "vlan"
-    state: "present"
+    name: ["vlan"]
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: config_network_vlans
 
 - name: debian | Configuring Defined Interfaces
   template:
-    src: "etc/network/interfaces.j2"
-    dest: "/etc/network/interfaces"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
-  register: "config_interface"
+    src: etc/network/interfaces.j2
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  register: config_interface
   become: true
   when: >
-        (config_network_interfaces is defined and
-        config_network_interfaces)
+    (config_network_interfaces is defined and
+    config_network_interfaces)
 
 - name: debian | Restarting Network Interfaces
   shell: bash -c "ifdown {{ item.name }} --force && ifup {{ item.name }} --force"
   become: true
-  with_items: '{{ network_interfaces }}'
+  with_items: "{{ network_interfaces }}"
   when: >
-        enable_configured_interfaces_after_defining and
-        item['configure'] and
-        config_interface['changed']
+    (enable_configured_interfaces_after_defining or item['enable']) and
+    item['configure'] and
+    config_interface['changed']
 
 - name: debian | Restarting Network VLANs
   shell: bash -c "ifdown {{ item.name }} --force && ifup {{ item.name }} --force"
   become: true
-  with_items: '{{ network_vlans }}'
+  with_items: "{{ network_vlans }}"
   when: >
-        config_network_vlans and
-        enable_configured_interfaces_after_defining and
-        item['configure'] and
-        config_interface['changed']
+    config_network_vlans and
+    (enable_configured_interfaces_after_defining or item['enable']) and
+    item['configure'] and
+    config_interface['changed']
 
 - name: debian | Restarting Network Bridges
   shell: bash -c "ifdown {{ item.name }} --force && ifup {{ item.name }} --force"
   become: true
-  with_items: '{{ network_bridges }}'
+  with_items: "{{ network_bridges }}"
   when: >
-        config_network_bridges and
-        enable_configured_interfaces_after_defining and
-        item['configure'] and
-        config_interface['changed']
+    config_network_bridges and
+    (enable_configured_interfaces_after_defining or item['enable']) and
+    item['configure'] and
+    config_interface['changed']
 
 - name: debian | Restarting OVS Bridges
   shell: bash -c "ifdown {{ item.name }} --force && ifup {{ item.name }} --force"
   become: true
-  with_items: '{{ ovs_bridges }}'
+  with_items: "{{ ovs_bridges }}"
   when: >
-        config_ovs_bridges and
-        enable_configured_interfaces_after_defining and
-        item['configure'] and
-        config_interface['changed']
+    config_ovs_bridges and
+    (enable_configured_interfaces_after_defining or item['enable']) and
+    item['configure'] and
+    config_interface['changed']
 
 - name: debian | Restarting OVS Bonds
   shell: bash -c "ifdown {{ item.name }} --force && ifup {{ item.name }} --force"
   become: true
-  with_items: '{{ ovs_bonds }}'
+  with_items: "{{ ovs_bonds }}"
   when: >
-        config_ovs_bonds and
-        enable_configured_interfaces_after_defining and
-        item['configure'] and
-        config_interface['changed']
+    config_ovs_bonds and
+    (enable_configured_interfaces_after_defining or item['enable']) and
+    item['configure'] and
+    config_interface['changed']
 
 - name: debian | Restarting OVS Interfaces
   shell: bash -c "ifdown {{ item.name }} --force && ifup {{ item.name }} --force"
   become: true
-  with_items: '{{ ovs_interfaces }}'
+  with_items: "{{ ovs_interfaces }}"
   when: >
-        config_ovs_interfaces and
-        enable_configured_interfaces_after_defining and
-        item['configure'] and
-        config_interface['changed']
+    config_ovs_interfaces and
+    (enable_configured_interfaces_after_defining or item['enable']) and
+    item['configure'] and
+    config_interface['changed']

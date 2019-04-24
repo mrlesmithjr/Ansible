@@ -1,25 +1,32 @@
 ---
 - name: debian | Installing Pre-Reqs
   apt:
-    name: "{{ item }}"
+    name: "{{ influxdb_debian_pre_reqs }}"
     state: present
   become: true
-  with_items: "{{ influxdb_debian_pre_reqs }}"
+  register: result
+  until: result is successful
 
 - name: debian | Adding InfluxDB Repo Key
   apt_key:
     url: "{{ influxdb_debian_repo_key }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | Adding InfluxDB Repo
   apt_repository:
     repo: "{{ influxdb_debian_repo }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | Installing InfluxDB
   apt:
-    name: "influxdb={{ influxdb_version }}-1"
+    name: "{{ 'influxdb=' + influxdb_version + '-1' }}"
     state: present
   become: true
+  register: result
+  until: result is successful

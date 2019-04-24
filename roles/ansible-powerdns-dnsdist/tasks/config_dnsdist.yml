@@ -5,6 +5,7 @@
     dest: /etc/dnsdist/dnsdist.conf
   register: dnsdist_configured
   notify: restart dnsdist
+  become: true
 
 # - name: config_dnsdist | Restarting DNSDist
 #   service:

@@ -3,11 +3,12 @@
   rabbitmq_user:
     name: "{{ item['name'] }}"
     password: "{{ item['password'] }}"
-    vhost: "{{ item['vhost'] }}"
-    configure_priv: "{{ item['configure_priv'] }}"
-    read_priv: "{{ item['read_priv'] }}"
-    write_priv: "{{ item['write_priv'] }}"
-    tags: "{{ item['tags'] }}"
+    vhost: "{{ item['vhost']|default(omit) }}"
+    configure_priv: "{{ item['configure_priv']|default(omit) }}"
+    read_priv: "{{ item['read_priv']|default(omit) }}"
+    write_priv: "{{ item['write_priv']|default(omit) }}"
+    tags: "{{ item['tags']|default(omit) }}"
+    permissions: "{{ item['permissions']|default(omit) }}"
     state: present
   become: true
   with_items: "{{ rabbitmq_users }}"
@@ -20,13 +21,15 @@
   rabbitmq_user:
     name: "{{ item['name'] }}"
     password: "{{ item['password'] }}"
-    vhost: "{{ item['vhost'] }}"
-    configure_priv: "{{ item['configure_priv'] }}"
-    read_priv: "{{ item['read_priv'] }}"
-    write_priv: "{{ item['write_priv'] }}"
-    tags: "{{ item['tags'] }}"
+    vhost: "{{ item['vhost']|default(omit) }}"
+    configure_priv: "{{ item['configure_priv']|default(omit) }}"
+    read_priv: "{{ item['read_priv']|default(omit) }}"
+    write_priv: "{{ item['write_priv']|default(omit) }}"
+    tags: "{{ item['tags']|default(omit) }}"
+    permissions: "{{ item['permissions']|default(omit) }}"
     state: present
   run_once: yes
+  delegate_to: "{{ rabbitmq_master }}"
   become: true
   with_items: "{{ rabbitmq_users }}"
   when: >

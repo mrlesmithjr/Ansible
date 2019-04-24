@@ -1,18 +1,16 @@
 ---
 - name: debian_pdns_recursor | Installing Pre-Reqs
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ['dnsutils', 'lsb-release']
+    state: present
   become: true
-  with_items:
-    - 'dnsutils'
 
 - name: debian_pdns_recursor | installing powerdns recursor
   apt:
     deb: "{{ pdns_recursor_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_amd64.deb"
-    state: "present"
+    state: present
   become: true
-  notify: restart pdns recursor
+  notify: restart pdns_recursor
   when: >
         ansible_architecture == "x86_64" and
         pdns_recursor_version != "4.x"
@@ -20,9 +18,9 @@
 - name: debian_pdns_recursor | installing powerdns recursor
   apt:
     deb: "{{ pdns_recursor_download_url }}/deb/pdns-recursor_{{ pdns_recursor_version }}_i386.deb"
-    state: "present"
+    state: present
   become: true
-  notify: restart pdns recursor
+  notify: restart pdns_recursor
   when: >
         ansible_architecture == "i386" and
         pdns_recursor_version != "4.x"
@@ -30,21 +28,21 @@
 - name: Adding PowerDNS Repo Key
   apt_key:
     url: "https://repo.powerdns.com/FD380FBB-pub.asc"
-    state: "present"
+    state: present
   become: true
   when: pdns_recursor_version == "4.x"
 
 - name: Pinning PowerDNS Repo
   template:
-    src: "pdns_repo.j2"
-    dest: "/etc/apt/preferences.d/pdns"
+    src: pdns_repo.j2
+    dest: /etc/apt/preferences.d/pdns
   become: true
   when: pdns_recursor_version == "4.x"
 
 - name: Adding PowerDNS Repo
   apt_repository:
-    repo: "deb http://repo.powerdns.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-rec-40 main"
-    state: "present"
+    repo: "deb http://repo.powerdns.com/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-rec-{{ pdns_recursor_short_version }} main"
+    state: present
   become: true
   when: >
         ansible_lsb['id'] != "Raspbian" and
@@ -52,8 +50,8 @@
 
 - name: Adding PowerDNS Repo
   apt_repository:
-    repo: "deb http://repo.powerdns.com/raspbian {{ ansible_distribution_release|lower }}-rec-40 main"
-    state: "present"
+    repo: "deb http://repo.powerdns.com/raspbian {{ ansible_distribution_release|lower }}-rec-{{ pdns_recursor_short_version }} main"
+    state: present
   become: true
   when: >
         ansible_lsb['id'] == "Raspbian" and
@@ -61,11 +59,9 @@
 
 - name: Installing PowerDNS Recursor
   apt:
-    name: "{{ item }}"
-    state: "latest"
+    name: ['pdns-recursor']
+    state: present
   become: true
   # We do this in order to allow the service to not fail starting when initially starting on port 53
   ignore_errors: true
-  with_items:
-    - 'pdns-recursor'
   when: pdns_recursor_version == "4.x"

@@ -263,9 +263,9 @@ iface {{ item['name'] }} inet {{ item['method']|lower }}
 ########## End of OVS Interfaces
 {% endif %}
 
-{% if dns_nameservers is defined %}
+{% if dns_nameservers is defined and dns_nameservers != [] %}
 dns-nameservers {{ dns_nameservers|join (' ') }}
 {% endif %}
-{% if dns_search is defined %}
+{% if dns_search is defined and dns_search != None %}
 dns-search {{ dns_search }}
 {% endif %}

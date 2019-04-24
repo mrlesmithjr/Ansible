@@ -1,15 +1,19 @@
 ---
 - name: redhat | enabling EPEL repo
   yum:
-    name: "epel-release"
-    state: "present"
+    name: epel-release
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution != "Fedora"
+    ansible_distribution != "Fedora"
 
 - name: redhat | installing kea dhcp
   yum:
-    name: "kea"
-    state: "present"
+    name: kea
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: ansible_distribution != "Fedora"

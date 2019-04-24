@@ -2,11 +2,12 @@
 # defaults file for ansible-awx
 awx:
   # Defines the version of Ansible to install
-  ansible_ver:              2.5.0
+  ansible_ver: 2.7.2
 
   # Container networking configuration
   # Set the awx_task and awx_web containers' search domain(s)
-  container_search_domains: []
+  container_search_domains:
+    []
     # - ansible.com
     # - example.com
 
@@ -22,16 +23,16 @@ awx:
 
   # This will create or update a default admin (superuser) account in AWX, if not provided
   # then these default values are used
-  default_admin_password:   password
-  default_admin_user:       admin
+  default_admin_password: password
+  default_admin_user: admin
 
-  host_port:                80
-  pg_database:              awx
+  host_port: 80
+  pg_database: awx
   # pg_hostname:            postgresql
-  pg_password:              awxpass
-  pg_port:                  5432
-  pg_username:              awx
-  postgres_data_dir:        /tmp/pgdocker
+  pg_password: awxpass
+  pg_port: 5432
+  pg_username: awx
+  postgres_data_dir: /tmp/pgdocker
 
   # RedHat pre-reqs
   redhat_pre_reqs:
@@ -50,15 +51,19 @@ awx:
     - python-setuptools
     - redhat-rpm-config
 
-  repo_dir:                 $HOME/awx
-  repo:                     https://github.com/ansible/awx.git
+  repo_dir: $HOME/awx
+  repo: https://github.com/ansible/awx.git
 
   # AWX Secret key
   # It's *very* important that this stay the same between upgrades or you will
   # lose the ability to decrypt your credentials
-  secret_key:               awxsecret
+  secret_key: awxsecret
 
-  update:                   true
+  task_hostname: "{{ ansible_hostname }}"
+
+  update: true
 
   # Defines the version of AWX to install
-  version:                  1.0.5
+  version: 3.0.0
+
+  web_hostname: "{{ ansible_hostname }}"

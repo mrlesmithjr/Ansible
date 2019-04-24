@@ -1,17 +1,17 @@
 ---
 - name: debian | Installing Pre-Reqs
   apt:
-    name: "{{ item }}"
+    name: ["python-pip", "ruby", "rubygems-integration"]
     state: present
   become: true
-  with_items:
-    - python-pip
-    - ruby
-    - rubygems-integration
+  register: result
+  until: result is successful
 
 - name: debian | Installing Redis
   apt:
     name: redis-server
     state: present
   become: true
+  register: result
+  until: result is successful
   when: not redis_install_from_source

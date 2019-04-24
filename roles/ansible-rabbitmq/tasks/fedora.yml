@@ -1,23 +1,27 @@
 ---
 - name: fedora | installing pre-reqs
   dnf:
-    name: "{{ item }}"
+    name: ['wget']
     state: present
   become: true
-  with_items:
-    - wget
+  register: result
+  until: result is successful
 
 - name: fedora | installing erlang
   dnf:
-    name: "erlang"
+    name: ['erlang']
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: fedora | adding RabbitMQ public GPG key
   rpm_key:
     key: "{{ rabbitmq_redhat_repo_key }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: fedora | downloading RabbitMQ
   get_url:
@@ -30,12 +34,14 @@
     name: "/opt/{{ rabbitmq_redhat_package }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: fedora | starting and enabling RabbitMQ service
   service:
-    name: "rabbitmq-server"
+    name: rabbitmq-server
     state: started
-    enabled: yes
+    enabled: true
   become: true
 
 - name: fedora | enabling the RabbitMQ Management Console

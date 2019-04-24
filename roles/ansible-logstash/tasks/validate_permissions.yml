@@ -2,9 +2,9 @@
 - name: validate_permissions | validating permissions on logstash folder
   file:
     path: "{{ logstash_folder }}"
-    state: "directory"
-    recurse: yes
-    owner: "logstash"
-    group: "logstash"
+    state: directory
+    recurse: true
+    owner: "{{ logstash_system_user }}"
+    group: "{{ logstash_system_group }}"
   become: true
-  notify: "restart logstash"
+  notify: restart logstash

@@ -50,7 +50,7 @@
     dest: /etc/frr/frr.conf
     owner: frr
     group: frr
-    mode: u=rw,g=r,o=
+    mode: u=rw,g=r,o=r
   become: true
   notify:
     - restart frr

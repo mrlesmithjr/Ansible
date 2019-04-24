@@ -1,16 +1,16 @@
 ---
-- name:         mysql_root_pw | setting MySQL root password
+- name: mysql_root_pw | setting MySQL root password
   debconf:
-    name:       mysql-server
-    question:   "{{ item.question }}"
-    value:      "{{ item.value }}"
-    vtype:      password
+    name: mysql-server
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: password
   changed_when: false
-  no_log:       true
-  become:       true
+  no_log: true
+  become: true
   with_items:
     - question: mysql-server/root_password
-      value:    "{{ mysql_root_password }}"
+      value: "{{ mysql_root_password }}"
     - question: mysql-server/root_password_again
-      value:    "{{ mysql_root_password }}"
-  when:         ansible_os_family == "Debian"
+      value: "{{ mysql_root_password }}"
+  when: ansible_os_family == "Debian"

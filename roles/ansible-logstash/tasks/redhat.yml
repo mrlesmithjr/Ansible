@@ -2,46 +2,49 @@
 - name: redhat | installing logstash rpm key
   rpm_key:
     key: "{{ logstash_repo_key }}"
-    state: "present"
+    state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: redhat | enabling logstash repository
   template:
-    src: "logstash_repo.j2"
-    dest: "/etc/yum.repos.d/logstash.repo"
+    src: logstash_repo.j2
+    dest: /etc/yum.repos.d/logstash.repo
   become: true
 
 - name: redhat | installing java
   yum:
-    name: "{{ item }}"
-    state: "latest"
+    name: ["{{ 'java-1.' + logstash_openjdk_version + '.0-openjdk' }}"]
+    state: present
   become: true
-  with_items:
-    - 'java-1.{{ openjdk_version }}.0-openjdk'
-  when: ansible_distribution != "Fedora" and logstash_install_java
+  register: result
+  until: result is successful
+  when: >
+    ansible_distribution != "Fedora" and
+    logstash_install_java
 
 - name: redhat | installing logstash
   yum:
-    name: "{{ item }}"
-    state: "latest"
+    name: ["logstash"]
+    state: present
   become: true
-  with_items:
-    - 'logstash'
+  register: result
+  until: result is successful
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing logstash
   dnf:
-    name: "{{ item }}"
-    state: "latest"
+    name: ["java", "logstash"]
+    state: present
   become: true
-  with_items:
-    - 'logstash'
-    - 'java'
+  register: result
+  until: result is successful
   when: ansible_distribution == "Fedora"
 
 - name: redhat | ensuring logstash is started and enabled on boot
   service:
-    name: "logstash"
-    state: "started"
-    enabled: yes
+    name: logstash
+    state: started
+    enabled: true
   become: true

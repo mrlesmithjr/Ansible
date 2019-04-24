@@ -1,5 +1,7 @@
 ---
 # tasks file for ansible-lighttpd
+- include: set_facts.yml
+
 - include: debian.yml
   when: ansible_os_family == "Debian"
 
@@ -9,5 +11,5 @@
 - include: config_lighttpd.yml
   when: config_lighttpd
 
-- include: config_php5.yml
-  when: lighttpd_enable_php5
+- include: config_php.yml
+  when: lighttpd_enable_php

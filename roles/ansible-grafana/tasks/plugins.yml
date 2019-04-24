@@ -1,24 +1,8 @@
 ---
-- name: plugins | Gather Installed Plugins
-  command: grafana-cli plugins ls
-  register: grafana_plugin_list
-  changed_when: false
+- name: plugins | Managing Grafana Plugins
+  grafana_plugin:
+    name: "{{ item['name'] }}"
+    version: "{{ item['version']|default(omit) }}"
+    state: "{{ item['state'] }}"
   become: true
-
-- name: plugins | Installing Plugins
-  command: "grafana-cli plugins install {{ item['name'] }}"
-  notify: restart grafana-server
-  become: true
-  with_items: '{{ grafana_plugins }}'
-  when: >
-        item['name'] not in grafana_plugin_list['stdout'] and
-        item['state'] == "present"
-
-- name: plugins | Removing Plugins
-  command: "grafana-cli plugins remove {{ item['name'] }}"
-  notify: restart grafana-server
-  become: true
-  with_items: '{{ grafana_plugins }}'
-  when: >
-        item['name'] in grafana_plugin_list['stdout'] and
-        item['state'] == "absent"
+  with_items: "{{ grafana_plugins }}"

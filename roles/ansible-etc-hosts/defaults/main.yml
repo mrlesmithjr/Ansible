@@ -7,7 +7,7 @@ etc_hosts_add_all_hosts: false
 etc_hosts_enable_ipv6: true
 
 # Defines your primary dns suffix
-etc_hosts_pri_dns_name: 'vagrant.local'
+etc_hosts_pri_dns_name: vagrant.local
 
 # Defines if node has static IP.
 etc_hosts_static_ip: false

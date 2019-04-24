@@ -1,55 +1,44 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-An [Ansible] role to install/configure NTP
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
-Build Status
-------------
+- [ansible-ntp](#ansible-ntp)
+  - [Build Status](#build-status)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# ansible-ntp
+
+An [Ansible](https://www.ansible.com) role to install/configure NTP
+
+## Build Status
 
 [![Build Status](https://travis-ci.org/mrlesmithjr/ansible-ntp.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-ntp)
 
-Requirements
-------------
+## Requirements
 
 Define ntp_master for your group of servers which should be used for your
 internal ntp servers for clients to connect to.
 ex. group_vars/ntp_masters
 
-Role Variables
---------------
+## Role Variables
 
-```
----
-# defaults file for ansible-ntp
-# Defines if host is ntp_master
-# set ntp_master to true on specific group_vars/group
-ntp_master: false
+[default/main.yml](defaults/main.yml)
 
-# Define your ntp_master_servers
-ntp_master_servers:
-  - 0.ubuntu.pool.ntp.org
-  - 1.ubuntu.pool.ntp.org
-  - 2.ubuntu.pool.ntp.org
-  - 3.ubuntu.pool.ntp.org
-
-# Defines your primary domain name (FQDN)
-ntp_pri_domain_name: 'example.org'
-
-# Defines internal ntp servers for clients to poll
-# ntp_servers:
-#  - 'ntp1.{{ ntp_pri_domain_name }}'
-#  - 'ntp2.{{ ntp_pri_domain_name }}'
-```
-
-Dependencies
-------------
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 - hosts: all
   become: true
   vars:
@@ -58,17 +47,14 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

@@ -1,105 +1,99 @@
 ---
-- name:       redhat | installing pre-reqs
+- name: redhat | installing pre-reqs
   yum:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - MySQL-python
-  when:       ansible_distribution != "Fedora"
+    name: ['MySQL-python']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution != "Fedora"
 
-- name:       redhat | installing mysql CentOS 6
+- name: redhat | installing mysql CentOS 6
   yum:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - mysql-server
-    - mysql
-  when:       >
+    name: ['mysql-server', 'mysql']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         ansible_distribution != "Fedora" and
         (ansible_distribution_version < '7')
 
-- name:       redhat | Installing Pre-Reqs On Fedora
+- name: redhat | Installing Pre-Reqs On Fedora
   dnf:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - libselinux-python
-    - mysql-devel
-    - python-devel
-    - python-dnf
-  when:       >
+    name: ['libselinux-python', 'mysql-devel', 'python-devel', 'python-dnf']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         ansible_distribution == "Fedora"
 
-- name:       redhat | Installing MySQL Fedora
+- name: redhat | Installing MySQL Fedora
   dnf:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - mysql-server
-    - mysql
-  when:       >
+    name: ['mysql-server', 'mysql']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         ansible_distribution == "Fedora"
 
-- name:       redhat | Installing Python Modules For Fedora
+- name: redhat | Installing Python Modules For Fedora
   pip:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - mysql-python
-  when:       >
+    name: ['mysql-python']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         ansible_distribution == "Fedora"
 
-- name:       redhat | Ensuring mysqld Is Enabled and Starts On Boot
+- name: redhat | Ensuring mysqld Is Enabled and Starts On Boot
   service:
-    name:     mysqld
-    state:    started
-    enabled:  true
-  become:     true
-  when:       >
+    name: mysqld
+    state: started
+    enabled: true
+  become: true
+  when: >
         (ansible_distribution == "CentOS" and
         ansible_distribution_version < "7") or
         (ansible_distribution == "Fedora" and
         (ansible_distribution_version == "24" or
         ansible_distribution_version == "25"))
 
-- name:       redhat | installing mariadb mysql CentOS 7
+- name: redhat | installing mariadb mysql CentOS 7
   yum:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - mariadb-server
-    - mariadb
-  when:       >
+    name: ['mariadb-server', 'mariadb']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         ansible_distribution != "Fedora" and
         (ansible_distribution_version >= '7')
 
-- name:       redhat | configuring mysql
+- name: redhat | configuring mysql
   template:
-    src:      etc/my.cnf.j2
-    dest:     /etc/my.cnf
-    owner:    root
-    group:    root
-    mode:     0644
-  register:   mariadb_reconfigured_redhat
-  become:     true
-  notify:     restart mariadb
-  when:       >
+    src: etc/my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  register: mariadb_reconfigured_redhat
+  become: true
+  notify: restart mariadb
+  when: >
         ansible_distribution != "Fedora" and
         (ansible_distribution_version >= '7')
 
-- name:       redhat | Ensuring mariadb Service Is Enabled and Starts On Boot
+- name: redhat | Ensuring mariadb Service Is Enabled and Starts On Boot
   service:
-    name:     mariadb
-    state:    started
-    enabled:  yes
-  become:     true
-  when:       >
+    name: mariadb
+    state: started
+    enabled: true
+  become: true
+  when: >
         (ansible_distribution == "CentOS" and
         ansible_distribution_version >= '7') or
         (ansible_distribution == "Fedora" and

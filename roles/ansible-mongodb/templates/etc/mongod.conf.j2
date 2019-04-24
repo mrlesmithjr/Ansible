@@ -1,3 +1,5 @@
+{{ ansible_managed|comment }}
+
 storage:
   dbPath: {{ mongodb_dbPath }}
   journal:
@@ -15,13 +17,22 @@ net:
   port: {{ mongodb_port }}
   bindIp: {{ mongodb_bind_ip|join (',') }}
 
+{% if ansible_os_family == "RedHat" %}
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: /var/run/mongodb/mongod.pid  # location of pidfile
+  timeZoneInfo: /usr/share/zoneinfo
+{% else %}
 #processManagement:
+{% endif %}
 
 {% if mongodb_replication %}
 replication:
   replSetName: {{ mongodb_replication_set }}
 
-#security:
+security:
+  authorization: disabled
 #  keyFile: {{ mongodb_replication_keyfile }}
 {% endif %}
 

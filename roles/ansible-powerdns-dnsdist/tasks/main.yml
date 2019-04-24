@@ -8,3 +8,8 @@
 
 - include: config_dnsdist.yml
   when: pdns_dnsdist_config
+
+- include: systemd_resolved.yml
+  when: >
+    ansible_service_mgr == "systemd" and
+    pdns_dnsdist_systemd_resolved_disable

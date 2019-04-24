@@ -1,42 +1,42 @@
 ---
-- name:             install | Cloning AWX Repo To
+- name: install | Cloning AWX Repo To
   git:
-    repo:           "{{ awx['repo'] }}"
-    dest:           "{{ awx['repo_dir'] }}"
-    version:        "{{ awx['version'] }}"
-    update:         "{{ awx['update'] }}"
-    force:          true
+    repo: "{{ awx['repo'] }}"
+    dest: "{{ awx['repo_dir'] }}"
+    version: "{{ awx['version'] }}"
+    update: "{{ awx['update'] }}"
+    force: true
     accept_hostkey: true
-  become:           true
+  become: true
 
-- name:             install | Configuring AWX Inventory
+- name: install | Configuring AWX Inventory
   template:
-    src:            inventory.j2
-    dest:           "{{ awx['repo_dir'] }}/installer/inventory"
-  become:           true
+    src: inventory.j2
+    dest: "{{ awx['repo_dir'] + '/installer/inventory' }}"
+  become: true
 
-- name:             install | Capturing Running Docker Containers
-  shell:            docker ps --format '{% raw %}{{.Names}}{% endraw %}'
-  become:           true
-  register:         _awx_running_docker_containers
+- name: install | Capturing Running Docker Containers
+  shell: docker ps --format '{% raw %}{{.Names}}{% endraw %}'
+  become: true
+  register: _awx_running_docker_containers
 
-- name:             install | Checking If AWX Has Been Installed
+- name: install | Checking If AWX Has Been Installed
   stat:
-    path:           $HOME/.awx_installed
-  become:           true
-  register:         _awx_installed_check
+    path: $HOME/.awx_installed
+  become: true
+  register: _awx_installed_check
 
-- name:             install | Installing AWX
-  command:          ansible-playbook -i inventory install.yml
+- name: install | Installing AWX
+  command: ansible-playbook -i inventory install.yml
   args:
-    chdir:          "{{ awx['repo_dir'] }}/installer"
-  become:           true
-  register:         _awx_installed
-  when:             not _awx_installed_check['stat']['exists']
+    chdir: "{{ awx['repo_dir'] + '/installer' }}"
+  become: true
+  register: _awx_installed
+  when: not _awx_installed_check['stat']['exists']
 
-- name:             install | Marking AWX As Being Installed
+- name: install | Marking AWX As Being Installed
   file:
-    path:           $HOME/.awx_installed
-    state:          touch
-  become:           true
-  when:             _awx_installed['changed']
+    path: $HOME/.awx_installed
+    state: touch
+  become: true
+  when: _awx_installed['changed']

@@ -1,7 +1,8 @@
 ---
 # defaults file for ansible-samba
 pri_domain_name: example.org
-samba_ad_info: []
+samba_ad_info:
+  []
   # ad_dc_hostname: "{{ ansible_hostname }}"
   # ad_dns_domain_name: "{{ pri_domain_name }}"
   # adminpass: P@55w0rd
@@ -27,20 +28,23 @@ samba_create_domain_users: false
 # Define Ansible group which contains your Samba domain controllers
 samba_domain_controllers_group: samba_domain_controllers
 
-samba_domain_groups: []
+samba_domain_groups:
+  []
   # - name: ad-test-group1
   #   members:
   #     - test01
   #     - test02
 
-samba_domain_users: []
+samba_domain_users:
+  []
   # - name: test01
   #   password: P@55w0rd
   # - name: test02
   #   password: P@55w0rd
 
 # Define samba groups to create
-samba_groups: []
+samba_groups:
+  []
   # - nogroup
   # - securedgroup
   # - testgroup
@@ -59,7 +63,8 @@ samba_server_role: standalone server
 
 # Defines root folder for samba shares to be created
 samba_share_path: /mnt/samba/shares
-samba_shares: []
+samba_shares:
+  []
   # - name: allaccess
   #   browsable: "yes"
   #   folder_perms: "0755"
@@ -92,7 +97,8 @@ samba_shares: []
   #   writable: "yes"
 
 # Define users to create
-samba_users: []
+samba_users:
+  []
   #   # Define user name to create
   # - name: vagrant
   #   # Define groups to add user to
@@ -108,5 +114,4 @@ samba_workgroup: "{{ samba_netbios_domain_name[0]|upper }}"
 # Printers options
 samba_use_printers: False
 samba_printer_type: cups
-samba_cups_server: 'localhost:631'
-
+samba_cups_server: "localhost:631"

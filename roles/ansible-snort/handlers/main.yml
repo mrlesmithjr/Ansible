@@ -3,10 +3,12 @@
 
 - name: restart snort
   service:
-    name: "snort"
+    name: snort
     state: restarted
+  become: true
 
 - name: restart snortd
   service:
-    name: "snortd"
+    name: snortd
     state: restarted
+  become: true

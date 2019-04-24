@@ -44,6 +44,15 @@ ansible-galaxy install -r requirements.yml
 ---
 # defaults file for ansible-drbd
 
+drbd_common:
+  disk: ''
+  net: |
+    cram-hmac-alg sha1;
+    shared-secret "{{ drbd_network_shared_secret }}";
+  handlers: ''
+  startup: ''
+  options: ''
+
 drbd_disks:
   - device: /dev/drbd0
     disk: /dev/sdb

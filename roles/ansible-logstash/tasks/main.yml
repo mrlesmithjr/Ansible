@@ -3,8 +3,8 @@
 - name: Checking To Ensure Node Meets Minimum Specs
   pause:
     prompt: >
-         "Node Does Not Meet Minimum Recommend Memory Requirements of
-         {{ logstash_min_memory_required }}MB"
+      "Node Does Not Meet Minimum Recommend Memory Requirements of
+      {{ logstash_min_memory_required }}MB"
     seconds: 10
   when: ansible_memtotal_mb < logstash_min_memory_required
 

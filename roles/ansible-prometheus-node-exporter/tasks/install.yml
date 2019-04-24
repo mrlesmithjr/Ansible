@@ -9,6 +9,8 @@
   unarchive:
     src: "{{ prometheus_node_exporter_source_dir }}/{{ prometheus_node_exporter_download|basename }}"
     dest: "{{ prometheus_node_exporter_install_dir }}"
+    owner: "{{ prometheus_node_exporter_user_info['user'] }}"
+    group: "{{ prometheus_node_exporter_user_info['group'] }}"
     copy: false
   args:
     creates: "{{ prometheus_node_exporter_install_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64/node_exporter"
@@ -18,5 +20,8 @@
   file:
     src: "{{ prometheus_node_exporter_install_dir }}/node_exporter-{{ prometheus_node_exporter_version }}.linux-amd64"
     dest: "{{ prometheus_node_exporter_install_dir }}/node_exporter"
-    state: "link"
+    state: link
+    owner: "{{ prometheus_node_exporter_user_info['user'] }}"
+    group: "{{ prometheus_node_exporter_user_info['group'] }}"
   become: true
+  notify: restart node_exporter

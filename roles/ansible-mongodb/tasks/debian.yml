@@ -1,51 +1,50 @@
 ---
+- name: debian | Installing Pre-Reqs
+  apt:
+    name: ["apt-transport-https", "python-pip"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
 - name: debian | Adding MongoDB Repo Key
   apt_key:
     keyserver: "{{ mongodb_apt_keyserver }}"
     id: "{{ mongodb_apt_gpg_key }}"
-    state: "present"
-  when: >
-        ansible_distribution == "Ubuntu"
+    state: present
+  become: true
+  register: result
+  until: result is successful
 
 - name: debian | Adding MongoDB Apt Repo
   apt_repository:
-    repo: "{{ mongodb_ubuntu_apt_repo }}"
-    state: "present"
-  when: >
-        ansible_distribution == "Ubuntu"
+    repo: "{{ mongodb_apt_repo_debian }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution == "Debian"
+
+- name: debian | Adding MongoDB Apt Repo
+  apt_repository:
+    repo: "{{ mongodb_apt_repo_ubuntu }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution == "Ubuntu"
 
 - name: debian | Installing MongoDB
   apt:
-    name: "{{ item }}"
-    state: "present"
-  with_items:
-    - 'mongodb'
-  when: >
-        ansible_distribution == "Debian"
-
-- name: debian | Installing MongoDB
-  apt:
-    name: "mongodb-org"
-    state: "present"
-  when: >
-        ansible_distribution == "Ubuntu"
-
-- name: debian | Configuring MongoDB Service (Xenial)
-  template:
-    src: "etc/systemd/system/mongodb.service.j2"
-    dest: "/etc/systemd/system/mongodb.service"
-    owner: "root"
-    group: "root"
-    mode: 0644
-  when: >
-        ansible_distribution == "Ubuntu" and
-        ansible_distribution_release|lower == "xenial"
+    name: ["mongodb-org", "mongodb-org-server"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
 
 - name: debian | Enabling and Starting MongoDB Service
   service:
-    name: "mongodb"
-    state: "started"
-    enabled: yes
-  when: >
-        ansible_distribution == "Ubuntu" and
-        ansible_distribution_release|lower == "xenial"
+    name: mongod
+    state: started
+    enabled: true
+  become: true

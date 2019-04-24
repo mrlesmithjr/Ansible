@@ -1,29 +1,32 @@
 ---
 galaxy_info:
   author: Larry Smith Jr.
-  description: An [Ansible](https://www.ansible.com) role to install/configure [Docker](https://www.docker.com)
+  description: >
+    An [Ansible](https://www.ansible.com) role to install/configure
+    [Docker](https://www.docker.com)
 
   license: license (MIT)
   min_ansible_version: 1.2
 
   platforms:
-  - name: EL
-    versions:
-    - 7
-  - name: Ubuntu
-    versions:
-    - precise
-    - trusty
-    - xenial
-    - zesty
-  - name: Debian
-    versions:
-    - jessie
-    - stretch
+    - name: EL
+      versions:
+        - 7
+    - name: Ubuntu
+      versions:
+        - bionic
+        - precise
+        - trusty
+        - xenial
+        - zesty
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
 
-  categories:
-  - cloud
-  - development
-  - packaging
-  - system
+  galaxy_tags:
+    - cloud
+    - development
+    - packaging
+    - system
 dependencies: []

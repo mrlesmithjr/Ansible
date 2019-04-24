@@ -1,39 +1,53 @@
 ---
 - name: debian | Installing Pre-Reqs
   apt:
-    name: "{{ item }}"
+    name: "{{ pdns_dnsdist_debian_pre_reqs }}"
     state: present
-  with_items: "{{ pdns_dnsdist_debian_pre_reqs }}"
+  become: true
+#   with_items: "{{ pdns_dnsdist_debian_pre_reqs }}"
 
 - name: debian | Adding PowerDNS Repo Key
   apt_key:
     url: "{{ pdns_dnsdist_debian_repo_key }}"
     state: present
+  become: true
 
 - name: debian | Pinning PowerDNS Repo
   template:
     src: pdns_repo.j2
     dest: /etc/apt/preferences.d/pdns
+  become: true
 
 - name: debian | Adding PowerDNS Repo
   apt_repository:
     repo: "{{ pdns_dnsdist_debian_repo }}-dnsdist-10 main"
     state: present
+  become: true
   when: pdns_dnsdist_ver == "1.0.x"
 
 - name: debian | Adding PowerDNS Repo
   apt_repository:
     repo: "{{ pdns_dnsdist_debian_repo }}-dnsdist-11 main"
     state: present
+  become: true
   when: pdns_dnsdist_ver == "1.1.x"
 
 - name: debian | Adding PowerDNS Repo
   apt_repository:
     repo: "{{ pdns_dnsdist_debian_repo }}-dnsdist-12 main"
     state: present
+  become: true
   when: pdns_dnsdist_ver == "1.2.x"
+
+- name: debian | Adding PowerDNS Repo
+  apt_repository:
+    repo: "{{ pdns_dnsdist_debian_repo }}-dnsdist-13 main"
+    state: present
+  become: true
+  when: pdns_dnsdist_ver == "1.3.x"
 
 - name: debian | Installing PowerDNS DNSDist
   apt:
     name: dnsdist
     state: present
+  become: true

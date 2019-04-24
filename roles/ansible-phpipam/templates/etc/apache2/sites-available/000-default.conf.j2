@@ -1,8 +1,8 @@
 <VirtualHost *:80>
     ServerName {{ ansible_fqdn }}
     ServerAdmin webmaster@localhost
-    DocumentRoot {{ web_root }}
-    <Directory {{ phpipam_root }}>
+    DocumentRoot {{ phpipam_web_root }}
+    <Directory {{ phpipam_install_dir }}>
         Options FollowSymLinks
         AllowOverride all
         Order allow,deny

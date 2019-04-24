@@ -1,4 +1,13 @@
 ---
+- name: debian | Cleaning Up Previous Repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: absent
+  become: true
+  with_items:
+    - "deb {{ gitlab_runner_uri_previous }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main"
+    - "deb-src {{ gitlab_runner_uri_previous }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main"
+
 - name: debian | Installing Pre-Reqs
   apt:
     name: "{{ item }}"
@@ -29,6 +38,6 @@
 
 - name: debian | Installing GitLab Runner Package
   apt:
-    name: "gitlab-ci-multi-runner={{ gitlab_runner_version }}"
+    name: "gitlab-runner={{ gitlab_runner_version }}"
     state: present
   become: true

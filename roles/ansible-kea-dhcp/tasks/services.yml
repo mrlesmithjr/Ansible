@@ -4,37 +4,37 @@
     name: "{{ item['name'] }}"
     enabled: "{{ item['enabled'] }}"
   become: true
-  with_items: '{{ kea_dhcp_debian_services }}'
+  with_items: "{{ kea_dhcp_debian_services }}"
   when: >
-        ansible_os_family == "Debian" and
-        item['enabled']
+    ansible_os_family == "Debian" and
+    item['enabled']
 
 - name: services | ensuring kea services are started (Debian)
   service:
     name: "{{ item['name'] }}"
-    state: "started"
+    state: started
   become: true
-  with_items: '{{ kea_dhcp_debian_services }}'
+  with_items: "{{ kea_dhcp_debian_services }}"
   when: >
-        ansible_os_family == "Debian" and
-        item['enabled']
+    ansible_os_family == "Debian" and
+    item['enabled']
 
 - name: services | enabling kea services (RedHat)
   service:
     name: "{{ item['name'] }}"
     enabled: "{{ item['enabled'] }}"
   become: true
-  with_items: '{{ kea_dhcp_redhat_services }}'
+  with_items: "{{ kea_dhcp_redhat_services }}"
   when: >
-        ansible_os_family == "RedHat" and
-        item['enabled']
+    ansible_os_family == "RedHat" and
+    item['enabled']
 
 - name: services | ensuring kea services are started (RedHat)
   service:
     name: "{{ item['name'] }}"
-    state: "started"
+    state: started
   become: true
-  with_items: '{{ kea_dhcp_redhat_services }}'
+  with_items: "{{ kea_dhcp_redhat_services }}"
   when: >
-        ansible_os_family == "RedHat" and
-        item['enabled']
+    ansible_os_family == "RedHat" and
+    item['enabled']

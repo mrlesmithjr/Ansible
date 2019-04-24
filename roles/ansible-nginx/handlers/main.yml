@@ -1,25 +1,25 @@
 ---
 # handlers file for ansible-nginx
-- name:    restart nginx
+- name: restart nginx
   service:
-    name:  nginx
+    name: nginx
     state: restarted
-  become:  true
+  become: true
 
-- name:    restart php5-fpm
+- name: restart php5-fpm
   service:
-    name:  php5-fpm
+    name: php5-fpm
     state: restarted
-  become:  true
+  become: true
 
-- name:    restart php7.0-fpm
+- name: restart php7.0-fpm
   service:
-    name:  php7.0-fpm
+    name: php7.0-fpm
     state: restarted
-  become:  true
+  become: true
 
-- name:    restart php7.2-fpm
+- name: restart php7.2-fpm
   service:
-    name:  php7.2-fpm
+    name: php7.2-fpm
     state: restarted
-  become:  true
+  become: true

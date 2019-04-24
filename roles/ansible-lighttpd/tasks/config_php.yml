@@ -1,0 +1,152 @@
+---
+- name: config_php | installing php (if-enabled)
+  apt:
+    name:
+      [
+        "{{ 'php' + lighttpd_php_version }}",
+        "{{ 'php' + lighttpd_php_version + '-cli' }}",
+        "{{ 'php' + lighttpd_php_version + '-fpm' }}",
+      ]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_os_family == "Debian"
+
+- name: config_php | installing php (if-enabled)
+  yum:
+    name: ["lighttpd-fastcgi", "php", "php-cli", "php-fpm"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_os_family == "RedHat" and
+    ansible_distribution != "Fedora"
+
+- name: config_php | installing php (if-enabled)
+  dnf:
+    name: ["lighttpd-fastcgi", "php", "php-cli", "php-fpm"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_os_family == "RedHat" and
+    ansible_distribution == "Fedora"
+
+- name: config_php | configuring php
+  template:
+    src: "{{ 'etc/php' + lighttpd_php_version + '/fpm/php.ini.j2' }}"
+    dest: "{{ lighttpd_php_path + '/fpm/php.ini' }}"
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  when: >
+    ansible_os_family == "Debian"
+
+- name: config_php | configuring php
+  template:
+    src: "{{ 'etc/php' + lighttpd_php_version + '/fpm/php.ini.j2' }}"
+    dest: /etc/php.ini
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  when: >
+    ansible_os_family == "RedHat"
+
+- name: config_php | configuring php
+  template:
+    src: etc/php-fpm.d/www.conf.j2
+    dest: /etc/php-fpm.d/www.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify:
+    - restart php-fpm
+  when: >
+    ansible_os_family == "RedHat"
+
+- name: config_php | ensuring php-fpm is enabled on boot and started
+  service:
+    name: php-fpm
+    state: started
+    enabled: true
+  become: true
+  when: >
+    ansible_os_family == "RedHat"
+
+- name: config_php | configuring lighttpd for php
+  template:
+    src: etc/lighttpd/conf-available/15-fastcgi-php.conf.j2
+    dest: /etc/lighttpd/conf-available/15-fastcgi-php.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify:
+    - restart lighttpd
+  when: >
+    ansible_os_family == "Debian"
+
+- name: config_php | enabling php modules for lighttpd
+  command: "{{ item.cmd }}"
+  args:
+    creates: "{{ item.creates }}"
+  become: true
+  with_items:
+    - cmd: "lighttpd-enable-mod fastcgi"
+      creates: "/etc/lighttpd/conf-enabled/10-fastcgi.conf"
+    - cmd: "lighttpd-enable-mod fastcgi-php"
+      creates: "/etc/lighttpd/conf-enabled/15-fastcgi-php.conf"
+  notify:
+    - restart lighttpd
+  when: >
+    ansible_os_family == "Debian"
+
+- name: config_php | installing php xcache (if-enabled)
+  apt:
+    name: "{{ 'php' + lighttpd_php_version + '-xcache' }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  notify:
+    - restart lighttpd
+  when: >
+    (ansible_distribution == "Debian" or
+    ansible_distribution == "Ubuntu" and
+    ansible_distribution_version < "16.04") and
+    lighttpd_enable_php_xcache
+
+- name: config_php | installing php xcache (if-enabled)
+  yum:
+    name: ["php-xcache", "xcache-admin"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  notify:
+    - restart lighttpd
+  when: >
+    ansible_os_family == "RedHat" and
+    ansible_distribution != "Fedora" and
+    lighttpd_enable_php_xcache
+
+- name: config_php | installing php xcache (if-enabled)
+  dnf:
+    name: ["php-xcache", "xcache-admin"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  notify:
+    - restart lighttpd
+  when: >
+    ansible_os_family == "RedHat" and
+    ansible_distribution == "Fedora" and
+    lighttpd_enable_php_xcache

@@ -1,38 +1,41 @@
 ---
 galaxy_info:
-  author:              Larry Smith Jr.
-  description:         An [Ansible] role to install/configure [DNSMasq]
+  author: Larry Smith Jr.
+  description: An [Ansible] role to install/configure [DNSMasq]
 
-  license:             license (GPLv2, CC-BY, etc)
+  license: MIT
   min_ansible_version: 1.2
 
   platforms:
-  - name:              EL
-    versions:
-    - 6
-    - 7
-  - name:              Fedora
-    versions:
-    - 22
-    - 23
-    - 24
-    - 25
-    - 26
-  - name:              Ubuntu
-    versions:
-    - bionic
-    - precise
-    - trusty
-    - vivid
-    - wily
-    - xenial
-  - name:              Debian
-    versions:
-    - jessie
-    - stretch
-    - wheezy
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Fedora
+      versions:
+        - 22
+        - 23
+        - 24
+        - 25
+        - 26
+        - 27
+        - 28
+        - 29
+    - name: Ubuntu
+      versions:
+        - bionic
+        - precise
+        - trusty
+        - vivid
+        - wily
+        - xenial
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+        - wheezy
 
-  categories:
-  - networking
-  - system
-dependencies:          []
+  galaxy_tags:
+    - networking
+    - system
+dependencies: []

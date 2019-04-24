@@ -1,14 +1,21 @@
 # {{ ansible_managed }}
 
-# ACLS
+{% if squid_auth_param is defined %}
+# AUTH_PARAM
+{% for item in squid_auth_param %}
+auth_param {{ item['name'] }} {{ item['type'] }} {{ item['arg']}}
+{% endfor %}
+{% endif %}
+
 {% if squid_acl is defined and squid_acl != [] %}
+# ACLS
 {%   for item in squid_acl %}
 acl {{ item['name'] }} {{ item['type'] }} {{ item['arg'] }}
 {%   endfor %}
 {% endif %}
 
-# Local Networks
 {% if squid_acl_localnet is defined and squid_acl_localnet != [] %}
+# Local Networks
 {%   for item in squid_acl_localnet %}
 acl localnet src {{ item }}
 {%   endfor %}
@@ -50,4 +57,8 @@ cache_peer {{ item.host }}.{{ item.domain}} {{ item.type }} {{ item.proxy_port}}
 cache_peer {{ item.host }} {{ item.type }} {{ item.proxy_port}} {{ item.icp_port }} {{ item.options }}
 {%     endif %}
 {%   endfor %}
+{% endif %}
+
+{% if squid_shutdown_lifetime is defined %}
+shutdown_lifetime {{squid_shutdown_lifetime}}{% else %}
 {% endif %}

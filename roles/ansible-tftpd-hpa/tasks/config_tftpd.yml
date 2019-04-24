@@ -5,34 +5,31 @@
     state: directory
     owner: tftp
     group: tftp
+  become: true
 
 - name: config_tftpd | configuring tftpd
   template:
-    src: "etc/default/tftpd-hpa.j2"
-    dest: "/etc/default/tftpd-hpa"
+    src: etc/default/tftpd-hpa.j2
+    dest: /etc/default/tftpd-hpa
     owner: root
     group: root
     mode: 0644
-  notify: restart tftpd-hpa
-
-- name: config_tftpd | configuring inetd
-  template:
-    src: "etc/inetd.conf.j2"
-    dest: "/etc/inetd.conf"
-    owner: root
-    group: root
-    mode: 0644
+  become: true
   notify: restart tftpd-hpa
 
 - name: config_tftpd | Downloading Netboot
   get_url:
     url: "{{ tftp_netboot_url }}/{{ tftp_netboot_file }}"
     dest: "{{ tftp_directory }}/{{ tftp_netboot_file }}"
+  become: true
+  when: tftp_netboot_enable
 
 - name: config_tftpd | Extracting Netboot
   unarchive:
     src: "{{ tftp_directory }}/{{ tftp_netboot_file }}"
     dest: "{{ tftp_directory }}"
-    copy: no
+    copy: false
   args:
     creates: "{{ tftp_directory }}/pxelinux.0"
+  become: true
+  when: tftp_netboot_enable

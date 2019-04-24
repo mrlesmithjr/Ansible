@@ -2,56 +2,56 @@
 # handlers file for ansible-consul
 - name: reload systemd
   systemd:
-    name: 'consul'
+    name: consul
     daemon_reload: yes
   become: true
   when: not ansible_check_mode
 
 - name: reload consul
   service:
-    name: "consul"
-    state: "reloaded"
+    name: consul
+    state: reloaded
   become: true
   when: not ansible_check_mode
 
 - name: restart consul
   service:
-    name: "consul"
-    state: "restarted"
+    name: consul
+    state: restarted
   become: true
   when: not ansible_check_mode
 
 - name: start consul
   service:
-    name: "consul"
-    state: "started"
+    name: consul
+    state: started
   become: true
   when: not ansible_check_mode
 
 - name: stop consul
   service:
-    name: "consul"
-    state: "stopped"
+    name: consul
+    state: stopped
   become: true
   when: not ansible_check_mode
 
 - name: restart dnsmasq
   service:
-    name: "dnsmasq"
-    state: "restarted"
+    name: dnsmasq
+    state: restarted
   become: true
   when: not ansible_check_mode
 
 - name: restart haproxy
   service:
-    name: "haproxy"
-    state: "restarted"
+    name: haproxy
+    state: restarted
   become: true
   when: not ansible_check_mode
 
 - name: restart keepalived
   service:
-    name: "keepalived"
-    state: "restarted"
+    name: keepalived
+    state: restarted
   become: true
   when: not ansible_check_mode

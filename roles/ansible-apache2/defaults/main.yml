@@ -29,26 +29,26 @@ apache2_php_max_memory: 128M
 
 apache2_php_post_max_size: 8M
 
-apache2_php_timezone: "UTC"
+apache2_php_timezone: UTC
 
 apache2_php_upload_max_filesize: 2M
 
-apache2_server_admin: 'webmaster@localhost'
+apache2_server_admin: webmaster@localhost
 
 # Define Apache2 virtual hosts
 apache2_virtual_hosts: []
-  # - documentroot: '/var/www/example.com'
-  #   default_site: false
-  #   port: 80
-  #   serveradmin: '{{ apache2_server_admin }}'
-  #   servername: 'www.example.com'
-  # - documentroot: '/var/www/example.org'
-  #   default_site: false
-  #   port: 80
-  #   serveradmin: '{{ apache2_server_admin }}'
-  #   servername: 'www.example.org'
-  # - documentroot: '/var/www/html'
-  #   default_site: true
-  #   port: 80
-  #   serveradmin: '{{ apache2_server_admin }}'
-  #   servername: ''
+# - documentroot: /var/www/example.com
+#   default_site: false
+#   port: 80
+#   serveradmin: "{{ apache2_server_admin }}"
+#   servername: www.example.com
+# - documentroot: /var/www/example.org
+#   default_site: false
+#   port: 80
+#   serveradmin: "{{ apache2_server_admin }}"
+#   servername: www.example.org
+# - documentroot: /var/www/html
+#   default_site: true
+#   port: 80
+#   serveradmin: "{{ apache2_server_admin }}"
+#   servername: ""

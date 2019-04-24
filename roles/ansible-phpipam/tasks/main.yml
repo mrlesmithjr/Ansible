@@ -32,5 +32,5 @@
   tags:
     - phpipam_db_backups
   when: >
-        enable_phpipam_db_backups is defined and
-        enable_phpipam_db_backups
+        phpipam_enable_db_backups is defined and
+        phpipam_enable_db_backups

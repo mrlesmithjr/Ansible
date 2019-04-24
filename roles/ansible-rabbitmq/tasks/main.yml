@@ -1,3 +1,4 @@
+---
 # tasks file for ansible-rabbitmq
 - include: debian.yml
   when: ansible_os_family == "Debian"
@@ -15,7 +16,8 @@
   when: rabbitmq_config_service
 
 - name: checking to see if already clustered
-  stat: path=/etc/rabbitmq/clustered
+  stat:
+    path: /etc/rabbitmq/clustered
   become: true
   register: clustered
 
@@ -23,6 +25,9 @@
   when: >
         rabbitmq_enable_clustering and
         not clustered['stat']['exists']
+
+- include: rabbitmq_vhosts.yml
+  when: rabbitmq_extra_vhosts is defined
 
 - include: rabbitmq_ha_config.yml
   when: >

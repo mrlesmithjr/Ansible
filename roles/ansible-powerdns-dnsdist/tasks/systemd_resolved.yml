@@ -1,0 +1,44 @@
+---
+- name: systemd_resolved | Checking If systemd-resolved Service Is Present
+  command: systemctl status systemd-resolved.service
+  register: _pdns_dnsdist_systemd_resolved_check
+  changed_when: false
+  failed_when: false
+
+- name: systemd_resolved | Disabling and Stopping systemd-resolved
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: false
+  become: true
+  register: _pdns_dnsdist_systemd_resolved_disabled
+  notify:
+    - restart dnsdist
+  when: _pdns_dnsdist_systemd_resolved_check['rc'] == 0
+
+- name: systemd_resolved | Checking If /etc/resolv.conf Exists
+  stat:
+    path: /etc/resolv.conf
+  register: _pdns_dnsdist_resolv_conf
+
+- name: systemd_resolved | Removing Existing /etc/resolv.conf If symlink
+  file:
+    path: /etc/resolv.conf
+    state: absent
+  become: true
+  register: _pdns_dnsdist_resolv_conf_removed
+  when: >
+    _pdns_dnsdist_systemd_resolved_disabled['changed'] and
+    _pdns_dnsdist_resolv_conf['stat']['islnk']
+
+- name: systemd_resolved | Creating /etc/resolv.conf
+  template:
+    src: etc/resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: o=rw,g=r,o=r
+  become: true
+  notify:
+    - restart dnsdist
+  when: _pdns_dnsdist_resolv_conf_removed['changed']

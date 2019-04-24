@@ -1,25 +1,27 @@
 ---
 - name: config_lighttpd | configuring lighttpd
   template:
-    src: "etc/lighttpd/lighttpd.conf.j2"
+    src: etc/lighttpd/lighttpd.conf.j2
     dest: "{{ lighttpd_config_file }}"
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - restart lighttpd
 
 - name: config_lighttpd | configuring lighttpd modules
   template:
-    src: "{{ item }}.j2"
-    dest: "/{{ item }}"
+    src: "{{ item + '.j2' }}"
+    dest: "{{ '/' + item }}"
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - restart lighttpd
   with_items:
     - etc/lighttpd/modules.conf
     - etc/lighttpd/conf.d/fastcgi.conf
   when: >
-        ansible_os_family == "RedHat"
+    ansible_os_family == "RedHat"

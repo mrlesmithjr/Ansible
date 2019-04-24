@@ -1,6 +1,8 @@
-# /etc/default/tftpd-hpa
+{{ ansible_managed|comment }}
 
 TFTP_USERNAME="tftp"
 TFTP_DIRECTORY="{{ tftp_directory }}"
 TFTP_ADDRESS="[::]:69"
 TFTP_OPTIONS="{{ tftp_options }}"
+
+RUN_DAEMON="yes"

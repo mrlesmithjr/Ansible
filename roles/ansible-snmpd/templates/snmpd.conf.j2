@@ -4,6 +4,9 @@ view   systemonly  included   .1.3.6.1.2.1.25.1
 {% if snmpd_authorized_networks is defined and snmpd_enable %}
 {%   for item in snmpd_authorized_networks %}
 rocommunity {{ item.community }} {{ item.network }}
+{%     if snmpd_trap %}
+trapcommunity {{ item.community }} {{ item.network }}
+{%     endif %}
 {%   endfor %}
 {% endif %}
 rocommunity public  default    -V systemonly

@@ -1,20 +1,17 @@
 ---
 - name: debian | installing dependencies
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["jq", "tree", "unzip", "uuid-runtime"]
+    state: present
   become: true
-  with_items:
-    - 'jq'
-    - 'tree'
-    - 'unzip'
-    - 'uuid-runtime'
+  register: result
+  until: result is successful
 
 - name: debian | installing add'l dependencies (Debian)
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["dnsutils"]
+    state: present
   become: true
-  with_items:
-    - 'dnsutils'
   when: ansible_distribution == "Debian"
+  register: result
+  until: result is successful

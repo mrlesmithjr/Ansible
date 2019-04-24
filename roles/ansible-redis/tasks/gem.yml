@@ -4,5 +4,7 @@
     name: "{{ item }}"
     state: present
   become: true
+  register: result
+  until: result is successful
   with_items:
     - redis

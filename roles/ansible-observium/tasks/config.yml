@@ -65,7 +65,7 @@
   changed_when: false
 
 - name: config | Ensuring PHP Mods are Enabled
-  command: "php5enmod {{ item }}"
+  command: "phpenmod {{ item }}"
   with_items:
     - 'mcrypt'
   when: item not in php_mods_enabled.stdout_lines

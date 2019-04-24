@@ -1,74 +1,77 @@
 ---
-- name: debian_pdns_server | installing powerdns pre-reqs
+- name: debian_pdns_server | Installing PowerDNS Pre-Reqs
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ['dnsutils', 'git', 'jq', 'python-mysqldb']
+    state: present
   become: true
-  with_items:
-    - 'dnsutils'
-    - 'git'
-    - 'jq'
-    - 'python-mysqldb'
-    # - 'mysql-client' # Causing MariaDB to be uninstalled
+  register: result
+  until: result is succeeded
 
-- name: debian_pdns_server | installing powerdns
+- name: debian_pdns_server | Installing PowerDNS
   apt:
-    deb: "{{ pdns_download_url }}/deb/pdns-static_{{ pdns_server_version }}_amd64.deb"
-    state: "present"
+    deb: "{{ pdns_auth_download_url }}/deb/pdns-static_{{ pdns_auth_version }}_amd64.deb"
+    state: present
   become: true
   notify: restart pdns
   when: >
         ansible_architecture == "x86_64" and
-        pdns_server_version != "4.x"
+        pdns_auth_version != "4.x"
 
-- name: debian_pdns_server | installing powerdns
+- name: debian_pdns_server | Installing PowerDNS
   apt:
-    deb: "{{ pdns_download_url }}/deb/pdns-static_{{ pdns_server_version }}_i386.deb"
-    state: "present"
+    deb: "{{ pdns_auth_download_url }}/deb/pdns-static_{{ pdns_auth_version }}_i386.deb"
+    state: present
   become: true
+  register: result
+  until: result is succeeded
   notify: restart pdns
   when: >
         ansible_architecture == "i386" and
-        pdns_server_version != "4.x"
+        pdns_auth_version != "4.x"
 
 - name: debian_pdns_server | Adding PowerDNS Repo Key
   apt_key:
-    url: "{{ pdns_repo_gpgkey }}"
-    state: "present"
+    url: "{{ pdns_auth_repo_gpgkey }}"
+    state: present
   become: true
-  when: pdns_server_version == "4.x"
+  register: result
+  until: result is succeeded
+  when: pdns_auth_version == "4.x"
 
 - name: debian_pdns_server | Pinning PowerDNS Repo
   template:
-    src: "pdns_repo.j2"
-    dest: "/etc/apt/preferences.d/pdns"
+    src: pdns_repo.j2
+    dest: /etc/apt/preferences.d/pdns
   become: true
-  when: pdns_server_version == "4.x"
+  when: pdns_auth_version == "4.x"
 
 - name: debian_pdns_server | Adding PowerDNS Repo
   apt_repository:
-    repo: "deb {{ pdns_repo_baseurl }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-auth-40 main"
-    state: "present"
+    repo: "deb {{ pdns_auth_repo_baseurl }}/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }}-auth-{{ pdns_auth_short_version }} main"
+    state: present
   become: true
+  register: result
+  until: result is succeeded
   when: >
         ansible_lsb['id'] != "Raspbian" and
-        pdns_server_version == "4.x"
+        pdns_auth_version == "4.x"
 
 - name: debian_pdns_server | Adding PowerDNS Repo
   apt_repository:
-    repo: "deb {{ pdns_repo_baseurl }}/raspbian {{ ansible_distribution_release|lower }}-auth-40 main"
-    state: "present"
+    repo: "deb {{ pdns_auth_repo_baseurl }}/raspbian {{ ansible_distribution_release|lower }}-auth-{{ pdns_auth_short_version }} main"
+    state: present
   become: true
+  register: result
+  until: result is succeeded
   when: >
         ansible_lsb['id'] == "Raspbian" and
-        pdns_server_version == "4.x"
+        pdns_auth_version == "4.x"
 
 - name: debian_pdns_server | Installing PowerDNS Authoritative 4.x
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ['pdns-server', 'pdns-backend-mysql']
+    state: present
   become: true
-  with_items:
-    - 'pdns-server'
-    - 'pdns-backend-mysql'
-  when: pdns_server_version == "4.x"
+  register: result
+  until: result is succeeded
+  when: pdns_auth_version == "4.x"

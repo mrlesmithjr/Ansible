@@ -3,7 +3,7 @@
 # https://github.com/mrlesmithjr/ansible-kvm/pull/2
 - name: config_kvm | Capturing Libvirt Group
   shell: "getent group libvirt | cut -d: -f1"
-  register: "_libvirt_group_found"
+  register: _libvirt_group_found
   changed_when: false
   check_mode: no
 
@@ -11,31 +11,31 @@
 # https://github.com/mrlesmithjr/ansible-kvm/pull/2
 - name: config_kvm | Capturing Libvirt Group
   shell: "getent group libvirtd | cut -d: -f1"
-  register: "_libvirtd_group_found"
+  register: _libvirtd_group_found
   changed_when: false
   check_mode: no
 
 - name: config_kvm | Setting unix_sock_group
   set_fact:
-    kvm_unix_sock_group: 'libvirt'
+    kvm_unix_sock_group: libvirt
   when: >
-        (_libvirt_group_found is defined and
-          _libvirt_group_found['stdout'] == 'libvirt')
+    (_libvirt_group_found is defined and
+      _libvirt_group_found['stdout'] == 'libvirt')
 
 - name: config_kvm | Setting unix_sock_group
   set_fact:
-    kvm_unix_sock_group: 'libvirtd'
+    kvm_unix_sock_group: libvirtd
   when: >
-        (_libvirtd_group_found is defined and
-          _libvirtd_group_found['stdout'] == 'libvirtd')
+    (_libvirtd_group_found is defined and
+      _libvirtd_group_found['stdout'] == 'libvirtd')
 
 - name: config_kvm | configuring kvm
   template:
-    src: "etc/libvirt/libvirtd.conf.j2"
-    dest: "/etc/libvirt/libvirtd.conf"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
+    src: etc/libvirt/libvirtd.conf.j2
+    dest: /etc/libvirt/libvirtd.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
   become: true
   notify:
     - "restart {{ kvm_service_name }}"
@@ -43,13 +43,13 @@
 
 - name: config_kvm | configuring kvm
   replace:
-    dest: "/etc/default/libvirt-bin"
-    regexp: "^libvirtd_opts=\"-d\""
-    replace: "libvirtd_opts=\"-d -l\""
+    dest: /etc/default/libvirt-bin
+    regexp: '^libvirtd_opts="-d"'
+    replace: 'libvirtd_opts="-d -l"'
   become: true
   notify:
     - "restart {{ kvm_service_name }}"
   when: >
-        kvm_enable_tcp and
-        ansible_os_family == "Debian" and
-        not ansible_check_mode
+    kvm_enable_tcp and
+    ansible_os_family == "Debian" and
+    not ansible_check_mode

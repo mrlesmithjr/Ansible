@@ -1,35 +1,30 @@
 ---
 - name: redhat | adding mariadb repo
   template:
-    src: "etc/yum.repos.d/MariaDB.repo.j2"
-    dest: "/etc/yum.repos.d/MariaDB.repo"
-    owner: "root"
-    group: "root"
-  register: "repo_added"
+    src: etc/yum.repos.d/MariaDB.repo.j2
+    dest: /etc/yum.repos.d/MariaDB.repo
+    owner: root
+    group: root
+  become: true
+  register: repo_added
 
 - name: redhat | installing mariadb mysql
   yum:
-    name: "{{ item }}"
-    state: "present"
+    name: ["MariaDB-server", "MySQL-python"]
+    state: present
     update_cache: true
-  with_items:
-    - 'MariaDB-server'
-    - 'MySQL-python'
+  become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution != "Fedora"
+    ansible_distribution != "Fedora"
 
 - name: redhat | installing mariadb mysql
   dnf:
-    name: "{{ item }}"
-    state: "present"
-  with_items:
-    - 'MariaDB-server'
-    - 'MySQL-python'
+    name: ["mariadb-server", "MySQL-python"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution == "Fedora"
-
-- name: redhat | ensuring mariadb mysql is enabled on boot and started
-  service:
-    name: "mysql"
-    state: "started"
-    enabled: yes
+    ansible_distribution == "Fedora"

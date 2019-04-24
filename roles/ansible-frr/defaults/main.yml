@@ -16,6 +16,7 @@ frr_bgp: []
   # asns:
   #   65000:
   #     log_neighbor_changes: true
+  #     timers: '3 9'
   #     maximum_paths: 64
   #     neighbors:
   #       192.168.250.11:
@@ -23,6 +24,7 @@ frr_bgp: []
   #         default_originate: false
   #         description: node1
   #         next_hop_self: true
+  #         timers_connect: 5
   #       192.168.250.12:
   #         asn: 65000
   #         default_originate: false
@@ -78,6 +80,16 @@ frr_ospf: []
   #   # - kernel
   #   # - ospf
   #   # - static
+  #
+
+# Defines Static Routes
+frr_static: []
+  # destination:
+  #   "next hop"
+  # 1.1.1.1:
+  #   blackhole
+  # 2.2.2.2:
+  #   192.168.0.1
 
 frr_package_url: "https://github.com/FRRouting/frr/releases/download/frr-{{ frr_version }}"
 
@@ -93,4 +105,15 @@ frr_router_id: []
 
 # Defines FRR version to install
 # https://github.com/FRRouting/frr/releases
-frr_version: 3.0.3
+frr_version: 6.0.2
+
+_frr_bgp_summary:
+  stdout: ""
+
+# Installs and configured FRR python tools for reload
+# If you make a change to your routing configuration, you need to reload so your changes take place. FRR reload enables you to apply only the modifications you make to your FRR configuration, synchronizing its running state with the configuration in /etc/frr/frr.conf. This is useful for optimizing the automation of FRR in your environment or to apply changes made at runtime.
+
+frr_reload: false
+
+# When a newer version of FRR is installed we need to restart instead of reloading the configuration.
+_frrdownload.changed: false

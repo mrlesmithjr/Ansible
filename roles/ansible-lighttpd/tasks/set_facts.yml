@@ -1,0 +1,26 @@
+---
+- name: set_facts | Setting PHP Version 5
+  set_fact:
+    lighttpd_php_path: /etc/php5
+    lighttpd_php_version: "5"
+  when: >
+    (ansible_distribution == "Ubuntu" and
+    ansible_distribution_version < '16.04') or
+    ansible_os_family == "Alpine"
+
+- name: set_facts | Setting PHP Version 7.0
+  set_fact:
+    lighttpd_php_path: /etc/php/7.0
+    lighttpd_php_version: "7.0"
+  when: >
+    ansible_distribution == "Ubuntu" and
+    ansible_distribution_version >= "16.04" and
+    ansible_distribution_version < "18.04"
+
+- name: set_facts | Setting PHP Version 7.2
+  set_fact:
+    lighttpd_php_path: /etc/php/7.2
+    lighttpd_php_version: "7.2"
+  when: >
+    ansible_distribution == "Ubuntu" and
+    ansible_distribution_version >= "18.04"

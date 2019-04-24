@@ -1,21 +1,21 @@
 ---
 # handlers file for ansible-kea-dhcp
-- name: "restart redhat kea-dhcp"
+- name: restart redhat kea-dhcp
   service:
     name: "{{ item['name'] }}"
-    state: "restarted"
+    state: restarted
   become: true
-  with_items: '{{ kea_dhcp_redhat_services }}'
+  with_items: "{{ kea_dhcp_redhat_services }}"
   when: >
-      ansible_os_family == "RedHat" and
-      item['enabled']
+    ansible_os_family == "RedHat" and
+    item['enabled']
 
-- name: "restart debian kea-dhcp"
+- name: restart debian kea-dhcp
   service:
     name: "{{ item['name'] }}"
-    state: "restarted"
+    state: restarted
   become: true
-  with_items: '{{ kea_dhcp_debian_services }}'
+  with_items: "{{ kea_dhcp_debian_services }}"
   when: >
-      ansible_os_family == "Debian" and
-      item['enabled']
+    ansible_os_family == "Debian" and
+    item['enabled']

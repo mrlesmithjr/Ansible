@@ -1,9 +1,8 @@
 ---
 - name: debian | installing bind
   apt:
-    name: "{{ item }}"
+    name: ["bind9", "bind9utils", "bind9-doc"]
     state: present
-  with_items:
-    - bind9
-    - bind9utils
-    - bind9-doc
+  become: true
+  register: result
+  until: result is successful

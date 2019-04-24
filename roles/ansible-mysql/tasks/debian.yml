@@ -1,85 +1,87 @@
 ---
-- include:    mysql_root_pw.yml
+- include: mysql_root_pw.yml
 
-- name:       debian | installing pre-reqs
+- name: debian | installing pre-reqs
   apt:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - automysqlbackup
-    - software-properties-common
-    - python-mysqldb
-    - rsync
+    name: ['automysqlbackup', 'software-properties-common', 'python-mysqldb',
+           'rsync']
+    state: present
+  become: true
+  register: result
+  until: result is successful
 
-- name:       debian | installing mysql
+- name: debian | installing mysql
   apt:
-    name:     mysql-server
-    state:    present
-  become:     true
-  when:       >
+    name: mysql-server
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         (ansible_distribution == "Debian" and
         ansible_distribution_version < '9.0') or
         (ansible_distribution == "Ubuntu")
 
-- name:       debian | installing mysql
+- name: debian | installing mysql
   apt:
-    name:     mariadb-server
-    state:    present
-  become:     true
-  when:       >
+    name: mariadb-server
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
         (ansible_distribution == "Debian" and
         ansible_distribution_version >= '9.0')
 
-- name:       debian | configuring mysql
+- name: debian | configuring mysql
   template:
-    src:      etc/mysql/my.cnf.j2
-    dest:     /etc/mysql/my.cnf
-    owner:    root
-    group:    root
-    mode:     0644
-  register:   mysql_reconfigured_14_04
-  become:     true
-  notify:     restart mysql
-  when:       >
+    src: etc/mysql/my.cnf.j2
+    dest: /etc/mysql/my.cnf
+    owner: root
+    group: root
+    mode: 0644
+  register: mysql_reconfigured_14_04
+  become: true
+  notify: restart mysql
+  when: >
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version <= '14.04') or
         ansible_distribution == "Debian"
 
-- name:       debian | configuring mysql
+- name: debian | configuring mysql
   template:
-    src:      etc/mysql/mysql.conf.d/mysqld.cnf.j2
-    dest:     /etc/mysql/mysql.conf.d/mysqld.cnf
-    owner:    root
-    group:    root
-    mode:     0644
-  register:   mysql_reconfigured_16_04
-  become:     true
-  notify:     restart mysql
-  when:       >
+    src: etc/mysql/mysql.conf.d/mysqld.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    owner: root
+    group: root
+    mode: 0644
+  register: mysql_reconfigured_16_04
+  become: true
+  notify: restart mysql
+  when: >
         (ansible_distribution == "Ubuntu" and
         ansible_distribution_version >= '16.04')
 
-- name:       debian | configuring mysql
+- name: debian | configuring mysql
   template:
-    src:      etc/mysql/mysql.conf.d/mysqld.cnf.j2
-    dest:     /etc/mysql/conf.d/mysqld.cnf
-    owner:    root
-    group:    root
-    mode:     0644
-  register:   mysql_reconfigured_debian
-  become:     true
-  notify:     restart mysql
-  when:       ansible_distribution == "Debian"
+    src: etc/mysql/mysql.conf.d/mysqld.cnf.j2
+    dest: /etc/mysql/conf.d/mysqld.cnf
+    owner: root
+    group: root
+    mode: 0644
+  register: mysql_reconfigured_debian
+  become: true
+  notify: restart mysql
+  when: ansible_distribution == "Debian"
 
-- name:       debian | configuring client configuration
+- name: debian | configuring client configuration
   template:
-    src:      etc/mysql/conf.d/client.cnf.j2
-    dest:     /etc/mysql/conf.d/client.cnf
-    owner:    root
-    group:    root
-    mode:     0644
-  notify:     reload mysql
-  become:     true
-  when:       >
+    src: etc/mysql/conf.d/client.cnf.j2
+    dest: /etc/mysql/conf.d/client.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload mysql
+  become: true
+  when: >
         ansible_distribution_version <= '14.04'

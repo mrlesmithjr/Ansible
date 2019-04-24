@@ -10,12 +10,15 @@ gitlab_runner_config:
   executor: shell
 
 gitlab_runner_debian_package:
-  key: '{{ gitlab_runner_uri }}/gpgkey'
-  package: '{{ gitlab_runner_uri }}/packages/{{ ansible_distribution|lower }}/{{ ansible_distribution_release|lower }}/gitlab-ci-multi-runner_{{ gitlab_runner_version }}_amd64.deb'
+  key: "{{ gitlab_runner_uri }}/gpgkey"
+  package: "{{ gitlab_runner_uri }}/packages/{{ ansible_distribution|lower }}/{{ ansible_distribution_release|lower }}/gitlab-ci-multi-runner_{{ gitlab_runner_version }}_amd64.deb"
   repos:
-    - 'deb {{ gitlab_runner_uri }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
-    - 'deb-src {{ gitlab_runner_uri }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main'
+    - "deb {{ gitlab_runner_uri }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main"
+    - "deb-src {{ gitlab_runner_uri }}/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release|lower }} main"
 
-gitlab_runner_uri: https://packages.gitlab.com/runner/gitlab-ci-multi-runner
+gitlab_runner_uri: https://packages.gitlab.com/runner/gitlab-runner
 
-gitlab_runner_version: 9.5.0
+# We need to cleanup previous repos using this
+gitlab_runner_uri_previous: https://packages.gitlab.com/runner/gitlab-ci-multi-runner
+
+gitlab_runner_version: 11.5.0

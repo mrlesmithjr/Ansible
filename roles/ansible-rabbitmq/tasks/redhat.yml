@@ -1,24 +1,27 @@
 ---
 - name: redhat | installing pre-reqs
   yum:
-    name: "{{ item }}"
+    name: ['epel-release', 'wget']
     state: present
   become: true
-  with_items:
-    - epel-release
-    - wget
+  register: result
+  until: result is successful
 
 - name: redhat | installing erlang
   yum:
-    name: "erlang"
+    name: erlang
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: redhat | adding RabbitMQ public GPG key
   rpm_key:
     key: "{{ rabbitmq_redhat_repo_key }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: redhat | downloading RabbitMQ
   get_url:
@@ -31,10 +34,12 @@
     name: "/opt/{{ rabbitmq_redhat_package }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: redhat | starting and enabling RabbitMQ service
   service:
-    name: "rabbitmq-server"
+    name: rabbitmq-server
     state: started
     enabled: yes
   become: true

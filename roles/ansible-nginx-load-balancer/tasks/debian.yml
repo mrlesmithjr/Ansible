@@ -1,20 +1,24 @@
 ---
 - name: debian | Adding NGINX PPA
   apt_repository:
-    repo: "ppa:nginx/{{ nginx_load_balancer_version }}"
-    state: "present"
+    repo: "{{ 'ppa:nginx/' + nginx_load_balancer_version }}"
+    state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | Installing NGINX
   apt:
-    name: "nginx"
-    state: "present"
+    name: nginx
+    state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | Installing Apache2 Modules
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["libapache2-mod-rpaf"]
+    state: present
   become: true
-  with_items:
-    - 'libapache2-mod-rpaf'
+  register: result
+  until: result is successful

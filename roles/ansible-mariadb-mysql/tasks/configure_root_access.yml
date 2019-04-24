@@ -1,21 +1,31 @@
 ---
+- name: configure_root | configuring root my.cnf
+  template:
+    src: root/my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
+  become: true
+  when: ansible_os_family == "Debian"
+
 - name: configure_root_access | updating root passwords
   mysql_user:
-    name: "root"
+    name: root
     host: "{{ item }}"
     password: "{{ mariadb_mysql_root_password }}"
-    login_user: "{{ mariadb_mysql_user }}"
-    login_password: "{{ mariadb_mysql_root_password }}"
+  become: true
   with_items:
-    - '{{ ansible_hostname }}'
-    - '127.0.0.1'
-    - '::1'
-    - 'localhost'
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - "::1"
+    - localhost
 
 - name: configure_root | configuring root my.cnf
   template:
-    src: "root/my.cnf.j2"
-    dest: "/root/.my.cnf"
-    owner: "root"
-    group: "root"
+    src: root/my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
     mode: 0600
+  become: true

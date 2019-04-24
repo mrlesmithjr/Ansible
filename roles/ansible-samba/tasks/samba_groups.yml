@@ -3,4 +3,5 @@
   group:
     name: "{{ item }}"
     state: present
-  with_items: '{{ samba_groups }}'
+  become: true
+  with_items: "{{ samba_groups }}"

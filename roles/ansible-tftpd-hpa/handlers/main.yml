@@ -2,5 +2,6 @@
 # handlers file for ansible-tftpd-hpa
 - name: restart tftpd-hpa
   service:
-    name: "tftpd-hpa"
+    name: tftpd-hpa
     state: restarted
+  become: true

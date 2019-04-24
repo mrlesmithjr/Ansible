@@ -7,7 +7,7 @@ dumpdir {{ chrony_dumpdir }}
 dumponexit
 keyfile /etc/chrony/chrony.keys
 local stratum {{ chrony_local_stratum }}
-log {{ chrony_log|join(' ')}}
+log {{ chrony_log|join(' ') }}
 logchange 0.5
 logdir {{ chrony_logdir }}
 maxupdateskew {{ chrony_maxupdateskew }}

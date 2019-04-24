@@ -14,19 +14,21 @@ observium_db_info:
   password: 'observium'
   user: 'observium'
 observium_debian_pre_reqs:
+  - apache2
   - fping
   - graphviz
   - imagemagick
   - ipmitool
-  - libapache2-mod-php
+  - libapache2-mod-php7.2
   - mtr-tiny
+  - mysql-server
   - mysql-client
   - php-pear
-  - php7.0-cli
-  - php7.0-gd
-  - php7.0-json
-  - php7.0-mcrypt
-  - php7.0-mysql
+  - php7.2-cli
+  - php7.2-gd
+  - php7.2-json
+  - php7.2-mysql
+  - php7.2-mysqli
   - python-mysqldb
   - rrdtool
   - snmp

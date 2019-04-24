@@ -4,14 +4,14 @@
 # Optionally specify a host, subnet, or network from which to allow NTP
 # connections to a machine acting as NTP server
 chrony_allow_hosts:
-  - '10/8'
-  - '192.168/16'
-  - '172.16/12'
+  - 10/8
+  - 192.168/16
+  - 172.16/12
 
 # Path to the directory to save the measurement history across restarts of
 # chronyd (assuming no changes are made to the system clock behavior whilst
 # it is not running)
-chrony_dumpdir: '/var/lib/chrony'
+chrony_dumpdir: /var/lib/chrony
 
 # A large value of 10 indicates that the clock is so many hops away from a
 # reference clock that its time is unreliable. If the computer ever has access
@@ -47,12 +47,12 @@ chrony_local_stratum: 10
 # This option logs the temperature measurements and system rate compensations
 # to a file called tempcomp.log.
 chrony_log:
-  - 'tracking'
-  - 'measurements'
-  - 'statistics'
+  - tracking
+  - measurements
+  - statistics
 
 # This directive allows the directory where log files are written to be specified
-chrony_logdir: '/var/log/chrony'
+chrony_logdir: /var/log/chrony
 
 # The maxupdateskew parameter is the threshold for determining whether an
 # estimate is too unreliable to be used.
@@ -63,23 +63,23 @@ chrony_maxupdateskew: 100.0
 
 # Define upstream NTP servers
 chrony_ntp_servers:
-  - server: '0.debian.pool.ntp.org'
+  - server: 0.debian.pool.ntp.org
     options:
-      - option: 'iburst'
-      - option: 'minpoll'
+      - option: iburst
+      - option: minpoll
         val: 8
-  - server: '1.debian.pool.ntp.org'
+  - server: 1.debian.pool.ntp.org
     options:
-      - option: 'iburst'
-      - option: 'minpoll'
+      - option: iburst
+      - option: minpoll
         val: 8
-  - server: '2.debian.pool.ntp.org'
+  - server: 2.debian.pool.ntp.org
     options:
-      - option: 'iburst'
-      - option: 'minpoll'
+      - option: iburst
+      - option: minpoll
         val: 8
-  - server: '3.debian.pool.ntp.org'
+  - server: 3.debian.pool.ntp.org
     options:
-      - option: 'iburst'
-      - option: 'minpoll'
+      - option: iburst
+      - option: minpoll
         val: 8

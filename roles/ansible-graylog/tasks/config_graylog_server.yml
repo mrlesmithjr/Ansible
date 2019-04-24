@@ -1,27 +1,27 @@
 ---
 - name: config_graylog_server | configuring graylog-server
   template:
-    src: "etc/graylog/server/server.conf.j2"
-    dest: "/etc/graylog/server/server.conf"
-    owner: "root"
-    group: "root"
-    mode: "0644"
+    src: etc/graylog/server/server.conf.j2
+    dest: /etc/graylog/server/server.conf
+    owner: root
+    group: root
+    mode: 0644
   become: true
-  notify: "restart graylog-server"
+  notify: restart graylog-server
   when: graylog_config_graylog_server
 
 - name: config_graylog_server | Creating {{ graylog_message_journal_dir }}
   file:
     path: "{{ graylog_message_journal_dir }}"
-    state: "directory"
+    state: directory
     owner: "{{ graylog_user }}"
     group: "{{ graylog_group }}"
-    mode: "u=rwx,g=rwx,o=rx"
+    mode: u=rwx,g=rwx,o=rx
   become: true
 
 - name: config_graylog_server | Ensuring Graylog Server Service Is Enabled And Started
   service:
-    name: "graylog-server"
-    state: "started"
-    enabled: yes
+    name: graylog-server
+    state: started
+    enabled: true
   become: true

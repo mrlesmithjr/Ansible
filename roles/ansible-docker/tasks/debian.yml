@@ -4,79 +4,89 @@
     update_cache: yes
     cache_valid_time: 86400
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | installing pre-reqs
   apt:
-    name: "{{ item }}"
+    name:
+      ["apt-transport-https", "ca-certificates", "software-properties-common"]
     state: present
   become: true
-  with_items:
-    - 'apt-transport-https'
-    - 'ca-certificates'
-    - 'software-properties-common'
+  register: result
+  until: result is successful
 
 # We are removing the old Docker info
 - name: debian | Removing Legacy Docker apt-key
   apt_key:
-    keyserver: "hkp://p80.pool.sks-keyservers.net:80"
-    id: "58118E89F3A912897C070ADBF76221572C52609D"
-    state: "absent"
+    keyserver: hkp://p80.pool.sks-keyservers.net:80
+    id: 58118E89F3A912897C070ADBF76221572C52609D
+    state: absent
   become: true
 
 # We are removing the old Docker info
 - name: debian | Removing Legacy Docker Repo
   apt_repository:
     repo: "deb https://apt.dockerproject.org/repo {{ ansible_distribution | lower }}-{{ ansible_distribution_release }} main"
-    state: "absent"
+    state: absent
   become: true
 
 - name: debian | adding docker apt-key
   apt_key:
     url: "{{ docker_ubuntu_repo_info['url'] }}"
     id: "{{ docker_ubuntu_repo_info['id'] }}"
-    state: "present"
+    state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | adding docker repo
   apt_repository:
     repo: "{{ docker_ubuntu_repo_info['repo'] }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 # We remove docker-engine as this is old package to install. The new package is
 # docker-ce
 - name: debian | uninstalling old docker package (if exists)
   apt:
-    name: "{{ item }}"
-    state: "absent"
+    name: ["docker-engine", "lxc-docker"]
+    state: absent
     purge: yes
   become: true
-  with_items:
-    - 'docker-engine'
-    - 'lxc-docker'
+  register: result
+  until: result is successful
 
 - name: debian | installing docker pre-reqs
   apt:
     name: "linux-image-extra-{{ ansible_kernel }}"
     state: present
   become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution == "Ubuntu" and
-        (ansible_distribution_version >= '14.04') and
-        docker_linux_image_extra is defined and
-        docker_linux_image_extra
+    ansible_distribution == "Ubuntu" and
+    (ansible_distribution_version >= '14.04' and
+    ansible_distribution_version <= '16.04') and
+    docker_linux_image_extra is defined and
+    docker_linux_image_extra
 
 - name: debian | checking for existing docker
   shell: dpkg-query -W 'docker-ce'
   ignore_errors: true
   register: has_docker
+  changed_when: false
 
 - name: debian | installing docker
   apt:
     name: "docker-ce={{ docker_version_debian }}"
-    state: "present"
+    state: present
   become: true
-  when: has_docker|failed
+  register: result
+  until: result is successful
+  when: has_docker is failed
 
 - name: debian | setting grub memory limit (if set)
   lineinfile:
@@ -86,8 +96,8 @@
   register: grub_updated
   become: true
   when: >
-        docker_set_grub_memory_limit is defined and
-        docker_set_grub_memory_limit
+    docker_set_grub_memory_limit is defined and
+    docker_set_grub_memory_limit
 
 - name: debian | updating grub (if updated)
   command: update-grub
@@ -96,11 +106,11 @@
 
 - name: debian | installing additonal packages
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["bridge-utils"]
+    state: present
   become: true
-  with_items:
-    - bridge-utils
+  register: result
+  until: result is successful
   when: >
     docker_install_bridge_utils is defined and
     docker_install_bridge_utils

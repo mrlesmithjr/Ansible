@@ -1,0 +1,10 @@
+[Unit]
+Description=Barnyard2 Daemon
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/barnyard2 -c /etc/snort/barnyard2.conf -d {{ snort_barnyard2_logdir }} -f snort.log -w {{ snort_barnyard2_waldo_file }} -g snort -u snort
+
+[Install]
+WantedBy=multi-user.target

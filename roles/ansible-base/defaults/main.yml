@@ -5,7 +5,6 @@ base_arch_packages:
   - 'base-devel'
   - 'curl'
   - 'git'
-  - 'git-core'
   - 'ntp'
   - 'sg3_utils'
 

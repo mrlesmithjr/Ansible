@@ -22,6 +22,26 @@
   when: >
         ansible_distribution != "Fedora"
 
+- name: Precreate /etc/my.cnf.d in case we need to add mariadb_config_overrides file
+  file:
+    path: /etc/my.cnf.d
+    state: directory
+    mode: 0755
+    recurse: yes
+  become: true
+  changed_when: false
+  when: mariadb_config_overrides is defined
+
+- name: redhat | add an overrides file
+  template:
+    src: "etc/mariadb_overrides.cnf.j2"
+    dest: "/etc/my.cnf.d/overrides.cnf"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  become: true
+  when: mariadb_config_overrides is defined
+
 - name: redhat | installing mariadb mysql
   yum:
     name: "{{ item }}"
@@ -44,6 +64,17 @@
     - 'MySQL-python'
   when: >
         ansible_distribution == "Fedora"
+
+- name: Remove migrated-from-my.cnf-settings.conf that is causing MariaDB to not start
+  file:
+    path: /etc/systemd/system/mariadb.service.d/migrated-from-my.cnf-settings.conf
+    state: absent
+  become: true
+
+- name: reload systemd for MariaDB changes
+  become: true
+  systemd:
+    daemon_reload: true
 
 - name: redhat | ensuring mariadb mysql is enabled on boot and started
   service:

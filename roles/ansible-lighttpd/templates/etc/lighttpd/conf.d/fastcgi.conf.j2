@@ -130,7 +130,7 @@ server.modules += ( "mod_fastcgi" )
 #server.chroot = "/srv/www"
 #server.document-root = "/servers/wwww.example.org/htdocs/"
 #
-{% if lighttpd_enable_php5 %}
+{% if lighttpd_enable_php %}
 fastcgi.server += ( ".php" =>
   ((
     "host" => "127.0.0.1",

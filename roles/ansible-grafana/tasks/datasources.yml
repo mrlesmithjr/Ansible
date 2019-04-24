@@ -1,0 +1,13 @@
+---
+- name: datasources | Managing Grafana Datasources
+  grafana_datasource:
+    database: "{{ item['database']|default(omit) }}"
+    ds_type: "{{ item['ds_type'] }}"
+    grafana_password: "{{ grafana_security_info['admin_password'] }}"
+    grafana_url: "{{ grafana_api_url }}"
+    grafana_user: "{{ grafana_security_info['admin_user'] }}"
+    is_default: "{{ item['default']|default(omit) }}"
+    name: "{{ item['name'] }}"
+    state: "{{ item['state']|default('present') }}"
+    url: "{{ item['url'] }}"
+  with_items: "{{ grafana_datasources }}"

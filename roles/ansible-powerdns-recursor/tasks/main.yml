@@ -3,4 +3,9 @@
 
 - include: pdns_accounts.yml
 
+- include: systemd_resolved.yml
+  when: >
+    ansible_service_mgr == "systemd" and
+    pdns_recursor_systemd_resolved_disable
+
 - include: pdns_recursor.yml

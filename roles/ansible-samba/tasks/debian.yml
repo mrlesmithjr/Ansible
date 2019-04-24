@@ -1,21 +1,24 @@
 ---
 - name: debian | installing pre-reqs
   apt:
-    name: "{{ item }}"
+    name: ["samba", "samba-common"]
     state: present
-  with_items:
-    - samba
-    - samba-common
+  become: true
+  register: result
+  until: result is successful
 
 - name: debian | Installing Packages When Domain Controller
   apt:
-    name: "{{ item }}"
+    name:
+      [
+        "krb5-config",
+        "krb5-user",
+        "libnss-winbind",
+        "libpam-winbind",
+        "winbind",
+      ]
     state: present
   become: true
-  with_items:
-    - krb5-config
-    - krb5-user
-    - libnss-winbind
-    - libpam-winbind
-    - winbind
+  register: result
+  until: result is successful
   when: samba_create_domain_controller

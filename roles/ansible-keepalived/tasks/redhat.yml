@@ -1,30 +1,34 @@
 ---
 - name: redhat | installing keepalived
   yum:
-    name: "keepalived"
-    state: "present"
+    name: ['keepalived']
+    state: present
   become: true
+  register: result
+  until: result is succeeded
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing keepalived
   dnf:
-    name: "keepalived"
-    state: "present"
+    name: ['keepalived']
+    state: present
   become: true
+  register: result
+  until: result is succeeded
   when: ansible_distribution == "Fedora"
 
 - name: redhat | enabling keepalived on boot and start
   service:
-    name: "keepalived"
-    state: "started"
-    enabled: yes
+    name: keepalived
+    state: started
+    enabled: true
   become: true
   when: not ansible_check_mode
 
 - name: redhat | allowing VIP to come up on both nodes
   sysctl:
-    name: "net.ipv4.ip_nonlocal_bind"
+    name: net.ipv4.ip_nonlocal_bind
     value: 1
-    state: "present"
-    reload: yes
+    state: present
+    reload: true
   become: true

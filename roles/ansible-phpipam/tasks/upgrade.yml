@@ -1,9 +1,10 @@
 ---
-- name: upgrade | checking if {{ phpipam_root }} exists
+- name: upgrade | checking if {{ phpipam_install_dir }} exists
   stat:
-    path: "{{ phpipam_root }}"
-  register: phpipam_root_check
+    path: "{{ phpipam_install_dir }}"
+  register: phpipam_install_dir_check
 
-- name: upgrade | moving {{ phpipam_root }} directory to {{ phpipam_root }}.{{ date }}
-  command: "mv {{ phpipam_root }} {{ phpipam_root }}.{{ date }}"
-  when: phpipam_root_check.stat.exists
+- name: upgrade | moving {{ phpipam_install_dir }} directory to {{ phpipam_install_dir }}.{{ date }}
+  command: "mv {{ phpipam_install_dir }} {{ phpipam_install_dir }}.{{ date }}"
+  become: true
+  when: phpipam_install_dir_check.stat.exists

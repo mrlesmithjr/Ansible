@@ -1,20 +1,20 @@
 galaxy_info:
-  author:               Larry Smith Jr.
-  description:          An [Ansible](https://www.ansible.com) role to install [AWX](https://github.com/ansible/awx)
+  author: Larry Smith Jr.
+  description: An [Ansible](https://www.ansible.com) role to install [AWX](https://github.com/ansible/awx)
 
-  license:              MIT
+  license: MIT
 
-  min_ansible_version:  1.2
+  min_ansible_version: 1.2
 
   platforms:
-    - name:             EL
+    - name: EL
       versions:
         - 7
-    - name:             Ubuntu
+    - name: Ubuntu
       versions:
         - xenial
 
   galaxy_tags:
     - automation
 
-dependencies:           []
+dependencies: []

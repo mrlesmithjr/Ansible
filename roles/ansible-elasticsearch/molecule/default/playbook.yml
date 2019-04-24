@@ -1,0 +1,88 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    elasticsearch:
+      # # Defines the Ansible group which contains the Elasticsearch nodes for cluster
+      cluster_group: elasticsearch
+
+      # Defines if elasticsearch should be configured
+      config: true
+
+      config_dir: /etc/elasticsearch
+      data_dir: /var/lib/elasticsearch
+
+      # Defines the amount of memory to allocate
+      # Heap Size (defaults to 256m min, 1g max)
+      # 50% of max memory is good.
+      heap_size: "{{ (ansible_memtotal_mb * elasticsearch_heap_size_multiplier)|round|int }}m"
+
+      home_dir: /usr/share/elasticsearch
+      listen_interface: enp0s8
+      log_dir: /var/log/elasticsearch
+      # max_locked_memory: unlimited
+      # max_map_count: 262144
+      # max_open_files: 65536
+      pid_dir: /var/run/elasticsearch
+      startup_sleep_time: 5
+      # Defines Elasticsearch Major release (1.7|2.x|5.x|6.x)
+      version_major_version: 5.x
+      # Defines Elasticsearch Minor release
+      version_minor_version: 5.6.4
+
+    elasticsearch_configuration:
+      # action.destructive_requires_name: true
+      # bootstrap.memory_lock: true
+
+      # # Defines cluster name
+      # cluster.name: my-application
+
+      # # To avoid a split brain, this setting should be set to a quorum of master- eligible nodes
+      discovery.zen.minimum_master_nodes: "{{ (groups[elasticsearch['cluster_group']]|count /2)|round(0, 'ceil')|int }}"
+
+      # # provide a seed list of other nodes in the cluster that are likely to be live and contactable
+      discovery.zen.ping.unicast.hosts: "{{ groups[elasticsearch['cluster_group']] }}"
+
+      # gateway.recover_after_nodes: 3
+      # http.port: 9200
+
+      # # In order to communicate and to form a cluster with nodes on other servers,
+      # # your node will need to bind to a non-loopback address
+      network.host: "{{ hostvars[inventory_hostname]['ansible_' + elasticsearch['listen_interface']]['ipv4']['address'] }}"
+
+      # # Define a specific interface to bind elasticsearch on for clustering
+      # # Usually not required
+      # # Vagrant instances requires this...
+      # # examples....(_eth1_|_enp0s8_)
+      network.publish_host: "{{ '_' + elasticsearch['listen_interface'] + '_' }}"
+
+      # # Data nodes hold data and perform data related operations such as CRUD,
+      # # search, and aggregations.
+      node.data: true
+
+      # # A node that has node.ingest set to true (default). Ingest nodes are able
+      # # to apply an ingest pipeline to a document in order to transform and enrich
+      # # the document before indexing. With a heavy ingest load, it makes sense to
+      # # use dedicated ingest nodes and to mark the master and data nodes as
+      # # node.ingest:                  false.
+      node.ingest: true
+
+      # # A node that has node.master set to true (default), which makes it eligible
+      # # to be elected as the master node, which controls the cluster.
+      node.master: true
+
+      node.name: "{{ ansible_hostname }}"
+      # path.data: /path/to/data
+      # path.logs: /path/to/logs
+
+  pre_tasks:
+    - name: Updating /etc/hosts With All Nodes
+      lineinfile:
+        path: /etc/hosts
+        regexp: "^{{ hostvars[item]['ansible_' + elasticsearch.listen_interface]['ipv4']['address'] }}"
+        line: "{{ hostvars[item]['ansible_' + elasticsearch.listen_interface]['ipv4']['address'] }} {{ hostvars[item]['ansible_hostname'] }}"
+        state: present
+      become: true
+      with_items: "{{ groups.elasticsearch }}"
+  roles:
+    - role: ansible-elasticsearch

@@ -1,7 +1,14 @@
 ---
 - name: config | Configuring RabbitMQ
   template:
-    src: "etc/rabbitmq/rabbitmq.config.j2"
+    src: "{{ rabbitmq_config_file }}"
     dest: "/etc/rabbitmq/rabbitmq.config"
+  become: true
+  notify: "restart rabbitmq-server"
+
+- name: config | Configuring RabbitMQ environemnt
+  template:
+    src: "{{ rabbitmq_config_env_file }}"
+    dest: "/etc/rabbitmq/rabbitmq-env.conf"
   become: true
   notify: "restart rabbitmq-server"

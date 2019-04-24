@@ -1,37 +1,37 @@
 ---
 - name: redhat | installing packages
   yum:
-    name: "{{ item }}"
-    state: "present"
+    name: ["ntp"]
+    state: present
   become: true
-  with_items:
-    - ntp
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution != "Fedora"
+    ansible_distribution != "Fedora"
 
 - name: redhat | installing packages
   dnf:
-    name: "{{ item }}"
-    state: "present"
+    name: ["ntp"]
+    state: present
   become: true
-  with_items:
-    - ntp
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution == "Fedora"
+    ansible_distribution == "Fedora"
 
 - name: redhat | configuring ntp
   template:
-    src: "etc/ntp.conf.j2"
-    dest: "/etc/ntp.conf"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
+    src: etc/ntp.conf.j2
+    dest: /etc/ntp.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
   become: true
   notify: restart ntpd
 
 - name: redhat | ensuring ntpd service is started and enabled on boot
   service:
-    name: "ntpd"
-    state: "started"
-    enabled: yes
+    name: ntpd
+    state: started
+    enabled: true
   become: true

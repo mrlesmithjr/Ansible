@@ -1,27 +1,14 @@
 ---
-- name: install | Downloading Guacamole Client Package
-  get_url:
-    url: "{{ guacamole_dl_url }}/{{ guacamole_client_package }}"
-    dest: /usr/local/src
-  become: true
-
 - name: install | Downloading Guacamole Server Package
   get_url:
-    url: "{{ guacamole_dl_url }}/{{ guacamole_server_package }}"
-    dest: /usr/local/src
-  become: true
-
-- name: install | Extracting Guacamole Client Package
-  unarchive:
-    src: "/usr/local/src/{{ guacamole_client_package }}"
-    dest: /usr/local/src
-    remote_src: true
+    url: "{{ guacamole_dl_url + '/source/' + guacamole_server_package }}"
+    dest: "{{ guacamole_src_dir }}"
   become: true
 
 - name: install | Extracting Guacamole Server Package
   unarchive:
-    src: "/usr/local/src/{{ guacamole_server_package }}"
-    dest: /usr/local/src
+    src: "{{ guacamole_src_dir + '/' + guacamole_server_package }}"
+    dest: "{{ guacamole_src_dir }}"
     remote_src: true
   become: true
 
@@ -33,21 +20,21 @@
 - name: install | Configuring Guacamole Server Build
   command: ./configure --with-init-dir=/etc/init.d
   args:
-    chdir: "/usr/local/src/guacamole-server-{{ guacamole_version }}"
+    chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
   become: true
   register: _guacamole_config_server_build
   when: not _guacamole_server_installed['stat']['exists']
 
 - name: install | Compiling Guacamole Server
   make:
-    chdir: "/usr/local/src/guacamole-server-{{ guacamole_version }}"
+    chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
   become: true
   register: _guacamole_server_compiled
   when: _guacamole_config_server_build['changed']
 
 - name: install | Installing Guacamole Server
   make:
-    chdir: "/usr/local/src/guacamole-server-{{ guacamole_version }}"
+    chdir: "{{ guacamole_src_dir + '/guacamole-server-' + guacamole_version }}"
     target: install
   become: true
   register: _guacamole_server_installed
@@ -57,18 +44,3 @@
   command: ldconfig
   become: true
   when: _guacamole_server_installed['changed']
-
-- name: install | Building Guacamole Client Package
-  command: mvn package
-  become: true
-  args:
-    chdir: "/usr/local/src/guacamole-client-{{ guacamole_version }}"
-    creates: "/usr/local/src/guacamole-client-{{ guacamole_version }}/guacamole/target/guacamole-{{ guacamole_version }}.war"
-
-- name: install | Creating Tomcat Symlink For guacamole-{{ guacamole_version }}.war
-  file:
-    src: "/usr/local/src/guacamole-client-{{ guacamole_version }}/guacamole/target/guacamole-{{ guacamole_version }}.war"
-    dest: "/var/lib/{{ guacamole_tomcat }}/webapps/guacamole.war"
-    state: link
-  become: true
-  notify: "restart {{ guacamole_tomcat }}"

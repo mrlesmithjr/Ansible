@@ -1,23 +1,27 @@
 ---
 - name: redhat | installing apache
   dnf:
-    name: "httpd"
-    state: "present"
+    name: httpd
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: >
         ansible_distribution == "Fedora"
 
 - name: redhat | installing apache
   yum:
-    name: "httpd"
-    state: "present"
+    name: httpd
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: >
         ansible_distribution != "Fedora"
 
 - name: redhat | enabling apache on boot and starting
   service:
-    name: "httpd"
-    state: "started"
+    name: httpd
+    state: started
     enabled: true
   become: true

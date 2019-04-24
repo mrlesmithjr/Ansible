@@ -1,0 +1,7 @@
+---
+- hosts: guac_servers
+  vars:
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-mysql
+    - role: ansible-guacamole

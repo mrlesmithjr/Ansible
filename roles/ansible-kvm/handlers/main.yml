@@ -2,23 +2,23 @@
 # handlers file for ansible-kvm
 - name: restart libvirt-bin
   service:
-    name: "libvirt-bin"
-    state: "restarted"
+    name: libvirt-bin
+    state: restarted
     enabled: true
   become: true
   when: not ansible_check_mode
 
 - name: restart libvirtd
   service:
-    name: "libvirtd"
-    state: "restarted"
+    name: libvirtd
+    state: restarted
     enabled: true
   become: true
   when: not ansible_check_mode
 
 - name: restart ssh
   service:
-    name: "ssh"
-    state: "restarted"
+    name: ssh
+    state: restarted
   become: true
   when: not ansible_check_mode

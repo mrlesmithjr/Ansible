@@ -1,10 +1,11 @@
 ---
 - name: config_db | Installing Python Modules
   pip:
-    name: "{{ item }}"
+    name: "{{ influxdb_python_modules }}"
     state: present
   become: true
-  with_items: "{{ influxdb_python_modules }}"
+  register: result
+  until: result is successful
 
 - name: config_db | Ensuring InfluxDB Is Running And Enabled On Boot
   service:
@@ -13,11 +14,16 @@
     enabled: true
   become: true
 
+- name: config_db | Waiting For InfluxDB
+  wait_for:
+    port: "{{ influxdb_http['bind_port'] }}"
+
 - name: config_db | Creating InfluxDB(s)
   influxdb_database:
     hostname: "{{ item['host'] }}"
     database_name: "{{ item['name'] }}"
     state: "{{ item['state'] }}"
+    port: "{{ influxdb_http['bind_port'] }}"
   become: true
   with_items: "{{ influxdb_databases }}"
 
@@ -28,8 +34,9 @@
     policy_name: "{{ item['retention_policy']['name'] }}"
     duration: "{{ item['retention_policy']['duration'] }}"
     replication: "{{ item['retention_policy']['replication'] }}"
+    port: "{{ influxdb_http['bind_port'] }}"
   become: true
   with_items: "{{ influxdb_databases }}"
   when: >
-        item['retention_policy'] is defined and
-        item['retention_policy']['enabled']
+    item['retention_policy'] is defined and
+    item['retention_policy']['enabled']

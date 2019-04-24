@@ -49,18 +49,18 @@ pdns_dnsdist_domain_blocks:
 
 pdns_dnsdist_downstream_servers:
   # - address: 192.168.202.201
-    # # Define order if order based selection is desired
-    # order: 1
-    # # Defines a pool name to assign the server to
-    # pool: test
-    # # Defines a different port for downstream server
-    # port: 5300
-    # # Defines the Queries Per Second limit
-    # qps: 1000
-    # # Defines receive timeout (default is 2)
-    # recv_timeout: 2
-    # # Defines send timeout (default is 2)
-    # send_timeout: 2
+  #   # Define order if order based selection is desired
+  #   order: 1
+  #   # Defines a pool name to assign the server to
+  #   pool: test
+  #   # Defines a different port for downstream server
+  #   port: 5300
+  #   # Defines the Queries Per Second limit
+  #   qps: 1000
+  #   # Defines receive timeout (default is 2)
+  #   recv_timeout: 2
+  #   # Defines send timeout (default is 2)
+  #   send_timeout: 2
   - address: 8.8.8.8
     pool: google
   - address: 8.8.4.4
@@ -88,13 +88,18 @@ pdns_dnsdist_enable_webserver: true
 
 pdns_dnsdist_local_address: 0.0.0.0
 
+# Define specific domain lookup rules to use defined pools
+# Define in order preferred as they are processed in order
 pdns_dnsdist_pool_rules: []
-  # - query:
-  #     - conviva.com
-  #   pool: google
-  # - query:
-  #     - facebook.com.
-  #   pool: opendns
+# - query:
+#     - conviva.com
+#   pool: google
+# - query:
+#     - facebook.com.
+#   pool: opendns
+# - query:
+#     - .
+#   pool: google
 
 pdns_dnsdist_pri_domain_name: example.org
 
@@ -103,6 +108,10 @@ pdns_dnsdist_redhat_pre_reqs:
   - yum-plugin-priorities
 
 pdns_dnsdist_repo_url: http://repo.powerdns.com
+
+pdns_dnsdist_resolv_conf_nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
 
 # firstAvailable|RoundRobin|whashed|wrandom|leastOutstanding
 pdns_dnsdist_server_policy: leastOutstanding
@@ -113,8 +122,11 @@ pdns_dnsdist_server_policy: leastOutstanding
 # echo "makeKey()" | sudo dnsdist
 pdns_dnsdist_setkey: "bKKPxcw4ieTkt29PenVFRcXzt1Nwc78TK+hHdUvqMCo="
 
+# Defines whether systemd-resolved service should be stopped/disabled
+pdns_dnsdist_systemd_resolved_disable: true
+
 # Define version to install...(1.0.x|1.1.x|1.2.x)
-pdns_dnsdist_ver: 1.2.x
+pdns_dnsdist_ver: 1.3.x
 
 pdns_dnsdist_webserver_info:
   address: 0.0.0.0

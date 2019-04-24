@@ -1,13 +1,15 @@
 ---
 - name: opensuse | Installing Apache
   zypper:
-    name: "apache2"
-    state: "present"
+    name: apache2
+    state: present
+  register: result
+  until: result is successful
   become: true
 
 - name: opensuse | Ensuring Apache Is Enabled And Started
   service:
-    name: "apache2"
-    state: "started"
+    name: apache2
+    state: started
     enabled: true
   become: true

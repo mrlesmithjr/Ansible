@@ -1,32 +1,31 @@
 ---
 # defaults file for ansible-guacamole
+
+# Authentication MySQL
+guacamole_auth_jdbc_package: "{{ 'guacamole-auth-jdbc-' + guacamole_version + '.tar.gz' }}"
+
 guacamole_auth_provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider
 
-guacamole_debian_pre_reqs:
-  - build-essential
-  - default-jdk
-  - libavcodec-dev
-  - libavutil-dev
-  - libcairo2-dev
-  - libfreerdp-dev
-  - libjpeg-turbo8-dev
-  - libossp-uuid-dev
-  - libpango1.0-dev
-  - libpng12-dev
-  - libpulse-dev
-  - libssh2-1-dev
-  - libssl-dev
-  - libswscale-dev
-  - libtelnet-dev
-  - libvncserver-dev
-  - libvorbis-dev
-  - libwebp-dev
-  - maven
-  - tomcat7
+guacamole_client_package: "{{ 'guacamole-' + guacamole_version + '.war' }}"
 
-guacamole_client_package: "guacamole-client-{{ guacamole_version }}.tar.gz"
+guacamole_dl_url: "{{ 'http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/' + guacamole_version }}"
 
-guacamole_dl_url: https://sourceforge.net/projects/guacamole/files/current/source
+# Defines if MySQL DB should be used for authentication
+guacamole_mysql_auth: false
+
+guacamole_mysql_connector_package: "{{ guacamole_mysql_connector_dl_url + 'mysql-connector-java-' + guacamole_mysql_connector_version + '.tar.gz' }}"
+
+guacamole_mysql_connector_dl_url: https://dev.mysql.com/get/Downloads/Connector-J/
+
+guacamole_mysql_connector_version: 8.0.13
+
+# Define MySQL DB Info
+guacamole_mysql_db:
+  name: guacamole
+  host: localhost
+  port: 3306
+  username: guacamole
+  password: guacamole
 
 # RDP settings
 guacamole_rdp_color_depth: 24
@@ -35,11 +34,16 @@ guacamole_rdp_height: 900
 guacamole_rdp_width: 1440
 guacamole_rdp_security: rdp
 
+guacamole_redhat_fusion_repos:
+  - https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+  - https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
+
 guacamole_redhat_pre_reqs:
+  - "{{ guacamole_tomcat }}"
   - cairo-devel
   - ffmpeg-devel
-  - gcc
   - freerdp-devel
+  - gcc
   - libjpeg-turbo-devel
   - libpng-devel
   - libssh2-devel
@@ -47,28 +51,35 @@ guacamole_redhat_pre_reqs:
   - libvncserver-devel
   - libvorbis-devel
   - libwebp-devel
-  - maven
+  # - maven
   - openssl-devel
   - pango-devel
   - pulseaudio-libs-devel
-  - tomcat
   - uuid-devel
 
-guacamole_server_package: "guacamole-server-{{ guacamole_version }}.tar.gz"
+guacamole_server_package: "{{ 'guacamole-server-' + guacamole_version + '.tar.gz' }}"
 
 guacamole_server_port: 4822
 
-guacamole_users: []
-  # - name: user1
-  #   password: password
-  #   connections:
-  #     - host: 10.0.101.50
-  #       name: nas01
-  #       protocol: ssh
-  #       port: 22
-  #     - host: 192.168.250.11
-  #       name: windows2016
-  #       protocol: rdp
-  #       port: 3389
+guacamole_src_dir: /usr/local/src
 
-guacamole_version: 0.9.13-incubating
+guacamole_users: []
+# - name: user1
+#   password: password
+#   connections:
+#     - host: 10.0.101.50
+#       name: nas01
+#       protocol: ssh
+#       port: 22
+#     - host: 192.168.250.11
+#       name: windows2016
+#       protocol: rdp
+#       port: 3389
+#     - host: 192.168.250.11
+#       name: 192.168.250.11
+#       protocol: vnc
+#       port: 5901
+#       password: password
+# Define version to install
+# 0.9.13-incubating | 0.9.14
+guacamole_version: 0.9.14

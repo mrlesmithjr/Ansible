@@ -8,7 +8,7 @@
   user:
     name: "{{ prometheus_user_info['user'] }}"
     groups: "{{ prometheus_user_info['group'] }}"
-    state: "present"
+    state: present
     system: true
     append: true
   become: true

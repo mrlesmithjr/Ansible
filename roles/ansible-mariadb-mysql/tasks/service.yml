@@ -1,0 +1,11 @@
+---
+- name: service | Ensuring mysql Service Is Started and Enabled On Boot
+  service:
+    name: mysql
+    state: started
+    enabled: true
+  become: true
+
+- name: service | Waiting For mysql Service
+  wait_for:
+    port: "{{ mariadb_mysql_port }}"

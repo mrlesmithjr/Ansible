@@ -3,14 +3,14 @@
 - name: config | creating consul configuration folders
   file:
     path: "{{ item }}"
-    owner: "root"
-    group: "root"
-    state: "directory"
+    owner: root
+    group: root
+    state: directory
   become: true
   with_items:
-    - '{{ consul_config_dir }}'
-    - '{{ consul_config_dir }}/client'
-    - '{{ consul_config_dir }}/scripts'
+    - "{{ consul_config_dir }}"
+    - "{{ consul_config_dir + '/client' }}"
+    - "{{ consul_config_dir + '/scripts' }}"
 
 # We create the consul data folder
 - name: config | creating consul data folder
@@ -19,21 +19,21 @@
     owner: "{{ consul_user }}"
     group: "{{ consul_group }}"
     recurse: yes
-    state: "directory"
+    state: directory
   become: true
 
 - import_tasks: cluster.yml
 
 - name: config | configuring consul
   template:
-    src: "etc/consul.d/config.json.j2"
-    dest: "{{ consul_config_dir }}/config.json"
-    owner: "root"
-    group: "root"
-    mode: "u=rw,g=r,o=r"
-  register: "consul_reconfigured"
+    src: etc/consul.d/config.json.j2
+    dest: "{{ consul_config_dir + '/config.json' }}"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  register: consul_reconfigured
   no_log: true
   become: true
   notify:
-    - "restart consul"
+    - restart consul
   when: not ansible_check_mode

@@ -3,11 +3,12 @@
 - name: reload systemd
   systemd:
     daemon_reload: true
-    name: "node_exporter"
+    name: node_exporter
   become: true
 
 - name: restart node_exporter
   service:
-    name: "node_exporter"
-    state: "restarted"
+    name: node_exporter
+    state: restarted
+    enabled: true
   become: true

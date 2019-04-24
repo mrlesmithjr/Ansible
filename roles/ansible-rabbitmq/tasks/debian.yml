@@ -1,30 +1,53 @@
 ---
+- name: debian | Adding Pre-Reqs
+  apt:
+    name: ['gnupg2']
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
 - name: debian | adding RabbitMQ public GPG key to the apt repo
   apt_key:
     url: "{{ rabbitmq_debian_repo_key }}"
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | adding RabbitMQ repo
   apt_repository:
     repo: "{{ rabbitmq_debian_repo }}"
     state: present
-  register: "rabbitmq_repo_added"
   become: true
+  register: result
+  until: result is successful
 
-- name: debian | updating apt cache
-  apt:
-    update_cache: yes
+- name: debian | add Rabbitmq erlang repo key
+  apt_key:
+    url: https://bintray.com/user/downloadSubjectPublicKey?username=rabbitmq-erlang
+    state: present
   become: true
-  when: rabbitmq_repo_added.changed
+  register: result
+  until: result is successful
+  when: rabbitmq_debian_erlang_from_rabbit
+
+- name: debian | add Rabbitmq erlang repo
+  apt_repository:
+    repo: deb https://dl.bintray.com/rabbitmq-erlang/debian {{ ansible_distribution_release }} erlang
+    state: present
+  become: true
+  when: rabbitmq_debian_erlang_from_rabbit
 
 - name: debian | installing RabbitMQ server
   apt:
-    name: "{{ item }}"
+    name: ['rabbitmq-server']
     state: present
   become: true
+  register: result
+  until: result is successful
   with_items:
-    - rabbitmq-server
+    - rabbitmq-server{{ (rabbitmq_debian_version is defined) | ternary(['=',rabbitmq_debian_version] | join(''),'') }}
 
 - name: debian | enabling the RabbitMQ Management Console
   rabbitmq_plugin:

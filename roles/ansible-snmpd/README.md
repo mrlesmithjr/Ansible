@@ -21,6 +21,7 @@ Role Variables
 # defaults file for ansible-snmpd
 snmpd_config: true
 snmpd_enable: true
+snmpd_trap: false
 
 # Define read-only snmpd settings
 snmpd_authorized_networks: []

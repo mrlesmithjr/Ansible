@@ -22,4 +22,4 @@
   when: >
     ansible_user_id == "vagrant" and
     vagrant_reboot is defined and
-    vagrant_reboot
+    vagrant_reboot['changed']

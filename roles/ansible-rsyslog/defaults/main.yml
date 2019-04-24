@@ -27,9 +27,126 @@ rsyslog_servers: []
 #  - name: 'graylog.{{ rsyslog_pri_domain_name }}'
 #    proto: udp
 #    port: 514
+#    selectors:
+#      - 'authpriv.*'
 #  - name: 'logstash.{{ rsyslog_pri_domain_name }}'
 #    proto: tcp
 #    port: 514
+#    selectors:
+#      - '*.warn'
 #  - name: localhost  #good for redirecting back itself..ex. logstash running on tcp/udp 10514...to get around logstash running on ports < 1024
 #    proto: tcp
 #    port: 10514
+#    selectors:
+#      - '*.*'
+
+# defines rsyslog outputs to local log files:
+rsyslog_localfiles:
+  - name: '/var/log/auth.log'
+    proto: 'file'
+    selectors: 'auth,authpriv.*'
+  - name: '/var/log/syslog'
+    proto: 'nosync'
+    selectors:
+      - '*.*'
+      - 'auth,authpriv.none'
+# - name: '/var/log/cron.log
+#   selectors: ['cron.*']
+# - name: '/var/log/daemon.log'
+#   selectors: 'daemon.*'
+  - name: '/var/log/kern.log'
+    proto: 'nosync'
+    selectors: 'kern.*'
+# - name: '/var/log/lpr.log'
+#   proto: 'nosync'
+#   selectors: 'lpr.*'
+  - name: '/var/log/mail.log'
+    selectors: 'mail.*'
+# - name: '/var/log/user.log'
+#   selectors: 'user.*'
+#
+# Logging for the mail system.  Split it up so that
+# it is easy to write scripts to parse these files.
+#
+# - name: '/var/log/mail.info'
+#   proto: 'nosync'
+#   selectors: 'mail.info'
+# - name: '/var/log/mail.warn'
+#   proto: 'nosync'
+#   selectors: 'mail.warn'
+  - name: '/var/log/mail.err'
+    selectors: 'mail.err'
+#
+#
+# Logging for INN news system.
+#
+  - name: '/var/log/news/news.crit'
+    selectors: 'news.crit'
+  - name: '/var/log/news/news.err'
+    selectors: 'news.err'
+  - name: '/var/log/news/news.notice'
+    proto: 'nosync'
+    selectors: 'news.notice'
+#
+# Some "catch-all" log files.
+#
+# - name: '/var/log/debug'
+#   proto: 'nosync'
+#   selectors:
+#     - '*.=debug'
+#     - 'auth,authpriv.none'
+#     -	'news.none'
+#     - 'mail.none'
+# - name: '/var/log/messages'
+#   proto: 'nosync'
+#   selectors:
+#     - '*.=info'
+#     - '*.=notice'
+#     - '*.=warn'
+#     - 'auth,authpriv.none'
+#     - 'cron,daemon.none'
+#     - 'mail,news.none'
+#
+
+rsyslog_devices:
+# Emergencies are sent to everybody logged in.
+#
+  - name: ':omusrmsg:*'
+    selectors: '*.emerg'
+#
+# I like to have messages displayed on the console, but only on a virtual
+# console I usually leave idle.
+#
+# - name: '/dev/tty8'
+#   selectors:
+#     - 'daemon,mail.*'
+#     - 'news.=crit'
+#     - 'news.=err'
+#     - 'news.=notice'
+#     - '*.=debug'
+#     - '*.=info'
+#     - '*.=notice'
+#     - '*.=warn'
+#
+# The named pipe /dev/xconsole is for the `xconsole' utility.  To use it,
+# you must invoke `xconsole' with the `-file' option:
+#
+#    $ xconsole -file /dev/xconsole [...]
+#
+# NOTE: adjust the list below, or you'll go crazy if you have a reasonably
+#      busy site..
+#
+  - name: '/dev/xconsole'
+    proto: 'pipe'
+    selectors:
+      - 'daemon.*'
+      - 'mail.*'
+      - 'news.err'
+      - '*.=debug'
+      - '*.=info'
+      - '*.=notice'
+      - '*.=warn'
+
+rsyslog_defaults: '{{ rsyslog_servers
+               |union(rsyslog_localfiles)
+	       |union(rsyslog_devices) }}'

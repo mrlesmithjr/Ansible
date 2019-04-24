@@ -1,127 +1,89 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-An [Ansible] role to install/configure [Prometheus]
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
-Requirements
-------------
+- [ansible-prometheus](#ansible-prometheus)
+  - [Build Status](#build-status)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-None
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Role Variables
---------------
+# ansible-prometheus
 
-```
----
-# defaults file for ansible-prometheus
-#
-# The following will be auto generated using `templates/prometheus.yml.j2` to
-# proper YAML. Make sure this block is correct.
-prometheus_config:
-  global:
-    # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-    scrape_interval: 15s
-    # Evaluate rules every 15 seconds. The default is every 1 minute.
-    evaluation_interval: 15s
-    # scrape_timeout is set to the global default (10s).
-    # Attach these labels to any time series or alerts when communicating with
-    # external systems (federation, remote storage, Alertmanager).
-    external_labels:
-        monitor: 'codelab-monitor'
-  # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-  rule_files:
-    # - "first.rules"
-    # - "second.rules"
-  # A scrape configuration containing exactly one endpoint to scrape:
-  # Here it's Prometheus itself.
-  scrape_configs:
-    # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-    - job_name: 'prometheus'
-      # metrics_path defaults to '/metrics'
-      # scheme defaults to 'http'.
-      static_configs:
-        - targets:
-          - 'localhost:9090'
-          labels:
-            group: 'production'
-    - job_name: '{{ ansible_hostname }}'
-      scrape_interval: 15s
-      static_configs:
-        - targets:
-          - 'localhost:9100'
+An [Ansible](https://www.ansible.com) role to install/configure [Prometheus](https://prometheus.io/)
 
-prometheus_config_file: "{{ prometheus_install_dir }}/prometheus/prometheus.yml"
-prometheus_download_url: 'https://github.com/prometheus/prometheus/releases/download'
-prometheus_download: '{{ prometheus_download_url }}/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz'
-prometheus_install_dir: '/opt'
-prometheus_local_storage: '/var/lib/prometheus/data'
-prometheus_source_dir: '/usr/local/src'
-prometheus_user_info:
-  group: 'prometheus'
-  user: 'prometheus'
-prometheus_version: '1.6.1'
-```
+## Build Status
 
-Dependencies
-------------
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-prometheus.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-prometheus)
+
+## Requirements
 
 None
 
-Example Playbook
-----------------
+## Role Variables
 
-```
+[defaults/main.yml](defaults/main.yml)
+
+## Dependencies
+
+None
+
+## Example Playbook
+
+```yaml
 - hosts: monitoring_server
   vars:
-    pri_domain_name: 'test.vagrant.local'
+    pri_domain_name: "test.vagrant.local"
     prometheus_config:
       global:
         scrape_interval: 1m
-        scrape_timeout: 10s 
+        scrape_timeout: 10s
         evaluation_interval: 1m
       rule_files:
       scrape_configs:
-        - job_name: 'node'
+        - job_name: "node"
           static_configs:
             - targets:
-                - '127.0.0.1:9100'
+                - "127.0.0.1:9100"
               labels:
-                host: 'node0'
+                host: "node0"
             - targets:
-                - '192.168.250.11:9100'
+                - "192.168.250.11:9100"
               labels:
-                host: 'node1'
+                host: "node1"
             - targets:
-                - '192.168.250.12:9100'
+                - "192.168.250.12:9100"
               labels:
-                host: 'node2'
-        - job_name: 'containers'
+                host: "node2"
+        - job_name: "containers"
           static_configs:
             - targets:
-                - '192.168.250.11:8080'
+                - "192.168.250.11:8080"
               labels:
-                docker_host: 'node1'
+                docker_host: "node1"
             - targets:
-                - '192.168.250.12:8080'
+                - "192.168.250.12:8080"
               labels:
-                docker_host: 'node2'
+                docker_host: "node2"
   roles:
     - role: ansible-prometheus
     - role: ansible-grafana
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
-[Prometheus]: <https://prometheus.io/>
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [@mrlesmithjr](https://twitter.com/mrlesmithjr)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

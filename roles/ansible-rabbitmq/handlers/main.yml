@@ -2,6 +2,6 @@
 # handlers file for ansible-rabbitmq
 - name: restart rabbitmq-server
   service:
-    name: "rabbitmq-server"
+    name: rabbitmq-server
     state: restarted
   become: true

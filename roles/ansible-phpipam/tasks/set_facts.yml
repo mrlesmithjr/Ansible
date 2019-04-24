@@ -1,35 +1,107 @@
 ---
 - name: setting fact Debian apache2
   set_fact:
-    web_group: "www-data"
-    web_owner: "www-data"
+    web_group: www-data
+    web_owner: www-data
   when: ansible_os_family == "Debian"
 
 - name: setting fact RedHat apache
   set_fact:
-    web_group: "apache"
-    web_owner: "apache"
+    web_group: apache
+    web_owner: apache
   when: ansible_os_family == "RedHat"
 
 - name: setting PHP version
   set_fact:
-    phpenmod_command: 'php5enmod'
-    php_path: 'etc/php5'  #no leading / for template path
-    php_sqlite_package: 'php5-sqlite'
+    phpenmod_command: php5enmod
+    php_path: etc/php5  #no leading / for template path
+    php_sqlite_package: php5-sqlite
     php_ver: 5
   when: >
         ansible_distribution == "Debian" or
         (ansible_distribution == "Ubuntu" and
-        ansible_distribution_version <= '14.04')
+        ansible_distribution_version <= "14.04")
 
 - name: setting PHP version
   set_fact:
-    phpenmod_command: 'phpenmod'
-    php_path: 'etc/php/7.0'  #no leading / for template path
-    php_sqlite_package: 'php7.0-sqlite3'
+    phpenmod_command: phpenmod
+    php_path: etc/php/7.0  #no leading / for template path
+    php_sqlite_package: php7.0-sqlite3
     php_ver: 7.0
   when: >
         (ansible_distribution == "Ubuntu" and
-        ansible_distribution_version >= '16.04') or
-        (ansible_distribution == "Debian" and 
-        ansible_distribution_version >= '9')
+        ansible_distribution_version >= "16.04" and
+        ansible_distribution_version < "18.04") or
+        (ansible_distribution == "Debian" and
+        ansible_distribution_version >= "9")
+
+- name: setting PHP version
+  set_fact:
+    phpenmod_command: phpenmod
+    php_path: etc/php/7.2  #no leading / for template path
+    php_sqlite_package: php7.2-sqlite3
+    php_ver: 7.2
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= "18.04")
+
+- name: Setting Debian Packages To Install
+  set_fact:
+    phpipam_debian_packages:
+      - fping
+      - "libapache2-mod-php{{ php_ver }}"
+      - python-mysqldb
+      - "php{{ php_ver }}"
+      - "php{{ php_ver }}-cli"
+      - "php{{ php_ver }}-gd"
+      - "php{{ php_ver }}-gmp"
+      - php-pear
+      - "php{{ php_ver }}-mysqlnd"
+      - "php{{ php_ver }}-ldap"
+      - "php{{ php_ver }}-mcrypt"
+      - "php{{ php_ver }}-curl"
+      - "{{ php_sqlite_package }}"
+      - wget
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= "14.04" and
+        ansible_distribution_version < "18.04") or
+        (ansible_distribution == "Debian" and
+        ansible_distribution_version >= "8")
+
+- name: Setting Debian Packages To Install
+  set_fact:
+    phpipam_debian_packages:
+      - fping
+      - "libapache2-mod-php{{ php_ver }}"
+      - python-mysqldb
+      - "php{{ php_ver }}"
+      - "php{{ php_ver }}-cli"
+      - "php{{ php_ver }}-gd"
+      - "php{{ php_ver }}-gmp"
+      - php-pear
+      - "php{{ php_ver }}-mysqlnd"
+      - "php{{ php_ver }}-ldap"
+      - "php{{ php_ver }}-curl"
+      - "{{ php_sqlite_package }}"
+      - wget
+  when: >
+        (ansible_distribution == "Ubuntu" and
+        ansible_distribution_version >= "18.04")
+
+- name: Setting RedHat Packages To Install
+  set_fact:
+    phpipam_redhat_packages:
+      - anacron
+      - fping
+      - MySQL-python
+      - php
+      - php-cli
+      - php-gmp
+      - php-pear
+      - php-mysqlnd
+      - php-ldap
+      - php-mcrypt
+      - php-curl
+      - wget
+  when: ansible_os_family == "RedHat"

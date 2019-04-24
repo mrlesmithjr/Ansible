@@ -1,0 +1,52 @@
+# 2018-10-21 (cc) <paul4hough@gmail.com>
+#
+---
+# influxdb_version: 1.4.2
+# Defines if InfluxDB is configured
+influxdb_config: true
+
+# defaults file for ansible-influxdb
+influxdb_config_databases: true
+
+influxdb_rpc_addr: "127.0.0.1:8188"
+
+influxdb_http:
+  # Determines whether HTTP authentication is enabled.
+  auth_enabled: false
+  # The bind address used by the HTTP service.
+  bind_address: ""
+  # The bind port used by the HTTP service.
+  bind_port: 8186
+  # The path of the unix domain socket.
+  bind_socket: /var/run/influxdb.sock
+  # Determines whether HTTP endpoint is enabled.
+  enabled: true
+  https_certificate: /etc/ssl/influxdb.pem
+  # Determines whether HTTPS is enabled.
+  https_enabled: false
+  # Use a separate private key location.
+  https_private_key:
+  # Determines whether HTTP request logging is enabled
+  log_enabled: true
+  # The maximum number of HTTP connections that may be open at once.  New
+  # connections that would exceed this limit are dropped.  Setting this value
+  # to 0 disables the limit.
+  max_connection_limit: 0
+  # The default chunk size for result sets that should be chunked.
+  max_row_limit: 0
+  # Determines whether the pprof endpoint is enabled.  This endpoint is used for
+  # troubleshooting and monitoring.
+  pprof_enabled: true
+  # The default realm sent back when issuing a basic auth challenge.
+  realm: InfluxDB
+  # Not implemented yet
+  # relay:
+  #   - name: local1
+  #     location: http://127.0.0.1:8086/write
+  #     timeout: 10s
+  # The JWT auth shared secret to validate requests using JSON web tokens.
+  shared_secret: ""
+  # Enable http service over unix domain socket
+  unix_socket_enabled: false
+  # Determines whether detailed write logging is enabled.
+  write_tracing: false

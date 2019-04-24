@@ -1,5 +1,5 @@
 ---
-- name: debian | Installing Pre-Reqs
+- name: debian | Installing Pre-Reqs non-ubuntu
   apt:
     name: "{{ item }}"
     state: present
@@ -7,17 +7,141 @@
   with_items:
     - iproute
     - libc-ares2
+  when: >
+     ansible_lsb.release is version ('18.04', '<') or
+     ansible_distribution != "Ubuntu"
+
+- name: debian | Installing Pre-Reqs Ubuntu 18+
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - iproute2
+    - libc-ares2
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_lsb.release is version ('18.04', '>=')
+
+- name: set url on frr between version 4 and 6.0.0
+  set_fact:
+    frr_url_part: '-1.'
+    frr_url_part_2: '+1_'
+  when:
+    - frr_version > 4
+    - frr_version <= 6.0
+
+- name: set url on frr greater than version 6.0.0
+  set_fact:
+    frr_url_part: '-0.'
+    frr_url_part_2: '.1_'
+    frr_url_part_3: '.1'
+  when:
+    - frr_version > 6.0
 
 - name: debian | Installing FRR {{ frr_version }}
   apt:
-    deb: "{{ frr_package_url }}/frr_{{ frr_version }}-1_{{ ansible_distribution|lower }}{{ ansible_distribution_major_version }}.1_amd64.deb"
+    deb: [ "{{ frr_package_url }}/frr_{{ frr_version }}{{frr_url_part|default('-1_')}}{{ ansible_distribution|lower }}{{ ansible_distribution_major_version }}{{frr_url_part_2|default('.1_')}}amd64.deb" ]
     state: present
   become: true
-  when: ansible_distribution == "Debian"
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_machine == 'x86_64'
 
-- name: debian | Installing FRR {{ frr_version }}
-  apt:
-    deb: "{{ frr_package_url }}/frr_{{ frr_version }}-1_{{ ansible_distribution|lower }}{{ ansible_distribution_version }}.1_amd64.deb"
+- name: debian | Add FRR {{ frr_version }} (Arm)
+  set_fact:
+    frr_debs: [ "{{ frr_package_url }}/frr_{{ frr_version }}{{frr_url_part|default('-1_')}}{{ ansible_distribution|lower }}{{ ansible_distribution_major_version }}{{frr_url_part_2|default('.1_')}}armhf.deb" ]
     state: present
   become: true
-  when: ansible_distribution == "Ubuntu"
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_machine == 'armv7l'
+
+- name: Ubuntu | Add FRR {{ frr_version }}
+  set_fact:
+    frr_debs: [ "{{ frr_package_url }}/frr_{{ frr_version }}{{frr_url_part|default('-1_')}}{{ ansible_distribution|lower }}{{ ansible_distribution_version }}{{frr_url_part_2|default('.1_')}}amd64.deb" ]
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == 'x86_64'
+
+- name: Ubuntu | Add FRR {{ frr_version }} (Arm)
+  set_fact:
+    frr_debs: [ "{{ frr_package_url }}/frr_{{ frr_version }}{{frr_url_part|default('-1_')}}{{ ansible_distribution|lower }}{{ ansible_distribution_version }}{{frr_url_part_2|default('.1_')}}armhf.deb" ]
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_machine == 'armv7l'
+
+- name: add python frr tools to install list
+  set_fact:
+    frr_package_deb: "{{ frr_package_url }}/frr-pythontools_{{ frr_version }}{{ frr_url_part }}{{ ansible_distribution|lower }}{{ ansible_distribution_version }}{{ frr_url_part_3 | default('+1') }}_all.deb"
+  when: frr_reload == true
+
+- name: add python frr tools to install list
+  set_fact:
+    frr_debs: "{{ frr_debs }} + [ '{{ frr_package_deb }}' ]"
+  when: frr_reload == true
+
+- name: Install python-ipaddr
+  package:
+    name: python-ipaddr
+    state: present
+  become: true
+
+- name: Doing things for Ubuntu-18.04
+  block:
+    - name: Create our download directory
+      file:
+        path: /tmp/frr/{{ frr_version }}/
+        state: directory
+
+    - name: Download FRR package
+      get_url:
+        url: "{{ item }}"
+        dest: /tmp/frr/{{ frr_version }}/
+      with_items: "{{ frr_debs }}"
+      changed_when: false
+      register: _frrdownload
+
+    - name: Installing FRR {{ frr_version }} and netplan apply to fix connectivity
+      shell: |
+        dpkg --force-confnew -i /tmp/frr/{{ frr_version }}/frr*.deb
+        netplan apply
+      become: true
+      when: _frrdownload.changed
+      notify: restart frr
+  when: ansible_lsb.release is version ('18.04', '>=')
+
+- name: Do things for not Ubuntu-18.04
+  block:
+    - name: Installing FRR {{ frr_version }}
+      apt:
+        deb: "{{ item }}"
+        state: present
+        force: true
+      become: true
+      with_items: "{{ frr_debs }}"
+      register: _frrdownload
+  when: ansible_lsb.release is version ('18.04', '<')
+
+- name: Backup old /etc/frr/daemons.conf and /etc/default/frr
+  copy:
+    remote_src: True
+    src: "{{ item }}"
+    dest: "{{ item }}.bak"
+  ignore_errors: true
+  when:
+    - frr_version > 6.0
+  with_items:
+    - /etc/frr/daemons.conf
+    - /etc/default/frr
+
+- name: Remove old /etc/frr/daemons.conf and /etc/default/frr
+  file:
+    path: "{{ item }}"
+    state: absent
+  notify: restart frr
+  when:
+    - frr_version > 6.0
+  with_items:
+    - /etc/frr/daemons.conf
+    - /etc/default/frr

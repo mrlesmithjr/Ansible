@@ -1,42 +1,48 @@
 ---
 - name: debian | Installing Pre-Reqs
   apt:
-    name: "{{ item }}"
-    state: "present"
+    name: ["apt-transport-https"]
+    state: present
   become: true
-  with_items:
-    - 'apt-transport-https'
+  register: result
+  until: result is successful
 
 - name: debian | installing logstash repo key
   apt_key:
     url: "{{ logstash_repo_key }}"
-    state: "present"
+    state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | adding logstash repo
   apt_repository:
     repo: "{{ logstash_deb_repo }}"
-    state: "present"
+    state: present
   become: true
-  register: "_logstash_repo_added"
+  register: _logstash_repo_added
 
 - name: debian | Updating apt-cache
   apt:
-    update_cache: yes
+    update_cache: true
   become: true
+  register: result
+  until: result is successful
   when: _logstash_repo_added['changed']
 
 - name: debian | installing java
   apt:
-    name: "openjdk-{{ openjdk_version }}-jre-headless"
-    state: "present"
+    name: "{{ 'openjdk-' + logstash_openjdk_version + '-jre-headless' }}"
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: logstash_install_java
 
 - name: debian | assigning Pin priority 1001 on APT Preferences
   template:
-    src: "etc/apt/preferences.d/logstash.j2"
-    dest: "/etc/apt/preferences.d/logstash"
+    src: etc/apt/preferences.d/logstash.j2
+    dest: /etc/apt/preferences.d/logstash
     owner: root
     group: root
     mode: 0644
@@ -44,30 +50,32 @@
 
 - name: debian | Installing Logstash
   apt:
-    name: "logstash={{ logstash_minor_ver }}"
-    state: "present"
-    force: yes  # This is required to allow downgrade if user desires to move back to previous version
-  # notify: "init logstash"
-  # when: ansible_distribution !=
+    name: "{{ 'logstash=' + logstash_minor_ver }}"
+    state: present
+    # This is required to allow downgrade if user desires to move back
+    # to previous version
+    force: yes
   become: true
+  register: result
+  until: result is successful
 
 - name: debian | checking for logstash-web
   stat:
-    path: "/etc/init/logstash-web.conf"
-  register: "logstash_web"
+    path: /etc/init/logstash-web.conf
+  register: logstash_web
 
 - name: debian | disabling logstash-web
   replace:
-    dest: "/etc/init/logstash-web.conf"
+    dest: /etc/init/logstash-web.conf
     regexp: "^start on virtual-filesystems"
     replace: "start on never"
   become: true
-  notify: "stop logstash-web"
+  notify: stop logstash-web
   when: logstash_web.stat.exists
 
 - name: debian | ensuring logstash is started and enabled on boot
   service:
-    name: "logstash"
-    state: "started"
-    enabled: yes
+    name: logstash
+    state: started
+    enabled: true
   become: true

@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+
+  pre_tasks:
+    - name: load variables
+      include_vars:
+        file: config.yml
+
+  roles:
+    - role: influxdb

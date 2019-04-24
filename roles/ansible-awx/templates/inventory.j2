@@ -1,18 +1,16 @@
 localhost ansible_connection=local ansible_python_interpreter="/usr/bin/env python"
 
 [all:vars]
-
+{% if awx['container_search_domains'] is defined and awx['container_search_domains'] != [] %}
+awx_container_search_domains={{ awx['container_search_domains']|join(',') }}
+{% endif %}
+awx_task_hostname={{ awx['task_hostname'] }}
+awx_web_hostname={{ awx['web_hostname'] }}
+default_admin_password={{ awx['default_admin_password'] }}
+default_admin_user={{ awx['default_admin_user'] }}
 dockerhub_base=ansible
 dockerhub_version=latest
-
-default_admin_user={{ awx['default_admin_user'] }}
-default_admin_password={{ awx['default_admin_password'] }}
-
-awx_secret_key={{ awx['secret_key'] }}
-
-postgres_data_dir={{ awx['postgres_data_dir'] }}
 host_port={{ awx['host_port'] }}
-
 {% if awx['pg_hostname'] is defined %}
 pg_hostname={{ awx['pg_hostname'] }}
 {% endif %}
@@ -20,12 +18,6 @@ pg_username={{ awx['pg_username'] }}
 pg_password={{ awx['pg_password'] }}
 pg_database={{ awx['pg_database'] }}
 pg_port={{ awx['pg_port'] }}
+postgres_data_dir={{ awx['postgres_data_dir'] }}
+secret_key={{ awx['secret_key'] }}
 
-# Proxy
-#http_proxy=http://proxy:3128
-#https_proxy=http://proxy:3128
-#no_proxy=mycorp.org
-
-{% if awx['container_search_domains'] is defined and awx['container_search_domains'] != [] %}
-awx_container_search_domains={{ awx['container_search_domains']|join(',') }}
-{% endif %}

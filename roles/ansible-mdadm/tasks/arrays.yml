@@ -23,7 +23,7 @@
   command: "{{ update_initramfs }}"
   when: array_created.changed
 
-# Capture the raid array details to append to /etc/mdadm/mdadm.conf
+# Capture the raid array details to append to mdadm.conf
 # in order to persist between reboots
 - name: arrays | Capturing Array Details
   command: "mdadm --detail --scan"
@@ -37,7 +37,9 @@
     opts: "{{ item.filesystem_opts | default(omit) }}"
     dev: "/dev/{{ item.name }}"
   with_items: '{{ mdadm_arrays }}'
-  when: item.state|lower == "present"
+  when:
+  - item.state|lower == "present"
+  - item.filesystem is defined
 
 # Mounting raid arrays
 - name: arrays | Mounting Array(s)
@@ -50,6 +52,7 @@
   with_items: '{{ mdadm_arrays }}'
   when:
   - item.state|lower == "present"
+  - item.filesystem is defined
   - item.mountpoint is defined
 
 # Unmounting raid arrays in preparation of destroying
@@ -103,31 +106,32 @@
         array_check.results[0].rc == 0 and
         array_removed.changed
 
-- name: arrays | Ensure /etc/mdadm/ directory exists
+- name: arrays | Ensure {{ mdadm_conf }}'s directory exists
   file:
-    path: /etc/mdadm/
+    path: "{{ mdadm_conf_path }}"
     state: directory
+  when: mdadm_conf_path is defined
 
-- name: arrays | Ensure /etc/mdadm/mdadm.conf file exists
+- name: arrays | Ensure {{ mdadm_conf }} file exists
   copy:
     content: ""
-    dest: /etc/mdadm/mdadm.conf
+    dest: "{{ mdadm_conf }}"
     force: no
 
-# Updating /etc/mdadm/mdadm.conf in order to persist between reboots
-- name: arrays | Updating /etc/mdadm/mdadm.conf
+# Updating mdadm.conf in order to persist between reboots
+- name: arrays | Updating {{ mdadm_conf }}
   lineinfile:
-    dest: "/etc/mdadm/mdadm.conf"
+    dest: "{{ mdadm_conf }}"
     regexp: "^{{ item }}"
     line: "{{ item }}"
     state: "present"
   with_items: '{{ array_details.stdout_lines }}'
   when: array_created.changed
 
-# Updating /etc/mdadm/mdadm.conf in order to not persist between reboots
-- name: arrays | Updating /etc/mdadm/mdadm.conf
+# Updating mdadm.conf in order to not persist between reboots
+- name: arrays | Updating {{ mdadm_conf }}
   lineinfile:
-    dest: "/etc/mdadm/mdadm.conf"
+    dest: "{{ mdadm_conf }}"
     regexp: "^ARRAY /dev/{{ item.name }}"
     line: "ARRAY /dev/{{ item.name }}"
     state: "absent"

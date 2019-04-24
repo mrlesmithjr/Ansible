@@ -1,0 +1,9 @@
+
+{% for group, settings in mariadb_config_overrides.items() %}
+
+[{{ group }}]
+{% for key, value in settings.items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+{% endfor %}

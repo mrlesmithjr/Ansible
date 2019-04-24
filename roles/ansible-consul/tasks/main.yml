@@ -22,17 +22,17 @@
   tags:
     - consul-app-services
   when: >
-        consul_services is defined and
-        consul_services
+    consul_services is defined and
+    consul_services
 
 - import_tasks: acl.yml
   tags:
     - consul-acl
   when: consul_acl is defined and
-        consul_acl and
-        consul_datacenter == consul_acl_datacenter
+    consul_acl and
+    consul_datacenter == consul_acl_datacenter
 
 - import_tasks: dnsmasq.yml
   when: >
-        consul_enable_dnsmasq is defined and
-        consul_enable_dnsmasq
+    consul_enable_dnsmasq is defined and
+    consul_enable_dnsmasq

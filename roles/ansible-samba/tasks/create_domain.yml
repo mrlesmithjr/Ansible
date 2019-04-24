@@ -22,11 +22,11 @@
   become: true
   register: samba_ad_created
   when: >
-        not samba_ad_created_check['stat']['exists'] and
-        (samba_create_domain_controller is defined and
-          samba_create_domain_controller) and
-        samba_server_role == "active directory domain controller" and
-        inventory_hostname == samba_primary_domain_controller
+    not samba_ad_created_check['stat']['exists'] and
+    (samba_create_domain_controller is defined and
+      samba_create_domain_controller) and
+    samba_server_role == "active directory domain controller" and
+    inventory_hostname == samba_primary_domain_controller
 
 - name: create_domain | marking domain as created
   file:
@@ -35,25 +35,25 @@
   become: true
   register: _samba_domain_created
   when: >
-        samba_ad_created['changed'] and
-        not samba_ad_created_check['stat']['exists'] and
-        inventory_hostname == samba_primary_domain_controller
+    samba_ad_created['changed'] and
+    not samba_ad_created_check['stat']['exists'] and
+    inventory_hostname == samba_primary_domain_controller
 
 - name: create_domain | Setting Fact For Domain Creation Status For Primary Domain Controller
   set_fact:
     _samba_domain_exists: true
   when: >
-        inventory_hostname == samba_primary_domain_controller and
-        (samba_ad_created_check['stat']['exists'] or
-        _samba_domain_created['changed'])
+    inventory_hostname == samba_primary_domain_controller and
+    (samba_ad_created_check['stat']['exists'] or
+    _samba_domain_created['changed'])
 
 - name: create_domain | Setting Fact For Domain Creation Status For Non Primary Domain Controller
   set_fact:
     _samba_domain_exists: true
   when: >
-        hostvars[samba_primary_domain_controller]['_samba_domain_exists'] and
-        inventory_hostname in groups[samba_domain_controllers_group] and
-        inventory_hostname != samba_primary_domain_controller
+    hostvars[samba_primary_domain_controller]['_samba_domain_exists'] and
+    inventory_hostname in groups[samba_domain_controllers_group] and
+    inventory_hostname != samba_primary_domain_controller
 
 - name: create_domain | marking domain as created
   file:
@@ -61,5 +61,5 @@
     state: touch
   become: true
   when: >
-        hostvars[inventory_hostname]['_samba_domain_exists'] and
-        not samba_ad_created_check['stat']['exists']
+    hostvars[inventory_hostname]['_samba_domain_exists'] and
+    not samba_ad_created_check['stat']['exists']

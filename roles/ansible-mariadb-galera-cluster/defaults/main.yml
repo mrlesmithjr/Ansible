@@ -95,6 +95,11 @@ mariadb_mysql_mem_multiplier: .25
 # Add the posibility to adjust the OOM score (only works for SystemD)
 mariadb_oom_score_adjust: 0
 
+# Add the posibility to adjust the LimitNOFILE (only works for SystemD)
+# default: 0 does not tamper LimitNOFILE
+# notice for SystemD: 0 does not mean 'unlimited', use 'infinity' for unlimited
+mariadb_max_open_files: 0
+
 # Define listen port
 mariadb_mysql_port: 3306
 
@@ -103,27 +108,21 @@ mariadb_mysql_port: 3306
 mariadb_mysql_root_password: 'root'
 
 mariadb_mysql_settings:
-  collation_server: 'latin1_swedish_ci'
-  character_set_client: 'latin1'
+  datadir: /var/lib/mysql
   expire_logs_days: 10
-  # ON|OFF
-  innodb_buffer_pool_size: 128M
-  innodb_doublewrite: 'ON'
-  innodb_flush_log_at_timeout: 1
-  innodb_read_io_threads: 4
-  innodb_write_io_threads: 4
-  join_buffer_size: 1M
   #Default is 16M
   key_buffer_size: '{{ (ansible_memtotal_mb | int * mariadb_mysql_mem_multiplier) | round | int }}M'
   max_allowed_packet: 16M
   max_binlog_size: 100M
-  max_connections: 150
-  max_heap_table_size: 16M
   query_cache_limit: 1M
   query_cache_size: 16M
   thread_cache_size: 8
   thread_stack: 192K
-  tmp_table_size: 16M
+
+# If this is defined it will create a file with overrides
+# mariadb_config_overrides:
+#   mariadb:
+#     max_connections: 2048
 
 # Define additional MySQL users
 mariadb_mysql_users: []

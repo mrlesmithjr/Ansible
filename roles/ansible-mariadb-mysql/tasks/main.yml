@@ -1,9 +1,11 @@
 ---
 # tasks file for ansible-mariadb-mysql
-- include: debian.yml
+- include_tasks: debian.yml
   when: ansible_os_family == "Debian"
 
-- include: redhat.yml
+- include_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include: configure_root_access.yml
+- include_tasks: service.yml
+
+- include_tasks: configure_root_access.yml

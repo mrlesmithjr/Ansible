@@ -1,10 +1,10 @@
 ---
 - name: config_chrony | Configuring Chrony
   template:
-    src: "etc/chrony/chrony.conf.j2"
-    dest: "/etc/chrony/chrony.conf"
-    owner: "root"
-    group: "root"
+    src: etc/chrony/chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
   become: true
   notify:
-    - 'restart chrony'
+    - restart chrony

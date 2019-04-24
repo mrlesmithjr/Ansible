@@ -1,5 +1,8 @@
 ---
 - name: python_modules | Installing Python Modules
   pip:
-    name: "pymongo"
-    state: "present"
+    name: pymongo
+    state: present
+  become: true
+  register: result
+  until: result is successful

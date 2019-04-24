@@ -14,7 +14,7 @@ ExecStart={{ prometheus_node_exporter_install_dir }}/node_exporter/node_exporter
   {% for collector in prometheus_node_exporter_disabled_collectors %}
     --no-collector.{{ collector }} \
   {% endfor %}
-  {% if prometheus_node_exporter_collector_textfile_directory != None %}
+  {% if prometheus_node_exporter_collector_textfile_directory is defined and prometheus_node_exporter_collector_textfile_directory != None %}
     --collector.textfile.directory "{{ prometheus_node_exporter_collector_textfile_directory }}" \
   {% endif %}
     --web.listen-address ":{{ prometheus_node_exporter_listen_port }}"

@@ -13,6 +13,8 @@ grafana_anonymous_auth_info:
   # specify role for unauthenticated users
   org_role: Viewer
 
+grafana_api_url: "{{ grafana_server_info['protocol'] }}://{{ grafana_server_info['http_addr'] }}:{{ grafana_server_info['http_port'] }}"
+
 grafana_apt_key: https://packagecloud.io/gpg.key
 
 grafana_apt_repo: deb https://packagecloud.io/grafana/stable/debian/ jessie main
@@ -25,6 +27,21 @@ grafana_auth_ldap_config_file: /etc/grafana/ldap.toml
 
 grafana_config: true
 
+# Define any Grafana datasources to manage
+grafana_datasources: []
+# - name: Elasticsearch
+#   ds_type: elasticsearch
+#   url: http://192.168.250.10:9200
+#   database: my-index_*
+#   default: false
+#   state: present
+# - name: Influxdb
+#   ds_type: influxdb
+#   url: http://192.168.250.10:8086
+#   database: my-index_*
+#   default: true
+#   state: present
+
 # Only required if not using sqlite3 as grafana_db_type
 grafana_db_info:
   host: 127.0.0.1:3306
@@ -36,12 +53,12 @@ grafana_db_info:
 grafana_db_type: sqlite3
 
 grafana_debian_pre_reqs:
+  - apt-transport-https
   - git
+  - gnupg2
   - maven
   - python-pip
   - unzip
-
-grafana_enable_plugins: false
 
 grafana_enable_vsphere_support: false
 
@@ -78,7 +95,7 @@ grafana_logging_info:
     - file
     # - syslog
   syslog_info:
-    address: "syslog.{{ pri_domain_name }}"
+    address: "syslog.{{ grafana_pri_domain_name }}"
     enabled: false
     # Syslog facility. user, daemon and local0 through local7 are valid.
     facility: ""
@@ -94,10 +111,13 @@ grafana_paths:
   logs: /var/log/grafana
   plugins: /var/lib/grafana/plugins
 
+# Define any Grafana plugins to manage
 grafana_plugins:
-  - name: grafana-clock-panel
-    # absent|present
-    state: present
+  []
+  # - name: grafana-clock-panel
+  #   state: present
+  # - name: grafana-piechart-panel
+  #   state: present
 
 grafana_security_info:
   admin_password: admin
@@ -116,7 +136,7 @@ grafana_server_info:
   domain: localhost
   enable_gzip: false
   enforce_domain: false
-  http_addr: ""
+  http_addr: 0.0.0.0
   http_port: 3000
   protocol: http
   root_url: "%(protocol)s://%(domain)s:%(http_port)s/"
@@ -176,4 +196,4 @@ grafana_users_info:
 
 grafana_welcome_emails: false
 
-pri_domain_name: example.org
+grafana_pri_domain_name: example.org

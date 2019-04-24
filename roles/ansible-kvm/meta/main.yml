@@ -6,22 +6,25 @@ galaxy_info:
   license: license (MIT)
   min_ansible_version: 1.2
   platforms:
-  - name: EL
-    versions:
-    - 6
-    - 7
-  - name: Ubuntu
-    versions:
-    - trusty
-    - xenial
-    - yakkety
-    - zesty
-  - name: Debian
-    versions:
-    - jessie
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Ubuntu
+      versions:
+        - bionic
+        - cosmic
+        - trusty
+        - xenial
+        - yakkety
+        - zesty
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
 
-  categories:
-  - cloud
-  - networking
-  - system
+  galaxy_tags:
+    - cloud
+    - networking
+    - system
 dependencies: []

@@ -1,23 +1,38 @@
 ---
 # defaults file for ansible-phpipam
 date: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
-enable_phpipam_db_backups: true
 
 # Defines root of phpipam web
 # If using http url headers...change this to '/'
-phpipam_base: '/phpipam/'
+phpipam_base: /phpipam/
 
-phpipam_db_backup_name_prefix: 'phpipam_bkp'
-phpipam_db_backup_root: '/backups/db/phpipam'
+# Defines whether we will overwrite the db schema from git with customizations
+phpipam_custom_db_schema: false
+
+phpipam_db_backup_dir: /backups/db/phpipam
+
+phpipam_db_backup_name_prefix: phpipam_bkp
 
 # Defines if backend db for pdns is clustered
 phpipam_db_cluster: false
 
 # Define db host
-phpipam_db_host: 'localhost'
+phpipam_db_host: localhost
+
+# Define db host port
+phpipam_db_host_port: 3306
+
+# Defines hosts where {{ phpipam_db_user }} can login from
+phpipam_db_allow_access_from_hosts:
+  - "{{ ansible_hostname }}"
+  - 127.0.0.1
+  - "::1"
+  - localhost
+  # Allows from everywhere
+  - "%"
 
 # Define db name
-phpipam_db_name: 'phpipam'
+phpipam_db_name: phpipam
 
 # Define db password
 phpipam_db_pass: phpipam
@@ -28,24 +43,32 @@ phpipam_db_user: phpipam
 # Defines if cron jobs for scanning and etc. should be defined.
 phpipam_define_cron_jobs: false
 
-# Deprecated as phpipam 1.3.1+ has submodules and it will not install those submodules
-phpipam_download: 'https://github.com/phpipam/phpipam/archive/{{ phpipam_download_file }}'
-phpipam_download_file: '{{ phpipam_version }}.tar.gz'
+# Defines the primary domain name
+phpipam_domain_name: example.org
+
+phpipam_enable_db_backups: true
+
+# Defines the directory where phpipam is to be installed
+phpipam_install_dir: "{{ phpipam_web_root }}/phpipam"
 
 # Defines if phpIPAM is pulled from https://github.com/phpipam/phpipam to install
 phpipam_install_from_git: true
 
- # Defines commit to checkout to install from..Helps keep consistent installs
- # Note - If not checking out master then the branch will be in a detached state
- # but will still allow changes to be made to configurations and such. Should not
- # cause any issues.
- # Examples
- # 9cbf625 Removed DHCP from settings
- # 861f98c Merge branch 'master' of https://github.com/phpipam/phpipam
- # 419aba5 Suppressed KEA arrors if cannot read leases file + shown error #777
+# Defines if phpIPAM is updated on each subsequent execution
+# Default is false, to ensure idempotency
+phpipam_install_from_git_update: false
+
+# Defines commit to checkout to install from..Helps keep consistent installs
+# Note - If not checking out master then the branch will be in a detached state
+# but will still allow changes to be made to configurations and such. Should not
+# cause any issues.
+# Examples
+# 9cbf625 Removed DHCP from settings
+# 861f98c Merge branch 'master' of https://github.com/phpipam/phpipam
+# 419aba5 Suppressed KEA arrors if cannot read leases file + shown error #777
 # phpipam_install_git_version: '9cbf625'
-phpipam_install_git_version: 'HEAD'
- # Change to HEAD to always checkout the latest
+# Change to HEAD to always checkout the latest
+phpipam_install_git_version: HEAD
 
 # Defines if current discovery functionality should be patched
 phpipam_patch_discovery: false
@@ -53,30 +76,55 @@ phpipam_patch_discovery: false
 # Defines if current email test functionality should be patched
 phpipam_patch_email: false
 
+# Defines whether or not PowerDNS is integrated
+phpipam_powerdns_integration: false
+
 phpipam_pre_load_db: true
 
 # Defines if Apache2 should be configured in order to enable prettify links
 phpipam_prettify_links: true
 
 # Define if using a clustered mariadb mysql and define a single node as primary
-phpipam_primary: 'node0'
+phpipam_primary: node0
 
-# Defines the root folder of where phpipam is to be installed
-phpipam_root: '{{ web_root }}/phpipam'
-phpipam_timezone: 'America/New_York'
+# Defines phpIPAM settings to inject into DB
+# 0 = disable, 1 = enable
+phpipam_settings:
+  api: 0
+  dbVersion: 20
+  domainAuth: 0
+  donate: 0
+  enableDNSresolving: 0
+  enableIPrequests: 0
+  enablePowerDNS: "{{ 1 if phpipam_powerdns_integration else 0 }}"
+  enableVRF: 0
+  IPfilter: mac;owner;state;switch;note;firewallAddressObject
+  powerDNSdbHost: 127.0.0.1
+  powerDNSname: pdns
+  powerDNSdbPassword: pdns
+  powerDNSdbPort: 3306
+  powerDNSdbUsername: pdns
+  prettyLinks: "{{ 'Yes' if phpipam_prettify_links else 'No' }}"
+  siteAdminMail: "admin@{{ phpipam_domain_name }}"
+  siteAdminName: Sysadmin
+  siteDomain: "{{ phpipam_domain_name }}"
+  siteTitle: phpipam IP address management
+  siteURL: "{{ phpipam_url }}"
+  subnetOrdering: subnet,asc
+  version: 1.4
+  visualLimit: 24
+  vlanDuplicate: 1
+
+phpipam_timezone: America/New_York
 
 # Defines if phpipam is to be upgraded
 phpipam_upgrade: false
 
 # Defines the phpipam url to configure apache2 for if configured for url rewrite
-phpipam_url: 'ipam.{{ pri_domain_name }}'
+phpipam_url: "ipam.{{ phpipam_domain_name }}"
 
 # Define phpipam version
-# Only used when not installing via GIT.
-# Version must match a release in: https://github.com/phpipam/phpipam/releases
-phpipam_version: '1.3.1'
+# Depracated
+# phpipam_version: 1.4
 
-# Defines the primary domain name
-pri_domain_name: 'example.org'
-
-web_root: '/var/www/html'
+phpipam_web_root: /var/www/html

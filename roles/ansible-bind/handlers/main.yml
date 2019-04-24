@@ -1,11 +1,13 @@
 ---
 # handlers file for ansible-bind
-- name: "reload bind"
+- name: reload bind
   service:
-    name: "bind9"
-    state: "reloaded"
+    name: bind9
+    state: reloaded
+  become: true
 
-- name: "restart bind"
+- name: restart bind
   service:
-    name: "bind9"
-    state: "restarted"
+    name: bind9
+    state: restarted
+  become: true

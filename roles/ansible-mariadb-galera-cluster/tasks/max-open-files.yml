@@ -1,0 +1,25 @@
+---
+# Supplementary configuration file
+- name: max-open-files | Create folder
+  file:
+    path: /etc/systemd/system/mariadb.service.d
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  become: true
+
+- name: max-open-files | Add the overriding file
+  template:
+    src: "etc/systemd/system/mariadb.service.d/max-open-files.conf.j2"
+    dest: "/etc/systemd/system/mariadb.service.d/max-open-files.conf"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  become: true
+
+- name: max-open-files | just force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  become: true

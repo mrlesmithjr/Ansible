@@ -21,35 +21,42 @@
   tags:
     - config_users
   when: >
-        kvm_config_users and
-        kvm_users is defined
+    kvm_config_users and
+    kvm_users is defined
 
 - include: config_ssh.yml
   tags:
     - config_ssh
   when: >
-        kvm_allow_root_ssh is defined and
-        kvm_allow_root_ssh
+    kvm_allow_root_ssh is defined and
+    kvm_allow_root_ssh
 
 - include: config_virtual_networks.yml
   tags:
     - config_virtual_networks
   when: >
-        kvm_config_virtual_networks and
-        kvm_virtual_networks is defined
+    kvm_config_virtual_networks and
+    kvm_virtual_networks is defined
+
+- include: config_storage_pools.yml
+  tags:
+    - config_storage_pools
+  when: >
+    kvm_config_storage_pools and
+    kvm_storage_pools is defined
 
 - include: config_vms.yml
   tags:
     - config_vms
   when: >
-        (kvm_manage_vms is defined and
-          kvm_manage_vms) and
-          kvm_vms is defined
+    (kvm_manage_vms is defined and
+      kvm_manage_vms) and
+      kvm_vms is defined
 
 - include: system_tweaks.yml
   when: kvm_enable_system_tweaks
 
 - include: apparmor.yml
   when: >
-        ansible_os_family == "Debian" and
-        kvm_disable_apparmor
+    ansible_os_family == "Debian" and
+    kvm_disable_apparmor

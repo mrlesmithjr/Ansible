@@ -17,12 +17,12 @@ input {
   {{ item.prot }} {
     type => "{{ item.type }}"
     port => "{{ item.port }}"
-{%     if item.format is defined %}
+{%       if item.format is defined %}
     format => "{{ item.format }}"
 {%     endif %}
-{%     if item.codec is defined %}
+{%       if item.codec is defined %}
     codec => "{{ item.codec }}"
-{%     endif %}
+{%       endif %}
   }
 }
 {%     endif %}
@@ -45,19 +45,19 @@ input {
 {%       if item.type == "rabbitmq" %}
 input {
   rabbitmq {
-{%       if item['auto_delete'] is defined %}
+{%         if item['auto_delete'] is defined %}
     auto_delete => {{ item['auto_delete']|lower }}
-{%       endif %}
-    host => "{{ item.host }}"
-{%       if item.exchange is defined %}
-    exchange => "{{ item.exchange }}"
-{%       endif %}
-{%       if item['user'] is defined %}
+{%         endif %}
+    host => "{{ item['host'] }}"
+{%         if item.exchange is defined %}
+    exchange => "{{ item['exchange'] }}"
+{%         endif %}
+{%         if item['user'] is defined %}
     user => "{{ item['user'] }}"
-{%       endif %}
-{%       if item['password'] is defined %}
+{%         endif %}
+{%         if item['password'] is defined %}
     password => "{{ item['password'] }}"
-{%       endif %}
+{%         endif %}
   }
 }
 {%       endif %}

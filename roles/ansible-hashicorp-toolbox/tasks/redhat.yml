@@ -1,0 +1,21 @@
+- name: redhat | installing HashiCorp Vagrant (x86_64)
+  dnf:
+    name: "{{ hashicorp_url }}/{{ item['name'] }}/{{ item['version'] }}/{{ item['name'] }}_{{ item['version'] }}_x86_64.rpm"
+    state: "{{ item['state'] }}"
+  become: true
+  with_items: "{{ hashicorp_tools }}"
+  when: >
+    item['name'] == "vagrant" and
+    not ansible_check_mode and
+    ansible_distribution == "Fedora"
+
+- name: redhat | installing HashiCorp Vagrant (x86_64)
+  yum:
+    name: "{{ hashicorp_url }}/{{ item['name'] }}/{{ item['version'] }}/{{ item['name'] }}_{{ item['version'] }}_x86_64.rpm"
+    state: "{{ item['state'] }}"
+  become: true
+  with_items: "{{ hashicorp_tools }}"
+  when: >
+    item['name'] == "vagrant" and
+    not ansible_check_mode and
+    ansible_distribution != "Fedora"

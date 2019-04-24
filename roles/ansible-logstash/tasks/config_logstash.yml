@@ -2,56 +2,64 @@
 - name: config_logstash | clearing existing logstash config
   file:
     path: "{{ logstash_config_dir }}"
-    state: "absent"
+    state: absent
   become: true
   when: >
-        clear_logstash_config is defined and
-        clear_logstash_config
+    clear_logstash_config is defined and
+    clear_logstash_config
 
 - name: config_logstash | setup logstash config directory and set permissions
   file:
     path: "{{ logstash_config_dir }}"
-    state: "directory"
-    owner: "logstash"
-    group: "logstash"
-    recurse: no
-    mode: 0775
+    state: directory
+    owner: "{{ logstash_system_user }}"
+    group: "{{ logstash_system_group }}"
+    mode: u=rwx,g=rx,o=rx
   become: true
 
 - name: config_logstash | removing original logstash config if it exists
   file:
-    path: "{{ logstash_config_dir }}/logstash.conf"
-    state: "absent"
+    path: "{{ logstash_config_dir + '/logstash.conf' }}"
+    state: absent
   become: true
-  notify: "restart logstash"
+  notify: restart logstash
 
 - name: config_logstash | configuring logstash
   template:
-    src: "etc/logstash/conf.d/{{ item }}.conf.j2"
-    dest: "{{ logstash_config_dir }}/{{ item }}.conf"
-    owner: "logstash"
-    group: "logstash"
-    mode: 0644
+    src: "{{ 'etc/logstash/conf.d/' + item + '.conf.j2' }}"
+    dest: "{{ logstash_config_dir + '/' + item + '.conf' }}"
+    owner: "{{ logstash_system_user }}"
+    group: "{{ logstash_system_group }}"
+    mode: u=rw,g=r,o=r
     #validate: "/opt/logstash/bin/logstash -tf %s" # commented due to error during tests with file not found.
   become: true
-  notify: "restart logstash"
-  with_items: '{{ logstash_base_configs }}'
+  notify: restart logstash
+  register: _logstash_config
+  with_items: "{{ logstash_base_configs }}"
 
 - name: config_logstash | creating logstash pattern folders
   file:
     path: "{{ item }}"
-    state: "directory"
-    owner: "logstash"
-    group: "logstash"
+    state: directory
+    owner: "{{ logstash_system_user }}"
+    group: "{{ logstash_system_group }}"
     mode: 0775
-    recurse: yes
+    recurse: true
   become: true
   with_items:
-    - '/opt/logstash/lib/logstash/outputs/elasticsearch'
-    - '/opt/logstash/patterns'
+    - /opt/logstash/lib/logstash/outputs/elasticsearch
+    - /opt/logstash/patterns
+
+- name: config_logstash | add the logstash user to system groups
+  user:
+    name: "{{ logstash_system_user }}"
+    groups: "{{ logstash_system_groups | join(',') }}"
+    append: no
 
 - name: config_logstash | test logstash configuration
   shell: "{{ logstash_bin }} -t -f {{ logstash_config_dir }} --path.settings /etc/logstash/"
   become: true
   changed_when: false
-  when: logstash_major_ver == '5.x'
+  when: >
+    logstash_major_ver == "5.x" and
+    _logstash_config['changed']

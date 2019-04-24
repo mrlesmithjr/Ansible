@@ -1,0 +1,16 @@
+---
+- hosts: mongodb_cluster
+  vars:
+    etc_hosts_add_all_hosts: true
+    mongodb_config_mongodb: true
+    mongodb_bind_ip:
+      # - 0.0.0.0
+      - 127.0.0.1
+      - "{{ ansible_enp0s8['ipv4']['address'] }}"
+    mongodb_replication: true
+    pri_domain_name: test.vagrant.local
+  roles:
+    - role: ansible-etc-hosts
+    - role: ansible-mongodb
+      become: true
+  tasks: []

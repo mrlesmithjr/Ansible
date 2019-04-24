@@ -3,49 +3,57 @@
   package:
     name: "{{ item }}"
     state: present
+  become: true
   with_items: "{{ snort_redhat_prereqs }}"
 
 - name: redhat | installing snort daq
   yum:
     name: "{{ snort_redhat_daq_package }}"
     state: present
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing snort
   yum:
     name: "{{ snort_redhat_package }}"
     state: present
+  become: true
   when: ansible_distribution != "Fedora"
 
 - name: redhat | installing snort daq
   dnf:
     name: "{{ snort_fedora_daq_package }}"
     state: present
+  become: true
   when: ansible_distribution == "Fedora"
 
 - name: redhat | installing snort
   dnf:
     name: "{{ snort_fedora_package }}"
     state: present
+  become: true
   when: ansible_distribution == "Fedora"
 
 - name: redhat | ensuring directory exists (/usr/local/lib/snort_dynamicrules)
   file:
-    dest: "/usr/local/lib/snort_dynamicrules"
+    dest: /usr/local/lib/snort_dynamicrules
     state: directory
     owner: root
     group: root
     mode: 0755
-    recurse: yes
+    recurse: true
+  become: true
 
 # Has Snort been packaged incorrectly? Shouldn't need to do this
 - name: redhat | ensuring libdnet.1 symlink exists
   file:
-    dest: "/usr/lib64/libdnet.1"
-    src: "/usr/lib64/libdnet.so.1"
+    dest: /usr/lib64/libdnet.1
+    src: /usr/lib64/libdnet.so.1
     state: link
+  become: true
 
 - name: redhat | ensuring snort is enabled
   service:
-    name: "snortd"
-    enabled: yes
+    name: snortd
+    enabled: true
+  become: true

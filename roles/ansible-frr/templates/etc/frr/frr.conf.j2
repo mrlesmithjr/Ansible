@@ -4,20 +4,64 @@ hostname {{ ansible_hostname }}
 password {{ frr_password }}
 log {{ frr_logging }}
 !
+{% if frr_interfaces is defined and frr_interfaces != [] %}
+{%   for key, value in frr_interfaces.iteritems() %}
+interface {{ key }}
+{%     if value['description'] is defined %}
+  description {{ value['description'] }}
+{%     endif %}
+{%     if value['ip'] is defined %}
+  ip address {{ value['ip'] }}
+{%     endif %}
+{%     if value['auth'] is defined %}
+  ip ospf authentication message-digest
+  ip ospf message-digest-key {{ value['auth']['id'] }} md5 {{ value['auth']['key'] }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
+!
+{% if frr_static is defined and frr_static != [] %}
+{%   for _static_dest, _static_next_hop in frr_static.iteritems() %}
+ip route {{ _static_dest }} {{ _static_next_hop }}
+{%   endfor %}
+{% endif %}
+!
 {% if frr_daemons['bgpd'] %}
 {%   if frr_bgp is defined and frr_bgp != [] %}
 {%     for key, value in frr_bgp['asns'].iteritems() %}
 router bgp {{ key }}
+{%       if frr_router_id != [] %}
   bgp router-id {{ frr_router_id }}
+{%       endif %}
 {%       if value['log_neighbor_changes']|default(False) %}
   bgp log-neighbor-changes
+{%       endif %}
+{%       if value['timers']|default(False) %}
+  timers bgp {{ value['timers'] }}
+{%       endif %}
+{%       if value['graceful_restart']|default(False) %}
+  bgp graceful-restart
 {%       endif %}
 {%       if value['maximum_paths'] is defined and value['maximum_paths'] != [] %}
   maximum-paths {{ value['maximum_paths'] }}
 {%       endif %}
 {%       if value['neighbors'] is defined %}
 {%         for neighbor, values in value['neighbors'].iteritems() %}
+{%           if values['is_peer_group']|default(False) %}
+  neighbor {{ neighbor }} peer-group
+{%           endif %}
+{%           if values['peer_group']|default(False) %}
+  neighbor {{ neighbor }} peer-group {{ values['peer_group'] }}
+{%           endif %}
+{%           if values['asn']|default(False) %}
   neighbor {{ neighbor }} remote-as {{ values['asn'] }}
+{%           endif %}
+{%           if values['password']|default(False) %}
+  neighbor {{ neighbor }} password {{ values['password'] }}
+{%           endif %}
+{%           if values['multihop']|default(False) %}
+  neighbor {{ neighbor }} ebgp-multihop {{ values['multihop'] }}
+{%           endif %}
 {%           if values['default_originate']|default(False) %}
   neighbor {{ neighbor }} default-originate
 {%           endif %}
@@ -26,6 +70,24 @@ router bgp {{ key }}
 {%           endif %}
 {%           if values['next_hop_self']|default(False) %}
   neighbor {{ neighbor }} next-hop-self
+{%           endif %}
+{%           if values['timers_connect']|default(False) %}
+  neighbor {{ neighbor }} timers connect {{ values['timers_connect'] }}
+{%           endif %}
+{%           if values['v4_route_reflector_client']|default(False) or
+                values['v4_route_map']|default(False) %}
+!
+  address-family ipv4 unicast
+{%             if values['v4_route_reflector_client']|default(False) %}
+    neighbor {{ neighbor }} route-reflector-client
+{%             endif %}
+{%             if values['v4_route_map']|default(False) %}
+{%               for _route_map in values['v4_route_map'] %}
+    neighbor {{ neighbor }} route-map {{ _route_map }}
+{%               endfor %}
+{%             endif %}
+  exit-address-family
+!
 {%           endif %}
 {%         endfor %}
 {%       endif %}
@@ -37,6 +99,7 @@ router bgp {{ key }}
 {%       endif %}
 {%       if value['redistribute'] is defined %}
 {%         if value['networks'] is not defined %}
+!
   address-family ipv4 unicast
 {%         endif %}
 {%         for _redistribute in value['redistribute'] %}
@@ -46,25 +109,35 @@ router bgp {{ key }}
 {%       if value['networks'] is defined or value['redistribute'] is defined %}
   exit-address-family
 {%       endif %}
+{%       if frr_vnc_defaults|default(False) %}
   vnc defaults
     response-lifetime 3600
     exit-vnc
+{%       endif %}
 {%     endfor %}
 {%   endif %}
 {% endif %}
 !
 {% if frr_daemons['ospfd'] %}
 router ospf
+{%       if frr_router_id != [] %}
   router-id {{ frr_router_id }}
+{%       endif %}
 {%   if frr_ospf is defined and frr_ospf != [] %}
 {%     if frr_ospf['areas'] is defined %}
 {%       for key, value in frr_ospf['areas'].iteritems() %}
 {%         for _network in value['networks'] %}
   network {{ _network }} area {{ key }}
 {%         endfor %}
+{%         if value['auth'] is defined %}
+  area {{ key }} authentication message-digest
+{%         endif %}
+{%         if value['type'] is defined %}
+  area {{ key }} {{ value['type'] }}
+{%         endif %}
 {%       endfor %}
 {%     endif %}
-{%     if frr_ospf['log_adjacency_changes'] %}
+{%     if frr_ospf['log_adjacency_changes']|default(False) %}
   log-adjacency-changes
 {%     endif %}
 {%     if frr_ospf['passive_interfaces'] is defined %}
@@ -78,5 +151,41 @@ router ospf
 {%       endfor %}
 {%     endif %}
 {%   endif %}
+{% endif %}
+!
+{% if frr_prefix_list is defined and frr_prefix_list != [] %}
+{%   for _frr_prefix_list_name, _frr_prefix_list_seq in frr_prefix_list.iteritems() %}
+{%     for key, value in _frr_prefix_list_seq.iteritems() %}
+{%       if value['prefix'] is defined %}
+{%         if value['match'] is defined %}
+ip prefix-list {{ _frr_prefix_list_name }} seq {{ key }} {{ value['prefix'] }} {{ value['match'] }}
+{%         else %}
+ip prefix-list {{ key }} seq {{ value['prefix'] }}
+{%         endif %}
+{%       endif %}
+{%     endfor %}
+{%   endfor %}
+!
+{% endif %}
+!
+{% if frr_route_map is defined and frr_route_map != [] %}
+{%   for _frr_route_map_name, _frr_route_map_seq in frr_route_map.iteritems() %}
+{%     for key, value in _frr_route_map_seq.iteritems() %}
+route-map {{ _frr_route_map_name }} {{ key }}
+{%       if value['interface'] is defined %}
+  match interface {{ value['interface'] }}
+{%       endif %}
+{%       if value['prefix_list'] is defined %}
+  match ip address prefix-list {{ value['prefix_list'] }}
+{%       endif %}
+{%       if value['community'] is defined %}
+  set community {{ value['community'] }} additive
+{%       endif %}
+{%       if value['origin'] is defined %}
+  set origin {{ value['origin'] }}
+{%       endif %}
+!
+{%     endfor %}
+{%   endfor %}
 {% endif %}
 !

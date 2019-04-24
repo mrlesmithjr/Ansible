@@ -2,19 +2,24 @@
 # tasks file for ansible-powerdns
 - include: pdns_accounts.yml
 
+- include: systemd_resolved.yml
+  when: >
+    ansible_service_mgr == "systemd" and
+    pdns_auth_systemd_resolved_disable
+
 - include: pdns_server.yml
 
 - include: pdns_zones.yml
   tags:
-    - pdns_create_pdns_zones
+    - pdns_auth_create_pdns_zones
   when: >
-        pdns_create_pdns_zones is defined and
-        pdns_create_pdns_zones
+        pdns_auth_create_pdns_zones is defined and
+        pdns_auth_create_pdns_zones
 
 - include: pdns_records.yml
   tags:
-    - pdns_create_pdns_records
+    - pdns_auth_create_records
   when: >
-        (pdns_create_pdns_records is defined and
-        pdns_create_pdns_records) and
-        pdns_records is defined
+        (pdns_auth_create_records is defined and
+        pdns_auth_create_records) and
+        pdns_auth_records is defined

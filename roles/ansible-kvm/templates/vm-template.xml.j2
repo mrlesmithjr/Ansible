@@ -4,7 +4,7 @@
   <vcpu>{{ item.vcpu }}</vcpu>
   <os>
     <type>hvm</type>
-{% for dev in item.boot_devices %}
+{% for dev in item['boot_devices'] %}
     <boot dev='{{ dev }}'/>
 {% endfor %}
     <bootmenu enable='yes'/>
@@ -14,28 +14,39 @@
     <apic/>
   </features>
   <devices>
-{% if graphics is defined and graphics == true %}
+{% if item['graphics'] is defined and item['graphics']|bool %}
     <graphics type='spice' autoport='yes'/>
 {% endif %}
-{% for hd in item.disks %}
+{% if item['cdrom'] is defined %}
+{%   if item['cdrom']['source'] is defined %}
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='{{ item['cdrom']['source'] }}'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <address type='drive' controller='0' bus='1' unit='0'/>
+    </disk>
+{%   endif %}
+{% endif %}
+{% for hd in item['disks'] %}
     <disk type='file' device='disk'>
       <driver name='qemu' type='{{ kvm_images_format_type }}' cache='{{ kvm_images_cache_mode }}'/>
-      <source file='{{ kvm_images_path }}/{{ hd.name }}.{{ kvm_images_format_type }}'/>
+      <source file='{{ kvm_images_path }}/{{ hd['name'] }}.{{ kvm_images_format_type }}'/>
 {%   if hd.disk_driver|lower == 'virtio' %}
-      <target dev='vd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd.disk_driver }}'/>
-{%   elif hd.disk_driver|lower == 'sata' or hd.disk_driver|lower == 'scsi' or hd.disk_driver|lower == 'sd' %}
-      <target dev='sd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd.disk_driver }}'/>
+      <target dev='vd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd['disk_driver'] }}'/>
+{%   elif hd.disk_driver|lower == 'sata' or hd['disk_driver']|lower == 'scsi' or hd['disk_driver']|lower == 'sd' %}
+      <target dev='sd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd['disk_driver'] }}'/>
 {%   endif %}
     </disk>
 {% endfor %}
-{% for int in item.network_interfaces %}
-    <interface type='{{ int.type }}'>
+{% for int in item['network_interfaces'] %}
+    <interface type='{{ int['type'] }}'>
 {%   if int['portgroup'] is not defined %}
-      <source {{ int.type }}='{{ int.source }}'/>
+      <source {{ int['type'] }}='{{ int['source'] }}'/>
 {%   elif int['portgroup'] is defined %}
-      <source {{ int.type }}='{{ int.source }}' portgroup='{{ int['portgroup'] }}'/>
+      <source {{ int['type'] }}='{{ int['source'] }}' portgroup='{{ int['portgroup'] }}'/>
 {%   endif %}
-      <model type='{{ int.network_driver }}'/>
+      <model type='{{ int['network_driver'] }}'/>
     </interface>
 {% endfor %}
     <console type='pty'>

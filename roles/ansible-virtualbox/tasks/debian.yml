@@ -1,16 +1,25 @@
 ---
 - name: debian | Installing Virtualbox
   apt:
-    deb: "{{ virtualbox_dl_url }}/{{ virtualbox_debian_package }}"
-    state: "present"
+    deb: "{{ virtualbox_dl_url + '/' + virtualbox_debian_package }}"
+    state: present
   become: true
-  when: ansible_distribution != "Linux Mint"
+  register: result
+  until: result is successful
+  when: >
+    (ansible_distribution == "Ubuntu" and
+    ansible_distribution_version < "18.10") or
+    ansible_distribution == "Debian"
 
 - name: debian | Installing Virtualbox
   apt:
-    deb: "{{ virtualbox_dl_url }}/virtualbox-{{ virtualbox_major_ver }}_{{ virtualbox_minor_ver }}-{{ virtualbox_build_ver }}~Ubuntu~bionic_amd64.deb"
-    state: "present"
+    deb: "{{ virtualbox_dl_url + '/virtualbox-' + virtualbox_major_ver|string + '_' + virtualbox_minor_ver|string + '-' + virtualbox_build_ver|string + '~Ubuntu~bionic_amd64.deb' }}"
+    state: present
   become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution == "Linux Mint" and
-        ansible_distribution_major_version == "19"
+    (ansible_distribution == "Linux Mint" and
+    ansible_distribution_major_version == "19") or
+    (ansible_distribution == "Ubuntu" and
+    ansible_distribution_version >= "18.10")

@@ -1,13 +1,13 @@
 Role Name
 =========
 
-An Ansible role to install/configure Observium Monitoring....  
+An Ansible role to install/configure Observium Monitoring....
 http://www.observium.org/
 
 Requirements
 ------------
 
-Install required Ansible roles...  
+Install required Ansible roles...
 ````
 ansible-galaxy install -r requirements.yml
 ````
@@ -19,13 +19,13 @@ Easily spin up a Vagrant Lab...
 cd vagrant
 vagrant up
 ````
-Open your browser to http://127.0.0.1:8080  
+Open your browser to http://127.0.0.1:8080
 And login
 ````
 user: admin
 password: observium
 ````
-When you are all done and ready to clean-up the Vagrant Lab...  
+When you are all done and ready to clean-up the Vagrant Lab...
 ````
 ./cleanup.sh
 ````
@@ -50,25 +50,28 @@ observium_db_info:
   password: 'observium'
   user: 'observium'
 observium_debian_pre_reqs:
+  - apache2
   - fping
   - graphviz
   - imagemagick
   - ipmitool
-  - libapache2-mod-php5
+  - libapache2-mod-php7.2
   - mtr-tiny
+  - mysql-server
   - mysql-client
   - php-pear
-  - php5-cli
-  - php5-gd
-  - php5-json
-  - php5-mcrypt
-  - php5-mysql
+  - php7.2-cli
+  - php7.2-gd
+  - php7.2-json
+  - php7.2-mysql
+  - php7.2-mysqli
   - python-mysqldb
   - rrdtool
   - snmp
   - subversion
   - whois
-#  - mysql-server
+  - snmp-mibs-downloader
+
 observium_dl_dir: '/opt'
 observium_dl_package: 'observium-community-latest.tar.gz'
 observium_dl_url: 'http://www.observium.org'

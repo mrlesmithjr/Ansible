@@ -19,5 +19,5 @@
 
 - include: systemd_resolved.yml
   when: >
-        ansible_service_mgr == "systemd" and
-        dnsmasq_systemd_resolved_disable
+    ansible_service_mgr == "systemd" and
+    dnsmasq_systemd_resolved_disable

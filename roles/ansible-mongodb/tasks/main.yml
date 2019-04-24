@@ -1,18 +1,20 @@
 ---
 # tasks file for ansible-mongodb
-- include: debian.yml
+- include_tasks: set_facts.yml
+
+- include_tasks: debian.yml
   when: ansible_os_family == "Debian"
 
-- include: redhat.yml
+- include_tasks: redhat.yml
   when: ansible_os_family == "RedHat"
 
-- include: python_modules.yml
+- include_tasks: python_modules.yml
 
-- include: users.yml
+- include_tasks: users.yml
   when: mongodb_create_users
 
-- include: config.yml
+- include_tasks: config.yml
   when: mongodb_config_mongodb
 
-- include: replication.yml
+- include_tasks: replication.yml
   when: mongodb_replication

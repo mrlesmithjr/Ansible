@@ -1,4 +1,7 @@
 hostname = "{{ ansible_hostname }}"
+{% if influxdb_rpc_addr %}
+bind-address = "{{ influxdb_rpc_addr }}"
+{% endif %}
 
 [meta]
   dir = "{{ influxdb_meta['dir'] }}"

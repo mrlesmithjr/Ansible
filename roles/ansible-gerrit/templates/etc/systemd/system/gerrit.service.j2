@@ -11,7 +11,7 @@ StandardError=syslog
 SyslogIdentifier=gerrit
 ExecStart={{ gerrit_site_dir }}/bin/gerrit.sh start
 ExecStop={{ gerrit_site_dir }}/bin/gerrit.sh stop
-PIDFile=/var/gerrit/logs/gerrit.pid
+PIDFile={{ gerrit_site_dir }}/logs/gerrit.pid
 
 [Install]
 WantedBy=multi-user.target

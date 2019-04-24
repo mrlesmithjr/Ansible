@@ -1,19 +1,29 @@
 ---
 - name: redhat | Installing KVM
   yum:
-    name: "{{ item }}"
-    state: "present"
+    name: "{{ kvm_redhat_packages }}"
+    state: present
   become: true
-  with_items: '{{ kvm_redhat_packages }}'
+  register: result
+  until: result is successful
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Creating libvirt Group
   group:
-    name: "libvirt"
-    state: "present"
+    name: libvirt
+    state: present
   become: true
   when: >
-        (ansible_distribution == "Fedora" and
-        ansible_distribution_major_version <= '12') or
-        (ansible_distribution == "CentOS" and
-        ansible_distribution_major_version <= '6')
+    (ansible_distribution == "Fedora" and
+    ansible_distribution_major_version <= '12') or
+    (ansible_distribution == "CentOS" and
+    ansible_distribution_major_version <= '6') or
+    (ansible_distribution == "RedHat" and
+    ansible_distribution_major_version <= '6')
+
+- name: redhat | Ensuring libvirtd Service Is Enabled and Started
+  service:
+    name: libvirtd
+    enabled: true
+    state: started
+  become: true

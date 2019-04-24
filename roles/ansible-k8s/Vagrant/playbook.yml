@@ -14,6 +14,7 @@
     # Defines if ansible_ssh_host is used for defining hosts
     etc_hosts_use_ansible_ssh_host: true
     k8s_cluster_init_skip_ca_verification: true
+    k8s_helm_install: true
     pri_domain_name: test.vagrant.local
   roles:
     - role: ansible-change-hostname

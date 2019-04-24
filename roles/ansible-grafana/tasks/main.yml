@@ -12,5 +12,12 @@
 - include: config.yml
   when: grafana_config
 
+- include_tasks: datasources.yml
+  when: >
+    grafana_datasources is defined and
+    grafana_datasources != []
+
 - include: plugins.yml
-  when: grafana_enable_plugins
+  when: >
+    grafana_plugins is defined and
+    grafana_plugins != []

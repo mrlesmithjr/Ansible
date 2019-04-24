@@ -89,7 +89,6 @@
     name: "mysql"
     state: "restarted"
   become: true
-  serial: 1
   when: >
         not galera_cluster_configured.stat.exists and
         inventory_hostname != galera_mysql_master_node

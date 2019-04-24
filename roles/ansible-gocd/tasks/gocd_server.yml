@@ -1,5 +1,13 @@
 ---
 - name: gocd_server | installing go-server
   apt:
-    name: "go-server"
+    name: go-server
     state: present
+  become: true
+
+- name: gocd_server | Ensuring go-server Service Is Running and Enabled on Boot
+  service:
+    name: go-server
+    state: started
+    enabled: true
+  become: true

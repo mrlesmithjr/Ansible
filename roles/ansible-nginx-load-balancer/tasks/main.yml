@@ -5,8 +5,8 @@
 
 - include: ssl.yml
   when: >
-        (nginx_load_balancer_ssl is defined and
-        nginx_load_balancer_ssl != []) and
-        nginx_load_balancer_ssl['enabled']
+    (nginx_load_balancer_ssl is defined and
+    nginx_load_balancer_ssl != []) and
+    nginx_load_balancer_ssl['enabled']
 
 - include: config.yml

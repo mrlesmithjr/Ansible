@@ -1,6 +1,8 @@
 ---
-- name:    debian | Installing DNSMasq
+- name: debian | Installing DNSMasq
   apt:
-    name:  dnsmasq
+    name: dnsmasq
     state: present
-  become:  true
+  become: true
+  register: result
+  until: result is successful

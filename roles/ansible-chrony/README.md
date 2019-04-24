@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [ansible-chrony](#ansible-chrony)
   - [Requirements](#requirements)
@@ -22,93 +23,7 @@ None
 
 ## Role Variables
 
-```yaml
----
-# defaults file for ansible-chrony
-
-# Optionally specify a host, subnet, or network from which to allow NTP
-# connections to a machine acting as NTP server
-chrony_allow_hosts:
-  - '10/8'
-  - '192.168/16'
-  - '172.16/12'
-
-# Path to the directory to save the measurement history across restarts of
-# chronyd (assuming no changes are made to the system clock behavior whilst
-# it is not running)
-chrony_dumpdir: '/var/lib/chrony'
-
-# A large value of 10 indicates that the clock is so many hops away from a
-# reference clock that its time is unreliable. If the computer ever has access
-# to another computer which is ultimately synchronized to a reference clock,
-# it will almost certainly be at a stratum less than 10. Therefore, the choice
-# of a high value like 10 for the local command prevents the machine’s own time
-# from ever being confused with real time, were it ever to leak out to clients
-# that have visibility of real servers.
-chrony_local_stratum: 10
-
-# The log command indicates that certain information is to be logged. It
-# accepts the following options:
-# measurements
-# This option logs the raw NTP measurements and related information to a file
-# called measurements.log.
-#
-# statistics
-# This option logs information about the regression processing to a file called
-# statistics.log.
-#
-# tracking
-# This option logs changes to the estimate of the system’s gain or loss rate,
-# and any slews made, to a file called tracking.log.
-#
-# rtc
-# This option logs information about the system’s real-time clock.
-#
-# refclocks
-# This option logs the raw and filtered reference clock measurements to a file
-# called refclocks.log.
-#
-# tempcomp
-# This option logs the temperature measurements and system rate compensations
-# to a file called tempcomp.log.
-chrony_log:
-  - 'tracking'
-  - 'measurements'
-  - 'statistics'
-
-# This directive allows the directory where log files are written to be specified
-chrony_logdir: '/var/log/chrony'
-
-# The maxupdateskew parameter is the threshold for determining whether an
-# estimate is too unreliable to be used.
-# By default, the threshold is 1000 ppm
-# Typical values for skew-in-ppm might be 100 for a dial-up connection to
-# servers over a telephone line, and 5 or 10 for a computer on a LAN
-chrony_maxupdateskew: 100.0
-
-# Define upstream NTP servers
-chrony_ntp_servers:
-  - server: '0.debian.pool.ntp.org'
-    options:
-      - option: 'iburst'
-      - option: 'minpoll'
-        val: 8
-  - server: '1.debian.pool.ntp.org'
-    options:
-      - option: 'iburst'
-      - option: 'minpoll'
-        val: 8
-  - server: '2.debian.pool.ntp.org'
-    options:
-      - option: 'iburst'
-      - option: 'minpoll'
-        val: 8
-  - server: '3.debian.pool.ntp.org'
-    options:
-      - option: 'iburst'
-      - option: 'minpoll'
-        val: 8
-```
+[defaults/main.yml](defaults/main.yml)
 
 ## Dependencies
 
@@ -132,6 +47,6 @@ MIT
 
 Larry Smith Jr.
 
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   [EverythingShouldBeVirtual](http://www.everythingshouldbevirtual.com)
--   mrlesmithjr [at] gmail.com
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://www.everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

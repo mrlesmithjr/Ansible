@@ -1,23 +1,28 @@
+# 2018-10-21 (cc) <paul4hough@gmail.com>
+#
+---
 galaxy_info:
   author: Larry Smith Jr.
-  description: An [Ansible] role to install/configure [InfluxDB]
+  description: An Ansible role to install/configure InfluxDB
 
-  license: license (GPLv2, CC-BY, etc)
+  license: MIT
 
   min_ansible_version: 1.2
   platforms:
-  - name: Ubuntu
-    versions:
-    - precise
-    - trusty
-    - xenial
-  - name: Debian
-    versions:
-    - jessie
-  - name: EL
-    versions:
-    - 6
-    - 7
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Ubuntu
+      versions:
+        - bionic
+        - precise
+        - trusty
+        - xenial
 
   galaxy_tags:
     - database

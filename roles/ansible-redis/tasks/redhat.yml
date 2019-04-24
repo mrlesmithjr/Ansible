@@ -1,54 +1,53 @@
 ---
-- name:       redhat | installing epel repo (RedHat)
+- name: redhat | installing epel repo (RedHat)
   yum:
-    name:     epel-release
-    state:    present
-  become:     true
-  when:       ansible_distribution != "Fedora"
+    name: epel-release
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution != "Fedora"
 
-- name:       redhat | installing dependencies
+- name: redhat | installing dependencies
   yum:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - python-devel
-    - python-pip
-    - ruby
-    # - rubygems-integration
-  when:       ansible_distribution != "Fedora"
+    name: ["python-devel", "python-pip", "ruby"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution != "Fedora"
 
-- name:       redhat | installing dependencies
+- name: redhat | installing dependencies
   dnf:
-    name:     "{{ item }}"
-    state:    present
-  become:     true
-  with_items:
-    - libselinux-python
-    - python-devel
-    - python-pip
-    - ruby
-    # - rubygems-integration
-  when:       ansible_distribution == "Fedora"
+    name: ["libselinux-python", "python-devel", "python-pip", "ruby"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution == "Fedora"
 
-- name:       redhat | installing redis
+- name: redhat | installing redis
   yum:
-    name:     redis
-    state:    present
+    name: redis
+    state: present
   notify:
     - start redis
-  become:     true
-  when:       >
-        ansible_distribution != "Fedora" and
-        not redis_install_from_source
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_distribution != "Fedora" and
+    not redis_install_from_source
 
-- name:       redhat | installing redis
+- name: redhat | installing redis
   dnf:
-    name:     redis
-    state:    present
+    name: redis
+    state: present
   notify:
     - start redis
-  become:     true
-  when:       >
-        ansible_distribution == "Fedora" and
-        not redis_install_from_source
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_distribution == "Fedora" and
+    not redis_install_from_source

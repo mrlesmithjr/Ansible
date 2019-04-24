@@ -26,7 +26,9 @@ HostKey {{ item }}
 {% endfor %}
 IgnoreRhosts {{ sshd_ignore_rhosts }}
 IgnoreUserKnownHosts {{ sshd_ignore_user_known_hosts }}
+{% if sshd_keep_deprecated %}
 KeyRegenerationInterval {{ sshd_key_regeneration_interval }}
+{% endif %}
 {% for item in sshd_ports %}
 Port {{ item }}
 {% endfor %}
@@ -43,9 +45,11 @@ PrintLastLog {{ sshd_print_lastlog }}
 PrintMotd {{ sshd_print_motd }}
 Protocol {{ sshd_protocol }}
 PubkeyAuthentication {{ sshd_pubkey_authentication }}
+{% if sshd_keep_deprecated %}
 RhostsRSAAuthentication {{ sshd_rhosts_rsa_authentication }}
 RSAAuthentication {{ sshd_rsa_authentication }}
 ServerKeyBits {{ sshd_server_key_bits }}
+{% endif %}
 StrictModes {{ sshd_strict_modes }}
 Subsystem {{ sshd_subsystem }}
 SyslogFacility {{ sshd_syslog_facility }}

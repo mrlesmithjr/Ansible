@@ -1,2 +1,5 @@
 ---
 # vars file for ansible-logstash
+logstash_system_user: "logstash"
+# the logstash user's primary group
+logstash_system_group: "logstash"

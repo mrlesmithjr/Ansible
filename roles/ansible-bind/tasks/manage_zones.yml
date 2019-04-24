@@ -11,6 +11,7 @@
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - reload bind
 
@@ -18,15 +19,17 @@
   file:
     path: "{{ bind_zones_dir }}"
     state: directory
+  become: true
   when: inventory_hostname in groups[bind_masters_group]
 
 - name: manage_zones | creating forward zones
   template:
     src: etc/bind/zones/forward_zone.j2
-    dest: "{{ bind_zones_dir }}/db.{{ item.zone }}"
+    dest: "{{ bind_zones_dir + '/db.' + item['zone'] }}"
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - reload bind
   with_items: "{{ bind_forward_zones }}"
@@ -35,10 +38,11 @@
 - name: manage_zones | creating reverse zones
   template:
     src: etc/bind/zones/reverse_zone.j2
-    dest: "{{ bind_zones_dir }}/db.{{ item.zone }}"
+    dest: "{{ bind_zones_dir + '/db.' + item['zone'] }}"
     owner: root
     group: root
     mode: 0644
+  become: true
   notify:
     - reload bind
   with_items: "{{ bind_reverse_zones }}"

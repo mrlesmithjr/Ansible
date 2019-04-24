@@ -8,10 +8,43 @@
     - iproute
   when: ansible_distribution != "Fedora"
 
+- name: set url on frr version less than or equal to 4.1
+  set_fact:
+    frr_url_part: "{{ frr_release_date }}"
+  when:
+    - frr_version <= "4.1"
+
+- name: set url on frr version 5
+  set_fact:
+    frr_url_part: "001"
+  when:
+    - frr_version == "5.0.2"
+
+- name: set url on frr version 6
+  set_fact:
+    frr_url_part: "01"
+  when:
+    - frr_version >= "6"
+
+- name: redhat | Create FRR {{ frr_version }} install
+  set_fact:
+    frr_debs: [ "{{ frr_package_url }}/frr-{{ frr_version }}-{{ frr_url_part }}.el7.centos.x86_64.rpm" ]
+  become: true
+
+- name: redhat | Create Python Tools FRR {{ frr_version }} install
+  set_fact:
+    frr_package_deb: "{{ frr_package_url }}/frr-pythontools-{{ frr_version }}-{{ frr_url_part }}.el7.centos.x86_64.rpm"
+
+- name: redhat | Combine FRR {{ frr_version }} and tools
+  set_fact:
+    frr_debs: "{{ frr_debs }} + [ '{{ frr_package_deb }}' ]"
+  when: frr_reload == true
+
 - name: redhat | Installing FRR {{ frr_version }}
   yum:
-    name: "{{ frr_package_url }}/frr-{{ frr_version }}-{{ frr_release_date }}.el7.centos.x86_64.rpm"
+    name: "{{ frr_debs }}"
+    state: present
   become: true
-  when: >
-        ansible_distribution == "CentOS" and
-        ansible_distribution_major_version == "7"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"

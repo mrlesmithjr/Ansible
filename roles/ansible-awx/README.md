@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [ansible-awx](#ansible-awx)
   - [Requirements](#requirements)
@@ -23,7 +24,7 @@ An [Ansible](https://www.ansible.com) role to install [AWX](https://github.com/a
 
 ## Requirements
 
--   [ansible-docker](https://github.com/mrlesmithjr/ansible-docker)
+- [ansible-docker](https://github.com/mrlesmithjr/ansible-docker)
 
 You can install required Ansible roles by running:
 
@@ -31,7 +32,7 @@ You can install required Ansible roles by running:
 ansible-galaxy install -r requirements.yml
 ```
 
--   [resources](https://github.com/ansible/awx/blob/devel/INSTALL.md#system-requirements)
+- [resources](https://github.com/ansible/awx/blob/devel/INSTALL.md#system-requirements)
 
 ## Role Variables
 
@@ -50,8 +51,8 @@ Reference [requirements](#requirements)
 Login to AWX dashboard by accessing `http://HostnameOrIP` and login with `user:pass`
 defined in [defaults/main.yml](defaults/main.yml) under:
 
--   user: `awx['default_admin_user']`
--   pass: `awx['default_admin_password']`
+- user: `awx['default_admin_user']`
+- pass: `awx['default_admin_password']`
 
 ## License
 
@@ -61,6 +62,6 @@ MIT
 
 Larry Smith Jr.
 
--   [EverythingShouldBeVirtual](http://www.everythingshouldbevirtual.com)
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   mrlesmithjr [at] gmail.com
+- [EverythingShouldBeVirtual](http://www.everythingshouldbevirtual.com)
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

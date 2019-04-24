@@ -1,11 +1,9 @@
 ---
 # tasks file for ansible-prometheus
-# - include: debian.yml
-#   when: ansible_os_family == "Debian"
-- include: install.yml
+- include_tasks: install.yml
 
-- include: user.yml
+- include_tasks: user.yml
 
-- include: config.yml
+- include_tasks: config.yml
 
-- include: service.yml
+- include_tasks: service.yml

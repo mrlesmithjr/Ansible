@@ -4,3 +4,21 @@
     update_cache: yes
     cache_valid_time: 86400
   become: true
+  register: result
+  until: result is successful
+
+- name: debian | Installing Pre-Reqs
+  apt:
+    name:
+      [
+        "build-essential",
+        "libreadline-gplv2-dev",
+        "libssl-dev",
+        "python-minimal",
+        "unzip",
+        "zlib1g-dev",
+      ]
+    state: present
+  become: true
+  register: result
+  until: result is successful

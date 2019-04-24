@@ -7,6 +7,11 @@
 # the session's environ(7)
 sshd_accept_env: 'LANG LC_*'
 
+# On some Options sshd-server is showing warnings for usage of deprecated options
+# To be able to keep or remove them this variable is used. Currently this removes:
+# KeyRegenerationInterval, RhostsRSAAuthentication, RSAAuthentication, ServerKeyBits
+sshd_keep_deprecated: false
+
 # This keyword can be followed by a list of group name patterns, separated by
 # spaces. If specified, login is allowed only for users whose primary group or
 # supplementary group list matches one of the patterns. Only group names are

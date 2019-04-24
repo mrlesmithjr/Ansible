@@ -19,8 +19,7 @@ ntp_master_servers:
   - 3.ubuntu.pool.ntp.org
 
 # Defines your primary domain name (FQDN)
-ntp_pri_domain_name: 'example.org'
-
+ntp_pri_domain_name: example.org
 # Defines internal ntp servers for clients to poll
 # ntp_servers:
 #  - 'ntp1.{{ ntp_pri_domain_name }}'

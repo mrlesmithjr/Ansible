@@ -1,0 +1,44 @@
+---
+- name: redhat | Capture Current Kernel Release
+  command: uname -r
+  register: kernel_release
+  changed_when: false
+
+- name: redhat | Installing Pre-Reqs
+  dnf:
+    name:
+      [
+        "kernel-devel",
+        "{{ 'kernel-devel-' + kernel_release['stdout'] }}",
+        "kernel-headers",
+        "elfutils-libelf-devel",
+        "libselinux-python",
+      ]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_distribution == "Fedora"
+
+- name: redhat | Installing Virtualbox
+  dnf:
+    name: "{{ virtualbox_dl_url + '/' + 'VirtualBox-' + virtualbox_major_ver|string + '-' + virtualbox_minor_ver|string + '_' + virtualbox_build_ver|string + '_fedora26-1.x86_64.rpm' }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_distribution == "Fedora" and
+    ansible_distribution_version >= "26" and
+    ansible_distribution_version < "29"
+
+- name: redhat | Installing Virtualbox
+  dnf:
+    name: "{{ virtualbox_dl_url + '/' + 'VirtualBox-' + virtualbox_major_ver|string + '-' + virtualbox_minor_ver|string + '_' + virtualbox_build_ver|string + '_fedora29-1.x86_64.rpm' }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_distribution == "Fedora" and
+    ansible_distribution_version == "29"

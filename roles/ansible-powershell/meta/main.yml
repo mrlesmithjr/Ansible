@@ -1,8 +1,9 @@
+---
 galaxy_info:
   author: Larry Smith Jr.
   description: An Ansible role to install/configure Powershell
 
-  license: license (GPLv2, CC-BY, etc)
+  license: MIT
 
   min_ansible_version: 1.2
 
@@ -20,8 +21,11 @@ galaxy_info:
         - 25
         - 26
         - 27
+        - 28
+        - 29
     - name: Ubuntu
       versions:
+        - bionic
         - trusty
         - xenial
 

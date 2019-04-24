@@ -1,0 +1,14 @@
+---
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    mongodb_dbPath: /var/lib/mongodb
+    mongodb_group: mongodb
+    mongodb_user: mongodb
+  when: ansible_os_family == "Debian"
+
+- name: set_facts | Setting RedHat Facts
+  set_fact:
+    mongodb_dbPath: /var/lib/mongo
+    mongodb_group: mongod
+    mongodb_user: mongod
+  when: ansible_os_family == "RedHat"

@@ -1,28 +1,30 @@
 ---
+- name: redhat_security | adding EPEL repo
+  yum:
+    name: epel-release
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: >
+    ansible_distribution != "Fedora"
+
 - name: redhat | installing pre-reqs
   yum:
-    name: "{{ item }}"
-    state: "present"
+    name: ["facter", "libselinux-python", "python-devel", "ruby", "rubygems"]
+    state: present
   become: true
-  with_items:
-    - 'libselinux-python'
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution != "Fedora"
+    ansible_distribution != "Fedora"
 
 - name: redhat | installing pre-reqs
   dnf:
-    name: "{{ item }}"
+    name: ["facter", "libselinux-python", "python-devel", "ruby", "rubygems"]
     state: "present"
   become: true
-  with_items:
-    - 'libselinux-python'
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution == "Fedora"
-
-- name: redhat_security | adding EPEL repo
-  yum:
-    name: "epel-release"
-    state: "present"
-  become: true
-  when: >
-        ansible_distribution != "Fedora"
+    ansible_distribution == "Fedora"

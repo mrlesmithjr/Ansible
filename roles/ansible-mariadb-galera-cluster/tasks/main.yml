@@ -11,6 +11,11 @@
 - include: redhat.yml
   when: ansible_os_family == "RedHat"
 
+- include: max-open-files.yml
+  when: >
+    ansible_service_mgr == "systemd" and
+    mariadb_max_open_files != 0
+
 - include: oom-score-adjust.yml
   when: >
     ansible_service_mgr == "systemd" and

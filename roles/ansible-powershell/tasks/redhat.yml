@@ -4,6 +4,8 @@
     key: https://packages.microsoft.com/keys/microsoft.asc
     state: present
   become: true
+  register: result
+  until: result is successful
 
 - name: redhat | Adding Powershell Repo
   yum_repository:
@@ -32,15 +34,19 @@
     name: compat-openssl10
     state: present
   become: true
+  register: result
+  until: result is successful
   when: >
-        ansible_distribution == "Fedora" and
-        ansible_distribution_major_version is version('26', '>=')
+    ansible_distribution == "Fedora" and
+    ansible_distribution_major_version is version('26', '>=')
 
 - name: redhat | Installing Powershell
   yum:
     name: powershell
     state: present
   become: true
+  register: result
+  until: result is successful
   when: ansible_distribution != "Fedora"
 
 - name: redhat | Installing Powershell
@@ -48,4 +54,6 @@
     name: powershell
     state: present
   become: true
+  register: result
+  until: result is successful
   when: ansible_distribution == "Fedora"

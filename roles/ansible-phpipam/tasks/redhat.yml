@@ -1,23 +1,16 @@
 ---
 - name: redhat | installing pre-req packages
   yum:
-    name: "{{ item }}"
+    name: "{{ phpipam_redhat_packages }}"
     state: present
-  with_items:
-    - fping
-    - MySQL-python
-    - php
-    - php-cli
-    - php-gmp
-    - php-pear
-    - php-mysqlnd
-    - php-ldap
-    - php-mcrypt
-    - php-curl
-    - wget
+  become: true
+  register: result
+  until: result is succeeded
+  when: ansible_distribution != "Fedora"
 
 - name: redhat | setting php timezone
   lineinfile:
-    dest: "/etc/php.ini"
+    dest: /etc/php.ini
     line: "date.timezone = {{ phpipam_timezone }}"
+  become: true
   notify: restart httpd

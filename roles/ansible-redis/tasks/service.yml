@@ -3,5 +3,5 @@
   service:
     name: "{{ redis_service }}"
     state: started
-    enabled: yes
+    enabled: true
   become: true

@@ -4,6 +4,7 @@
     name: "mdadm"
     state: "present"
 
-- name: arrays | Set update_initramfs cmd to dracut -f 
+- name: arrays | Setting distribution-specific facts
   set_fact:
     update_initramfs: "dracut -f"
+    mdadm_conf: "/etc/mdadm.conf"

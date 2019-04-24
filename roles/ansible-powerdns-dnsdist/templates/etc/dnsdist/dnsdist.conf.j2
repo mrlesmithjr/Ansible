@@ -32,12 +32,14 @@ carbonServer('{{ pdns_dnsdist_carbon_metrics_info.server }}', '{{ pdns_dnsdist_c
 
 {% if pdns_dnsdist_enable_domain_blocks %}
 {%   for item in pdns_dnsdist_domain_blocks %}
-addDomainBlock("{{ item }}")
+addAction("{{ item }}", DropAction())
 {%   endfor %}
 {% endif %}
 
 {% if pdns_dnsdist_enable_pool_rules and pdns_dnsdist_pool_rules is defined %}
-{%  for item in pdns_dnsdist_pool_rules %}
-addPoolRule({"{{ item.query| join ('", "') }}"}, "{{ item.pool }}")
+{%  for rule in pdns_dnsdist_pool_rules %}
+{%    for query in rule['query'] %}
+addAction("{{ query }}", PoolAction("{{ rule['pool'] }}"))
+{%    endfor %}
 {%  endfor %}
 {% endif %}

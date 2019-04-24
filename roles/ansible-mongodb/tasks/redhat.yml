@@ -1,21 +1,42 @@
 ---
+- name: redhat | Enabling Epel Release
+  yum:
+    name: epel-release
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
+- name: redhat | Installing Pre-Reqs
+  yum:
+    name: ["python-pip"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
 - name: redhat | Adding MongoDB Repo
   yum_repository:
-    name: "{{ mongodb_redhat_repo_info.name }}"
-    description: "{{ mongodb_redhat_repo_info.description }}"
-    baseurl: "{{ mongodb_redhat_repo_info.baseurl }}"
-    gpgcheck: "{{ mongodb_redhat_repo_info.gpgcheck }}"
-    enabled: "{{ mongodb_redhat_repo_info.enabled }}"
-    gpgkey: "{{ mongodb_redhat_repo_info.gpgkey }}"
-    state: "present"
+    name: "{{ mongodb_redhat_repo_info['name'] }}"
+    description: "{{ mongodb_redhat_repo_info['description'] }}"
+    baseurl: "{{ mongodb_redhat_repo_info['baseurl'] }}"
+    gpgcheck: "{{ mongodb_redhat_repo_info['gpgcheck'] }}"
+    enabled: "{{ mongodb_redhat_repo_info['enabled'] }}"
+    gpgkey: "{{ mongodb_redhat_repo_info['gpgkey'] }}"
+    state: present
+  become: true
 
 - name: redhat | Installing MongoDB
   yum:
-    name: "mongodb-org"
-    state: "present"
+    name: ["mongodb-org", "mongodb-org-server"]
+    state: present
+  become: true
+  register: result
+  until: result is successful
 
 - name: redhat | Ensuring MongoDB Is Enabled and Started
   service:
-    name: "mongod"
-    state: "started"
-    enabled: yes
+    name: mongod
+    state: started
+    enabled: true
+  become: true

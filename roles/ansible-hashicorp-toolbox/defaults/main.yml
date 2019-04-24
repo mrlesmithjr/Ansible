@@ -2,7 +2,8 @@
 # defaults file for ansible-hashicorp-toolbox
 hashicorp_install_dir: /usr/local/bin/
 
-hashicorp_tools: []
+hashicorp_tools:
+  []
   # - name: consul
   #   version: 1.2.0
   #   state: present

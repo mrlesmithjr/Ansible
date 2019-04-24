@@ -1,17 +1,20 @@
 ---
-- name: debian | adding gocd repo key
+- name: debian | Adding GoCD Repo Key
   apt_key:
     url: "{{ gocd_repo_key }}"
     state: present
+  become: true
 
-- name: debian | adding gocd repo
+- name: debian | Adding GoCD Repo
   apt_repository:
     repo: "{{ gocd_repo }}"
     state: present
+  become: true
 
-- name: debian | installing/uninstalling additional apt packages
+- name: debian | Installing GoCD Pre-Reqs
   apt:
-    name: "{{ item.name }}"
-    state: "{{ item.state }}"
-  with_items: gocd_apt_packages
-  when: gocd_apt_packages is defined
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+  - default-jre-headless

@@ -5,9 +5,9 @@
     state: "present"
   become: true
   with_items:
-     - 'lvm2'
-     - 'scsitools'
-     - 'xfsprogs'
+  - lvm2
+  - scsitools
+  - xfsprogs
 
 - name: debian | checking for scsi devices
   shell: "sg_scan"

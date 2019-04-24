@@ -3,10 +3,12 @@
   apt:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
     - autoconf
     - bison
     - flex
+    - git
     - libdumbnet-dev
     - libpcap-dev
     - libpcre3-dev
@@ -16,89 +18,102 @@
 
 - name: barnyard2 | installing add'l pre-reqs
   apt:
-    name: "libmariadbclient-dev"
-    state: "present"
+    name: libmariadbclient-dev
+    state: present
+  become: true
   when: snort_barnyard2_db_type == "mariadb"
 
 - name: barnyard2 | installing add'l pre-reqs
   apt:
-    name: "libmysqlclient-dev"
-    state: "present"
+    name: libmysqlclient-dev
+    state: present
+  become: true
   when: snort_barnyard2_db_type == "mysql"
 
 - name: barnyard2 | ensuring snort_src_dir exists
   file:
     path: "{{ snort_src_dir }}"
     state: directory
+  become: true
 
 - name: barnyard2 | downloading snort daq
   get_url:
     url: "https://snort.org/downloads/snort/daq-{{ snort_daq_version }}.tar.gz"
     dest: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}.tar.gz"
+  become: true
 
 - name: barnyard2 | extracting snort daq
   unarchive:
     src: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}.tar.gz"
     dest: "{{ snort_src_dir }}"
     creates: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}/configure"
-    copy: no
+    copy: false
+  become: true
 
 - name: barnyard2 | building snort daq
   command: "{{ item }}"
   args:
     chdir: "{{ snort_src_dir }}/daq-{{ snort_daq_version }}"
-    creates: "/usr/local/lib/daq/daq_pcap.so"
+    creates: /usr/local/lib/daq/daq_pcap.so
+  become: true
   with_items:
-    - './configure'
-    - 'make'
-    - 'make install'
+    - ./configure
+    - make
+    - make install
 
 - name: barnyard2 | cloning barnyard2 repo
   git:
-    repo: "https://github.com/firnsy/barnyard2"
+    repo: https://github.com/firnsy/barnyard2
     dest: "{{ snort_src_dir }}/barnyard2"
-    update: no
+    update: false
+  become: true
 
 - name: barnyard2 | building barnyard2
   command: "{{ item }}"
   args:
     chdir: "{{ snort_src_dir }}/barnyard2"
-    creates: "/usr/local/bin/barnyard2"
+    creates: /usr/local/bin/barnyard2
+  become: true
   with_items:
-    - './autogen.sh'
-    - './configure --with-mysql --with-mysql-libraries=/usr/lib/'
-    - 'ln -s /usr/include/dumbnet.h /usr/include/dnet.h'
-    - 'ldconfig'
-    - 'make'
-    - 'make install'
+    - ./autogen.sh
+    - ./configure --with-mysql --with-mysql-libraries=/usr/lib/
+    - ln -s /usr/include/dumbnet.h /usr/include/dnet.h
+    - ldconfig
+    - make
+    - make install
+  become: true
   when: snort_barnyard2_db_type == "mariadb"
 
 - name: barnyard2 | building barnyard2
   command: "{{ item }}"
   args:
     chdir: "{{ snort_src_dir }}/barnyard2"
-    creates: "/usr/local/bin/barnyard2"
+    creates: /usr/local/bin/barnyard2
+  become: true
   with_items:
-    - './autogen.sh'
-    - './configure --with-mysql --with-mysql-libraries=/usr/lib/{{ ansible_machine }}-linux-gnu/'
-    - 'ln -s /usr/include/dumbnet.h /usr/include/dnet.h'
-    - 'ldconfig'
-    - 'make'
-    - 'make install'
+    - ./autogen.sh
+    - ./configure --with-mysql --with-mysql-libraries=/usr/lib/{{ ansible_machine }}-linux-gnu/
+    - ln -s /usr/include/dumbnet.h /usr/include/dnet.h
+    - ldconfig
+    - make
+    - make install
+  become: true
   when: snort_barnyard2_db_type == "mysql"
 
 - name: barnyard2 | configuring barnyard2
   template:
-    src: "etc/snort/barnyard2.conf.j2"
-    dest: "/etc/snort/barnyard2.conf"
+    src: etc/snort/barnyard2.conf.j2
+    dest: /etc/snort/barnyard2.conf
     owner: root
     group: root
     mode: 0644
+  become: true
 
 - name: barnyard2 | ensuring /var/log/barnyard2 directory exists
   file:
-    path: "/var/log/barnyard2"
+    path: /var/log/barnyard2
     state: directory
+  become: true
 
 - name: barnyard2 | checking if barnyard2 waldo file exists
   stat:
@@ -111,66 +126,86 @@
     state: touch
     owner: snort
     group: snort
+  become: true
   when: not barnyard2_waldo_file.stat.exists
 
 - name: barnyard2 | creating snort sid-msg.map
-  shell: "./create-sidmap.pl /etc/snort/rules > /etc/snort/sid-msg.map"
-  ignore_errors: yes
+  shell: ./create-sidmap.pl /etc/snort/rules > /etc/snort/sid-msg.map
+  ignore_errors: true
+  become: true
   args:
-    chdir: "/usr/share/oinkmaster/"
-    creates: "/etc/snort/sid-msg.map"
+    chdir: /usr/share/oinkmaster/
+    creates: /etc/snort/sid-msg.map
 
 - name: barnyard2 | copying MySQL schema
   copy:
-    src: "create_mysql"
-    dest: "/tmp/create_mysql"
+    src: create_mysql
+    dest: /tmp/create_mysql
+  become: true
 
 - name: barnyard2 | creating MySQL DBs
   mysql_db:
     name: "{{ item }}"
     state: present
+  become: true
   with_items:
-    - 'archive'
-    - 'snort'
+    - archive
+    - snort
 
 - name: barnyard2 | setting MySQL DB permissions
   mysql_user:
     user: "{{ snort_barnyard2_db_info.user }}"
     password: "{{ snort_barnyard2_db_info.pass }}"
     priv: "{{ item }}.*:USAGE/{{ item }}.*:ALL"
+  become: true
   with_items:
-    - 'archive'
-    - 'snort'
+    - archive
+    - snort
 
 - name: barnyard2 | checking if MySQL DB schema imported
   stat:
-    path: "/var/log/.db_schema_imported"
+    path: /var/log/.db_schema_imported
   register: db_schema_imported
 
 - name: barnyard2 | importing MySQL DB Schema
   mysql_db:
-    name: "snort"
+    name: snort
     state: import
-    target: "/tmp/create_mysql"
+    target: /tmp/create_mysql
+  become: true
   register: db_schema_import
   when: not db_schema_imported.stat.exists
 
 - name: barnyard2 | marking MySQL DB schema as imported
   file:
-    path: "/var/log/.db_schema_imported"
+    path: /var/log/.db_schema_imported
     state: touch
+  become: true
   when: db_schema_import.changed
 
 - name: barnyard2 | creating barnyard2 service
   template:
-    src: "etc/init.d/barnyard2.j2"
-    dest: "/etc/init.d/barnyard2"
+    src: lib/systemd/system/barnyard2.service.j2
+    dest: /lib/systemd/system/barnyard2.service
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  become: true
+  when: ansible_service_mgr == "systemd"
+
+- name: barnyard2 | creating barnyard2 service
+  template:
+    src: etc/init.d/barnyard2.j2
+    dest: /etc/init.d/barnyard2
     owner: root
     group: root
     mode: 0700
+  become: true
+  when: ansible_service_mgr == "SysV"
 
 - name: barnyard2 | starting and enabling barnyard2 service
   service:
-    name: "barnyard2"
+    name: barnyard2
     state: started
-    enabled: yes
+    enabled: true
+  become: true

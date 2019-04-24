@@ -1,0 +1,25 @@
+---
+- name: rabbitmq_extra_vhosts | Create vhosts
+  rabbitmq_vhost:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  with_items: "{{ rabbitmq_extra_vhosts }}"
+  run_once: "{{ rabbitmq_enable_clustering is defined and rabbitmq_enable_clustering }}"
+  register: rabbitmq_created_vhosts
+
+- name: rabbitmq_extra_vhosts | Check guest administrator is present
+  command: rabbitmqctl -q list_users
+  become: true
+  run_once: "{{ rabbitmq_enable_clustering is defined and rabbitmq_enable_clustering }}"
+  when: rabbitmq_created_vhosts.changed
+  changed_when: false
+  register: rabbitmq_existing_users
+
+- name: rabbitmq_extra_vhosts | Give access to new vhosts to guest administrator
+  command: "rabbitmqctl -q set_permissions -p {{ item['name'] }} guest '.*' '.*' '.*'"
+  become: true
+  run_once: "{{ rabbitmq_enable_clustering is defined and rabbitmq_enable_clustering }}"
+  with_items: "{{ rabbitmq_created_vhosts.results|selectattr('changed')|list }}"
+  when:
+    - item['state'] == 'present'
+    - rabbitmq_existing_users.stdout_lines | map('regex_search', '^guest\\s\\[.*administrator.*\\]$') | list | difference([None]) | length > 0

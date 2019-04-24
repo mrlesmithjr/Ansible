@@ -3,16 +3,16 @@
 graylog_config_graylog_server: true
 
 graylog_debian_package_info:
-  file: 'graylog-{{ graylog_version }}-repository_latest.deb'
-  url: 'https://packages.graylog2.org/repo/packages'
+  file: "{{ 'graylog-' + graylog_version|string + '-repository_latest.deb' }}"
+  url: https://packages.graylog2.org/repo/packages
 
-graylog_es_cluster_name: 'graylog'
+graylog_es_cluster_name: graylog
 
 # Defines if node should be a data node in the cluster...default is true
 graylog_es_data_node: true
 
 graylog_es_discovery_zen_ping_unicast_hosts:
-  - 'localhost'
+  - localhost
 
 # Defines if node should be a master node in the cluster...default is true
 graylog_es_master_node: true
@@ -22,23 +22,22 @@ graylog_es_network_host: 127.0.0.1
 graylog_es_replicas: 0
 graylog_es_shards: 4
 
-graylog_group: 'graylog'
+graylog_group: graylog
+
+graylog_http_bind_address: "{{ ansible_host + ':9000' }}"
 
 # Defines if Java Default JRE is installed
 # Best to use oracle-java-8
 graylog_install_default_java_jre: false
 
-graylog_message_journal_dir: '/data/journal'
+graylog_message_journal_dir: /data/journal
 graylog_message_journal_enabled: true
 
-graylog_mongodb_uri: 'mongodb://localhost/graylog'
+graylog_mongodb_uri: mongodb://localhost/graylog
 
 graylog_redhat_package_info:
-  file: 'graylog-{{ graylog_version }}-repository_latest.rpm'
-  url: 'https://packages.graylog2.org/repo/packages'
-
-# REST API listen URI. Must be reachable by other Graylog server nodes if you run a cluster
-graylog_rest_listen_uri: 'http://127.0.0.1:9000/api/'
+  file: "{{ 'graylog-' + graylog_version|string + '-repository_latest.rpm' }}"
+  url: https://packages.graylog2.org/repo/packages
 
 # Default is true unless installing multiple instances
 graylog_server_master: true
@@ -50,15 +49,12 @@ graylog_server_password_secret: []
 graylog_server_root_password: []
 
 # Define Syslog Input Protocol udp|tcp
-graylog_server_syslog_input_protocol: 'udp'
+graylog_server_syslog_input_protocol: udp
 
-graylog_user: 'graylog'
+graylog_user: graylog
 
 # Define Graylog Version to Install
-graylog_version: 2.2
+graylog_version: 3.0
 
 # Generate new pw using...pwgen -N 1 -s 96
-graylog_web_application_secret: 'X4S0oYP9DcGjgpX6uAGOfHS3NbB5OpSHWVKwQP94mJxaDCM3WPP0QP5zd8uqZs2tDBPiKET6r81IJEumQkqAk6WOnqKwvCu1'
-
-# Web interface listen URI.
-graylog_web_listen_uri: 'http://127.0.0.1:9000/'
+graylog_web_application_secret: X4S0oYP9DcGjgpX6uAGOfHS3NbB5OpSHWVKwQP94mJxaDCM3WPP0QP5zd8uqZs2tDBPiKET6r81IJEumQkqAk6WOnqKwvCu1

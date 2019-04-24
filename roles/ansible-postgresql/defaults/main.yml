@@ -2,18 +2,23 @@
 # defaults file for ansible-postgresql
 postgresql_config: false
 
-postgresql_data_dir: '/var/lib/postgresql/{{ postgresql_version }}/main'
+postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+
+# Defines any DBs to manage
+postgresql_dbs: []
+# - name: acme
+#   state: present
 
 postgresql_debian_pre_reqs:
-  - 'libpq-dev'
-  - 'python-dev'
-  - 'python-pip'
+  - "libpq-dev"
+  - "python-dev"
+  - "python-pip"
 
 postgresql_debian_repo_info:
-  key: 'https://www.postgresql.org/media/keys/ACCC4CF8.asc'
-  repo: 'deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release|lower }}-pgdg main'
+  key: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+  repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release|lower }}-pgdg main"
 
-postgresql_dynamic_shared_memory_type: 'posix'
+postgresql_dynamic_shared_memory_type: "posix"
 
 # Enables advertising the server's existence via Bonjour.
 postgresql_enable_bonjour: false
@@ -22,11 +27,11 @@ postgresql_enable_replication: false
 
 postgresql_enable_ssl: true
 
-postgresql_external_pid_file: '/var/run/postgresql/{{ postgresql_version }}-main.pid'
+postgresql_external_pid_file: "/var/run/postgresql/{{ postgresql_version }}-main.pid"
 
-postgresql_hba_file: '/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf'
+postgresql_hba_file: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
 
-postgresql_ident_file: '/etc/postgresql/{{ postgresql_version }}/main/pg_ident.conf'
+postgresql_ident_file: "/etc/postgresql/{{ postgresql_version }}/main/pg_ident.conf"
 
 # Specifies the TCP/IP address(es) on which the server is to listen for
 # connections from client applications.
@@ -36,7 +41,7 @@ postgresql_ident_file: '/etc/postgresql/{{ postgresql_version }}/main/pg_ident.c
 # The default value is localhost, which allows only local TCP/IP
 # "loopback" connections to be made
 postgresql_listen_addresses:
-  - 'localhost'
+  - "localhost"
   # - '*'
 
 # The TCP port the server listens on; 5432 by default.
@@ -66,28 +71,29 @@ postgresql_max_wal_size: 1GB
 postgresql_min_wal_size: 80MB
 
 postgresql_replication:
-  interface: 'enp0s8'
+  interface: "enp0s8"
   # master: "{{ groups[postgresql_replication_group][0] }}"
-  master: 'node0'
-  user: 'repluser'
+  master: "node0"
+  user: "repluser"
 
 # Define Ansible group which contains the hosts to setup replication
-postgresql_replication_group: 'postgres_replication'
+postgresql_replication_group: "postgres_replication"
 
 # Sets the amount of memory the database server uses for shared memory buffers.
 # The default is typically 128 megabytes (128MB)
 postgresql_shared_buffers: >
-                           {% if ansible_memtotal_mb > 1024 %}{{ (ansible_memtotal_mb|int * 0.25)|round|int }}MB
-                           {% else %}128MB
-                           {% endif %}
+  {% if ansible_memtotal_mb > 1024 %}{{ (ansible_memtotal_mb|int * 0.25)|round|int }}MB
+  {% else %}128MB
+  {% endif %}
 
 # Specifies the directory of the Unix-domain socket(s) on which the server
 # is to listen for connections from client applications
 postgresql_unix_socket_directories:
-  - '/var/run/postgresql'
+  - "/var/run/postgresql"
 
 # Define any db users to create
-postgresql_users: []
+postgresql_users:
+  []
   # - name: 'test'
   #   # db: 'test'
   #   password: 'test'
@@ -107,4 +113,4 @@ postgresql_wal_buffers: -1
 # written to WAL when full_page_writes is on or during a base backup. A
 # compressed page image will be decompressed during WAL replay.
 # The default value is off.
-postgresql_wal_compression: 'off'
+postgresql_wal_compression: "off"

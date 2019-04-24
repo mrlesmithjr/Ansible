@@ -13,3 +13,5 @@
 - include_tasks: config.yml
 
 - include_tasks: services.yml
+
+- include_tasks: client.yml

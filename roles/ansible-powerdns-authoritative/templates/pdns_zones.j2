@@ -1,9 +1,9 @@
 {
   "name":"{{ item }}",
-  "kind":"{{ pdns_zone_types }}",
+  "kind":"{{ pdns_auth_zone_types }}",
   "masters": [],
-{% if pdns_config_soa_edit_api %}
-  "soa_edit_api": "{{ pdns_soa_edit_api }}",
+{% if pdns_auth_config_soa_edit_api %}
+  "soa_edit_api": "{{ pdns_auth_soa_edit_api }}",
 {% endif %}
-  "nameservers": ["{{ pdns_nameservers|join (', ') }}"]
+  "nameservers": ["{{ pdns_auth_nameservers|join (', ') }}"]
 }

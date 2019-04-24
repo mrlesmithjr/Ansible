@@ -9,13 +9,13 @@
         # Add names of interfaces to listen on
         interfaces-config:
           interfaces:
-            - '*'
+            - "*"
             # - 'eth0'
             # - 'eth1'
-          dhcp-socket-type: 'raw'
+          dhcp-socket-type: raw
         # Use Memfile lease database backend to store leases in a CSV file.
         lease-database:
-          type: 'memfile'
+          type: memfile
           persist: true
           lfc-interval: 0
         # Setup reclamation of the expired leases and leases affinity.
@@ -30,48 +30,48 @@
         valid-lifetime: 4000
         # Below an example of the simple subnet declarations
         subnet4:
-          - subnet: '192.0.2.0/24'
-            next-server: '192.0.2.234'
+          - subnet: 192.0.2.0/24
+            next-server: 192.0.2.234
             pools:
-              - pool: '192.0.2.1 - 192.0.2.200'
+              - pool: "192.0.2.1 - 192.0.2.200"
             reservations:
-              - hw-address: '1a:1b:1c:1d:1e:1f'
-                ip-address: '192.0.2.202'
-          - subnet: '192.0.3.0/24'
+              - hw-address: "1a:1b:1c:1d:1e:1f"
+                ip-address: 192.0.2.202
+          - subnet: 192.0.3.0/24
             pools:
-              - pool: '192.0.3.1 - 192.0.3.200'
+              - pool: "192.0.3.1 - 192.0.3.200"
             relay:
-              ip-address: '10.0.0.1'
-          - subnet: '192.0.4.0/24'
+              ip-address: 10.0.0.1
+          - subnet: 192.0.4.0/24
             pools:
-              - pool: '192.0.4.1 - 192.0.4.200'
+              - pool: "192.0.4.1 - 192.0.4.200"
         option-data:
-          - name: 'domain-name-servers'
-            data: '8.8.8.8, 8.8.4.4'
-          - name: 'domain-name'
-            data: '{{ kea_dhcp_pri_domain_name }}'
-          - name: 'tftp-server-name'
-            data: 'tftp.{{ kea_dhcp_pri_domain_name }}'
-          - name: 'boot-file-name'
-            data: 'pxelinux.0'
+          - name: domain-name-servers
+            data: "8.8.8.8, 8.8.4.4"
+          - name: domain-name
+            data: "{{ kea_dhcp_pri_domain_name }}"
+          - name: tftp-server-name
+            data: "tftp.{{ kea_dhcp_pri_domain_name }}"
+          - name: boot-file-name
+            data: pxelinux.0
         dhcp-ddns:
           enable-updates: false
-          qualifying-suffix: '{{ kea_dhcp_pri_domain_name }}'
+          qualifying-suffix: "{{ kea_dhcp_pri_domain_name }}"
         # next-server: '0.0.0.0'
         control-socket:
-          socket-type: 'unix'
-          socket-name: '/var/run/kea.socket'
+          socket-type: unix
+          socket-name: /var/run/kea.socket
       # Logging configuration starts here. It tells Kea servers to store
       # all log messages (on severity INFO or more) in a file.
       # debuglevel variable is used on DEBUG level only.
       Logging:
         loggers:
-          - name: 'kea-dhcp4'
+          - name: kea-dhcp4
             output_options:
-              - output: '/var/log/kea-dhcp4.log'
-            severity: 'INFO'
+              - output: /var/log/kea-dhcp4.log
+            severity: INFO
             debuglevel: 0
-    pri_domain_name: 'test.vagrant.local'
+    pri_domain_name: test.vagrant.local
   roles:
     - role: ansible-kea-dhcp
   tasks:

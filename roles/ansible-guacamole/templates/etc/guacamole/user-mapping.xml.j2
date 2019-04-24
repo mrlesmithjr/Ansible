@@ -16,6 +16,11 @@
             <param name="security">{{ guacamole_rdp_security }}</param>
             <param name="disable-auth">{{ guacamole_rdp_disable_auth|lower }}</param>
 {%         endif %}
+{%         if connection['protocol'] == "vnc" %}
+{%           if connection['password'] is defined %}
+            <param name="password">{{ connection['password'] }}</param>
+{%           endif %}
+{%         endif %}
         </connection>
 {%       endfor %}
 {%     endif %}

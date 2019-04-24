@@ -1,47 +1,40 @@
-Role Name
-=========
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-An [Ansible] role that Configures /etc/hosts
+- [ansible-etc-hosts](#ansible-etc-hosts)
+  - [Build Status](#build-status)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
+  - [Author Information](#author-information)
 
-Requirements
-------------
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-None
+# ansible-etc-hosts
 
-Role Variables
---------------
+An [Ansible](https://www.ansible.com) role that Configures /etc/hosts
 
-```
----
-# defaults file for ansible-etc-hosts
-# Defines if all nodes in play should be added to each hosts /etc/hosts
-etc_hosts_add_all_hosts: false
+## Build Status
 
-# Defines if ipv6 info is included in /etc/hosts
-etc_hosts_enable_ipv6: true
+[![Build Status](https://travis-ci.org/mrlesmithjr/ansible-etc-hosts.svg?branch=master)](https://travis-ci.org/mrlesmithjr/ansible-etc-hosts)
 
-# Defines your primary dns suffix
-etc_hosts_pri_dns_name: 'vagrant.local'
-
-# Defines if node has static IP.
-etc_hosts_static_ip: false
-
-# Defines if ansible_host is used for defining hosts
-etc_hosts_use_ansible_ssh_host: true
-
-# Defines if ansible_default_ipv4.address is used for defining hosts
-etc_hosts_use_default_ip_address: false
-```
-
-Dependencies
-------------
+## Requirements
 
 None
 
-Example Playbook
-----------------
+## Role Variables
 
-```
+[defaults/main.yml](defaults/main.yml)
+
+## Dependencies
+
+None
+
+## Example Playbook
+
+```yaml
 - hosts: all
   become: true
   vars:
@@ -49,17 +42,14 @@ Example Playbook
     - role: ansible-etc-hosts
 ```
 
-License
--------
+## License
 
-BSD
+MIT
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- @mrlesmithjr
-- http://everythingshouldbevirtual.com
-- mrlesmithjr [at] gmail.com
 
-[Ansible]: <https://www.ansible.com>
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)

@@ -1,0 +1,9 @@
+---
+- name: dbs | Managing Databases
+  postgresql_db:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  become: true
+  become_user: postgres
+  with_items: "{{ postgresql_dbs }}"
+  when: postgresql_dbs is defined

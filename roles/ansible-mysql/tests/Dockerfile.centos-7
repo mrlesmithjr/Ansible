@@ -17,7 +17,10 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == system
     rm -f /lib/systemd/system/basic.target.wants/*;\
     rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-RUN pip install ansible
+RUN pip install enum34 ipaddress wheel && \
+    pip install ansible ansible-lint
+
+COPY .ansible-lint /
 
 VOLUME ["/sys/fs/cgroup"]
 

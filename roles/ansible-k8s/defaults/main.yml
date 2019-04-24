@@ -37,7 +37,7 @@ k8s_helm_package: "helm-v{{ k8s_helm_version }}-linux-{{ k8s_helm_architecture }
 
 k8s_helm_url: https://kubernetes-helm.storage.googleapis.com
 
-k8s_helm_version: 2.9.0
+k8s_helm_version: 2.10.0
 
 k8s_package_url: https://packages.cloud.google.com
 
@@ -59,4 +59,4 @@ k8s_token_file: /etc/kubernetes/.k8s_token
 k8s_users:
   - user: vagrant
 
-k8s_version: 1.10.2
+k8s_version: 1.11.2

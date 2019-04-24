@@ -1,24 +1,26 @@
 ---
 # Upgrading these packages to ensure a successful Ansible install
-- name:       python_modules | Updating Python Modules
+- name: python_modules | Updating Python Modules
   pip:
-    name:     "{{ item }}"
-    state:    latest
-  become:     true
-  with_items:
-    - pip
-    - cffi
-    - pyOpenSSL
+    name: ["pip", "cffi", "pyOpenSSL"]
+    state: latest
+  become: true
+  register: result
+  until: result is successful
 
-- name:       python_modules | Installing Ansible {{ awx['ansible_ver'] }}
+- name: python_modules | Installing Ansible {{ awx['ansible_ver'] }}
   pip:
-    name:     ansible
-    state:    present
-    version:  "{{ awx['ansible_ver'] }}"
-  become:     true
+    name: ansible
+    state: present
+    version: "{{ awx['ansible_ver'] }}"
+  become: true
+  register: result
+  until: result is successful
 
-- name:       python_modules | Installing docker-py
+- name: python_modules | Installing docker-py
   pip:
-    name:     docker-py
-    state:    present
-  become:     true
+    name: docker-py
+    state: present
+  become: true
+  register: result
+  until: result is successful

@@ -70,6 +70,7 @@ apt_sources_debian_distribution: 'stable'
 
 # Specific to Debian not Ubuntu
 apt_sources_debian_repository_url: 'http://deb.debian.org'
+apt_sources_debian_debug_repository_url: 'http://debug.mirrors.debian.org'
 
 apt_sources_enable_backports: true
 
@@ -78,6 +79,8 @@ apt_sources_enable_proposed: false
 apt_sources_enable_security: true
 
 apt_sources_enable_updates: true
+
+apt_sources_enable_debug: false
 
 # Specific to Ubuntu not Debian
 apt_sources_ubuntu_components:

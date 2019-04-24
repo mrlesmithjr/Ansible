@@ -1,0 +1,38 @@
+---
+- name: arch | Capture Kernel Info Raw
+  set_fact:
+    kernel_info_raw: "{{ ansible_kernel.split('.') }}"
+
+- name: arch | Setting Kernel Info
+  set_fact:
+    kernel_info: "{{ kernel_info_raw[0] + kernel_info_raw[1] }}"
+
+- name: arch | Installing linux-headers
+  pacman:
+    name: "{{ 'linux' + kernel_info + '-headers' }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful
+
+- name: arch | Installing VirtualBox
+  pacman:
+    name:
+      [
+        "{{ 'linux' + kernel_info + '-virtualbox-host-modules' }}",
+        "virtualbox-guest-iso",
+        "virtualbox",
+      ]
+    state: present
+  become: true
+  register: virtualbox_installed
+  until: virtualbox_installed is successful
+
+# May need to reboot if new kernel installed
+- name: arch | Reload Virtualbox Modules
+  command: /usr/bin/vboxreload
+  #   modprobe:
+  #     name: vboxdrv
+  #     state: present
+  become: true
+  when: virtualbox_installed['changed']

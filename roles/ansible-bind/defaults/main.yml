@@ -2,17 +2,17 @@
 # defaults file for ansible-bind
 # Define acls for defining ip addresses or networks allowed to query bind
 bind_acls: []
-  # - name: lan
-  #   networks:
-  #     - 10.0.0.0/8
-  #     - localhost
-  #     - localnets
-  # - name: wireless
-  #   networks:
-  #     - 172.16.0.0/16
-  # - name: dmz
-  #   networks:
-  #     - 192.168.0.0/16
+# - name: lan
+#   networks:
+#     - 10.0.0.0/8
+#     - localhost
+#     - localnets
+# - name: wireless
+#   networks:
+#     - 172.16.0.0/16
+# - name: dmz
+#   networks:
+#     - 192.168.0.0/16
 
 # Defines if bind should query root-hints servers for unknown queries
 # Set bind_forwarding_server: false
@@ -20,7 +20,8 @@ bind_caching_server: true
 
 bind_config: false
 
-bind_forward_zones: []
+bind_forward_zones:
+  []
   # - zone: "{{ bind_pri_domain_name }}"
   #   expire: 2419200
   #   hostmaster: "hostmaster.{{ bind_pri_domain_name }}"
@@ -69,7 +70,8 @@ bind_forward_zones: []
 bind_forwarding_server: false
 
 # Defines forwarding addresses to be used if bind_forwarding_server: true
-bind_forwarders: []
+bind_forwarders:
+  []
   # - 8.8.8.8
   # - 8.8.4.4
 
@@ -79,7 +81,8 @@ bind_manage_zones: false
 bind_masters_group: bind-masters
 bind_pri_domain_name: vagrant.local
 
-bind_reverse_zones: []
+bind_reverse_zones:
+  []
   # - zone: 192.168
   #   expire: 2419200
   #   hostmaster: "hostmaster.{{ bind_pri_domain_name }}"

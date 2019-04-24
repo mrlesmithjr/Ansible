@@ -2,10 +2,12 @@
 # handlers file for ansible-gocd
 - name: restart go-server
   service:
-    name: "go-server"
+    name: go-server
     state: restarted
+  become: true
 
 - name: restart go-agent
   service:
-    name: "go-agent"
+    name: go-agent
     state: restarted
+  become: true

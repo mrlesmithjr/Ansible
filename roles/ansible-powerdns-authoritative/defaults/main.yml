@@ -2,192 +2,205 @@
 # defaults file for ansible-powerdns-authoritative
 
 # Defines if Dynamic DNS is allowed
-pdns_allow_ddns_updates: false
+pdns_auth_allow_ddns_updates: false
 
 # Defines subnet to allow DDNS updates from if allowed
-pdns_allow_ddns_updates_from: 0.0.0.0/0
+pdns_auth_allow_ddns_updates_from: 0.0.0.0/0
 
 #Defines if additional nameservers should be notified of zone updates.
-pdns_also_notify:
+pdns_auth_also_notify:
   configure: false
   notify_ips:
     - 192.168.200.201
     - 192.168.200.202
 
 # Defines the API Key
-pdns_api_key: 'changeme'
+pdns_auth_api_key: changeme
 
 # Defines the API URL
-pdns_api_url: 'http://127.0.0.1:{{ pdns_webserver_port }}/servers/localhost/zones'
+pdns_auth_api_url: "http://127.0.0.1:{{ pdns_auth_webserver_port }}/servers/localhost/zones"
+
+# Defines the Carbon server info for metrics
+pdns_auth_carbon_info:
+  interval: 30
+  ourname: "{{ ansible_hostname }}"
+  # Must be defined as IP otherwise will not work
+  server: 192.168.200.201
+
+# Set to true if setting up Master/Slave
+# Otherwise Master zones will not update their SOA in order to transfer
+pdns_auth_config_soa_edit_api: false
+
+# Defines if dns zones should be created...pdns_auth_fwd_zones
+pdns_auth_create_pdns_zones: false
+
+# Defines if dns records should be created/updated
+pdns_auth_create_records: false
+
+# Defines the curl header for managing records via API URL
+pdns_auth_curl_header: "-H 'X-API-Key: {{ pdns_auth_api_key }}'"
+
+# Defines hosts where {{ pdns_auth_db_user }} can login from
+pdns_auth_db_allow_access_from_hosts:
+  - "{{ ansible_hostname }}"
+  - 127.0.0.1
+  - "::1"
+  - localhost
+  # Allows from everywhere
+  - "%"
+
+# Defines if backend db for pdns is clustered
+pdns_auth_db_cluster: false
+pdns_auth_db_host: localhost
+pdns_auth_db_name: powerdns
+pdns_auth_db_pass: powerdns
+pdns_auth_db_user: powerdns
+
+pdns_auth_default_soa_mail: "hostmaster.{{ pdns_auth_pri_domain_name }}"
+pdns_auth_default_soa_name: "{{ ansible_hostname + '.' + pdns_auth_pri_domain_name }}"
+
+pdns_auth_download_url: https://downloads.powerdns.com/releases
+
+# Defines if Anycast networking should be enabled
+pdns_auth_enable_anycast: false
+
+# Defines if API should be enabled
+pdns_auth_enable_api: true
+
+# Defines is Carbon metrics are enabled for monitoring statistics
+pdns_auth_enable_carbon_metrics: false
+
+# Defines if DNS logging should be enabled
+pdns_auth_enable_logging: false
+
+# Defines if recursive lookups should be enabled
+pdns_auth_enable_recursive_lookups: false
+
+# Defines if web server should be enabled
+pdns_auth_enable_web_server: false
+
+# Defines the DNS forward zones to create if pdns_auth_create_pdns_zones is true
+pdns_auth_fwd_zones: []
+# - "_msdcs.{{ pdns_auth_pri_domain_name }}"
+# - "_sites.{{ pdns_auth_pri_domain_name }}"
+# - "_tcp.{{ pdns_auth_pri_domain_name }}"
+# - "_udp.{{ pdns_auth_pri_domain_name }}"
+# - "{{ pdns_auth_pri_domain_name }}"
+
+pdns_auth_json_interface: true
+
+# Defines if PDNS will listen on all interfaces
+pdns_auth_listen_all_interfaces: true
+
+# Defines if node should perform as PDNS Master
+pdns_auth_master: false
+
+# Define nameservers to use when creating zones..
+pdns_auth_nameservers:
+  - "ns1.{{ pdns_auth_pri_domain_name }}"
+  - "ns2.{{ pdns_auth_pri_domain_name }}"
 
 # Defines the listen port
 pdns_auth_port: 53
 
-# Defines the Carbon server info for metrics
-pdns_carbon_info:
-  interval: 30
-  ourname: '{{ ansible_hostname }}'
-  server: 192.168.200.201 # Must be defined as IP otherwise will not work
-
-# Set to true if setting up Master/Slave
-# Otherwise Master zones will not update their SOA in order to transfer
-pdns_config_soa_edit_api: false
-
-# Defines if dns records should be created/updated
-pdns_create_pdns_records: false
-
-# Defines if dns zones should be created...pdns_fwd_zones and pdns_fwd_zones
-pdns_create_pdns_zones: false
-
-# Defines the curl header for managing records via API URL
-pdns_curl_header: "-H 'X-API-Key: {{ pdns_api_key }}'"
-
-# Defines hosts where {{ pdns_db_user }} can login from
-pdns_db_allow_access_from_hosts:
-  - '{{ ansible_hostname }}'
-  - 127.0.0.1
-  - '::1'
-  - 'localhost'
- # Allows from everywhere
-  - '%'
-
-# Defines if backend db for pdns is clustered
-pdns_db_cluster: false
-
-# Defines the host where the MySQL DB resides
-pdns_db_host: 'localhost'
-pdns_db_name: 'powerdns'
-pdns_db_pass: 'powerdns'
-pdns_db_user: 'powerdns'
-pdns_default_soa_mail: 'hostmaster.{{ pri_domain_name }}'
-pdns_default_soa_name: '{{ ansible_hostname }}.{{ pri_domain_name }}'
-pdns_download_url: 'https://downloads.powerdns.com/releases'
-
-
-# Defines if Anycast networking should be enabled
-pdns_enable_pdns_anycast: false
-
-# Defines if API should be enabled
-pdns_enable_pdns_api: true
-
-# Defines is Carbon metrics are enabled for monitoring statistics
-pdns_enable_pdns_carbon_metrics: false
-
-# Defines if recursive lookups should be enabled
-pdns_enable_pdns_recursive_lookups: false
-
-# Defines if DNS logging should be enabled
-pdns_enable_pdns_server_logging: false
-
-# Defines if web server should be enabled
-pdns_enable_pdns_web_server: false
-
-# Defines the DNS forward zones to create if pdns_create_pdns_zones is true
-pdns_fwd_zones: []
-  # - '_msdcs.{{ pri_domain_name }}'
-  # - '_sites.{{ pri_domain_name }}'
-  # - '_tcp.{{ pri_domain_name }}'
-  # - '_udp.{{ pri_domain_name }}'
-  # - '{{ pri_domain_name }}'
-
-pdns_repo_baseurl: 'http://repo.powerdns.com'
-pdns_repo_gpgkey: 'https://repo.powerdns.com/FD380FBB-pub.asc'
-pdns_json_interface: true
-
-# Defines if PDNS will listen on all interfaces
-pdns_listen_all_interfaces: true
-
-# Defines if node should perform as PDNS Master
-pdns_master: false
-
-# Define nameservers to use when creating zones..
-pdns_nameservers:
-  - 'ns1.{{ pri_domain_name }}'
-  - 'ns2.{{ pri_domain_name }}'
+# Defines primary domain name of environment
+pdns_auth_pri_domain_name: example.org
 
 # Define DNS records to create/update
-pdns_records: []
-  # - name: 'vcsa'
-  #   zone: '{{ pri_domain_name }}'
-  #   type: 'A'
-  #   changetype: 'REPLACE'
-  #   content: 10.0.101.40
-  #   disabled: false
-  #   ttl: 3600
-  #   priority: 0
-  # - name: 'logstash'
-  #   zone: '{{ pri_domain_name }}'
-  #   type: 'A'
-  #   changetype: 'REPLACE'
-  #   content: 10.0.101.60
-  #   disabled: false
-  #   ttl: 3600
-  #   priority: 0
-  # - name: 'dns'
-  #   zone: '{{ pri_domain_name }}'
-  #   type: 'A'
-  #   changetype: 'REPLACE'
-  #   content: 192.168.70.241
-  #   disabled: false
-  #   ttl: 3600
-  #   priority: 0
-  # - name: 'ntp1'
-  #   zone: '{{ pri_domain_name }}'
-  #   type: 'CNAME'
-  #   changetype: 'REPLACE'
-  #   content: 'dns.{{ pri_domain_name }}'
-  #   disabled: false
-  #   ttl: 3600
-  #   priority: 0
+pdns_auth_records: []
+# - name: vcsa
+#   zone: "{{ pdns_auth_pri_domain_name }}"
+#   type: A
+#   changetype: REPLACE
+#   content: 10.0.101.40
+#   disabled: false
+#   ttl: 3600
+#   priority: 0
+# - name: logstash
+#   zone: "{{ pdns_auth_pri_domain_name }}"
+#   type: A
+#   changetype: REPLACE
+#   content: 10.0.101.60
+#   disabled: false
+#   ttl: 3600
+#   priority: 0
+# - name: dns
+#   zone: "{{ pdns_auth_pri_domain_name }}"
+#   type: A
+#   changetype: REPLACE
+#   content: 192.168.70.241
+#   disabled: false
+#   ttl: 3600
+#   priority: 0
+# - name: ntp1
+#   zone: "{{ pdns_auth_pri_domain_name }}"
+#   type: CNAME
+#   changetype: REPLACE
+#   content: "dns.{{ pdns_auth_pri_domain_name }}"
+#   disabled: false
+#   ttl: 3600
+#   priority: 0
 
 # Defines PDNS recursor host
-pdns_recursor_host: 127.0.0.1
+pdns_auth_recursor_host: 127.0.0.1
 
 # Defines PDNS recursor port
-pdns_recursor_port: 5300
+pdns_auth_recursor_port: 5300
 
-# Defines the DNS reverse zones to create if pdns_create_pdns_zones is true
-pdns_rev_zones: []
-  # - '0.0.10.in-addr.arpa'
-  # - '2.0.10.in-addr.arpa'
-  # - '101.0.10.in-addr.arpa'
-  # - '106.0.10.in-addr.arpa'
-  # - '107.0.10.in-addr.arpa'
-  # - '110.0.10.in-addr.arpa'
-  # - '125.0.10.in-addr.arpa'
-  # - '10.10.10.in-addr.arpa'
-  # - '24.16.172.in-addr.arpa'
-  # - '1.168.192.in-addr.arpa'
-  # - '70.168.192.in-addr.arpa'
-  # - '200.168.192.in-addr.arpa'
+pdns_auth_repo_baseurl: http://repo.powerdns.com
+pdns_auth_repo_gpgkey: https://repo.powerdns.com/FD380FBB-pub.asc
+
+# These are going to be temporary
+pdns_auth_resolv_conf_nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Defines the DNS reverse zones to create if pdns_auth_create_pdns_zones is true
+pdns_auth_rev_zones: []
+# - 0.0.10.in-addr.arpa
+# - 2.0.10.in-addr.arpa
+# - 101.0.10.in-addr.arpa
+# - 106.0.10.in-addr.arpa
+# - 107.0.10.in-addr.arpa
+# - 110.0.10.in-addr.arpa
+# - 125.0.10.in-addr.arpa
+# - 10.10.10.in-addr.arpa
+# - 24.16.172.in-addr.arpa
+# - 1.168.192.in-addr.arpa
+# - 70.168.192.in-addr.arpa
+# - 200.168.192.in-addr.arpa
+
+# This translates to 4.1 as they use shortened versions for repos
+pdns_auth_short_version: 41
 
 # Defines version to install
 # To install 3.4.10-1 change to 3.4.10-1
 # To install 4.x change to 4.x
-pdns_server_version: '4.x'
+pdns_auth_version: 4.x
 
 # Defines if node should perform as PDNS Slave
-pdns_slave: false
-pdns_slaves:
+pdns_auth_slave: false
+
+pdns_auth_slaves:
   - 172.28.128.4/32
   - 172.28.128.6/32
-pdns_webserver_address: 0.0.0.0
-pdns_webserver_allow: '0.0.0.0/0,::/0'
-pdns_webserver_password: 'changeme'
 
+pdns_auth_soa_edit_api: INCEPTION-INCREMENT
+
+# Defines whether systemd-resolved service should be stopped/disabled
+pdns_auth_systemd_resolved_disable: true
+
+pdns_auth_webserver_address: 0.0.0.0
+pdns_auth_webserver_allow: "0.0.0.0/0,::/0"
+pdns_auth_webserver_password: changeme
 # Defines API Webserver port
-pdns_webserver_port: 8081
+pdns_auth_webserver_port: 8081
 
 # Defines zone types to create using API
 # Native,Master,Slave
 # Native should be used by default...
-pdns_zone_types: 'Native'
+pdns_auth_zone_types: Native
 
 # Defines the folder to create locally that will contain the records and
 # zones to be created by pdns_records.yml and pdns_zones.yml
-pdns_zones_dir: 'pdns_zones'
-
-# Defines primary domain name of environment
-pri_domain_name: 'example.org'
-
-pdns_soa_edit_api: 'INCEPTION-INCREMENT'
+pdns_auth_zones_dir: pdns_zones
