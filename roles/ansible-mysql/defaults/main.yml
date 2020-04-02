@@ -1,7 +1,7 @@
 ---
 # defaults file for ansible-mysql
 
-# Defines if mysql should listen on loopback (default) or allow remove connections
+# Defines if mysql should listen on loopback (default) or allow remote connections
 mysql_allow_remote_connections: false
 
 # Defines hosts where root can login from
