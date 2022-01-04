@@ -21,3 +21,4 @@
   command: "/usr/bin/rescan-scsi-bus.sh"
   become: true
   changed_when: False
+  ignore_errors: true
