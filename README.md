@@ -1,3 +1,13 @@
+> [!CAUTION]
+> ## ⚠️ This Repository Is Archived
+> 
+> This monolithic Ansible collection is no longer maintained. It has been superseded by individual, actively-maintained role repositories.
+> 
+> Find the current roles at: [github.com/mrlesmithjr?tab=repositories&q=ansible-](https://github.com/mrlesmithjr?tab=repositories&q=ansible-)
+> 
+> **Archived:** 2026-03-25
+> **Reason:** Legacy collection replaced by per-role repos with modern CI, testing, and dependency management.
+
 # Ansible Playbooks and Roles
 
 A comprehensive collection of Ansible playbooks, roles, and automation examples for infrastructure management. This repository serves as a reference implementation and learning resource for Ansible automation.
